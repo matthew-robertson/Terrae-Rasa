@@ -1,0 +1,20 @@
+package net.dimensia.src;
+
+public class ChestLootHelper
+{
+	public ItemStack[] getLowLevelChest_SurfaceWorld()
+	{
+		return null;
+	}
+	
+	public ItemStack[] getHighLevelChest_SurfaceWorld()
+	{
+		return null;
+	}
+	
+	public ItemStack[] getDungeonLevelChest_SurfaceWorld()
+	{
+		return null;
+	}
+	
+}

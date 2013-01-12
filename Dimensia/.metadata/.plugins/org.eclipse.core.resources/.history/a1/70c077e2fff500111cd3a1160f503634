@@ -1,0 +1,122 @@
+package net.dimensia.src;
+
+import java.util.Random;
+
+public class AIManager {
+	public static void AISpeech(String s){
+		//Flesh this out once displaying text works properly
+		System.out.println(s);
+	}
+	
+	public static void AIWander(World world, EntityLiving npc){
+		//If there are no values set, pick a direction and distance
+		Random gen = new Random();
+		if (npc.wanderLeft <= 0 && npc.wanderRight <= 0){
+			int r = gen.nextInt(10);
+			if (r == 1){
+				r = gen.nextInt(2);
+				if (r == 0){
+					npc.wanderLeft = gen.nextInt(10);				
+				}
+				else{
+					npc.wanderRight = gen.nextInt(10);
+				}
+			}
+			
+		}
+		npc.ticksSinceLastWander++;
+		//If there is a drop of 2 or more blocks to the direction of movement, and the npc is not in the air
+		if (((!world.getBlockGenerate((int)(npc.x + npc.width) / 6, (int)(npc.y + npc.height) / 6 + 1).getIsSolid() && npc.wanderRight > 0)
+			|| (!world.getBlockGenerate((int)(npc.x) / 6 - 1, (int)(npc.y + npc.height) / 6 + 1).getIsSolid() && npc.wanderLeft > 0)) 
+			&& (world.getBlockGenerate((int)(npc.x + npc.width) / 6 - 1, (int)(npc.y + npc.height) / 6 + 1).getIsSolid() && world.getBlockGenerate((int)(npc.x) / 6, (int)(npc.y + npc.height) / 6 + 1).getIsSolid())){
+			npc.wanderRight = 0;
+			npc.wanderLeft = 0;
+		}
+		//System.out.println(world.getBlockGenerate((int)(npc.x + npc.width) / 6, (int)(npc.y + npc.height) / 6 - 1).getBlockName());
+		if (npc.ticksSinceLastWander >= 2){
+			if ((isJumpPossible(world, npc, true) && npc.wanderRight > 0) || isJumpPossible(world, npc, false) && npc.wanderLeft > 0 ){
+			/*if ((world.getBlockGenerate((int)(npc.x + npc.width) / 6, (int)(npc.y + npc.height) / 6 - 1).getIsSolid() && npc.wanderRight > 0)
+				|| (world.getBlockGenerate((int)(npc.x) / 6 - 1, (int)(npc.y + npc.height) / 6 - 1).getIsSolid() && npc.wanderLeft > 0)){*/
+				npc.hasJumped();
+			}
+			if (npc.wanderRight > 0){
+				npc.moveEntityRight(world);
+				npc.wanderRight -= npc.baseSpeed * npc.movementSpeedModifier;
+			}
+			else if (npc.wanderLeft > 0){			
+				npc.moveEntityLeft(world);
+				npc.wanderLeft -= npc.baseSpeed * npc.movementSpeedModifier;
+			}
+			npc.ticksSinceLastWander = 0;
+		}
+	}
+	/**
+	 * Launch a projectile at a provided angle
+	 * @param world the current world
+	 * @param npc the npc launching the projectile
+	 * @param angle the angle to fire at
+	 * @param projectile the projectile to launch
+	 */
+	public static void AIProjectile(World world, EntityLiving npc, int angle, EntityProjectile projectile){
+		npc.launchProjectile(world, angle, projectile);
+		npc.ticksSinceLastProjectile = 0;
+	}
+	
+	/**
+	 * launch a projectile to hit a specific target point. Improve to account for gravity later.
+	 * @param npc to launch the projectile
+	 * @param x location of the target
+	 * @param y location of the target
+	 */
+	public static void AIProjectile(World world, EntityLiving npc, int x, int y, EntityProjectile projectile){
+		int angle = MathHelper.angleMousePlayer(x, y, npc.x, npc.y) - 90;
+		if (angle < 0){
+			angle += 360;
+		}
+		npc.launchProjectile(world, angle, projectile);
+		npc.ticksSinceLastProjectile = 0;
+	}
+	
+	public static boolean isJumpPossible(World world, EntityLiving npc, boolean direction){
+		int maxBlockHeight = 0;
+		int blockHeight = 0;
+		//If checking the right side
+		if (direction){
+			//Check all the blocks in a line up to the maximum jump height + the npc's block height
+			for (int i = 0; i <= npc.upwardJumpHeight + npc.height / 6; i++){
+				 if (!world.getBlockGenerate((int)(npc.x + npc.width) / 6, (int)(npc.y + npc.height) / 6 - 1 - i).getIsSolid()){
+					 blockHeight++;
+					 if (blockHeight > maxBlockHeight){
+						 maxBlockHeight = blockHeight;
+					 }
+				 }
+				 else{
+					 blockHeight = 0;
+				 }
+				 if (maxBlockHeight >= npc.blockHeight){
+					 return true;
+				 }
+			}
+		}
+		//if checking the left side
+		else if (!direction){
+			//Check all the blocks in a line up to the maximum jump height + the npc's block height
+			for (int i = 0; i <= npc.upwardJumpHeight + npc.height / 6; i++){
+				 if (!world.getBlockGenerate((int)(npc.x - 1) / 6, (int)(npc.y + npc.height) / 6 - 1 - i).getIsSolid()){
+					 blockHeight++;
+					 if (blockHeight > maxBlockHeight){
+						 maxBlockHeight = blockHeight;
+					 }
+				 }
+				 else{
+					 blockHeight = 0;
+				 }
+				 if (maxBlockHeight >= npc.blockHeight){
+					 return true;
+				 }
+			}
+		}
+		return false;
+	}
+	
+}

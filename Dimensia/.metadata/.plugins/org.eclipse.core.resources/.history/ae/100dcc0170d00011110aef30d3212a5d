@@ -1,0 +1,17 @@
+package net.dimensia.src;
+
+public class StatusEffectAttackSpeedBuff extends StatusEffect
+{
+	public StatusEffectAttackSpeedBuff(int durationSeconds, int tier) 
+	{
+		super(durationSeconds, tier);
+	}
+	
+	public void applyInitialEffect(EntityLiving entity)
+	{	
+	}
+	
+	public void removeInitialEffect(EntityLiving entity)
+	{	
+	}
+}

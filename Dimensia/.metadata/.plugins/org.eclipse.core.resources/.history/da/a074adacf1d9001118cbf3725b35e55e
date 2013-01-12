@@ -1,0 +1,93 @@
+package net.dimensia.src;
+
+public class WorldGenCave {
+
+	public WorldGenCave(World cave){
+		generateBase(cave);
+		count = 0;
+		dungeonGen(cave);
+	}
+	
+	private World generateBase(World cave){
+		for( int i = 0; i <= cave.getWidth(); i++){
+			for (int j = 0; j <= cave.getHeight(); j++){
+				if (i == 0 || j == 0 || i == cave.getWidth() || j == cave.getHeight()){
+					cave.setBlockGenerate(Block.adminium, i, j);
+				}
+				else{
+					cave.setBlockGenerate(Block.dirt, i, j);
+				}
+			}
+		}
+		return cave;
+	}
+	
+	private World dungeonGen(World cave){
+		int empty = 0;
+		for (int i = cave.getHeight() - 1; i >= 1; i--){ //Go through the height
+			for (int j = 1; j < cave.getWidth() - 1; j++){ //go through the width
+				empty = (int)(Math.random()*100+1); //Select if the cell should be emptied
+				if (empty <= 40){ //If the number is beneath the cutoff
+					cave.setBlockGenerate(Block.air, j, i); //Empty the cell
+					cave.setBlockGenerate(Block.air, j+1, i);						
+				}
+			}
+		}	
+			cellauto(cave); //Run the Celluar Automata function to hollow/smooth out caves
+			cellauto(cave); //Run the Celluar Automata function to hollow/smooth out caves
+			cellauto(cave); //Run the Celluar Automata function to hollow/smooth out caves
+		return cave;
+	}
+
+	private void cellauto(World cave){
+		int solid = 0, choice = 0;
+		count ++;
+		for (int i = cave.getHeight() - 1; i > 0; i--){ //Go through the height
+			for (int j = 1; j < cave.getWidth() - 1; j++){ //go through the width
+				solid = 0; //Reset the solid counter
+				//Figure out how many solid blocks there are in a 3x3 area
+				for(int k = i - 1; k <= i + 1; k++){ //Height
+					for(int l = j - 1; l <= j + 1; l++){ //Width
+						if (cave.getBlockGenerate(l, k) != Block.air) solid++; //If the block is solid, add to the count
+					}
+				}					
+				if (solid >= 5 || (solid == 0 && count <= 2)){ //if there is 5 or more walls or if there are 0 walls and it is the first 1 iterations
+					if (cave.getBlockGenerate(j, i) == Block.air){ //If the cell is currently empty
+						choice = (int)(Math.random() * 100 + 1); //select which block
+						if (i > (int)(cave.getHeight() / 3 * 2)){	//If the current cell is in the bottom third of the map							
+							if (choice < 75){ //75% chance of stone
+								cave.setBlockGenerate(Block.stone, j, i); //Fill cell with stone
+							}
+							else{ //25% chance of dirt
+								cave.setBlockGenerate(Block.dirt, j, i); //Fill cell with dirt
+							}
+						}
+						else{ //If the current cell is in the top two thirds
+							if (cave.getBlockGenerate(j, i-1) == Block.air){
+								if (choice < 80){ //80% chance of dirt
+									cave.setBlockGenerate(Block.dirt, j, i); //Fill cell with dirt
+								}
+								else{ //20% Chance of stone
+									cave.setBlockGenerate(Block.stone, j, i); //Fill cell with stone
+								}
+							}
+							else{
+								if (choice < 30){ //30% chance of dirt
+									cave.setBlockGenerate(Block.dirt, j, i); //Fill cell with dirt
+								}
+								else{ //70% Chance of stone
+									cave.setBlockGenerate(Block.stone, j, i); //Fill cell with stone
+								}
+							}
+						}						
+					}
+				}
+				else{ //If there are less than 5 walls
+					cave.setBlockGenerate(Block.air, j, i); //Empty the cell
+				}
+			}
+		}
+	}
+	
+	private int count;
+}

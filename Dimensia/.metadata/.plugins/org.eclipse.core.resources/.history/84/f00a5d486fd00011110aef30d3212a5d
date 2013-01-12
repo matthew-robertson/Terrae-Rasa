@@ -1,0 +1,10 @@
+package net.dimensia.src;
+
+public class StatusEffectDodgeBuff extends StatusEffect
+{
+	public StatusEffectDodgeBuff(int durationSeconds, int tier)
+	{
+		super(durationSeconds, tier);
+	}
+
+}

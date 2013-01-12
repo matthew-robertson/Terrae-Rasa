@@ -1,0 +1,14 @@
+package net.dimensia.src;
+
+public class StatusEffectFatalWounds extends StatusEffect
+{
+	public StatusEffectFatalWounds(int durationSeconds, int tier) 
+	{
+		super(durationSeconds, tier);
+	}
+	
+	public void removeInitialEffect(EntityLiving entity)
+	{
+		entity.health = 0;
+	}
+}

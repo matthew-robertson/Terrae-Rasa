@@ -1,0 +1,13 @@
+package net.dimensia.src;
+
+public class StatusEffectStunned 
+{
+	public void applyInitialPotionEffect(EntityLiving entity)
+	{	
+	}
+	
+	public void removeInitialPotionEffect(EntityLiving entity)
+	{	
+	}
+
+}

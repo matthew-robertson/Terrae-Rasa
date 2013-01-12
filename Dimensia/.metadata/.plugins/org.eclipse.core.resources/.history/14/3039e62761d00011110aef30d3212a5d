@@ -1,0 +1,19 @@
+package net.dimensia.src;
+
+public class StatusEffectDazed extends StatusEffect
+{
+	public StatusEffectDazed(int durationSeconds, int tier) 
+	{
+		super(durationSeconds, tier);
+	}
+
+	public void applyInitialPotionEffect(EntityLiving entity)
+	{	
+		entity.movementSpeedModifier *= 0.5f;
+	}
+	
+	public void removeInitialPotionEffect(EntityLiving entity)
+	{	
+		entity.movementSpeedModifier *= 2.0f;
+	}
+}

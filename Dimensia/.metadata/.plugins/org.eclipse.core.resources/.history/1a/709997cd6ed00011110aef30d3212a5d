@@ -1,0 +1,18 @@
+package net.dimensia.src;
+
+public class StatusEffectDamageBuff extends StatusEffect
+{
+	public StatusEffectDamageBuff(int durationSeconds, int tier) 
+	{
+		super(durationSeconds, tier);
+	}
+
+	public void applyInitialEffect(EntityLiving entity)
+	{
+		
+	}
+	
+	public void removeInitialEffect(EntityLiving entity)
+	{	
+	}
+}

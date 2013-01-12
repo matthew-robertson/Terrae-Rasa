@@ -1,0 +1,53 @@
+package net.dimensia.src;
+
+import java.util.Random;
+
+public class ChestLootHelper
+{
+	public ItemStack[] getLowLevelChest_Surface()
+	{
+		return null;
+	}
+	
+	public ItemStack[] getHighLevelChest_Surface()
+	{
+		return null;
+	}
+	
+	public ItemStack[] getDungeonLevelChest_Surface()
+	{
+		return null;
+	}
+	//
+	private ItemStack getLowLevelChestRareItem_Surface()
+	{
+		
+	}
+	
+	private ItemStack getLowLevelChestCommonItem_Surface()
+	{
+		
+	}
+	//
+	private ItemStack getHighLevelChestRareItem_Surface()
+	{
+		
+	}
+	
+	private ItemStack getHighLevelChestCommonItem_Surface()
+	{
+		
+	}
+	//
+	private ItemStack getDungeonLevelChestRareItem_Surface()
+	{
+		
+	}
+	
+	private ItemStack getDungeonLevelChestCommonItem_Surface()
+	{
+		
+	}
+	
+	private final Random random = new Random();
+}

@@ -1,0 +1,97 @@
+package net.dimensia.src;
+
+import java.util.Random;
+
+public class ChestLootHelper
+{
+	public ItemStack[] getLowLevelChest_Surface()
+	{
+		return null;
+	}
+	
+	public ItemStack[] getHighLevelChest_Surface()
+	{
+		return null;
+	}
+	
+	public ItemStack[] getDungeonLevelChest_Surface()
+	{
+		return null;
+	}
+	//
+	private ItemStack getLowLevelChestRareItem_Surface()
+	{
+		int i = random.nextInt(6);
+		
+		if(i == 0)
+			return new ItemStack(Item.bronzeBody);
+		else if(i == 1)
+			return new ItemStack(Item.bronzeHelmet);
+		else if(i == 2)
+			return new ItemStack(Item.bronzeGreaves);
+		else if(i == 3)
+			return new ItemStack(Item.ironIngot);
+		else if(i == 4)
+			return new ItemStack(Item.bronzeSword);
+		else if(i == 5)
+			return new ItemStack(Item.ironPickaxe);
+		else
+			return new ItemStack(Item.silverCoin, random.nextInt(20) + 25);
+	}
+	
+	private ItemStack getLowLevelChestCommonItem_Surface()
+	{
+		int i = random.nextInt();
+		
+		if(i == 0)
+			return new ItemStack(Block.dirt, 5 + random.nextInt(10));
+		else if(i == 1)
+			return new ItemStack(Block.stone, 5 + random.nextInt(10))
+		else if(i == 1)
+			return new ItemStack(Item.copperIngot, 1 + random.nextInt(1));
+		else if(i == 1)
+			return new ItemStack(Item.bronzeIngot);
+		else if(i == 1)
+			return new ItemStack(Item.silverCoin, 10 + random.nextInt(10));
+		else if(i == 1)
+			return new ItemStack(Item.woodenArrow, 17 + random.nextInt(10));
+		else if(i == 1)
+			return new ItemStack(Item.healthPotion1, 1 + random.nextInt(1));
+		else if(i == 1)
+			return new ItemStack(Item.manaPotion1, 1 + random.nextInt(1));
+		else if(i == 1)
+			return new ItemStack(Item.healingHerb1, 1 + random.nextInt(2));
+		else if(i == 1)
+			return new ItemStack(Item.magicHerb1, 1 + random.nextInt(2));
+		else if(i == 1)
+			return new ItemStack(Item.vialEmpty, 4 + random.nextInt(4));
+		else if(i == 1)
+			return new ItemStack(Item.vialOfWater, 4 + random.nextInt(4));
+	
+	
+	}
+	//
+	private ItemStack getHighLevelChestRareItem_Surface()
+	{
+		
+	}
+	
+	private ItemStack getHighLevelChestCommonItem_Surface()
+	{
+		
+	}
+	//
+	private ItemStack getDungeonLevelChestRareItem_Surface()
+	{
+		
+	}
+	
+	private ItemStack getDungeonLevelChestCommonItem_Surface()
+	{
+		
+	}
+	
+	
+	
+	private final Random random = new Random();
+}
