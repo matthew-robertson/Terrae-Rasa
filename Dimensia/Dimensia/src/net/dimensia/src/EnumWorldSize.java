@@ -5,6 +5,9 @@ public enum EnumWorldSize
 	SMALL(2400, 1200), 
 	MEDIUM(3600, 1800), 
 	LARGE(4800, 2400); 
+
+	private int width;
+	private int height;
 	
 	EnumWorldSize(int w, int h)
 	{
@@ -39,7 +42,4 @@ public enum EnumWorldSize
 		}
 		return EnumWorldSize.MEDIUM;
 	}
-	
-	private int width;
-	private int height;
 }

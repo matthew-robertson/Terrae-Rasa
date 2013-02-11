@@ -9,7 +9,10 @@ package net.dimensia.src;
 public class BlockChest extends Block
 {
 	private static final long serialVersionUID = 1L;
-
+	private boolean isAttachedRight;
+	private boolean isAttachedLeft;
+	private ItemStack[] mainInventory;
+	
 	protected BlockChest(int i)
 	{
 		super(i);
@@ -18,6 +21,7 @@ public class BlockChest extends Block
 	
 	public BlockChest(BlockChest block)
 	{
+		//super();
 		this.droppedItem = block.droppedItem;
 		this.maximumDropAmount = block.maximumDropAmount;
 		this.minimumDropAmount = block.minimumDropAmount;
@@ -44,6 +48,10 @@ public class BlockChest extends Block
 		this.isAttachedRight = false;
 	}
 	
+	/**
+	 * @deprecated
+	 * --restructure
+	 */
 	public BlockChest clone()
 	{
 		BlockChest chest = (BlockChest) super.clone();
@@ -174,8 +182,4 @@ public class BlockChest extends Block
 	{
 		return (isAttachedRight || isAttachedLeft);
 	}
-	
-	private boolean isAttachedRight;
-	private boolean isAttachedLeft;
-	private ItemStack[] mainInventory;
 }

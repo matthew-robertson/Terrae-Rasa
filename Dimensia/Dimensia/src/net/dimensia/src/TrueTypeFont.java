@@ -1,4 +1,5 @@
 package net.dimensia.src;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -18,7 +19,6 @@ import java.awt.GraphicsEnvironment;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
-
 
 /**
  * A TrueType font implementation originally for Slick, edited for Bobjob's Engine

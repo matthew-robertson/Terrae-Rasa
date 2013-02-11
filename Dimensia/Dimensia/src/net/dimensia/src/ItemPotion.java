@@ -2,6 +2,9 @@ package net.dimensia.src;
 
 public class ItemPotion extends Item
 {
+	protected int tier;
+	protected int durationSeconds;
+	
 	public ItemPotion(int i, int durationSeconds, int tier)
 	{
 		super(i);
@@ -18,7 +21,4 @@ public class ItemPotion extends Item
 	{
 		return durationSeconds;
 	}
-	
-	protected int tier;
-	protected int durationSeconds;
 }

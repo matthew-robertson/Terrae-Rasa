@@ -1,0 +1,131 @@
+package net.dimensia.src;
+
+import java.util.Random;
+
+public class AIManager {
+	public static void AISpeech(String s){
+		//Flesh this out once displaying text works properly
+		System.out.println(s);
+	}
+	
+	/**
+	 * Allows NPCs who are alerted (to a player, other npc, etc...) to either chase, or run away
+	 * @param world - current world
+	 * @param npc - the actor to be moved
+	 * @param target - the actor to be chased or fled from
+	 * @param chase - true if the actor should chase, false if the actor should run away
+	 */
+	public static void AIChaseAndRetreat(World world, EntityLiving npc, EntityLiving target, boolean chase){
+		//(npcx - playerx) + npcx
+		//If the target is to the right of the npc
+		if (target.getX() > npc.getX()){
+			if (chase){
+				//Chase
+			}
+			else{
+				//
+			}
+		}
+		//else if the target is to the left
+		else if (target.getX() < npc.getX()){
+			if (chase){
+				//chase function here
+			}
+			else{
+				//run away
+			}
+		}
+	}
+	
+	/**
+	 * Allows npcs and enemies not alerted to the player to wander about the map safely
+	 * @param world - current world
+	 * @param npc - the actor to be moved
+	 */
+	public static void AIWander(World world, EntityLivingPlayer player, EntityLiving npc){
+		//If there are no values set, pick a direction and distance
+		Random gen = new Random();
+		if (npc.wanderLeft <= 0 && npc.wanderRight <= 0){
+			int r = gen.nextInt(10);
+			if (r == 1){
+				r = gen.nextInt(2);
+				if (r == 0){
+					npc.wanderLeft = gen.nextInt(20);				
+				}
+				else{
+					npc.wanderRight = gen.nextInt(20);
+				}
+			}
+			
+		}
+		npc.ticksSinceLastWander++;
+		//Broken. Fix this
+		//If there is a drop of 2 or more blocks to the direction of movement, and the npc is not in the air
+		if (((!npc.isWalkingSafe(world, true) && npc.wanderRight > 0)
+			|| (!npc.isWalkingSafe(world, false) && npc.wanderLeft > 0)) 
+			&& npc.isOnGround(world)){
+			npc.wanderRight = 0;
+			npc.wanderLeft = 0;
+		}
+		
+		if (npc.ticksSinceLastWander >= 2){
+			boolean up = gen.nextBoolean();
+			/*if ((npc.isJumpPossibleAndNeeded(world, player, true, up) && npc.wanderRight > 0) 
+			 || (npc.isJumpPossibleAndNeeded(world, player, false, up) && npc.wanderLeft > 0 )){
+				npc.hasJumped();
+			}*/
+			if (npc.wanderRight > 0){
+				AIMoveRight(world, npc, npc.wanderRight, up);
+				//npc.moveEntityRight(world);
+				npc.wanderRight -= npc.baseSpeed * npc.movementSpeedModifier;
+			}
+			else if (npc.wanderLeft > 0){	
+				AIMoveLeft(world, npc, npc.wanderLeft, up);
+				//npc.moveEntityLeft(world);
+				npc.wanderLeft -= npc.baseSpeed * npc.movementSpeedModifier;
+			}
+			npc.ticksSinceLastWander = 0;
+		}
+	}
+	
+	public static void AIMoveLeft(World world, EntityLiving npc, int amount, boolean up){
+		if ((npc.isJumpPossibleAndNeeded(world, false, up) || (!npc.isWalkingSafe(world, false) && npc.alert)) && amount > 0){
+			npc.hasJumped();
+		}
+		npc.moveEntityLeft(world);
+	}
+	
+	public static void AIMoveRight(World world, EntityLiving npc, int amount, boolean up){
+		if ((npc.isJumpPossibleAndNeeded(world, true, up) || (!npc.isWalkingSafe(world, true) && npc.alert)) && amount > 0){
+			npc.hasJumped();
+		}
+		npc.moveEntityRight(world);
+	}
+	
+	/**
+	 * Launches a projectile at a provided angle
+	 * @param world the current world
+	 * @param npc the npc launching the projectile
+	 * @param angle the angle to fire at
+	 * @param projectile the projectile to launch
+	 */
+	public static void AIProjectile(World world, EntityLiving npc, int angle, EntityProjectile projectile){
+		npc.launchProjectile(world, angle, projectile);
+		npc.ticksSinceLastProjectile = 0;
+	}
+	
+	/**
+	 * launches a projectile to hit a specific target point. Improve to account for gravity later.
+	 * @param npc to launch the projectile
+	 * @param x location of the target
+	 * @param y location of the target
+	 */
+	public static void AIProjectile(World world, EntityLiving npc, int x, int y, EntityProjectile projectile){
+		int angle = MathHelper.angleMousePlayer(x, y, npc.x, npc.y) - 90;
+		if (angle < 0){
+			angle += 360;
+		}
+		npc.launchProjectile(world, angle, projectile);
+		npc.ticksSinceLastProjectile = 0;
+	}		
+}

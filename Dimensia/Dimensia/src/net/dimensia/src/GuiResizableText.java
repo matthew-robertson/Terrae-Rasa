@@ -26,6 +26,20 @@ import org.lwjgl.opengl.GL11;
 
 public class GuiResizableText 
 {	
+	private static TrueTypeFont trueTypeFont;
+	private int screenX;
+	private int screenY;
+	private boolean overrideColor;
+	private float maxScale;
+	private float baseScale;
+	private float scale;
+	private int centery;
+	private int mouseY;
+	private int mouseWidth;
+	private int mouseHeight;
+	private int mouseX;	
+	private String text;
+	
 	/**
 	 * Constructs an instance of GuiResizableText. For a better description of what this class does, see 
 	 * the class description.	 
@@ -177,19 +191,5 @@ public class GuiResizableText
 	public void resetScale()
 	{
 		scale = baseScale;
-	}
-	
-	private static TrueTypeFont trueTypeFont;
-	private int screenX;
-	private int screenY;
-	private boolean overrideColor;
-	private float maxScale;
-	private float baseScale;
-	private float scale;
-	private int centery;
-	private int mouseY;
-	private int mouseWidth;
-	private int mouseHeight;
-	private int mouseX;	
-	private String text;
+	}	
 }

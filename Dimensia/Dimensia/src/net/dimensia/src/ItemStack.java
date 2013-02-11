@@ -5,7 +5,11 @@ import java.io.Serializable;
 public class ItemStack implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-
+	private String itemName;
+	private int stackSize;
+	private int maxStackSize;
+	private int itemID;
+	
 	public ItemStack(Item item)
 	{
 		itemID = item.itemID;
@@ -119,9 +123,4 @@ public class ItemStack implements Serializable
 	{
 		return new Integer(itemID);
 	}
-	
-	private String itemName;
-	private int stackSize;
-	private int maxStackSize;
-	private int itemID;
 }

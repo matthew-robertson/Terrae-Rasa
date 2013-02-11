@@ -1,4 +1,5 @@
 package net.dimensia.src;
+
 import java.awt.Font;
 
 import org.lwjgl.opengl.Display;
@@ -14,9 +15,19 @@ import org.lwjgl.opengl.GL11;
  * @version     1.0
  * @since       1.0
  */
-
 public class GuiButton 
 {	
+	private static TrueTypeFont trueTypeFont;
+	private String[] values;
+	private int screenX;
+	private int screenY;
+	private boolean centerComponent;
+	private int buttonIndex;
+	private float width;
+	private float height;
+	private float x;
+	private float y;
+	
 	/**
 	 * Constructs a new instance of GuiButton. Initializes the button with the specified
 	 * values, and currently can only center the button.
@@ -122,15 +133,4 @@ public class GuiButton
 			buttonIndex = 0;
 		}
 	}
-	
-	private static TrueTypeFont trueTypeFont;
-	private String[] values;
-	private int screenX;
-	private int screenY;
-	private boolean centerComponent;
-	private int buttonIndex;
-	private float width;
-	private float height;
-	private float x;
-	private float y;
 }

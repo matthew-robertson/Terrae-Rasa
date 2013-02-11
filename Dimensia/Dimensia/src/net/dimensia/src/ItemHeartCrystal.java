@@ -1,8 +1,9 @@
 package net.dimensia.src;
 
-
 public class ItemHeartCrystal extends Item
 {
+	private final int HEALTH_INCREASE;
+	
 	public ItemHeartCrystal(int i)
 	{
 		super(i);
@@ -10,15 +11,13 @@ public class ItemHeartCrystal extends Item
 		HEALTH_INCREASE = 20;
 	}
 	
-	public void onRightClick(World world, EntityPlayer entity)
+	public void onRightClick(World world, EntityLivingPlayer player)
 	{
-		boolean success = world.player.boostMaxHealth(HEALTH_INCREASE);
+		boolean success = player.boostMaxHealth(HEALTH_INCREASE);
 		
 		if(success)
 		{
-			world.player.inventory.removeEntireStackFromInventory(world.player.selectedSlot);
+			player.inventory.removeEntireStackFromInventory(world, player, player.selectedSlot);
 		}
 	}
-	
-	private final int HEALTH_INCREASE;
 }

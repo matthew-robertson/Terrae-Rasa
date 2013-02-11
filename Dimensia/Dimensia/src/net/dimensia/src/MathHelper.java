@@ -31,10 +31,18 @@ public class MathHelper
 		return f * -1;
 	}
 	
-	public static int angleMousePlayer(float x, float y, float x2, float y2){
-		float x1 = x - x2;
-		float y1 = y - y2;
-		int degrees = (int) Math.toDegrees(Math.atan2(x1,y1));
+	/**
+	 * A method designed to find the angle between the player and the mouse
+	 * @param mouseX - location of the mouse on the X axis, with respect to the origin
+	 * @param mouseY - location of the mouse on the Y axis, with respect to the origin
+	 * @param playerX - location of the player on the X axis, with respect to the origin
+	 * @param playerY - location of the player on the Y axis, with respect to the origin
+	 * @return
+	 */
+	public static int angleMousePlayer(float mouseX, float mouseY, float playerX, float playerY){
+		float deltaX = mouseX - playerX;
+		float deltaY = mouseY - playerY;
+		int degrees = (int) Math.toDegrees(Math.atan2(deltaX, deltaY));
 		if (degrees < 0){
 			degrees += 360;
 		}

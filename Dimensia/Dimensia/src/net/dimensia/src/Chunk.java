@@ -19,6 +19,8 @@ import java.io.Serializable;
  * {@link #getChunkWidth()} or {@link #getChunkHeight()} when performing chunk
  * size operations.</b>
  * 
+ * <i> Update: </i> Chunks now store biome data, which can be set with 
+ * 
  * @author      Alec Sobeck
  * @author      Matthew Robertson
  * @version     1.0
@@ -27,15 +29,26 @@ import java.io.Serializable;
 public class Chunk implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-
+	private Biome biome;
+	public final float[][] light;
+	public final Block[][] backWalls;
+	public final Block[][] blocks;
+	private final int x;
+	private final int y;
+	private boolean wasChanged;
+	private static final int CHUNK_WIDTH = 300;
+	private static final int CHUNK_HEIGHT = 600;
+	
 	/**
 	 * Constructs a new Chunk. Chunks are initialized with blocks[][] fully set to air, and backwalls[][]
 	 * fully set to air as well. All light values are 0.0f (no light).
 	 * @param x the x position of the chunk in the chunk grid
 	 * @param y the y position of the chunk in the chunk grid
 	 */
-	public Chunk(int x, int y)
+	public Chunk(Biome biome, int x, int y)
 	{
+		//this.biome = biome;
+		this.biome = Biome.forest;
 		blocks = new Block[CHUNK_WIDTH][CHUNK_HEIGHT];
 		backWalls = new Block[CHUNK_WIDTH][CHUNK_HEIGHT];
 		for(int i = 0; i < CHUNK_WIDTH; i++)
@@ -70,6 +83,20 @@ public class Chunk implements Serializable
 		return CHUNK_HEIGHT;
 	}
 	
+	public final Biome getBiome()
+	{
+		return biome;
+	}
+	
+	/**
+	 * Sets the biome of the chunk to the specified new biome type
+	 * @param biome the new biome type assigned to this chunk
+	 */
+	public synchronized void setBiome(Biome biome)
+	{
+		this.biome = biome;
+	}
+	
 	/**
 	 * Gets the light[][] stored in this instanceof Chunk
 	 * @return the light array for this Chunk
@@ -79,6 +106,12 @@ public class Chunk implements Serializable
 		return light;
 	}
 	
+	/**
+	 * Gets the block at position (x,y) of the chunk, NOT the world 
+	 * @param x the x position of the block requested
+	 * @param y the y position of the block requested
+	 * @return the block at the specified position, which should never be null
+	 */
 	public final Block getBlock(int x, int y)
 	{
 		return blocks[x][y];
@@ -156,13 +189,6 @@ public class Chunk implements Serializable
 	/**
 	 * 
 	 */
-
-	public final float[][] light;
-	public final Block[][] backWalls;
-	public final Block[][] blocks;
-	private final int x;
-	private final int y;
-	private boolean wasChanged;
-	private static final int CHUNK_WIDTH = 300;
-	private static final int CHUNK_HEIGHT = 600;
+	
+	
 }

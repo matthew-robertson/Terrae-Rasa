@@ -2,8 +2,10 @@ package net.dimensia.src;
 
 import java.util.Vector;
 
-public class ItemRanged extends Item{
-
+public class ItemRanged extends Item
+{
+	protected Vector<ItemStack> ammo;
+	
 	protected ItemRanged(int i, int d) {
 		super(i);
 		maxStackSize = 1;
@@ -32,6 +34,4 @@ public class ItemRanged extends Item{
 	public int getDamage(){
 		return damage;
 	}
-	
-	protected Vector<ItemStack> ammo;
 }

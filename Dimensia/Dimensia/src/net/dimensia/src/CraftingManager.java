@@ -6,7 +6,10 @@ import java.util.Vector;
 public class CraftingManager implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-
+	public Recipe[] craftingRecipes;
+	public Recipe[] furnaceRecipes;
+	public Recipe[] inventoryRecipes;	
+	
 	public CraftingManager()
 	{
 		RecipeManager manager = new RecipeManager(); //when initializing an instance of CraftingManager, initialize the recipe arrays
@@ -111,8 +114,4 @@ public class CraftingManager implements Serializable
 		vector.copyInto(temp);		
 		return temp;
 	}
-	
-	public Recipe[] craftingRecipes;
-	public Recipe[] furnaceRecipes;
-	public Recipe[] inventoryRecipes;	
 }

@@ -7,9 +7,9 @@ public class ItemPotionDamageBuff extends ItemPotion
 		super(i, duration, tier);
 	}
 	
-	public void onRightClick(World world, EntityPlayer entity)
+	public void onRightClick(World world, EntityLivingPlayer player)
 	{
-		entity.registerStatusEffect(new StatusEffectDamageBuff(durationSeconds, tier));
-		world.player.inventory.removeItemsFromInventoryStack(1, world.player.selectedSlot);
+		player.registerStatusEffect(new StatusEffectDamageBuff(durationSeconds, tier));
+		player.inventory.removeItemsFromInventoryStack(1, player.selectedSlot);
 	}
 }

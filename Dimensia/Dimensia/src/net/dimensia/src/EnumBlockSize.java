@@ -11,6 +11,8 @@ public enum EnumBlockSize
 	THREEBYONE(7),
 	THREEBYTWO(8),
 	THREEBYTHREE(9);
+
+	private int metaValue;
 	
 	EnumBlockSize(int i)
 	{
@@ -21,6 +23,4 @@ public enum EnumBlockSize
 	{
 		return metaValue;
 	}
-	
-	private int metaValue;
 }

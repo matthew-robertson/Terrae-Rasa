@@ -1,16 +1,23 @@
 package net.dimensia.src;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class Biome implements Serializable, Cloneable
 {
 	private static final long serialVersionUID = 1L;
+	protected int biomeID;
+	protected float x;
+	protected float y;
+	protected float width;
+	protected float height;
+	protected List<EntityLivingNPCEnemy> spawnableEntites;
+	protected String biomeName;
 	
 	protected Biome(int i, String name)
 	{
-		spawnableEntites = new ArrayList<EntityEnemy>();
+		spawnableEntites = new ArrayList<EntityLivingNPCEnemy>();
 		biomeName = name;
 		x = 0;
 		y = 0;
@@ -37,23 +44,6 @@ public class Biome implements Serializable, Cloneable
 		this.height = biome.height;
 		this.spawnableEntites = biome.spawnableEntites;
 		this.biomeName = biome.biomeName;
-	}
-
-	/**
-	 * Overrides Object.clone() to provide public cloing functionality to biomes.
-	 * @return a cloned biome, able to then have its bounds set
-	 */
-	public Biome clone()
-	{
-		try 
-		{
-			return (Biome) super.clone();
-		}
-		catch (CloneNotSupportedException e) 
-		{
-			e.printStackTrace();
-		}
-		return null;
 	}
 	
 	/**
@@ -120,11 +110,5 @@ public class Biome implements Serializable, Cloneable
 	public static final Biome desert = new BiomeDesert(1, "Desert");
 	public static final Biome arctic = new BiomeArctic(2, "Arctic");
 	
-	protected int biomeID;
-	protected float x;
-	protected float y;
-	protected float width;
-	protected float height;
-	protected List<EntityEnemy> spawnableEntites;
-	protected String biomeName;
+	
 }

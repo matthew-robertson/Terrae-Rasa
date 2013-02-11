@@ -8,21 +8,9 @@ import java.awt.Frame;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
-import net.dimensia.src.Block;
-import net.dimensia.src.EntityPlayer;
-import net.dimensia.src.EnumDifficulty;
-import net.dimensia.src.FileManager;
+import net.dimensia.src.EntityLivingPlayer;
 import net.dimensia.src.GuiMainMenu;
-import net.dimensia.src.Item;
-import net.dimensia.src.ItemStack;
-import net.dimensia.src.Keys;
-import net.dimensia.src.LightingEngine;
-import net.dimensia.src.MouseInput;
 import net.dimensia.src.Render;
-import net.dimensia.src.RenderGlobal;
-import net.dimensia.src.SoundEngine;
-import net.dimensia.src.SoundManager;
-import net.dimensia.src.StatusEffectDazed;
 import net.dimensia.src.World;
 
 import org.lwjgl.opengl.Display;
@@ -32,13 +20,32 @@ import org.lwjgl.opengl.PixelFormat;
 
 public class Dimensia
 {
+	public static boolean initInDebugMode;
+	public static Dimensia dimensia;
+	public static boolean done;
+	public static boolean isMainMenuOpen;
+	public static boolean areResourcesLoaded;
+	public static boolean needsResized;
+	public static int width;
+	public static int height;
+	public final GameEngine gameEngine;
+	private Frame dimensiaFrame;
+	private Canvas dimensiaCanvas;
+	private static String osName;
+	private final static String version = "Alpha 1.0.17";	
+	private final static String windowTitle = "Dimensia " + version;
+	public final static String WINDOWS_BASE_PATH = new StringBuilder().append("C:/Users/").append(System.getProperty("user.name")).append("/AppData/Roaming/Dimensia").toString();
+	public final static String MAC_BASE_PATH = new StringBuilder().append("/Users/").append(System.getProperty("user.name")).append("/Library/Application").append(" Support/Dimensia").toString();
+	public final static String LINUX_BASE_PATH = new StringBuilder().append("/home/").append(System.getProperty("user.name")).append("/Dimensia").toString();
+	
 	public Dimensia(int w, int h)
 	{
 		width = w;
 		height = h;
+		this.gameEngine = new GameEngine();
 	}
 	
-	public static void main(String[] args) throws Exception 
+	public static void main(String[] args) 
 	{		
 		osName = System.getProperty("os.name").toLowerCase();
 		System.out.println("User Operating System is: " + osName);
@@ -52,14 +59,18 @@ public class Dimensia
 			}
 			else
 			{
-				System.setProperty("org.lwjgl.librarypath", WINDOWSBASEPATH + "/bin/native/windows");
+				System.setProperty("org.lwjgl.librarypath", WINDOWS_BASE_PATH + "/bin/native/windows");
 			}		
 		}
 		else if(osName.contains("mac"))//Mac 
 		{
-			System.out.println(MACBASEPATH + "/bin/native/macosx");
-			System.setProperty("org.lwjgl.librarypath", MACBASEPATH + "/bin/native/macosx");
-			//Mac stuff here
+			System.out.println(MAC_BASE_PATH + "/bin/native/macosx");
+			System.setProperty("org.lwjgl.librarypath", MAC_BASE_PATH + "/bin/native/macosx");
+		}
+		else if(osName.contains("ubuntu") || osName.contains("linux"))
+		{
+			System.out.println(LINUX_BASE_PATH + "/bin/native/linux");
+			System.setProperty("org.lwjgl.librarypath", LINUX_BASE_PATH + "/bin/native/linux");
 		}
 		else
 		{
@@ -121,68 +132,6 @@ public class Dimensia
 			System.exit(1);
 		}
 	}	
-	
-	/**
-	//Frame and canvas
-			Frame frame = new Frame(windowTitle);
-			Canvas canvas = new Canvas();
-			
-			frame.setLayout(new BorderLayout());
-			frame.add(canvas, "Center");
-			canvas.setPreferredSize(new Dimension(width, height));
-			frame.pack();
-			frame.setLocationRelativeTo(null);
-			frame.setVisible(true);
-			
-			dimensiaCanvas = canvas;
-			dimensiaFrame = frame;
-			
-			boolean fullscreen = false;
-			
-			if(dimensiaCanvas != null)
-			{
-				System.out.println("Creating frame");
-				Graphics g = dimensiaCanvas.getGraphics();
-				if(g != null)
-				{
-					g.setColor(Color.red);
-					g.fillRect(0, 0, width, height);
-					g.dispose();
-				}
-				Display.setParent(dimensiaCanvas);
-			}
-			else if(fullscreen)
-			{
-				Display.setFullscreen(true);
-				width = Display.getDisplayMode().getWidth();
-				height = Display.getDisplayMode().getHeight();
-				if(width <= 0)
-				{
-					width = 1;
-				}
-				if(height <= 0)
-				{
-					height = 1;
-				}
-			}
-			else
-			{
-				Display.setDisplayMode(new DisplayMode(width, height));
-			}
-			
-			try
-			{
-				PixelFormat format = new PixelFormat();
-				format = format.withDepthBits(24);
-				Display.create(format);
-			}
-			catch(LWJGLException e)
-			{
-				e.printStackTrace();
-				Thread.sleep(1000);
-				Display.create();
-			}
-	 */
 	
 	/**
 	 * Resizes the JFrame and all components when applicable 
@@ -252,9 +201,8 @@ public class Dimensia
 	 */
 	public void loadResources()
  	{
-		Render.initializeTextures(world); 
-		
-		
+		Render.initializeTextures(gameEngine.getWorld()); 
+		/*
 		if(true)return;
 		soundManager = new SoundManager(5, 0.5f);
 		SoundEngine engine = new SoundEngine();
@@ -267,9 +215,8 @@ public class Dimensia
 		//soundManager.volume = 0.5f; //Default Volume % is 50%
 		//SOUND_EXPLODE = soundManager.addSound("resources/hit.wav");
 		//Gui.Load textures //Load textures 
-	}
-	
-	int SOUND_T;
+		*/
+ 	}
 	
 	public void run()
 	{
@@ -277,159 +224,27 @@ public class Dimensia
 		loadResources(); //Load all graphical and sound resources
 		
 		isMainMenuOpen = true;
-		init();        
-		
-		//Variables for the gameloop cap (20 times / second)
-        final int TICKS_PER_SECOND = 20;
-		final int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
-		final int MAX_FRAMESKIP = 5;
-		long next_game_tick = System.currentTimeMillis();
-		long start, end;
-		int loops;
-		
-	    while(!done) //Main Game Loop
-	    {
-	    	start = System.currentTimeMillis();
-	        loops = 0;
-	        while(System.currentTimeMillis() > next_game_tick && loops < MAX_FRAMESKIP) //Update the game 20 times/second 
-	        {
-	        	if(!isMainMenuOpen) //Handle game inputs if the main menu isnt open (aka the game is being played)
-	        	{
-	        		MouseInput.mouse(world, world.player);
-	        		Keys.keyboard(world, world.player);	            
-	        		world.onWorldTick();
-	        	}
-	        	
-				if(needsResized || width < 640 || height < 400) //If the window needs resized, resize it
-				{
-					resizeWindow();
-					needsResized = false;
-				}
-	        	 
-	        	next_game_tick += SKIP_TICKS;
-	            loops++;
-	        }
-	        Display.update();
-            
-	        if(isMainMenuOpen) //if the main menu is open, render that, otherwise render the game
-	        {
-	        	mainMenu.render();
-		    }
-	        else
-	        {
-	        	RenderGlobal.render(world); //Renders Everything on the screen for the game
-		    }
-	        
-        	end = System.currentTimeMillis();        	
-       //     System.out.println(end - start);
-	    }     
-        
+		gameEngine.init();        
+		gameEngine.run();
+	    
 	    Display.destroy(); //Cleans up  
         //soundManager.destroy(); //Destroys the soundManager object
         System.exit(0); //remember to exit the system and release resources
 	} 		
-	
-	/**
-	 * Start a game from the main menu.
-	 * @param world the world to play on.
-	 * @param player the player to play on.
-	 */
-	public void startGame(World world, EntityPlayer player)
-	{
-		dimensia.world = world;
-		dimensia.world.addPlayerToWorld(player);
-		isMainMenuOpen = false;
-		mainMenu = null;
-	}
-	
-	/**
-	 * Misc. things required to initalize the game
-	 */
-	public void init()
-	{
-		mainMenu = new GuiMainMenu();
-		
-		if(initInDebugMode)
-		{
-			isMainMenuOpen = false;
-			FileManager fileManager = new FileManager();
-			dimensia.world = fileManager.generateNewWorld("World", 1200, 800, EnumDifficulty.EASY);//EnumWorldSize.LARGE.getWidth(), EnumWorldSize.LARGE.getHeight());
-			dimensia.world.addPlayerToWorld(new EntityPlayer("Alec", EnumDifficulty.EASY));
-			dimensia.world.assessForAverageSky();
-			
-			world.player.inventory.pickUpItemStack(new ItemStack(Block.woodTable, 100));
-			world.player.inventory.pickUpItemStack(new ItemStack(Block.torch, 100));
-			world.player.inventory.pickUpItemStack(new ItemStack(Block.chest, 100));
-			//*
-			world.player.inventory.pickUpItemStack(new ItemStack(Item.healthPotion1, 100));
-			world.player.inventory.pickUpItemStack(new ItemStack(Block.plank, 100));
-			world.player.inventory.pickUpItemStack(new ItemStack(Item.manaPotion1, 100));
-			world.player.inventory.pickUpItemStack(new ItemStack(Item.magicMissileSpell, 1));
-			world.player.inventory.pickUpItemStack(new ItemStack(Item.snowball, 1));
-			/**/
-			
-			world.player.inventory.pickUpItemStack(new ItemStack(Item.woodenArrow, 100));
-			world.player.inventory.pickUpItemStack(new ItemStack(Block.furnace, 100));
-			world.player.inventory.pickUpItemStack(new ItemStack(Block.craftingTable, 6));
-			world.player.inventory.pickUpItemStack(new ItemStack(Block.plank, 100));
-			world.player.inventory.pickUpItemStack(new ItemStack(Item.goldPickaxe));
-		
-			world.player.inventory.pickUpItemStack(new ItemStack(Item.copperIngot, 100));
-			world.player.inventory.pickUpItemStack(new ItemStack(Item.ironIngot, 6));
-			world.player.inventory.pickUpItemStack(new ItemStack(Item.copperCoin, 5));
-			
-			world.player.inventory.pickUpItemStack(new ItemStack(Item.woodenArrow, 5));
-			world.player.inventory.pickUpItemStack(new ItemStack(Item.woodenArrow, 5));
-			world.player.inventory.pickUpItemStack(new ItemStack(Item.woodenArrow, 5));
-			world.player.inventory.pickUpItemStack(new ItemStack(Item.woodenArrow, 5));
-			
-			world.player.inventory.pickUpItemStack(new ItemStack(Item.copperOre, 100));
-			world.player.inventory.pickUpItemStack(new ItemStack(Item.tinOre, 100));
-			world.player.inventory.pickUpItemStack(new ItemStack(Item.goldOre, 15));
-			world.player.inventory.pickUpItemStack(new ItemStack(Item.tinIngot, 100));
-			
-			world.player.inventory.pickUpItemStack(new ItemStack(Item.goldHelmet));
-			world.player.inventory.pickUpItemStack(new ItemStack(Item.goldHelmet));
-			world.player.inventory.pickUpItemStack(new ItemStack(Item.goldBody));
-			world.player.inventory.pickUpItemStack(new ItemStack(Item.goldGreaves));
-			world.player.inventory.pickUpItemStack(new ItemStack(Item.bronzeHelmet));
-			world.player.inventory.pickUpItemStack(new ItemStack(Item.bronzeBody));
-			world.player.inventory.pickUpItemStack(new ItemStack(Item.bronzeGreaves));
-
-			world.player.inventory.pickUpItemStack(new ItemStack(Item.rocketBoots));
-			world.player.inventory.pickUpItemStack(new ItemStack(Item.heartCrystal, 2));
-			world.player.inventory.pickUpItemStack(new ItemStack(Item.manaCrystal, 2));
-			world.player.inventory.pickUpItemStack(new ItemStack(Item.angelsSigil, 2));
-			world.player.inventory.pickUpItemStack(new ItemStack(Item.ringOfVigor, 5));
-			world.player.inventory.pickUpItemStack(new ItemStack(Item.regenerationPotion2, 5));
-			//world.player.registerStatusEffect(new StatusEffectDazed(500000, 1));
-			LightingEngine.applySunlight(world);
-		}		
-	}
 	
 	public final static String getVersion()
 	{
 		return version;
 	}
 		
-	public static boolean initInDebugMode;
-	public static Dimensia dimensia;
-	public static boolean done;
-	public GuiMainMenu mainMenu;
-	public boolean isMainMenuOpen;
-	public SoundManager soundManager;	
-	public World world;
-	public static boolean areResourcesLoaded;
-	private Frame dimensiaFrame;
-	private Canvas dimensiaCanvas;
-	private boolean needsResized;
-	private int width;
-	private int height;
-	private static String osName;
-	private final static String version = "Alpha 1.0.12";	
-	private final static String windowTitle = "Dimensia " + version;
-	private final static String WINDOWSBASEPATH = new StringBuilder().append("C:/Users/").append(System.getProperty("user.name")).append("/AppData/Roaming/Dimensia").toString();
-	private final static String MACBASEPATH = new StringBuilder().append("/Users/").append(System.getProperty("user.name")).append("/Library/Application").append(" Support/Dimensia").toString();
-
+	public static void resetMainMenu()
+	{
+		dimensia.gameEngine.mainMenu = new GuiMainMenu();
+	}
+	
+	public static void startGame(World world, EntityLivingPlayer player)
+	{
+		dimensia.gameEngine.startGame(world, player);
+	}
 }
 

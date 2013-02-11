@@ -1,10 +1,13 @@
 package net.dimensia.src;
+
 import java.util.Vector;
-
-
 
 public class RecipeManager 
 {
+	public Vector<Recipe> craftingList;
+	public Vector<Recipe> furnaceList;
+	public Vector<Recipe> inventoryList;
+	
 	public RecipeManager()
 	{
 		if(craftingList == null)
@@ -306,9 +309,5 @@ public class RecipeManager
 		new ItemStack(Block.plank, 10)
 	});	
 	
-	
 
-	public Vector<Recipe> craftingList;
-	public Vector<Recipe> furnaceList;
-	public Vector<Recipe> inventoryList;
 }

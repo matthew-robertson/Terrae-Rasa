@@ -18,6 +18,19 @@ import org.lwjgl.opengl.GL11;
  */
 public class GuiTextbox
 {	
+	private int MAX_TEXT_CHARACTERS;
+	private static TrueTypeFont trueTypeFont; /*This has pretty heavy overhead to create. Should it be static?*/
+	private float width;
+	private float height;
+	private int screenX;
+	private int screenY;
+	private float textScale;	
+	private float x;
+	private float y;
+	private boolean centerComponent;	
+	private boolean isFocused;	
+	private String text;
+	
 	/**
 	 * Constructs an instance of GuiTextBox. Initializes the textbox with no text in it, at the specified
 	 * position on the screen, focus is disabled by default.
@@ -206,17 +219,4 @@ public class GuiTextbox
 	{
 		isFocused = false;
 	}
-
-	private int MAX_TEXT_CHARACTERS;
-	private static TrueTypeFont trueTypeFont; /*This has pretty heavy overhead to create. Should it be static?*/
-	private float width;
-	private float height;
-	private int screenX;
-	private int screenY;
-	private float textScale;	
-	private float x;
-	private float y;
-	private boolean centerComponent;	
-	private boolean isFocused;	
-	private String text;
 }

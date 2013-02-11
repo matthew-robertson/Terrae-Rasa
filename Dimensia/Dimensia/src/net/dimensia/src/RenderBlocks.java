@@ -1,21 +1,22 @@
 package net.dimensia.src;
+
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
 public class RenderBlocks extends Render
 {
-	public void renderBackwall(World world)
+	public void renderBackwall(World world, EntityLivingPlayer player)
 	{
-		adjustCamera(world);
+		adjustCamera(world, player);
 		final int xsize = (int)(Display.getWidth() / 11.1);
 		final int ysize = (int)(Display.getHeight() / 11.1) + 1;
-		int x = (int) ((world.player.x - (0.25f * Display.getWidth())) / 6);
-		int y = (int) ((world.player.y - (0.25f * Display.getHeight())) / 6);
+		int x = (int) ((player.x - (0.25f * Display.getWidth())) / 6);
+		int y = (int) ((player.y - (0.25f * Display.getHeight())) / 6);
 		if(y < 0) y = 0;
 		if(x < 0) x = 0;
 		if(xsize + x > world.getWidth()) x = world.getWidth() - xsize;
 		if(ysize + y > world.getHeight()) y = world.getHeight() - ysize - 1;
-		Chunk[][] chunks = getRequiredChunks(world);
+		Chunk[][] chunks = getRequiredChunks(world, player);
 		TERRAIN.bind();
 		
 		//Settings for lighting
@@ -204,19 +205,19 @@ public class RenderBlocks extends Render
 		t.draw();
 	}
 	
-	public void render(World world) 
+	public void render(World world, EntityLivingPlayer player) 
 	{
-		adjustCamera(world);
+		adjustCamera(world, player);
 		final int xsize = (int)(Display.getWidth() / 11.1);
 		final int ysize = (int)(Display.getHeight() / 11.1) + 1;
-		int x = (int) ((world.player.x - (0.25f * Display.getWidth())) / 6);
-		int y = (int) ((world.player.y - (0.25f * Display.getHeight())) / 6);
+		int x = (int) ((player.x - (0.25f * Display.getWidth())) / 6);
+		int y = (int) ((player.y - (0.25f * Display.getHeight())) / 6);
 		if(y < 0) y = 0;
 		if(x < 0) x = 0;
 		if(xsize + x > world.getWidth()) x = world.getWidth() - xsize;
 		if(ysize + y > world.getHeight()) y = world.getHeight() - ysize - 1;
-		Chunk[][] chunks = getRequiredChunks(world);
-		TERRAIN.bind();
+		Chunk[][] chunks = getRequiredChunks(world, player);
+		TERRAIN_GROUND.bind();
 		
 		//Settings for lighting
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
@@ -332,17 +333,14 @@ public class RenderBlocks extends Render
 						{
 							continue;
 						}
-						if (block.getTileMap() != ' '){
-							TERRAIN_GROUND.bind();
-						}
 						if(block.hasMetaData) //large texture
 						{
 							if(block.metaData == 1) //if the block with metadata is in the top-left corner of the larger block, render it
 							{
 								int blockHeight = block.blockHeight;
 								int blockWidth = block.blockWidth;		
-							    float tx = (float)((block.iconIndex % 16) * 16) / 256;
-							    float ty = (float)((block.iconIndex / 16) * 16) / 512;
+							    float tx = (float)((block.iconIndex % 32) * 16) / 256;
+							    float ty = (float)((block.iconIndex / 32) * 16) / 512;
 								float tw = tx + (block.textureWidth / 256);
 								float th = ty + (block.textureHeight / 512);				
 								int xm = x1 * 6; 
@@ -370,8 +368,8 @@ public class RenderBlocks extends Render
 						{
 							int blockHeight = block.blockHeight;
 							int blockWidth = block.blockWidth;		
-						    float tx = (float)((block.iconIndex % 16) * 16) / 256;
-						    float ty = (float)((block.iconIndex / 16) * 16) / 512;
+						    float tx = (float)((block.iconIndex % 32) * 16) / 256;
+						    float ty = (float)((block.iconIndex / 32) * 16) / 512;
 							float tw = tx + (block.textureWidth / 256);
 							float th = ty + (block.textureHeight / 512);				
 							int xm = x1 * 6; 
@@ -416,7 +414,7 @@ public class RenderBlocks extends Render
 	 * @param y
 	 * @param height
 	 */
-	private void renderLighting(World world, Chunk[][] chunks, int x, int width, int y, int height)
+	private void renderLighting(World world, EntityLivingPlayer player, Chunk[][] chunks, int x, int width, int y, int height)
 	{
 		int baseX_F = (int) ((int)(x / Chunk.getChunkWidth()) * Chunk.getChunkWidth());
 		int baseY_F = (int) ((int)(y / Chunk.getChunkHeight()) * Chunk.getChunkHeight());
@@ -424,9 +422,9 @@ public class RenderBlocks extends Render
 		int remainingHeight = height;
 		boolean isEmitingLight = false;
 	
-		if(world.player.inventory.getMainInventoryStack(world.player.selectedSlot) != null)
+		if(player.inventory.getMainInventoryStack(player.selectedSlot) != null)
 		{
-			if((world.player.inventory.getMainInventoryStack(world.player.selectedSlot).getItemID() == Block.torch.blockID))
+			if((player.inventory.getMainInventoryStack(player.selectedSlot).getItemID() == Block.torch.blockID))
 			{
 				isEmitingLight = true;
 			}	
@@ -446,9 +444,9 @@ public class RenderBlocks extends Render
 		//int xm = 250;
 		//int ym = 1500; 		
 		int strength = 15;
-		float[][] lightMap = LightingEngine.generateLightSource(world, (int)(world.player.x / 6), (int)(world.player.y / 6), strength, 1.0f);
-		int playerx = (int) (world.player.x / 6);
-		int playery = (int) (world.player.y / 6);
+		float[][] lightMap = LightingEngine.generateLightSource(world, (int)(player.x / 6), (int)(player.y / 6), strength, 1.0f);
+		int playerx = (int) (player.x / 6);
+		int playery = (int) (player.y / 6);
 				
 		t.startDrawingQuads();
 		try
@@ -571,8 +569,8 @@ public class RenderBlocks extends Render
 			{	
 				for(int k = 0; k < strength * 2; k++) //y
 				{
-					int xm = (int) MathHelper.zeroOrGreater(MathHelper.multipleOfSix((int) ((i - strength) * 6 + (world.player.x / 6) * 6)));
-					int ym = (int) MathHelper.zeroOrGreater(MathHelper.multipleOfSix((int) ((k - strength) * 6 + (world.player.y / 6) * 6)));
+					int xm = (int) MathHelper.zeroOrGreater(MathHelper.multipleOfSix((int) ((i - strength) * 6 + (player.x / 6) * 6)));
+					int ym = (int) MathHelper.zeroOrGreater(MathHelper.multipleOfSix((int) ((k - strength) * 6 + (player.y / 6) * 6)));
 					
 					t.setColorRGBA_F(0, 0, 0, lightMap[i][k + 1]);
 					t.addVertexWithUV(xm , ym + 6, 0, 0, 1);
@@ -592,13 +590,13 @@ public class RenderBlocks extends Render
 		GL11.glEnable(GL11.GL_TEXTURE_2D);		
 	}
 	
-	private Chunk[][] getRequiredChunks(World world)
+	private Chunk[][] getRequiredChunks(World world, EntityLivingPlayer player)
 	{
 		Chunk[][] chunks;
 		final int width = (int)((float)(Display.getWidth() / 6) / 1.85);;
 		final int height = (int)((float)(Display.getHeight() / 6) / 1.85);;
-		float x = ((world.player.x - (0.25f * Display.getWidth())) / 6);
-		float y = ((world.player.y - (0.25f * Display.getHeight())) / 6);
+		float x = ((player.x - (0.25f * Display.getWidth())) / 6);
+		float y = ((player.y - (0.25f * Display.getHeight())) / 6);
 		if(y < 0) y = 0; 
 		if(x < 0) x = 0;
 		if(width + x > world.getWidth()) x = world.getWidth() - width - 1;

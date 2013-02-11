@@ -17,4 +17,5 @@
 <fullyQualifiedTypeName name="java.util.concurrent.ConcurrentHashMap"/>
 <fullyQualifiedTypeName name="java.util.List"/>
 <fullyQualifiedTypeName name="java.util.ArrayList"/>
+<fullyQualifiedTypeName name="net.dimensia.client.GameEngine"/>
 </qualifiedTypeNameHistroy>

@@ -1,21 +1,22 @@
 package net.dimensia.src;
 
-
 public class ItemPotionHealth extends Item
 {
+	protected int healthRestored;
+
 	public ItemPotionHealth(int i, int h)
 	{
 		super(i);
 		healthRestored = h;
 	}
 	
-	public void onRightClick(World world, EntityPlayer entity)
+	public void onRightClick(World world, EntityLivingPlayer player)
 	{
-		boolean success = world.player.healPlayer(world, healthRestored);
+		boolean success = player.healPlayer(world, healthRestored);
 		
 		if(success)
 		{
-			world.player.inventory.removeItemsFromInventoryStack(1, world.player.selectedSlot);
+			player.inventory.removeItemsFromInventoryStack(1, player.selectedSlot);
 		}
 	}
 	
@@ -23,6 +24,4 @@ public class ItemPotionHealth extends Item
 	{
 		return healthRestored;
 	}
-	
-	protected int healthRestored;
 }

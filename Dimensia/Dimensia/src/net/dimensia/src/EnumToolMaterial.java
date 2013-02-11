@@ -3,8 +3,9 @@ package net.dimensia.src;
 public enum EnumToolMaterial 
 {
 	/**
-	 * Stone hardness = 50.0f;
-	 * With that: (in comments, game ticks to break stone with the tool strength specified)
+	 * Stone hardness is 50.0f;
+	 * There are some comments describing how long it takes to break a piece of stone with
+	 * the specified tool strength. Ex. Copper takes 50 game ticks (2.5 sec)
 	 */
 	
 	FIST		(0.0f, 0, 2.5f, "Fist"),
@@ -22,6 +23,11 @@ public enum EnumToolMaterial
 	TIER12		(10.0f , 12, 45.0f, ""), //5 
 	GOD			(100.0f , 12, 45.0f, ""); //This is intended for testing 
 	
+	public float strength;
+	public int toolTier;
+	public float distance;
+	public String materialName;
+	
 	EnumToolMaterial(float s, int t, float d, String name)
 	{
 		strength = s;
@@ -34,22 +40,19 @@ public enum EnumToolMaterial
 	{
 		return strength;
 	}
+	
 	public int getToolTier()
 	{
 		return toolTier;
 	}
+
 	public String getMaterialName()
 	{
 		return materialName;
 	}
 	
-	public float getDistance(){
+	public float getDistance()
+	{
 		return distance;
 	}
-	
-	public float strength;
-	public int toolTier;
-	public float distance;
-	public String materialName;
-	
 }

@@ -1,8 +1,11 @@
 package net.dimensia.src;
+
 import java.util.Random;
 
 public class WeatherSnow extends Weather
 {
+	public Particle[] snow;
+	private Random random = new Random();
 	/**
 	 * Gives the WeatherSnow instance all the information it needs to create a decent snow effect
 	 * then initializes all the particles appropriately. 
@@ -30,7 +33,7 @@ public class WeatherSnow extends Weather
 	 */
 	private Block getBlockAtPosition(World world, float x, float y)
 	{
-		return world.getBlock(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)x / 6), MathHelper.returnIntegerInWorldMapBounds_X(world, (int)y / 6));
+		return world.getBlockGenerate(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)x / 6), MathHelper.returnIntegerInWorldMapBounds_X(world, (int)y / 6));
 	}
 	
 	/**
@@ -42,7 +45,7 @@ public class WeatherSnow extends Weather
 	 */
 	private boolean isInBlock(World world, float x, float y)
 	{
-		return !(world.getBlock(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)x / 6), MathHelper.returnIntegerInWorldMapBounds_X(world, (int)y / 6)).isPassable());
+		return !(world.getBlockGenerate(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)x / 6), MathHelper.returnIntegerInWorldMapBounds_X(world, (int)y / 6)).isPassable());
 	}
 	
 	/**
@@ -85,14 +88,14 @@ public class WeatherSnow extends Weather
 				if(getBlockAtPosition(world, snow[i].x, snow[i].y) instanceof BlockGrass && snow[i].x > 0 && snow[i].y > 0)
 				{
 					//Adding snow cover
-					if(world.getBlock(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)snow[i].x / 6), MathHelper.returnIntegerInWorldMapBounds_Y(world, (int)((snow[i].y - 6) / 6))) == Block.air)
+					if(world.getBlockGenerate(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)snow[i].x / 6), MathHelper.returnIntegerInWorldMapBounds_Y(world, (int)((snow[i].y - 6) / 6))).getBlockID() == Block.air.getBlockID())
 					{
-						world.setBlock(Block.snowCover, MathHelper.returnIntegerInWorldMapBounds_X(world, (int)snow[i].x / 6), MathHelper.returnIntegerInWorldMapBounds_Y(world, (int)((snow[i].y - 6) / 6)));						
+						world.setBlockGenerate(Block.snowCover, MathHelper.returnIntegerInWorldMapBounds_X(world, (int)snow[i].x / 6), MathHelper.returnIntegerInWorldMapBounds_Y(world, (int)((snow[i].y - 6) / 6)));						
 					}
 					//Converting grass to snowy-grass:
-					if (world.getBlock(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)snow[i].x / 6), MathHelper.returnIntegerInWorldMapBounds_Y(world, (int)((snow[i].y - 6) / 6) + 1)) == Block.grass)
+					if (world.getBlockGenerate(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)snow[i].x / 6), MathHelper.returnIntegerInWorldMapBounds_Y(world, (int)((snow[i].y - 6) / 6) + 1)).getBlockID() == Block.grass.getBlockID())
 					{
-						world.setBlock(Block.snowyGrass.clone(), MathHelper.returnIntegerInWorldMapBounds_X(world, (int)snow[i].x / 6), MathHelper.returnIntegerInWorldMapBounds_Y(world, (int)((snow[i].y - 6) / 6) + 1));					
+						world.getBlockGenerate(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)snow[i].x / 6), MathHelper.returnIntegerInWorldMapBounds_Y(world, (int)((snow[i].y - 6) / 6) + 1)).setBitMap(world.getBlockGenerate(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)snow[i].x / 6), MathHelper.returnIntegerInWorldMapBounds_Y(world, (int)((snow[i].y - 6) / 6) + 1)).getBitMap() + 16);					
 					}					
 					
 				}
@@ -102,7 +105,4 @@ public class WeatherSnow extends Weather
 			}
 		} 	
 	}
-
-	public Particle[] snow;
-	private Random random = new Random();
 }

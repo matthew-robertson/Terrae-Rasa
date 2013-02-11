@@ -63,8 +63,6 @@ public class CallableGenerateWorld implements Callable<World>
 	private void saveWorld(World world) throws FileNotFoundException, IOException
 	{
 		verifyDirectoriesExist();
-		EntityPlayer player = world.getPlayer(); //Temperarily store the player
-		world.player = null;
 		
 		String fileName = (BASE_PATH + "/World Saves/" + world.getWorldName() + ".dat"); 
 		GZIPOutputStream fileWriter = new GZIPOutputStream(new FileOutputStream(new File(fileName))); //Open an output stream
@@ -80,7 +78,6 @@ public class CallableGenerateWorld implements Callable<World>
 		s.close();
 		bos.close();
 		fileWriter.close();      
-		world.player = player;
 	}
 	
 	/**

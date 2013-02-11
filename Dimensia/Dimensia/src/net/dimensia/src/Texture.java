@@ -1,4 +1,5 @@
 package net.dimensia.src;
+
 import org.lwjgl.opengl.GL11;
 
 /**
@@ -12,6 +13,8 @@ import org.lwjgl.opengl.GL11;
  */
 public class Texture 
 {
+	private int textureID; 
+	
 	/**
 	 * Constructs a new Texture object, storing the specified textureID for binding
 	 * @param textureID the Integer representing the texture that can be bound
@@ -29,6 +32,4 @@ public class Texture
 	{
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureID);
 	}
-	
-	private int textureID; 
 }

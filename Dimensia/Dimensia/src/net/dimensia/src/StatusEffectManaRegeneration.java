@@ -13,7 +13,7 @@ public class StatusEffectManaRegeneration extends StatusEffect
 		{
 			if(ticksLeft % (40 / tier) == 0)
 			{
-				((EntityPlayer)(entity)).restorePlayerMana(world, 4);
+				((EntityLivingPlayer)(entity)).restorePlayerMana(world, 4);
 			}
 		}
 		catch(Exception e) //This should indicate that somehow a non-player has somehow got this buff. Mana cap no longer matters in this case

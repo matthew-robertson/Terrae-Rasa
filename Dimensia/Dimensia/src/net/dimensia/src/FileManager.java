@@ -1,4 +1,5 @@
 package net.dimensia.src;
+
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.File;
@@ -16,16 +17,22 @@ import net.dimensia.client.Dimensia;
 
 public class FileManager
 {		
+	private final String BASE_PATH;
+	
 	public FileManager()
 	{
-		String osName = System.getProperty("os.name");
-		if(osName.toLowerCase().contains("window"))
+		String osName = System.getProperty("os.name").toLowerCase();
+		if(osName.contains("window"))
 		{
-			BASE_PATH = new StringBuilder().append("C:/Users/").append(System.getProperty("user.name")).append("/AppData/Roaming/Dimensia").toString();
+			BASE_PATH = Dimensia.WINDOWS_BASE_PATH;
 		}
-		else if(osName.toLowerCase().contains("mac"))
+		else if(osName.contains("mac"))
 		{
-			BASE_PATH = new StringBuilder().append("/Users/").append(System.getProperty("user.name")).append("/Library/Application Support/Dimensia").toString();
+			BASE_PATH = Dimensia.MAC_BASE_PATH;
+		}
+		else if(osName.contains("ubuntu") || osName.contains("linux"))
+		{
+			BASE_PATH = Dimensia.LINUX_BASE_PATH;
 		}
 		else
 		{
@@ -43,8 +50,36 @@ public class FileManager
 	public World generateAndSaveWorld(String name, EnumWorldSize worldSize, EnumDifficulty difficulty)
 	{
 		World world = generateNewWorld(name, worldSize.getWidth(), worldSize.getHeight(), difficulty);
-		world.saveRemainingWorld();
+		world.saveRemainingWorld("Earth");
 		return world;
+	}
+	
+	/**
+	 * Gets a new WorldHell, with specified settings, and saves it to file before returning it.
+	 * @param name the name of the WorldHell to create
+	 * @param worldSize the Enum used to indicate the WorldHell's size
+	 * @param difficulty the Enum used to indicate the WorldHell's difficulty
+	 * @return the newly generated WorldHell or in case of failure, null
+	 */
+	public WorldHell generateAndSaveWorldHell(String name, EnumWorldSize worldSize, EnumDifficulty difficulty)
+	{
+		WorldHell worldHell = generateNewWorldHell(name, worldSize.getWidth(), worldSize.getHeight(), difficulty);
+		worldHell.saveRemainingWorld("Hell");
+		return worldHell;
+	}
+	
+	/**
+	 * Gets a new WorldSky, with specified settings, and saves it to file before returning it.
+	 * @param name the name of the WorldSky to create
+	 * @param worldSize the Enum used to indicate the WorldSky's size
+	 * @param difficulty the Enum used to indicate the WorldSky's difficulty
+	 * @return the newly generated WorldSky or in case of failure, null
+	 */
+	public WorldSky generateAndSaveWorldSky(String name, EnumWorldSize worldSize, EnumDifficulty difficulty)
+	{
+		WorldSky worldSky = generateNewWorldSky(name, worldSize.getWidth(), worldSize.getHeight(), difficulty);
+		worldSky.saveRemainingWorld("Sky");
+		return worldSky;
 	}
 	
 	/**
@@ -54,10 +89,10 @@ public class FileManager
 	 * @throws IOException Indicates the saving operation has failed
 	 * @throws ClassNotFoundException Indicates the World class does not exist with the correct version
 	 */	
-	public World loadWorld(String name) throws IOException, ClassNotFoundException
+	public World loadWorld(String dir, String name) throws IOException, ClassNotFoundException
 	{
 		World world = new World();
-		world.loadAndApplyWorldData(BASE_PATH, name);
+		world.loadAndApplyWorldData(BASE_PATH, name, dir);
 		return world;
 	}
 		
@@ -77,16 +112,46 @@ public class FileManager
 	}
 	
 	/**
+	 * Creates a new WorldHell, complete with worldgen, and ready to use
+	 * @param name the WorldHell's name
+	 * @param w the width of the WorldHell
+	 * @param h the height of the WorldHell
+	 * @param difficulty the difficulty setting of the WorldHell (easy, medium, hardcore)
+	 * @return the newly created WorldHell
+	 */
+	public WorldHell generateNewWorldHell(String name, int w, int h, EnumDifficulty difficulty)
+	{
+		WorldHell worldHell = (WorldHell) new WorldGenHell().generate(new WorldHell(name, w, h, difficulty));
+		LightingEngine.applySunlight(worldHell);
+		return worldHell;
+	}
+	
+	/**
+	 * Creates a new WorldSky, complete with worldgen, and ready to use
+	 * @param name the WorldSky's name
+	 * @param w the width of the WorldSky
+	 * @param h the height of the WorldSky
+	 * @param difficulty the difficulty setting of the WorldSky (easy, medium, hardcore)
+	 * @return the newly created WorldSky
+	 */
+	public WorldSky generateNewWorldSky(String name, int w, int h, EnumDifficulty difficulty)
+	{
+		WorldSky world = (WorldSky) new WorldGenSky().generate(new World(name, w, h, difficulty));
+		LightingEngine.applySunlight(world);
+		return world;
+	}
+	
+	/**
 	 * Creates a new player and saves it to file immediately before returning that new player
 	 * @param name Name of the player being created
 	 * @param difficulty The difficulty settings (EnumDifficulty) of the player being created
 	 * @return The new player created, or in the case of a failure - null;
 	 */
-	public EntityPlayer generateAndSavePlayer(String name, EnumDifficulty difficulty)
+	public EntityLivingPlayer generateAndSavePlayer(String name, EnumDifficulty difficulty)
 	{
 		try 
 		{
-			EntityPlayer player = generateNewEntityPlayer(name, difficulty);
+			EntityLivingPlayer player = generateNewEntityLivingPlayer(name, difficulty);
 			savePlayer(player);
 			return player;
 		}
@@ -98,14 +163,14 @@ public class FileManager
 	}
 	
 	/**
-	 * Generates a new EntityPlayer with filler x, y positions
+	 * Generates a new EntityLivingPlayer with filler x, y positions
 	 * @param name the name of the player to be generated.
 	 * @param difficulty the difficulty setting (EnumDifficulty) of the player to be generated
-	 * @return a newly generated EntityPlayer with given attributes 
+	 * @return a newly generated EntityLivingPlayer with given attributes 
 	 */
-	private EntityPlayer generateNewEntityPlayer(String name, EnumDifficulty difficulty)
+	private EntityLivingPlayer generateNewEntityLivingPlayer(String name, EnumDifficulty difficulty)
 	{
-		return new EntityPlayer(name, difficulty);
+		return new EntityLivingPlayer(name, difficulty);
 	}
 	
 	/**
@@ -114,7 +179,7 @@ public class FileManager
 	 * @throws IOException Indicates the saving operation has failed
 	 * @throws FileNotFoundException Indicates the desired directory (file) is not found on the filepath
 	 */
-	private void savePlayer(EntityPlayer player) throws FileNotFoundException, IOException
+	public void savePlayer(EntityLivingPlayer player) throws FileNotFoundException, IOException
 	{
 		verifyDirectoriesExist();
 		String fileName = (BASE_PATH + "/Player Saves/" + player.getName() + ".dat");		
@@ -144,7 +209,7 @@ public class FileManager
 	private void verifyDirectoriesExist()
 	{
 		new File(BASE_PATH);
-		new File(BASE_PATH + "/Bin").mkdir();
+		new File(BASE_PATH + "/bin").mkdir();
     	new File(BASE_PATH + "/World Saves").mkdir();
         new File(BASE_PATH + "/Resources").mkdir();
         new File(BASE_PATH + "/Player Saves").mkdir();
@@ -223,14 +288,13 @@ public class FileManager
 	 * Saves the player and world to disk after quitting the game. This currently cheats a bit and gets the world using
 	 * "Dimensia.Dimensia.world" as the location. This is not advised, but currently siffices.
 	 */
-	public void saveAndQuitGame(World world)
+	public void saveAndQuitGame()
 	{
 		try
 		{
-			savePlayer(Dimensia.dimensia.world.player);
-			world.saveRemainingWorld();
-			Dimensia.dimensia.mainMenu = new GuiMainMenu(); // Loads the menu again
-			Dimensia.dimensia.isMainMenuOpen = true; //Sets menu open
+			Dimensia.dimensia.gameEngine.closeGameToMenu();
+			Dimensia.resetMainMenu();
+			Dimensia.isMainMenuOpen = true; //Sets menu open
 			System.out.println("Save and quit successful");
 		}
 		catch (Exception e)
@@ -327,15 +391,15 @@ public class FileManager
 	/**
 	 * Loads the specified player from the ~/Player Saves/ Directory
 	 * @param name the name of the player to load
-	 * @return the entityplayer loaded
+	 * @return the EntityLivingPlayer loaded
 	 * @throws IOException Indicates the saving operation has failed
-	 * @throws ClassNotFoundException Indicates the EntityPlayer class does not exist with the correct version
+	 * @throws ClassNotFoundException Indicates the EntityLivingPlayer class does not exist with the correct version
 	 */
-	public EntityPlayer loadPlayer(String name) throws IOException, ClassNotFoundException
+	public EntityLivingPlayer loadPlayer(String name) throws IOException, ClassNotFoundException
 	{
 		String fileName = BASE_PATH + "/Player Saves/" + name + ".dat";
 		ObjectInputStream ois = new ObjectInputStream(new DataInputStream(new GZIPInputStream(new FileInputStream(fileName)))); //Open an input stream
-		EntityPlayer player = (EntityPlayer)ois.readObject(); //Load the object
+		EntityLivingPlayer player = (EntityLivingPlayer)ois.readObject(); //Load the object
 	    System.out.println("Player loaded from: " + fileName);
 		ois.close();
 		player.reconstructPlayerFromFile();
@@ -426,6 +490,4 @@ public class FileManager
 	{
 		return BASE_PATH;
 	}
-	
-	private final String BASE_PATH;
 }

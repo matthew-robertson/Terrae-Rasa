@@ -1,6 +1,6 @@
 package net.dimensia.src;
-import java.io.Serializable;
 
+import java.io.Serializable;
 
 public class BlockLeaves extends Block implements Serializable
 {
@@ -15,5 +15,4 @@ public class BlockLeaves extends Block implements Serializable
 	{
 		return (random.nextInt(20) == 0) ? new ItemStack(Block.sapling, 1) : null;
 	}
-	
 }

@@ -31,6 +31,11 @@ package net.dimensia.src;
  */
 public class MonsterDrop
 {	
+	private int rollMaximum;
+	private int minimum;
+	private int maximum;
+	private ItemStack drop;
+
 	/**
 	 * Constructs a new monster drop, with only the ItemStack. The chance of the drop is assumed to be 100% and maximum/minimum drop amount is 1. In other words, a 
 	 * Guaranteed drop can be registered using this constructor.
@@ -79,9 +84,4 @@ public class MonsterDrop
 	{
 		return new ItemStack(drop);
 	}
-	
-	private int rollMaximum;
-	private int minimum;
-	private int maximum;
-	private ItemStack drop;
 }

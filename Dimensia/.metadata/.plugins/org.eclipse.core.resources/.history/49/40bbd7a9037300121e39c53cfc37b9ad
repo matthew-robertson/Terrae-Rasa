@@ -1,0 +1,21 @@
+Restructuring
+>Fix class names
+>Fix variables
+>More documentation
+>Fix graphics engine
+
+
+
+
+Bugs
+>Game is non-responsive during world gen
+		Add threading to this issue. CallableGenerateWorld?
+>Fix the shit main menu
+>TEXT!
+
+
+Sound 
+Lighting
+Animation
+
+Fix texture loader

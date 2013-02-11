@@ -1,8 +1,15 @@
 package net.dimensia.src;
 
-
 public class ItemArmor extends Item
 {
+	protected boolean isSavingRelic;
+	protected EnumSetBonuses[] bonuses;
+	protected EnumArmor armorType;
+	protected int defense;
+	protected int dexterity;
+	protected int strength;
+	protected int intellect;
+	
 	protected ItemArmor(int i) 
 	{
 		super(i);
@@ -105,14 +112,5 @@ public class ItemArmor extends Item
 	public boolean getIsSavingRelic()
 	{
 		return isSavingRelic;
-	}
-	
-	
-	protected boolean isSavingRelic;
-	protected EnumSetBonuses[] bonuses;
-	protected EnumArmor armorType;
-	protected int defense;
-	protected int dexterity;
-	protected int strength;
-	protected int intellect;
+	}	
 }

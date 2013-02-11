@@ -1,8 +1,10 @@
 package net.dimensia.src;
 
-
 public class ItemTool extends Item
 {
+	/** Damage the weapon does */
+	public int damageDone; 	
+	
 	protected ItemTool(int i)
 	{
 		super(i);
@@ -20,6 +22,4 @@ public class ItemTool extends Item
 	{
 		return damageDone;
 	}
-	
-	public int damageDone; //Damage the weapon does	
 }

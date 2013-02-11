@@ -1,12 +1,63 @@
 package net.dimensia.src;
-import java.awt.Font;
 
+import java.awt.Font;
 
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
 public class Render 
 {	
+	public static Texture zombie;
+	public static Texture goblin;
+	public static Texture slime;
+	
+	//</menu textures>
+	public static Animation a_water;
+
+	public static Texture dino;
+	public static Texture ICONS;
+	public static Texture snow_tex;
+	public static Texture TERRAIN;
+	public static Texture TERRAIN_GROUND;
+	public static Texture PROJECTILES;
+	public static RenderUI renderUI;
+	public static RenderEntities renderEntities;
+	public static RenderBlocks renderBlocks;
+	public static RenderParticles renderParticles;
+	public static TrueTypeFont trueTypeFont;
+	public static TrueTypeFont trueTypeFont_AR;
+	public static Tessellator t = Tessellator.instance;
+	public static TextureLoader loader;
+	public static Texture player_garbage;
+	public static Texture player_heart;
+	public static Texture player_mana;
+	public static Texture playerTexture;
+	public static Texture actionbarSlot;
+	public static Texture actionbarOutline;
+	public static Texture logo;
+	public static Texture background2;
+	public static Texture[] textures;
+	public static Texture[] backgroundImages;
+	//menu textures
+	public static Texture buttonTexture;
+	public static Texture[] moons;
+	public static Texture sun; 
+	public static Texture background_1; //Background (sky)
+	/** 
+	 * cameraX is a relatively unique variable. It's where the camera is moved to on the X axis, based on player location. Therefore this value becomes
+	 * very important to rendering user interface components. Using this value in addition to another, allows something to always be seen
+	 * by the player, and for that object not to shake or move randomly. This value is always in 'ortho' units, for easy rendering and 
+	 * camera readjustment. <b>NOTE: cameraX is often negative or inversed, use getCameraX() to correct this. </b>
+	 **/
+	private static int cameraX;
+	/** 
+	 * cameraY is a relatively unique variable. It's where the camera is moved to on the Y axis, based on player location. Therefore this value becomes
+	 * very important to rendering user interface components. Using this value in addition to another, allows something to always be seen
+	 * by the player, and for that object not to shake or move randomly. This value is always in 'ortho' units, for easy rendering and 
+	 * camera readjustment. <b>NOTE: cameraY is often negative or inversed, use getCameraY() to correct this. </b>
+	 **/
+	private static int cameraY;
+	
 	protected void renderSkyBackgroundScene()
 	{		
 		background2.bind();        
@@ -24,15 +75,15 @@ public class Render
 	 * This is due to the large amount of math required. Subsequent camera adjustments (per rendered frame) can be made 
 	 * much cheaper using {@link #adjustToLastCameraPosition()}.
 	 */
-	protected void adjustCamera(World world) 
+	protected void adjustCamera(World world, EntityLivingPlayer player) 
 	{
 		GL11.glLoadIdentity();// + seems to be on ----> this side of the Y axis, it behaves quite wierdly when comparing along the X axis however
 		final int width = (int) (Display.getWidth() / 2) + 1;
 		final int height = (int) (Display.getHeight() / 2) + 1;
 		final int xAdjust = (int) (Display.getWidth() * 0.239);
 		final int yAdjust = (int) (Display.getHeight() * 0.188);
-		float sx = MathHelper.inverseValue((int)world.player.x) + xAdjust;
-		float sy = MathHelper.inverseValue((int)world.player.y) + yAdjust;
+		float sx = MathHelper.inverseValue((int)player.x) + xAdjust;
+		float sy = MathHelper.inverseValue((int)player.y) + yAdjust;
 		if(sx > 0) sx = 0; //Bounds checking
 		if(sy > 0) sy = 0;				
 		if(sx < MathHelper.inverseValue(world.getWidth()) * 6 + width) sx = MathHelper.inverseValue(world.getWidth()) * 6 + width;
@@ -121,56 +172,4 @@ public class Render
 	{
 		return Math.abs(cameraY);
 	}
-	
-	public static Texture zombie;
-	public static Texture goblin;
-	public static Texture slime;
-	
-	//</menu textures>
-	public static Animation a_water;
-
-	public static Texture dino;
-	public static Texture ICONS;
-	public static Texture snow_tex;
-	public static Texture TERRAIN;
-	public static Texture TERRAIN_GROUND;
-	public static Texture PROJECTILES;
-	public static RenderUI renderUI;
-	public static RenderEntities renderEntities;
-	public static RenderBlocks renderBlocks;
-	public static RenderParticles renderParticles;
-	public static TrueTypeFont trueTypeFont;
-	public static TrueTypeFont trueTypeFont_AR;
-	public static Tessellator t = Tessellator.instance;
-	public static TextureLoader loader;
-	public static Texture player_garbage;
-	public static Texture player_heart;
-	public static Texture player_mana;
-	public static Texture playerTexture;
-	public static Texture actionbarSlot;
-	public static Texture actionbarOutline;
-	public static Texture logo;
-	public static Texture background2;
-	public static Texture[] textures;
-	public static Texture[] backgroundImages;
-	//menu textures
-	public static Texture buttonTexture;
-	public static Texture[] moons;
-	public static Texture sun; 
-	public static Texture background_1; //Background (sky)
-
-	/** 
-	 * cameraX is a relatively unique variable. It's where the camera is moved to on the X axis, based on player location. Therefore this value becomes
-	 * very important to rendering user interface components. Using this value in addition to another, allows something to always be seen
-	 * by the player, and for that object not to shake or move randomly. This value is always in 'ortho' units, for easy rendering and 
-	 * camera readjustment. <b>NOTE: cameraX is often negative or inversed, use getCameraX() to correct this. </b>
-	 **/
-	private static int cameraX;
-	/** 
-	 * cameraY is a relatively unique variable. It's where the camera is moved to on the Y axis, based on player location. Therefore this value becomes
-	 * very important to rendering user interface components. Using this value in addition to another, allows something to always be seen
-	 * by the player, and for that object not to shake or move randomly. This value is always in 'ortho' units, for easy rendering and 
-	 * camera readjustment. <b>NOTE: cameraY is often negative or inversed, use getCameraY() to correct this. </b>
-	 **/
-	private static int cameraY;
 }

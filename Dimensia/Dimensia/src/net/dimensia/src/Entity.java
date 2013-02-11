@@ -22,15 +22,39 @@ import java.io.Serializable;
  * @version     1.0
  * @since       1.0
  */
-public class Entity implements Serializable 
+public class Entity implements Serializable
 {
 	private static final long serialVersionUID = 1L;
+	protected boolean isAffectedByWalls;
+	protected boolean isAffectedByGravity;
+	protected boolean canJumpAgain; //Can the entity jump?
+	protected boolean isJumping;	
+	protected float upwardJumpHeight; //Determines the jump distance
+	protected float jumpSpeed;
+	protected float x;
+	protected float y;
+	protected float fallSpeed;
+	protected float upwardJumpCounter; //Holds the value of the jump, reset when hitting the ground	
 	
 	public Entity()
 	{
 		isAffectedByWalls = true;
 		isAffectedByGravity = true;		
 	}	
+	
+	public Entity(Entity entity)
+	{
+		this.isAffectedByWalls = entity.isAffectedByWalls;
+		this.isAffectedByGravity = entity.isAffectedByGravity;
+		this.canJumpAgain = entity.canJumpAgain; 
+		this.isJumping = entity.isJumping;	
+		this.upwardJumpHeight = entity.upwardJumpHeight; 
+		this.jumpSpeed = entity.jumpSpeed;
+		this.x = entity.x;
+		this.y = entity.y;
+		this.fallSpeed = entity.fallSpeed;
+		this.upwardJumpCounter = entity.upwardJumpCounter; 
+	}
 	
 	public Entity setPosition(int i, int j)
 	{
@@ -71,14 +95,5 @@ public class Entity implements Serializable
 		return y;
 	}
 	
-	protected boolean isAffectedByWalls;
-	protected boolean isAffectedByGravity;
-	protected boolean canJumpAgain; //Can the entity jump?
-	protected boolean isJumping;	
-	protected float upwardJumpHeight; //Determines the jump distance
-	protected float jumpSpeed;
-	protected float x;
-	protected float y;
-	protected float fallSpeed;
-	protected float upwardJumpCounter; //Holds the value of the jump, reset when hitting the ground	
+	
 }

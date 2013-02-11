@@ -1,9 +1,8 @@
 package net.dimensia.src;
+
 import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.Hashtable;
-
-import net.dimensia.client.Dimensia;
 
 /**
  * This class is responsable for holding all the ItemStacks and ItemArmor_ the player currently has. <br>
@@ -15,9 +14,14 @@ import net.dimensia.client.Dimensia;
  * 
  *
  */
-public class InventoryPlayer implements Serializable
+public class InventoryPlayer 
+		implements Serializable
 {
 	private static final long serialVersionUID = 1L;
+	private Hashtable<String, Integer> inventoryTotals;
+	private ItemStack[] trash;
+	private ItemStack[] mainInventory;
+	private ItemStack[] armorInventory;		
 	
 	/**
 	 * Only constructor for InventoryPlayer. <br>
@@ -143,13 +147,13 @@ public class InventoryPlayer implements Serializable
 	 * @param stack Stack to pick up
 	 * @return whatever's left, or null for a successful operation
 	 */
-	public ItemStack pickUpItemStack(ItemStack stack)
+	public ItemStack pickUpItemStack(World world, EntityLivingPlayer player, ItemStack stack)
 	{
 		int slot;
 		int size = stack.getStackSize();
 		try		
 		{
-			Dimensia.dimensia.world.player.onInventoryChange();
+			player.onInventoryChange();
 		}
 		catch (Exception e)	//Try/catch- fixing lazy programming for many years!
 		{	
@@ -214,12 +218,12 @@ public class InventoryPlayer implements Serializable
 	 * @param stack stack to try to remove (including # to remove)
 	 * @return success of the removal
 	 */
-	public boolean removeItemsFromInventory(ItemStack stack)
+	public boolean removeItemsFromInventory(World world, EntityLivingPlayer player, ItemStack stack)
 	{
 		int quantity = stack.getStackSize();
 		boolean[] nullSlots = new boolean[mainInventory.length];
 		boolean removeItems = false;
-		Dimensia.dimensia.world.player.onInventoryChange();
+		player.onInventoryChange();
 		
 		for(int i = 0; i < mainInventory.length; i++)
 		{
@@ -293,9 +297,9 @@ public class InventoryPlayer implements Serializable
 	 * Removes an entire stack of the mainInventory[].
 	 * @param index index in mainInventory[] to remove
 	 */
-	public void removeEntireStackFromInventory(int index)
+	public void removeEntireStackFromInventory(World world, EntityLivingPlayer player, int index)
 	{
-		Dimensia.dimensia.world.player.onInventoryChange();
+		player.onInventoryChange();
 		inventoryTotals.put(mainInventory[index].getItemName(), inventoryTotals.get(mainInventory[index].getItemName()) - mainInventory[index].getStackSize()); 
 		mainInventory[index] = null;
 	}
@@ -306,9 +310,9 @@ public class InventoryPlayer implements Serializable
 	 * @param index where to place the stack in mainInventory[]
 	 * @return success of the operation
 	 */
-	public boolean putItemStackInSlot(ItemStack stack, int index)
+	public boolean putItemStackInSlot(World world, EntityLivingPlayer player, ItemStack stack, int index)
 	{
-		Dimensia.dimensia.world.player.onInventoryChange();
+		player.onInventoryChange();
 		
 		if(stack == null) //the stack to be placed is null, so clear the slot in mainInventory[] (this has to get a bit hacky for control reasons)
 		{
@@ -330,9 +334,9 @@ public class InventoryPlayer implements Serializable
 	 * @param index where to combine stacks in mainInventory[]
 	 * @return success of operation
 	 */
-	public boolean combineItemStacksInSlot(ItemStack stack, int index)
+	public boolean combineItemStacksInSlot(World world, EntityLivingPlayer player, ItemStack stack, int index)
 	{
-		Dimensia.dimensia.world.player.onInventoryChange();
+		player.onInventoryChange();
 		if(mainInventory[index] == null || mainInventory[index].getItemID() != stack.getItemID())
 		{	
 			return false;
@@ -360,6 +364,23 @@ public class InventoryPlayer implements Serializable
 		{
 			armorInventory[index] = new ItemStack(stack);
 		}
+		return true;
+	}
+	
+	/**
+	 * Checks to see if the player has anything in their (main)inventory
+	 * @return true if the mainInventory is empty, otherwise false
+	 */
+	public boolean isEmpty()
+	{
+		for(int i = 0; i < mainInventory.length; i++)
+		{
+			if(mainInventory[i] != null)
+			{
+				return false;
+			}
+		}
+		
 		return true;
 	}
 	
@@ -486,9 +507,4 @@ public class InventoryPlayer implements Serializable
 			}
 		}
 	}
-	
-	private Hashtable<String, Integer> inventoryTotals;
-	private ItemStack[] trash;
-	private ItemStack[] mainInventory;
-	private ItemStack[] armorInventory;		
 }

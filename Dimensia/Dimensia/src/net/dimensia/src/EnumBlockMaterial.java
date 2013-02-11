@@ -1,7 +1,7 @@
 package net.dimensia.src;
 
-public enum EnumBlockMaterial {
-
+public enum EnumBlockMaterial 
+{
 	DIRT(),
 	STONE(),
 	IRON(),
@@ -9,8 +9,5 @@ public enum EnumBlockMaterial {
 	
 	EnumBlockMaterial()
 	{
-		
 	}
-		
-	
 }

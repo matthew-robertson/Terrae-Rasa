@@ -5,7 +5,8 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class FontUtils {
+public class FontUtils
+{
 	/**
 	 * A cache of the dynamically loaded fonts found in the fonts directory.
 	 */
@@ -40,5 +41,4 @@ public class FontUtils {
 		
 		return font;
 	}
-
 }

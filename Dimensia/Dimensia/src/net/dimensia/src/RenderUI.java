@@ -46,6 +46,16 @@ import org.lwjgl.opengl.GL11;
 
 public class RenderUI extends Render
 {
+	private Font font = FontUtils.getFont("andy-bold.ttf");
+	private final TrueTypeFont tooltipFont = new TrueTypeFont((font.deriveFont(24.0f)), false);
+	private GuiResizableTextUncentered saveAndQuit;
+	//Variables for the item picked up by the mouse:
+	private boolean shouldDropItem;
+	private int mouseItemSize; //How big it is
+	private ItemStack mouseItem; //What it is
+	private int mouseXOffset; //How far it should be adjusted to avoid looking bad
+	private int mouseYOffset;	
+	
 	/**
 	 * Constructs a new instance of RenderUI. The constructor is only required to initialize the 'Save And Quit'
 	 * button, and mouseItem information currently
@@ -74,30 +84,30 @@ public class RenderUI extends Render
 	 * <li>the garbage slot
 	 * <li>the recipe scroller
 	 */
-	public void render(World world)
+	public void render(World world, EntityLivingPlayer player)
 	{		
 		GL11.glEnable(GL11.GL_BLEND);
 		
-		renderHeartsAndMana(world); //The hearts and mana
+		renderHeartsAndMana(world, player); //The hearts and mana
 	
-		if(world.player.isInventoryOpen)
+		if(player.isInventoryOpen)
 		{
-			renderInventory(world); //The full inventory if it's open
-			updateMouse(world); 
-			if(world.player.isViewingChest) //Chest(s) if they're being viewed
+			renderInventory(world, player); //The full inventory if it's open
+			updateMouse(world, player); 
+			if(player.isViewingChest) //Chest(s) if they're being viewed
 			{
-				renderChest(world);
+				renderChest(world, player);
 			}
 			
-			attemptToRenderItemTooltip(world);
+			attemptToRenderItemTooltip(world, player);
 		}	
 		else
 		{
-			renderActionBar(world);	//The actionbar if the inventory is closed
+			renderActionBar(world, player);	//The actionbar if the inventory is closed
 		}
 		
 		renderMouseItem(); //The item held by the mouse, if there is one
-		renderText(world); //Health and the 'Save And Quit' button
+		renderText(world, player); //Health and the 'Save And Quit' button
 		
 		
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA); //Re-enable this so the lighting renders properly
@@ -108,20 +118,20 @@ public class RenderUI extends Render
 	 * Updates all mouse events on call. Including: chests, the mainInventory, the garbage, 
 	 * and the recipe scroller 
 	 */
-	public void updateMouse(World world)
+	public void updateMouse(World world, EntityLivingPlayer player)
 	{
-		mouseEventInventory(world);	
+		mouseEventInventory(world, player);	
 	}
 	
 	/**
 	 * Attempts to render a tooltip for the selected Item. This may later extend beyond the item's name, to include
 	 * comprehensive information like damage, or item effect.
 	 */
-	private void attemptToRenderItemTooltip(World world)
+	private void attemptToRenderItemTooltip(World world, EntityLivingPlayer player)
 	{
-		if(world.player.inventory.getMainInventoryStack(world.player.selectedSlot) != null)
+		if(player.inventory.getMainInventoryStack(player.selectedSlot) != null)
 		{
-			//world.player.inventory.getMainInventoryStack(world.player.selectedSlot).getItemName()
+			//player.inventory.getMainInventoryStack(player.selectedSlot).getItemName()
 			tooltipFont.drawString(getCameraX() + 150, getCameraY() + 100, "Hello Test", 0.2f, -1.0f);
 			tooltipFont.drawString(getCameraX() + 150, getCameraY() + 150, "Hello Test", 0.4f, -1.0f);
 			tooltipFont.drawString(getCameraX() + 150, getCameraY() + 200, "Hello Test", 0.6f, -1.0f);
@@ -144,7 +154,7 @@ public class RenderUI extends Render
 	 * @param yOffset how far on the y-axis is the rendered mouse item adjusted
 	 * @param itemSize how big is the mouse item being rendered
 	 */
-	private void pickUpMouseItem(World world, int whichInventory, int index, int xOffset, int yOffset, int itemSize)
+	private void pickUpMouseItem(World world, EntityLivingPlayer player, int whichInventory, int index, int xOffset, int yOffset, int itemSize)
 	{
 		shouldDropItem = false;
 		mouseItemSize = itemSize;
@@ -153,18 +163,18 @@ public class RenderUI extends Render
 		
 		if(whichInventory == 1) //Main Inventory
 		{
-			mouseItem = world.player.inventory.getMainInventoryStack(index);
-			world.player.inventory.putItemStackInSlot(null, index);
+			mouseItem = player.inventory.getMainInventoryStack(index);
+			player.inventory.putItemStackInSlot(world, player, null, index);
 		}
 		else if(whichInventory == 2) //Armor Inventory
 		{
-			mouseItem = world.player.inventory.getArmorInventoryStack(index);
-			world.player.inventory.setArmorInventoryStack(null, index);
+			mouseItem = player.inventory.getArmorInventoryStack(index);
+			player.inventory.setArmorInventoryStack(null, index);
 		}
 		else if(whichInventory == 3) //Trash
 		{
-			mouseItem = world.player.inventory.getTrashStack(index);
-			world.player.inventory.setTrashStack(null, index);
+			mouseItem = player.inventory.getTrashStack(index);
+			player.inventory.setTrashStack(null, index);
 		}
 	}
 	
@@ -173,34 +183,34 @@ public class RenderUI extends Render
 	 * @param whichInventory the number value of the inventory the item is to be placed in. Main-1, Armor-2, Trash-3
 	 * @param index slot of the selected inventory to place the item.
 	 */
-	private void placeItemIntoInventory(World world, int whichInventory, int index)
+	private void placeItemIntoInventory(World world, EntityLivingPlayer player, int whichInventory, int index)
 	{
 		shouldDropItem = false;
 		
 		if(whichInventory == 1) //Main Inventory
 		{
-			if(world.player.inventory.getMainInventoryStack(index) == null) //There's nothing there, so the mouse doesnt have to pickup something
+			if(player.inventory.getMainInventoryStack(index) == null) //There's nothing there, so the mouse doesnt have to pickup something
 			{
-				world.player.inventory.putItemStackInSlot(mouseItem, index);
+				player.inventory.putItemStackInSlot(world, player, mouseItem, index);
 				mouseItem = null;
 			}
-			else if(world.player.inventory.getMainInventoryStack(index).getItemID() == mouseItem.getItemID())
+			else if(player.inventory.getMainInventoryStack(index).getItemID() == mouseItem.getItemID())
 			{
-				if(world.player.inventory.getMainInventoryStack(index).getStackSize() + mouseItem.getStackSize() <= world.player.inventory.getMainInventoryStack(index).getMaxStackSize())
+				if(player.inventory.getMainInventoryStack(index).getStackSize() + mouseItem.getStackSize() <= player.inventory.getMainInventoryStack(index).getMaxStackSize())
 				{
-					world.player.inventory.combineItemStacksInSlot(mouseItem, index);
+					player.inventory.combineItemStacksInSlot(world, player, mouseItem, index);
 					mouseItem = null;
 				}
 				else
 				{
-					mouseItem.removeFromStack((world.player.inventory.getMainInventoryStack(index).getMaxStackSize() - world.player.inventory.getMainInventoryStack(index).getStackSize()));
-					world.player.inventory.getMainInventoryStack(index).setStackSize(world.player.inventory.getMainInventoryStack(index).getMaxStackSize());
+					mouseItem.removeFromStack((player.inventory.getMainInventoryStack(index).getMaxStackSize() - player.inventory.getMainInventoryStack(index).getStackSize()));
+					player.inventory.getMainInventoryStack(index).setStackSize(player.inventory.getMainInventoryStack(index).getMaxStackSize());
 				}
 			}
 			else //If there is an item there, swap that slot's item and the mouse's item.
 			{
-				ItemStack stack = new ItemStack(world.player.inventory.getMainInventoryStack(index));
-				world.player.inventory.putItemStackInSlot(mouseItem, index);
+				ItemStack stack = new ItemStack(player.inventory.getMainInventoryStack(index));
+				player.inventory.putItemStackInSlot(world, player, mouseItem, index);
 				mouseItem = stack;
 			}
 		}
@@ -237,22 +247,22 @@ public class RenderUI extends Render
 				}	
 			}
 			
-			if(world.player.inventory.getArmorInventoryStack(index) == null) //There's nothing there, so the mouse doesnt have to pickup something
+			if(player.inventory.getArmorInventoryStack(index) == null) //There's nothing there, so the mouse doesnt have to pickup something
 			{
-				world.player.inventory.setArmorInventoryStack(mouseItem, index);
+				player.inventory.setArmorInventoryStack(mouseItem, index);
 				mouseItem = null;
 			}
 			else //If there is an item there, swap that slot's item and the mouse's item.
 			{
-				ItemStack stack = world.player.inventory.getArmorInventoryStack(index);
-				world.player.inventory.setArmorInventoryStack(mouseItem, index);
+				ItemStack stack = player.inventory.getArmorInventoryStack(index);
+				player.inventory.setArmorInventoryStack(mouseItem, index);
 				mouseItem = stack;
 			}
 		}
 		else if(whichInventory == 3) //Trash
 		{
 			//The mouse doesnt swap items in this instance, so just place the item there
-			world.player.inventory.setTrashStack(mouseItem, index);
+			player.inventory.setTrashStack(mouseItem, index);
 			mouseItem = null;
 		}
 		else //If something's added to no inventory, then obviously something's wrong.
@@ -264,11 +274,11 @@ public class RenderUI extends Render
 	/**
 	 * Drops the mouseItem into the world
 	 */
-	private void dropMouseItem(World world)
+	private void dropMouseItem(World world, EntityLivingPlayer player)
 	{
 		if(mouseItem != null)
 		{
-			world.addItemStackToItemList(new EntityItemStack(world.player.x, world.player.y, mouseItem));
+			world.addItemStackToItemList(new EntityLivingItemStack(player.x, player.y, mouseItem));
 			mouseItem = null;
 		}
 	}
@@ -311,7 +321,7 @@ public class RenderUI extends Render
 	/**
 	 * Handles Mouse Events for everything in the inventory.
 	 */
-	private void mouseEventInventory(World world)
+	private void mouseEventInventory(World world, EntityLivingPlayer player)
 	{
 		int x = MathHelper.getCorrectMouseXPosition();
 		int y = MathHelper.getCorrectMouseYPosition();		
@@ -319,7 +329,7 @@ public class RenderUI extends Render
 		
 		if(saveAndQuit.inBounds(x, y) && Mouse.isButtonDown(0))
 		{
-			saveAndQuit.saveAndQuit(world);
+			saveAndQuit.saveAndQuit(world, player);
 		}
 		
 		if(!Mouse.isButtonDown(0)) //If the mouse isnt down, there's really no reason to run the rest of this function
@@ -337,7 +347,7 @@ public class RenderUI extends Render
 			e.printStackTrace();
 		}
 		
-		for(int i = 0; i < world.player.inventory.getMainInventoryLength(); i++) //Inventory
+		for(int i = 0; i < player.inventory.getMainInventoryLength(); i++) //Inventory
 		{
 			int size = 20;
 			int x1 = (int) ((Display.getWidth() * 0.25f) + (((i % 12) - 6) * (size + 3)));
@@ -345,13 +355,13 @@ public class RenderUI extends Render
 			
 			if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
 			{
-				if(world.player.inventory.getMainInventoryStack(i) != null && mouseItem == null) //The mouse doesn't have something picked up
+				if(player.inventory.getMainInventoryStack(i) != null && mouseItem == null) //The mouse doesn't have something picked up
 				{
-					pickUpMouseItem(world, 1, i, x - x1 - 2, y - y1 - 2, 16);
+					pickUpMouseItem(world, player, 1, i, x - x1 - 2, y - y1 - 2, 16);
 				}
 				else if(mouseItem != null) //The mouse has something picked up
 				{
-					placeItemIntoInventory(world, 1, i);
+					placeItemIntoInventory(world, player, 1, i);
 				}
 			}		
 		}
@@ -364,15 +374,15 @@ public class RenderUI extends Render
 		
 			if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
 			{
-				if(world.player.inventory.getArmorInventoryStack(i) != null && mouseItem == null) //The mouse doesn't have something picked up
+				if(player.inventory.getArmorInventoryStack(i) != null && mouseItem == null) //The mouse doesn't have something picked up
 				{
-					pickUpMouseItem(world, 2, i, x - x1 - 2, y - y1 - 2, 16);
+					pickUpMouseItem(world, player, 2, i, x - x1 - 2, y - y1 - 2, 16);
 				}
 				else if(mouseItem != null) //The mouse has something picked up
 				{
-					placeItemIntoInventory(world, 2, i);
+					placeItemIntoInventory(world, player, 2, i);
 				}
-				world.player.onArmorChange();
+				player.onArmorChange();
 			}			
 		}
 		
@@ -382,13 +392,13 @@ public class RenderUI extends Render
 		if(x > x1 && x < x1 + 20 && y > y1 && y < y1 + 20) //Garbage
 		{
 			System.out.println("Garbage");
-			if(world.player.inventory.getTrashStack(0) != null && mouseItem == null)  //The mouse doesn't have something picked up
+			if(player.inventory.getTrashStack(0) != null && mouseItem == null)  //The mouse doesn't have something picked up
 			{
-				pickUpMouseItem(world, 3, 0, x - x1, y - y1, 16);
+				pickUpMouseItem(world, player, 3, 0, x - x1, y - y1, 16);
 			}
 			else if(mouseItem != null) //The mouse has something picked up
 			{
-				placeItemIntoInventory(world, 3, 0);
+				placeItemIntoInventory(world, player, 3, 0);
 			}
 		}			
 		
@@ -399,19 +409,19 @@ public class RenderUI extends Render
 			
 		x1 = xoff;
 		y1 = yoff; 
-		if(x > x1 && x < x1 + size && y > y1 && y < y1 + size && world.player.selectedRecipe >= 2) //Left
+		if(x > x1 && x < x1 + size && y > y1 && y < y1 + size && player.selectedRecipe >= 2) //Left
 		{
 			shouldDropItem = false;
-			adjustSliderPosition(world, -1);
+			adjustSliderPosition(world, player, -1);
 		}
 		
 		x1 = xoff + 24;
 		y1 = yoff;
-		if(x > x1 && x < x1 + size && y > y1 && y < y1 + size && world.player.selectedRecipe >= 1) //Mid-Left
+		if(x > x1 && x < x1 + size && y > y1 && y < y1 + size && player.selectedRecipe >= 1) //Mid-Left
 		{
 		
 			shouldDropItem = false;
-			adjustSliderPosition(world, -1);
+			adjustSliderPosition(world, player, -1);
 		}
 	
 		size = 24; 
@@ -421,7 +431,7 @@ public class RenderUI extends Render
 		{
 			
 			shouldDropItem = false;
-			craftRecipe(world, world.player.selectedRecipe, -2, -2, 16);
+			craftRecipe(world, player, player.selectedRecipe, -2, -2, 16);
 		}
 
 		size = 20; 
@@ -431,7 +441,7 @@ public class RenderUI extends Render
 		{
 		
 			shouldDropItem = false;
-			adjustSliderPosition(world, 1);
+			adjustSliderPosition(world, player, 1);
 		}
 		
 		x1 = xoff + 100;
@@ -439,34 +449,34 @@ public class RenderUI extends Render
 		if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Right
 		{
 			shouldDropItem = false;
-			adjustSliderPosition(world, 1);
+			adjustSliderPosition(world, player, 1);
 		}
 		
-		if(world.player.isViewingChest)
+		if(player.isViewingChest)
 		{
-			chestMouseEvents(world, x, y);
+			chestMouseEvents(world, player, x, y);
 		}
 		
 		//if the player didnt click something, drop their mouseitem
 		if(shouldDropItem)
 		{
-			dropMouseItem(world);
+			dropMouseItem(world, player);
 		}
 	}
 	
 	/**
 	 * Adjusts the currently selected recipe in the slider. Requires a function to prevent bounds errors.
 	 */
-	private void adjustSliderPosition(World world, int adjustment)
+	private void adjustSliderPosition(World world, EntityLivingPlayer player, int adjustment)
 	{
-		world.player.selectedRecipe += adjustment;
-		if(world.player.selectedRecipe < 0) 
+		player.selectedRecipe += adjustment;
+		if(player.selectedRecipe < 0) 
 		{
-			world.player.selectedRecipe = 0; 
+			player.selectedRecipe = 0; 
 		}
-		if(world.player.selectedRecipe >= world.player.getAllPossibleRecipes().length)
+		if(player.selectedRecipe >= player.getAllPossibleRecipes().length)
 		{
-			world.player.selectedRecipe = world.player.getAllPossibleRecipes().length - 1;
+			player.selectedRecipe = player.getAllPossibleRecipes().length - 1;
 		}
 	}
 	
@@ -479,14 +489,14 @@ public class RenderUI extends Render
 	 * @param yoff how far to offset the rendering of the cursor item (Y)
 	 * @param size how big the image is (16)
 	 */
-	private void craftRecipe(World world, int index, int xoff, int yoff, int size)
+	private void craftRecipe(World world, EntityLivingPlayer player, int index, int xoff, int yoff, int size)
 	{
-		if(world.player.getAllPossibleRecipes().length <= 0) 
+		if(player.getAllPossibleRecipes().length <= 0) 
 		{
 		 	return; //There are no recipes
 		}
 		
-		Recipe whatToCraft = world.player.getAllPossibleRecipes()[index];
+		Recipe whatToCraft = player.getAllPossibleRecipes()[index];
 		
 		if(mouseItem != null && mouseItem.getItemID() != whatToCraft.getResult().getItemID()) //check if it's possible to craft successfully
 		{
@@ -499,7 +509,7 @@ public class RenderUI extends Render
 			{
 				for(int i = 0; i < whatToCraft.getRecipe().length; i++) //remove the items from the inventory
 				{
-					world.player.inventory.removeItemsFromInventory(whatToCraft.getRecipe()[i]);
+					player.inventory.removeItemsFromInventory(world, player, whatToCraft.getRecipe()[i]);
 				}
 				mouseItem.addToStack(whatToCraft.getResult().getStackSize()); //pick up the item
 			}
@@ -508,7 +518,7 @@ public class RenderUI extends Render
 		{
 			for(int i = 0; i < whatToCraft.getRecipe().length; i++) //remove items from inventory
 			{
-				world.player.inventory.removeItemsFromInventory(whatToCraft.getRecipe()[i]);
+				player.inventory.removeItemsFromInventory(world, player, whatToCraft.getRecipe()[i]);
 			}
 			
 			mouseXOffset = xoff;
@@ -521,14 +531,14 @@ public class RenderUI extends Render
 	/**
 	 * Draws the hearts and mana the player has, size adjusted for damaged life/mana
 	 */
-	private void renderHeartsAndMana(World world)
+	private void renderHeartsAndMana(World world, EntityLivingPlayer player)
 	{		
 		/*
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glColor4f(1, 0, 0, 1);
 		int x1 = getCameraX() + 10;
 		int y1 = getCameraY() + 10;		
-		int newX = (int) (world.player.health / world.player.maxHealth * 100);
+		int newX = (int) (player.health / player.maxHealth * 100);
 		int newY = 11;		
 		t.startDrawingQuads();
 		t.addVertexWithUV(x1, y1 + newY, 0, 0, 1);
@@ -539,10 +549,10 @@ public class RenderUI extends Render
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		*/
 		
-		float heartsFull = (float)world.player.health / 20;	//How many hearts are full? (partial hearts are important too!)	
-		float partialHeartValue = heartsFull - ((int)(world.player.health / 20));
+		float heartsFull = (float)player.health / 20;	//How many hearts are full? (partial hearts are important too!)	
+		float partialHeartValue = heartsFull - ((int)(player.health / 20));
 		player_heart.bind();
-		for(int i = 0; i < (world.player.maxHealth) / 20; i++) //Draw Heart images
+		for(int i = 0; i < (player.maxHealth) / 20; i++) //Draw Heart images
 		{	
 			float newsize = 0;
 			float x = 0;
@@ -615,10 +625,10 @@ public class RenderUI extends Render
 			t.draw();	
 		}		
 				
-		float manaFull = (float)world.player.mana / 20;	
-		float partialMana = manaFull - ((int)(world.player.mana / 20));
+		float manaFull = (float)player.mana / 20;	
+		float partialMana = manaFull - ((int)(player.mana / 20));
 		player_mana.bind();
-		for(int i = 0; i < (world.player.maxMana) / 20; i++) //Draw Mana Stars
+		for(int i = 0; i < (player.maxMana) / 20; i++) //Draw Mana Stars
 		{	
 			float newsize = 0;
 			float x = 0;
@@ -648,7 +658,7 @@ public class RenderUI extends Render
 			x += getCameraX() + 3 + ((size + 1) * i );
 			y += getCameraY() + 28;
 			
-			if(world.player.maxHealth > 200)
+			if(player.maxHealth > 200)
 			{
 				y += size;
 			}
@@ -693,7 +703,7 @@ public class RenderUI extends Render
 	/**
 	 * Renders the actionbar (only if the inventory is closed)
 	 */
-	private void renderActionBar(World world) 
+	private void renderActionBar(World world, EntityLivingPlayer player) 
 	{		
 		GL11.glColor4f(1, 1, 1, 0.6f); //the slots are partially transparent full colour
 			
@@ -705,7 +715,7 @@ public class RenderUI extends Render
 			int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + ((i - 6) * (xsize + 3)));
 			int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - (xsize + 22f));
 			
-			if(i == world.player.selectedSlot) //If the slot is the one selected, make it slightly larger and fancier
+			if(i == player.selectedSlot) //If the slot is the one selected, make it slightly larger and fancier
 			{
 				y -= 2;
 				ysize += 4;
@@ -725,7 +735,7 @@ public class RenderUI extends Render
 		
 		for(int i = 0; i < 12; i++) //Images of the Items on the hotbar
 		{			
-			if(world.player.inventory.getMainInventoryStack(i) == null) //Make sure a nullpointer isnt thrown
+			if(player.inventory.getMainInventoryStack(i) == null) //Make sure a nullpointer isnt thrown
 			{
 				continue;
 			}
@@ -734,13 +744,13 @@ public class RenderUI extends Render
 				int size = 16;
 				int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + ((i - 6) * (21)) + 1);
 				int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - 39);
-				if(world.player.inventory.getMainInventoryStack(i).getItemID() < 2048) //blocks need slightly different dimensions
+				if(player.inventory.getMainInventoryStack(i).getItemID() < 2048) //blocks need slightly different dimensions
 				{
 					size = 14;
 					y += 1;
 					x += 1;
 				}
-				textures[world.player.inventory.getMainInventoryStack(i).getItemID()].bind();
+				textures[player.inventory.getMainInventoryStack(i).getItemID()].bind();
 				t.startDrawingQuads();
 				t.addVertexWithUV(x, y + size, 0, 0, 1);
 				t.addVertexWithUV(x + size, y + size, 0, 1, 1);
@@ -748,14 +758,14 @@ public class RenderUI extends Render
 				t.addVertexWithUV(x, y, 0, 0, 0);
 				t.draw();
 				
-				if(world.player.inventory.getMainInventoryStack(i).getMaxStackSize() == 1) //if the stacksize is one, dont render stacksize
+				if(player.inventory.getMainInventoryStack(i).getMaxStackSize() == 1) //if the stacksize is one, dont render stacksize
 				{
 					continue;
 				}
 				
 				//otherwise render the stacksize in green text
 				GL11.glColor4f(0, 1, 0, 1);
-				trueTypeFont.drawString(x - 2, y + 18, new StringBuilder().append(world.player.inventory.getMainInventoryStack(i).getStackSize()).toString(), 0.25f, -0.25f);
+				trueTypeFont.drawString(x - 2, y + 18, new StringBuilder().append(player.inventory.getMainInventoryStack(i).getStackSize()).toString(), 0.25f, -0.25f);
 				GL11.glColor4f(1, 1, 1, 1);
 			}
 		}		
@@ -764,13 +774,13 @@ public class RenderUI extends Render
 	/**
 	 * Renders the full inventory - recipes, armour, all 40 slots, coins, ammo...
 	 */
-	private void renderInventory(World world) 
+	private void renderInventory(World world, EntityLivingPlayer player) 
 	{
 		GL11.glColor4f(1, 1, 1, 0.6f);
 
 		actionbarSlot.bind();
 		t.startDrawingQuads();
-		for(int i = 0; i < world.player.inventory.getMainInventory().length; i++) //Inventory Frames
+		for(int i = 0; i < player.inventory.getMainInventory().length; i++) //Inventory Frames
 		{
 			int size = 20;
 			int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + (((i % 12) - 6) * (size + 3)));
@@ -807,7 +817,7 @@ public class RenderUI extends Render
 		t.addVertexWithUV(x, y, 0, 0, 0);
 		t.draw();
 		
-		if(world.player.inventory.getTrashStack(0) == null) //Garbage Slot Image If nothing's there
+		if(player.inventory.getTrashStack(0) == null) //Garbage Slot Image If nothing's there
 		{
 			player_garbage.bind(); 
 			GL11.glColor4f(0.6f, 0.6f, 0.6f, 1);
@@ -819,8 +829,8 @@ public class RenderUI extends Render
 			t.draw();
 		}
 		
-		populateInventorySlots(world); 
-		renderScrollableCraftingRecipeWheel(world);
+		populateInventorySlots(world, player); 
+		renderScrollableCraftingRecipeWheel(world, player);
 		
 		saveAndQuit.draw();
 	}		
@@ -828,13 +838,13 @@ public class RenderUI extends Render
 	/**
 	 * Fills all the inventory frames rendered with items if the slot isnt null
 	 */
-	private void populateInventorySlots(World world) 
+	private void populateInventorySlots(World world, EntityLivingPlayer player) 
 	{
 		GL11.glColor4f(1, 1, 1, 1);
 		
 		for(int i = 0; i < 48; i++) //Main Inventory
 		{
-			if(world.player.inventory.getMainInventoryStack(i) == null) 
+			if(player.inventory.getMainInventoryStack(i) == null) 
 			{
 				continue;
 			}
@@ -843,13 +853,13 @@ public class RenderUI extends Render
 				int size = 16;
 				int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + (((i % 12) - 6) * (size + 7)) + 2);
 				int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - ((i / 12) * (size + 7)) - (size + 24f));
-				if(world.player.inventory.getMainInventoryStack(i).getItemID() < 2048)
+				if(player.inventory.getMainInventoryStack(i).getItemID() < 2048)
 				{
 					size = 14;
 					y += 1;
 					x += 1;
 				}
-				textures[world.player.inventory.getMainInventoryStack(i).getItemID()].bind();
+				textures[player.inventory.getMainInventoryStack(i).getItemID()].bind();
 				t.startDrawingQuads();
 				t.addVertexWithUV(x, y + size, 0, 0, 1);
 				t.addVertexWithUV(x + size, y + size, 0, 1, 1);
@@ -860,13 +870,13 @@ public class RenderUI extends Render
 		}	
 		for(int i = 0; i < 8; i++) //Armor Inventory
 		{
-			if(world.player.inventory.getArmorInventoryStack(i) == null) 
+			if(player.inventory.getArmorInventoryStack(i) == null) 
 			{	
 				continue;			
 			}
 			else
 			{
-				textures[world.player.inventory.getArmorInventoryStack(i).getItemID()].bind();
+				textures[player.inventory.getArmorInventoryStack(i).getItemID()].bind();
 				t.startDrawingQuads();
 				int size = 16;
 				int x = (int) (getCameraX() + (Display.getWidth() * 0.5f) - ((size + 4) * 2.5f) + 2);
@@ -879,9 +889,9 @@ public class RenderUI extends Render
 			}
 		}	
 		
-		if(world.player.inventory.getTrashStack(0) != null) //Garbage Slot 
+		if(player.inventory.getTrashStack(0) != null) //Garbage Slot 
 		{
-			textures[world.player.inventory.getTrashStack(0).getItemID()].bind();
+			textures[player.inventory.getTrashStack(0).getItemID()].bind();
 			t.startDrawingQuads(); 
 			int size = 16;
 			int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + ((-6 * (size + 7)))) + 2;
@@ -897,7 +907,7 @@ public class RenderUI extends Render
 		GL11.glColor4f(0, 1, 0, 1);
 		for(int i = 0; i < 48; i++) //Main Inventory
 		{
-			if(world.player.inventory.getMainInventoryStack(i) == null || world.player.inventory.getMainInventoryStack(i).getMaxStackSize() == 1) 
+			if(player.inventory.getMainInventoryStack(i) == null || player.inventory.getMainInventoryStack(i).getMaxStackSize() == 1) 
 			{
 				continue;
 			}
@@ -905,7 +915,7 @@ public class RenderUI extends Render
 			{
 				int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + (((i % 12) - 6) * 23) + 2);
 				int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - ((i / 12) * 23) - 40);
-				trueTypeFont.drawString(x - 2, y + 18, new StringBuilder().append(world.player.inventory.getMainInventoryStack(i).getStackSize()).toString(), 0.25f, -0.25f);
+				trueTypeFont.drawString(x - 2, y + 18, new StringBuilder().append(player.inventory.getMainInventoryStack(i).getStackSize()).toString(), 0.25f, -0.25f);
 			}
 		}	
 		
@@ -916,7 +926,7 @@ public class RenderUI extends Render
 	 * Renders the crafting 'wheel' that lists all possible recipes when near the appropriate furniture.
 	 * 2 small images on either side that move it and one central image which can be crafted
 	 */
-	private void renderScrollableCraftingRecipeWheel(World world)
+	private void renderScrollableCraftingRecipeWheel(World world, EntityLivingPlayer player)
 	{
 		actionbarSlot.bind();
 		GL11.glColor4f(1, 1, 1, 0.6f);
@@ -927,7 +937,7 @@ public class RenderUI extends Render
 		int yoff = 10 + getCameraY();
 		
 		//Panes of scrolling bar:
-		if(world.player.selectedRecipe >= 2 && world.player.getAllPossibleRecipes().length > 0) //Top slot, if applicable
+		if(player.selectedRecipe >= 2 && player.getAllPossibleRecipes().length > 0) //Top slot, if applicable
 		{
 			size = 20; 
 			x = xoff;
@@ -939,7 +949,7 @@ public class RenderUI extends Render
 			t.addVertexWithUV(x, y, 0, 0, 0);
 			t.draw();		
 		}
-		if(world.player.selectedRecipe >= 1 && world.player.getAllPossibleRecipes().length > 0) //Mid-Top slot, if applicable (pane)
+		if(player.selectedRecipe >= 1 && player.getAllPossibleRecipes().length > 0) //Mid-Top slot, if applicable (pane)
 		{
 			size = 20; 
 			x = xoff + 24;
@@ -951,7 +961,7 @@ public class RenderUI extends Render
 			t.addVertexWithUV(x, y, 0, 0, 0);
 			t.draw();		
 		}
-		if(world.player.getAllPossibleRecipes().length != 0) //Currently selected recipe (pane)
+		if(player.getAllPossibleRecipes().length != 0) //Currently selected recipe (pane)
 		{
 			size = 24; 
 			x = xoff + 49;
@@ -965,7 +975,7 @@ public class RenderUI extends Render
 
 			GL11.glColor4f(1.0f, 0.466f, 0.466f, 0.6f);	
 			t.startDrawingQuads();  
-			for(int i = 0; i < world.player.getAllPossibleRecipes()[world.player.selectedRecipe].getRecipe().length; i++) //Panes for the recipe ingredients
+			for(int i = 0; i < player.getAllPossibleRecipes()[player.selectedRecipe].getRecipe().length; i++) //Panes for the recipe ingredients
 			{
 				float newSize = 20;
 				float newX = x + 2 + ((newSize + 2) * i);
@@ -978,7 +988,7 @@ public class RenderUI extends Render
 			t.draw();		
 			GL11.glColor4f(1, 1, 1, 0.6f);
 		}
-		if(world.player.selectedRecipe + 1 < world.player.getAllPossibleRecipes().length) //Mid-Bottom slot, if applicable (pane)
+		if(player.selectedRecipe + 1 < player.getAllPossibleRecipes().length) //Mid-Bottom slot, if applicable (pane)
 		{
 			size = 20; //Mid Bottom
 			x = xoff + 76;
@@ -990,7 +1000,7 @@ public class RenderUI extends Render
 			t.addVertexWithUV(x, y, 0, 0, 0);
 			t.draw();		
 		}
-		if(world.player.selectedRecipe + 2 < world.player.getAllPossibleRecipes().length) //Bottom slot, if applicable (pane)
+		if(player.selectedRecipe + 2 < player.getAllPossibleRecipes().length) //Bottom slot, if applicable (pane)
 		{	
 			size = 20; 
 			x = xoff + 100;
@@ -1006,12 +1016,12 @@ public class RenderUI extends Render
 		//Images of the actual resulting item from the recipe:
 		yoff += 4;
 		GL11.glColor4f(1, 1, 1, 1);
-		if(world.player.selectedRecipe >= 2 && world.player.getAllPossibleRecipes().length > 0) //Left slot, if applicable (result image)
+		if(player.selectedRecipe >= 2 && player.getAllPossibleRecipes().length > 0) //Left slot, if applicable (result image)
 		{
 			x = xoff + 4;
 			y = yoff;
 			size = 12; //Top
-			textures[world.player.getAllPossibleRecipes()[world.player.selectedRecipe - 2].getResult().getItemID()].bind();
+			textures[player.getAllPossibleRecipes()[player.selectedRecipe - 2].getResult().getItemID()].bind();
 			t.startDrawingQuads();
 			t.addVertexWithUV(x, y + size, 0, 0, 1);
 			t.addVertexWithUV(x + size, y + size, 0, 1, 1);
@@ -1019,19 +1029,19 @@ public class RenderUI extends Render
 			t.addVertexWithUV(x, y, 0, 0, 0);
 			t.draw();
 			
-			if(world.player.getAllPossibleRecipes()[world.player.selectedRecipe - 2].getResult().getStackSize() > 1)
+			if(player.getAllPossibleRecipes()[player.selectedRecipe - 2].getResult().getStackSize() > 1)
 			{
 				GL11.glColor4f(0, 1, 0, 1);
-				trueTypeFont.drawString(x - 2, y + 17, ""+world.player.getAllPossibleRecipes()[world.player.selectedRecipe - 2].getResult().getStackSize(), 0.25f, -0.25f);
+				trueTypeFont.drawString(x - 2, y + 17, ""+player.getAllPossibleRecipes()[player.selectedRecipe - 2].getResult().getStackSize(), 0.25f, -0.25f);
 				GL11.glColor4f(1, 1, 1, 1);
 			}
 		}
-		if(world.player.selectedRecipe >= 1 && world.player.getAllPossibleRecipes().length > 0) //Left-middle slot, if applicable (result image)
+		if(player.selectedRecipe >= 1 && player.getAllPossibleRecipes().length > 0) //Left-middle slot, if applicable (result image)
 		{
 			x = xoff + 28;
 			y = yoff;
 			size = 12;
-			textures[world.player.getAllPossibleRecipes()[world.player.selectedRecipe - 1].getResult().getItemID()].bind();
+			textures[player.getAllPossibleRecipes()[player.selectedRecipe - 1].getResult().getItemID()].bind();
 			t.startDrawingQuads();
 			t.addVertexWithUV(x, y + size, 0, 0, 1);
 			t.addVertexWithUV(x + size, y + size, 0, 1, 1);
@@ -1039,19 +1049,19 @@ public class RenderUI extends Render
 			t.addVertexWithUV(x, y, 0, 0, 0);
 			t.draw();
 			
-			if(world.player.getAllPossibleRecipes()[world.player.selectedRecipe - 1].getResult().getStackSize() > 1)
+			if(player.getAllPossibleRecipes()[player.selectedRecipe - 1].getResult().getStackSize() > 1)
 			{
 				GL11.glColor4f(0, 1, 0, 1);
-				trueTypeFont.drawString(x - 2, y + 17, ""+world.player.getAllPossibleRecipes()[world.player.selectedRecipe - 1].getResult().getStackSize(), 0.25f, -0.25f);
+				trueTypeFont.drawString(x - 2, y + 17, ""+player.getAllPossibleRecipes()[player.selectedRecipe - 1].getResult().getStackSize(), 0.25f, -0.25f);
 				GL11.glColor4f(1, 1, 1, 1);
 			}
 		}
-		if(world.player.getAllPossibleRecipes().length != 0) //Currently selected recipe (result image)
+		if(player.getAllPossibleRecipes().length != 0) //Currently selected recipe (result image)
 		{
 			x = xoff + 55;
 			y = yoff - 2;
 			size = 16;
-			textures[world.player.getAllPossibleRecipes()[world.player.selectedRecipe].getResult().getItemID()].bind();
+			textures[player.getAllPossibleRecipes()[player.selectedRecipe].getResult().getItemID()].bind();
 			t.startDrawingQuads();
 			t.addVertexWithUV(x - 2, y + size, 0, 0, 1);
 			t.addVertexWithUV(x - 2 + size, y + size, 0, 1, 1);
@@ -1059,18 +1069,18 @@ public class RenderUI extends Render
 			t.addVertexWithUV(x - 2, y, 0, 0, 0);
 			t.draw();
 			
-			if(world.player.getAllPossibleRecipes()[world.player.selectedRecipe].getResult().getStackSize() > 1)
+			if(player.getAllPossibleRecipes()[player.selectedRecipe].getResult().getStackSize() > 1)
 			{
 				GL11.glColor4f(0, 1, 0, 1);
-				trueTypeFont.drawString(x - 3, y + 19, ""+world.player.getAllPossibleRecipes()[world.player.selectedRecipe].getResult().getStackSize(), 0.25f, -0.25f);
+				trueTypeFont.drawString(x - 3, y + 19, ""+player.getAllPossibleRecipes()[player.selectedRecipe].getResult().getStackSize(), 0.25f, -0.25f);
 				GL11.glColor4f(1, 1, 1, 1);
 			}
-			for(int i = 0; i < world.player.getAllPossibleRecipes()[world.player.selectedRecipe].getRecipe().length; i++) //Images of the ingredients for the selected recipe
+			for(int i = 0; i < player.getAllPossibleRecipes()[player.selectedRecipe].getRecipe().length; i++) //Images of the ingredients for the selected recipe
 			{
 				float newSize = 12;
 				float newX = x + ((size + 5) * i);
 				float newY = y + size + 10;
-				textures[world.player.getAllPossibleRecipes()[world.player.selectedRecipe].getRecipe()[i].getItemID()].bind();
+				textures[player.getAllPossibleRecipes()[player.selectedRecipe].getRecipe()[i].getItemID()].bind();
 				t.startDrawingQuads();
 				t.addVertexWithUV(newX, newY + newSize, 0, 0, 1);
 				t.addVertexWithUV(newX + newSize, newY + newSize, 0, 1, 1);
@@ -1079,16 +1089,16 @@ public class RenderUI extends Render
 				t.draw();
 
 				GL11.glColor4f(0, 1, 0, 1);
-				trueTypeFont.drawString(newX - 2, newY + 17, new StringBuilder().append(world.player.getAllPossibleRecipes()[world.player.selectedRecipe].getRecipe()[i].getStackSize()).toString(), 0.25f, -0.25f);
+				trueTypeFont.drawString(newX - 2, newY + 17, new StringBuilder().append(player.getAllPossibleRecipes()[player.selectedRecipe].getRecipe()[i].getStackSize()).toString(), 0.25f, -0.25f);
 				GL11.glColor4f(1, 1, 1, 1);
 			}
 		}
-		if(world.player.selectedRecipe + 1 < world.player.getAllPossibleRecipes().length) //Mid-Right slot, if applicable (result image)
+		if(player.selectedRecipe + 1 < player.getAllPossibleRecipes().length) //Mid-Right slot, if applicable (result image)
 		{
 			size = 12;
 			x = xoff + 80;
 			y = yoff;
-			textures[world.player.getAllPossibleRecipes()[world.player.selectedRecipe + 1].getResult().getItemID()].bind();
+			textures[player.getAllPossibleRecipes()[player.selectedRecipe + 1].getResult().getItemID()].bind();
 			t.startDrawingQuads();
 			t.addVertexWithUV(x, y + size, 0, 0, 1);
 			t.addVertexWithUV(x + size, y + size, 0, 1, 1);
@@ -1096,30 +1106,30 @@ public class RenderUI extends Render
 			t.addVertexWithUV(x, y, 0, 0, 0);
 			t.draw();
 			
-			if(world.player.getAllPossibleRecipes()[world.player.selectedRecipe + 1].getResult().getStackSize() > 1)
+			if(player.getAllPossibleRecipes()[player.selectedRecipe + 1].getResult().getStackSize() > 1)
 			{
 				GL11.glColor4f(0, 1, 0, 1);
-				trueTypeFont.drawString(x - 2, y + 17, ""+world.player.getAllPossibleRecipes()[world.player.selectedRecipe + 1].getResult().getStackSize(), 0.25f, -0.25f);
+				trueTypeFont.drawString(x - 2, y + 17, ""+player.getAllPossibleRecipes()[player.selectedRecipe + 1].getResult().getStackSize(), 0.25f, -0.25f);
 				GL11.glColor4f(1, 1, 1, 1);
 			}
 		}
-		if(world.player.selectedRecipe + 2 < world.player.getAllPossibleRecipes().length) //Right slot, if applicable (result image)
+		if(player.selectedRecipe + 2 < player.getAllPossibleRecipes().length) //Right slot, if applicable (result image)
 		{
 			size = 12;
 			x = xoff + 104;
 			y = yoff;
 			t.startDrawingQuads();
-			textures[world.player.getAllPossibleRecipes()[world.player.selectedRecipe + 2].getResult().getItemID()].bind();
+			textures[player.getAllPossibleRecipes()[player.selectedRecipe + 2].getResult().getItemID()].bind();
 			t.addVertexWithUV(x, y + size, 0, 0, 1);
 			t.addVertexWithUV(x + size, y + size, 0, 1, 1);
 			t.addVertexWithUV(x + size, y, 0, 1, 0);
 			t.addVertexWithUV(x, y, 0, 0, 0);
 			t.draw();
 			
-			if(world.player.getAllPossibleRecipes()[world.player.selectedRecipe + 2].getResult().getStackSize() > 1)
+			if(player.getAllPossibleRecipes()[player.selectedRecipe + 2].getResult().getStackSize() > 1)
 			{
 				GL11.glColor4f(0, 1, 0, 1);
-				trueTypeFont.drawString(x - 2, y + 17, ""+world.player.getAllPossibleRecipes()[world.player.selectedRecipe + 2].getResult().getStackSize(), 0.25f, -0.25f);
+				trueTypeFont.drawString(x - 2, y + 17, ""+player.getAllPossibleRecipes()[player.selectedRecipe + 2].getResult().getStackSize(), 0.25f, -0.25f);
 				GL11.glColor4f(1, 1, 1, 1);
 			}		
 		}
@@ -1128,17 +1138,17 @@ public class RenderUI extends Render
 	/**
 	 * Renders all (constanty visible) text
 	 */
-	private void renderText(World world)
+	private void renderText(World world, EntityLivingPlayer player)
 	{
 		GL11.glColor4f(1, 1, 1, 1);
 		//Health:
-		String health = new StringBuilder().append("Life: ").append((int)world.player.health).append(" / ").append(world.player.maxHealth).toString();
+		String health = new StringBuilder().append("Life: ").append((int)player.health).append(" / ").append(player.maxHealth).toString();
 		trueTypeFont.drawString((getCameraX() + 10), (getCameraY() + 15), health, 0.3f, -0.3f);
 		
-		if(world.player.isInventoryOpen)
+		if(player.isInventoryOpen)
 		{
 			//Defense:
-			String defense = new StringBuilder().append("Defense: " + (int)(world.player.defense)).toString();
+			String defense = new StringBuilder().append("Defense: " + (int)(player.defense)).toString();
 			trueTypeFont.drawString(getCameraX() + ((Display.getWidth() * 0.5f) - 15), getCameraY() + 75, defense, 0.3f, -0.3f, TrueTypeFont.ALIGN_RIGHT);
 		}
 	}
@@ -1169,15 +1179,15 @@ public class RenderUI extends Render
 	 * @param x the x position of the mouse (not including getCameraX())
 	 * @param y the y position of the mouse (not including getCameraY())
 	 */
-	private void chestMouseEvents(World world, int x, int y)
+	private void chestMouseEvents(World world, EntityLivingPlayer player, int x, int y)
 	{
 		//Get the initial block the player is viewing
-		BlockChest chest = (BlockChest)world.getBlock(world.player.viewedChestX, world.player.viewedChestY).clone();
+		BlockChest chest = (BlockChest)world.getBlock(player.viewedChestX, player.viewedChestY).clone();
 		
 		if(chest.metaData != 1) //Make sure its metadata is 1 (otherwise it doesnt technically exist)
 		{
 			//Get the metadata for the block's size
-			int[][] metadata = MetaDataHelper.getMetaDataArray(world.getBlock(world.player.viewedChestX, world.player.viewedChestY).blockWidth / 6, world.getBlock(world.player.viewedChestX, world.player.viewedChestY).blockHeight / 6); //metadata used by the block of size (x,y)
+			int[][] metadata = MetaDataHelper.getMetaDataArray(world.getBlock(player.viewedChestX, player.viewedChestY).blockWidth / 6, world.getBlock(player.viewedChestX, player.viewedChestY).blockHeight / 6); //metadata used by the block of size (x,y)
 			int metaWidth = metadata.length; 
 			int metaHeight = metadata[0].length;	
 			int x1 = 0;
@@ -1189,7 +1199,7 @@ public class RenderUI extends Render
 			{
 				for(int j = 0; j < metaHeight; j++)
 				{
-					if(metadata[i][j] == world.getBlock(world.player.viewedChestX - x1, world.player.viewedChestY - y1).metaData)
+					if(metadata[i][j] == world.getBlock(player.viewedChestX - x1, player.viewedChestY - y1).metaData)
 					{
 						x1 = i; 
 						y1 = j;
@@ -1199,7 +1209,7 @@ public class RenderUI extends Render
 			}			
 			
 			//Update the chest
-			chest = (BlockChest)(world.getBlock(world.player.viewedChestX - x1, world.player.viewedChestY - y1));
+			chest = (BlockChest)(world.getBlock(player.viewedChestX - x1, player.viewedChestY - y1));
 		}	
 		
 		if(!chest.isAttached()) //Single chest (unattached)
@@ -1256,7 +1266,7 @@ public class RenderUI extends Render
 			}
 			
 			//Chest to the left:			
-			BlockChest chest2 = (BlockChest)(world.getBlock(world.player.viewedChestX - 2, world.player.viewedChestY));
+			BlockChest chest2 = (BlockChest)(world.getBlock(player.viewedChestX - 2, player.viewedChestY));
 			
 			for(int i = 0; i < 20; i++)
 			{
@@ -1310,7 +1320,7 @@ public class RenderUI extends Render
 			}
 			
 			//Chest to the right:			
-			BlockChest chest2 = (BlockChest)(world.getBlock(world.player.viewedChestX + 2, world.player.viewedChestY));
+			BlockChest chest2 = (BlockChest)(world.getBlock(player.viewedChestX + 2, player.viewedChestY));
 			
 			for(int i = 0; i < 20; i++)
 			{
@@ -1342,15 +1352,15 @@ public class RenderUI extends Render
 	 * Renders the selected chest(s), based on the chest's attachment. This function is relatively long
 	 * and tedious, due to there being multiple unique states a chest can have.
 	 */
-	private void renderChest(World world)
+	private void renderChest(World world, EntityLivingPlayer player)
 	{
 		//Get the initial block the player is viewing
-		BlockChest chest = (BlockChest)world.getBlock(world.player.viewedChestX, world.player.viewedChestY);
+		BlockChest chest = (BlockChest)world.getBlock(player.viewedChestX, player.viewedChestY);
 		
 		if(chest.metaData != 1)
 		{
 			//Get the metadata for the block's size
-			int[][] metadata = MetaDataHelper.getMetaDataArray(world.getBlock(world.player.viewedChestX, world.player.viewedChestY).blockWidth / 6, world.getBlock(world.player.viewedChestX, world.player.viewedChestY).blockHeight / 6); //metadata used by the block of size (x,y)
+			int[][] metadata = MetaDataHelper.getMetaDataArray(world.getBlock(player.viewedChestX, player.viewedChestY).blockWidth / 6, world.getBlock(player.viewedChestX, player.viewedChestY).blockHeight / 6); //metadata used by the block of size (x,y)
 			int metaWidth = metadata.length; 
 			int metaHeight = metadata[0].length;	
 			int x = 0;
@@ -1362,7 +1372,7 @@ public class RenderUI extends Render
 			{
 				for(int j = 0; j < metaHeight; j++)
 				{
-					if(metadata[i][j] == world.getBlock(world.player.viewedChestX - x, world.player.viewedChestY - y).metaData)
+					if(metadata[i][j] == world.getBlock(player.viewedChestX - x, player.viewedChestY - y).metaData)
 					{
 						x = i; 
 						y = j;
@@ -1372,9 +1382,9 @@ public class RenderUI extends Render
 			}
 			
 			//Update the chest
-			chest = (BlockChest)(world.getBlock(world.player.viewedChestX - x, world.player.viewedChestY - y));
-			world.player.viewedChestX -= x;
-			world.player.viewedChestY -= y;
+			chest = (BlockChest)(world.getBlock(player.viewedChestX - x, player.viewedChestY - y));
+			player.viewedChestX -= x;
+			player.viewedChestY -= y;
 		}	
 		
 		if(!chest.isAttached()) //Single chest (unattached)
@@ -1466,7 +1476,7 @@ public class RenderUI extends Render
 			}
 			
 			//Chest to the left:
-			BlockChest chest2 = (BlockChest)(world.getBlock(world.player.viewedChestX - 2, world.player.viewedChestY));
+			BlockChest chest2 = (BlockChest)(world.getBlock(player.viewedChestX - 2, player.viewedChestY));
 			
 			for(int i = 0; i < 20; i++) //Draw all the background slots
 			{
@@ -1555,7 +1565,7 @@ public class RenderUI extends Render
 			}
 			
 			//Chest to the right:			
-			BlockChest chest2 = (BlockChest)(world.getBlock(world.player.viewedChestX + 2, world.player.viewedChestY));
+			BlockChest chest2 = (BlockChest)(world.getBlock(player.viewedChestX + 2, player.viewedChestY));
 			
 			for(int i = 0; i < 20; i++) //Draw all the background slots
 			{
@@ -1601,14 +1611,4 @@ public class RenderUI extends Render
 		}
 		GL11.glColor4f(1, 1, 1, 1);
 	}
-	
-	private Font font = FontUtils.getFont("andy-bold.ttf");
-	private final TrueTypeFont tooltipFont = new TrueTypeFont((font.deriveFont(24.0f)), false);
-	private GuiResizableTextUncentered saveAndQuit;
-	//Variables for the item picked up by the mouse:
-	private boolean shouldDropItem;
-	private int mouseItemSize; //How big it is
-	private ItemStack mouseItem; //What it is
-	private int mouseXOffset; //How far it should be adjusted to avoid looking bad
-	private int mouseYOffset;	
 }

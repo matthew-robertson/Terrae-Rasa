@@ -1,42 +1,52 @@
 package net.dimensia.src;
+
 import java.util.Vector;
 
-public class SpawnManager{
-	public SpawnManager(){
+public class SpawnManager
+{
+	public Vector<EntityLivingNPCEnemy> forestNightEnemies;
+	public Vector<EntityLivingNPCEnemy> desertNightEnemies;
+	public Vector<EntityLivingNPCEnemy> arcticNightEnemies;
+	public Vector<EntityLivingNPCEnemy> forestDayEnemies;
+	public Vector<EntityLivingNPCEnemy> desertDayEnemies;
+	public Vector<EntityLivingNPCEnemy> arcticDayEnemies;
+	
+	public SpawnManager()
+	{
 		if (forestNightEnemies == null){
-			forestNightEnemies = new Vector<EntityEnemy>();
+			forestNightEnemies = new Vector<EntityLivingNPCEnemy>();
 		}
 		
 		if (forestDayEnemies == null){
-			forestDayEnemies = new Vector<EntityEnemy>();
+			forestDayEnemies = new Vector<EntityLivingNPCEnemy>();
 		}
 		
 		if (desertNightEnemies == null){
-			desertNightEnemies = new Vector<EntityEnemy>();
+			desertNightEnemies = new Vector<EntityLivingNPCEnemy>();
 		}
 		
 		if (desertDayEnemies == null){
-			desertDayEnemies = new Vector<EntityEnemy>();
+			desertDayEnemies = new Vector<EntityLivingNPCEnemy>();
 		}
 		
 		if (arcticNightEnemies == null){
-			arcticNightEnemies = new Vector<EntityEnemy>();
+			arcticNightEnemies = new Vector<EntityLivingNPCEnemy>();
 		}
 		
 		if (arcticDayEnemies == null){
-			arcticDayEnemies = new Vector<EntityEnemy>();
+			arcticDayEnemies = new Vector<EntityLivingNPCEnemy>();
 		}
 		
-		
+		setSpawnVector();		
 	}
 	
 	/**
 	 * Get the forestNightEnemies Vector as an array
 	 * @return forestNightEnemies Vector as an array
 	 */
-	public EntityEnemy[] getForestNightEnemiesAsArray()
+	public EntityLivingNPCEnemy[] getForestNightEnemiesAsArray()
 	{
-		EntityEnemy[] enemies = new EntityEnemy[forestNightEnemies.size()];
+		EntityLivingNPCEnemy[] enemies = new EntityLivingNPCEnemy[forestNightEnemies.size()];
 		forestNightEnemies.copyInto(enemies);
 		return enemies;
 	}
@@ -45,9 +55,9 @@ public class SpawnManager{
 	 * Get the desertNightEnemies Vector as an array
 	 * @return desertNightEnemies Vector as an array
 	 */
-	public EntityEnemy[] getDesertNightEnemiesAsArray()
+	public EntityLivingNPCEnemy[] getDesertNightEnemiesAsArray()
 	{
-		EntityEnemy[] enemies = new EntityEnemy[desertNightEnemies.size()];
+		EntityLivingNPCEnemy[] enemies = new EntityLivingNPCEnemy[desertNightEnemies.size()];
 		desertNightEnemies.copyInto(enemies);
 		return enemies;
 	}
@@ -56,9 +66,9 @@ public class SpawnManager{
 	 * Get the arcticNightEnemies Vector as an array
 	 * @return arcticNightEnemies Vector as an array
 	 */
-	public EntityEnemy[] getArcticNightEnemiesAsArray()
+	public EntityLivingNPCEnemy[] getArcticNightEnemiesAsArray()
 	{
-		EntityEnemy[] enemies = new EntityEnemy[arcticNightEnemies.size()];
+		EntityLivingNPCEnemy[] enemies = new EntityLivingNPCEnemy[arcticNightEnemies.size()];
 		arcticNightEnemies.copyInto(enemies);
 		return enemies;
 	}
@@ -67,9 +77,9 @@ public class SpawnManager{
 	 * Get the forestDayEnemies Vector as an array
 	 * @return forestDayEnemies Vector as an array
 	 */
-	public EntityEnemy[] getForestDayEnemiesAsArray()
+	public EntityLivingNPCEnemy[] getForestDayEnemiesAsArray()
 	{
-		EntityEnemy[] enemies = new EntityEnemy[forestDayEnemies.size()];
+		EntityLivingNPCEnemy[] enemies = new EntityLivingNPCEnemy[forestDayEnemies.size()];
 		forestDayEnemies.copyInto(enemies);
 		return enemies;
 	}
@@ -78,9 +88,9 @@ public class SpawnManager{
 	 * Get the desertDayEnemies Vector as an array
 	 * @return desertDayEnemies Vector as an array
 	 */
-	public EntityEnemy[] getDesertDayEnemiesAsArray()
+	public EntityLivingNPCEnemy[] getDesertDayEnemiesAsArray()
 	{
-		EntityEnemy[] enemies = new EntityEnemy[desertDayEnemies.size()];
+		EntityLivingNPCEnemy[] enemies = new EntityLivingNPCEnemy[desertDayEnemies.size()];
 		desertDayEnemies.copyInto(enemies);
 		return enemies;
 	}
@@ -89,9 +99,9 @@ public class SpawnManager{
 	 * Get the arcticDayEnemies Vector as an array
 	 * @return arcticDayEnemies Vector as an array
 	 */
-	public EntityEnemy[] getArcticDayEnemiesAsArray()
+	public EntityLivingNPCEnemy[] getArcticDayEnemiesAsArray()
 	{
-		EntityEnemy[] enemies = new EntityEnemy[arcticDayEnemies.size()];
+		EntityLivingNPCEnemy[] enemies = new EntityLivingNPCEnemy[arcticDayEnemies.size()];
 		arcticDayEnemies.copyInto(enemies);
 		return enemies;
 	}
@@ -100,11 +110,11 @@ public class SpawnManager{
 	 * add an enemy to the forestNightEnemies vector
 	 * @param enemy to add.
 	 */
-	public void addForestNightEnemy(EntityEnemy enemy)
+	public void addForestNightEnemy(EntityLivingNPCEnemy enemy)
 	{
 		if(forestNightEnemies == null)
 		{
-			forestNightEnemies = new Vector<EntityEnemy>();
+			forestNightEnemies = new Vector<EntityLivingNPCEnemy>();
 		}
 		forestNightEnemies.add(enemy);
 	}
@@ -113,11 +123,11 @@ public class SpawnManager{
 	 * add an enemy to the desertNightEnemies vector
 	 * @param enemy to add.
 	 */
-	public void addDesertNightEnemy(EntityEnemy enemy)
+	public void addDesertNightEnemy(EntityLivingNPCEnemy enemy)
 	{
 		if(desertNightEnemies == null)
 		{
-			desertNightEnemies = new Vector<EntityEnemy>();
+			desertNightEnemies = new Vector<EntityLivingNPCEnemy>();
 		}
 		desertNightEnemies.add(enemy);
 	}
@@ -126,11 +136,11 @@ public class SpawnManager{
 	 * add an enemy to the arcticNightEnemies vector
 	 * @param enemy to add.
 	 */
-	public void addArcticNightEnemy(EntityEnemy enemy)
+	public void addArcticNightEnemy(EntityLivingNPCEnemy enemy)
 	{
 		if(arcticNightEnemies == null)
 		{
-			arcticNightEnemies = new Vector<EntityEnemy>();
+			arcticNightEnemies = new Vector<EntityLivingNPCEnemy>();
 		}
 		arcticNightEnemies.add(enemy);
 	}
@@ -139,11 +149,11 @@ public class SpawnManager{
 	 * add an enemy to the forestDayEnemies vector
 	 * @param enemy to add.
 	 */
-	public void addForestDayEnemy(EntityEnemy enemy)
+	public void addForestDayEnemy(EntityLivingNPCEnemy enemy)
 	{
 		if(forestDayEnemies == null)
 		{
-			forestDayEnemies = new Vector<EntityEnemy>();
+			forestDayEnemies = new Vector<EntityLivingNPCEnemy>();
 		}
 		forestDayEnemies.add(enemy);
 	}
@@ -152,11 +162,11 @@ public class SpawnManager{
 	 * add an enemy to the desertDayEnemies vector
 	 * @param enemy to add.
 	 */
-	public void addDesertDayEnemy(EntityEnemy enemy)
+	public void addDesertDayEnemy(EntityLivingNPCEnemy enemy)
 	{
 		if(desertDayEnemies == null)
 		{
-			desertDayEnemies = new Vector<EntityEnemy>();
+			desertDayEnemies = new Vector<EntityLivingNPCEnemy>();
 		}
 		desertDayEnemies.add(enemy);
 	}
@@ -165,34 +175,98 @@ public class SpawnManager{
 	 * add an enemy to the desertDayEnemies vector
 	 * @param enemy to add.
 	 */
-	public void addArcticDayEnemy(EntityEnemy enemy)
+	public void addArcticDayEnemy(EntityLivingNPCEnemy enemy)
 	{
 		if(arcticDayEnemies == null)
 		{
-			arcticDayEnemies = new Vector<EntityEnemy>();
+			arcticDayEnemies = new Vector<EntityLivingNPCEnemy>();
 		}
 		arcticDayEnemies.add(enemy);
 	}
 	
-	/** EntityEnemy Declarations **/
-	public final EntityEnemy goblin = new EntityEnemy(this, 0, "Goblin").setSpawnVector("forest", " ").setSpawnVector("desert", "night").setTexture(Render.goblin).setDamageDone(7).setMaxHealth(50).setDrops(new MonsterDrop[] { 
-			new MonsterDrop(new ItemStack(Item.coal), 1, 2, 5), new MonsterDrop(new ItemStack(Item.healthPotion1), 1, 2, 20)
-	});
-	public final  EntityEnemy zombie = new EntityEnemy(this, 1, "zombie").setSpawnVector(" ", "night").setDamageDone(16).setMaxHealth(60).setTexture(Render.zombie).setDrops(new MonsterDrop[]{
-			new MonsterDrop(new ItemStack(Item.healthPotion2), 1, 1, 50), new MonsterDrop(new ItemStack(Item.ironSword), 1, 1, 100), new MonsterDrop(new ItemStack(Item.bronzeSword), 1, 1, 66)
-	});
-	public final EntityEnemy slime = new EntityEnemy(this, 2, "Slime").setSpawnVector(" ", " ").setBlockAndWorldDimensions(1,1).setTexture(Render.slime).setMaxHealth(30).setDamageDone(4).setBaseSpeed(1.0f).setDrops(new MonsterDrop[]{
-			new MonsterDrop(new ItemStack(Item.silverIngot), 1, 1, 200), new MonsterDrop(new ItemStack(Item.healingHerb1), 1, 1, 15), new MonsterDrop(new ItemStack(Item.vialOfWater), 1, 1, 15)  
-	});
-	public final EntityEnemy dino = new EntityEnemy(this, 3, "Dinosaur").setSpawnVector("forest", "night").setBlockAndWorldDimensions(5,4).setTexture(Render.dino).setMaxHealth(150).setDamageDone(20).setBaseSpeed(3.4f).setDrops(new MonsterDrop[]{
-			new MonsterDrop(new ItemStack(Item.ringOfVigor), 1, 1, 100), new MonsterDrop(new ItemStack(Item.coal), 1, 3, 4), new MonsterDrop(new ItemStack(Item.healingHerb2), 1, 1, 20) 
-	});
-	public final EntityEnemy floatingEye = new EntityEnemy(this, 4, "Eyeball").setDamageDone(12).setMaxHealth(60);
-	
-	public Vector<EntityEnemy> forestNightEnemies;
-	public Vector<EntityEnemy> desertNightEnemies;
-	public Vector<EntityEnemy> arcticNightEnemies;
-	public Vector<EntityEnemy> forestDayEnemies;
-	public Vector<EntityEnemy> desertDayEnemies;
-	public Vector<EntityEnemy> arcticDayEnemies;
+	/**
+	 * @depreciated [Forced compiler warning]-> replace string == string2 with string.equals(string2)
+	 * 
+	 * Sets possible spawn locations (biomes/times) for the EntityLivingNPCEnemy 
+	 * instance the method is called on.
+	 * @param manager
+	 * @param t = chosen biome/time to allow spawning
+	 * @return
+	 */
+	private void setSpawnVector()
+	{
+		for(int i = 0; i < EntityLivingNPCEnemy.enemyList.length; i++)
+		{
+			if(EntityLivingNPCEnemy.enemyList[i] != null)
+			{
+				EntityLivingNPCEnemy enemy = new EntityLivingNPCEnemy(EntityLivingNPCEnemy.enemyList[i]);
+				String type = enemy.type;
+				String time = enemy.time;
+				
+				//Arctic spawns
+				if (type.equals("arctic") && time.equals("day")){
+					addArcticDayEnemy(enemy);
+				}
+				
+				if (type.equals("arctic") && time.equals("night")){
+					addArcticNightEnemy(enemy);
+				}
+				
+				if (type.equals("arctic") && time.equals(" ")){
+					addArcticDayEnemy(enemy);
+					addArcticNightEnemy(enemy);
+				}
+				
+				//Desert spawns
+				if (type.equals("desert") && time.equals("day")){
+					addDesertDayEnemy(enemy);
+				}
+				
+				if (type.equals("desert") && time.equals("night")){
+					addDesertNightEnemy(enemy);
+				}
+				
+				if (type.equals("desert") && time.equals(" ")){
+					addDesertDayEnemy(enemy);
+					addDesertNightEnemy(enemy);
+				}
+				
+				//Forest spawns
+				if (type.equals("forest") && time.equals("day")){
+					addForestDayEnemy(enemy);
+				}	
+				
+				if (type.equals("forest") && time.equals("night")){
+					addForestNightEnemy(enemy);
+				}		
+				
+				if (type.equals("forest") && time.equals(" ")){
+					addForestDayEnemy(enemy);
+					addForestNightEnemy(enemy);
+				}
+				
+				//All spawns
+				if (type.equals(" ") && time.equals("day")){
+					addArcticDayEnemy(enemy);
+					addDesertDayEnemy(enemy);
+					addForestDayEnemy(enemy);			
+				}
+				
+				if (type.equals(" ") && time.equals("night")){
+					addArcticNightEnemy(enemy);
+					addDesertNightEnemy(enemy);
+					addForestNightEnemy(enemy);			
+				}	
+				
+				if (type.equals(" ") && time.equals(" ")){
+					addArcticDayEnemy(enemy);
+					addDesertDayEnemy(enemy);
+					addForestDayEnemy(enemy);			
+					addArcticNightEnemy(enemy);
+					addDesertNightEnemy(enemy);
+					addForestNightEnemy(enemy);
+				}	
+			}
+		}
+	}
 }

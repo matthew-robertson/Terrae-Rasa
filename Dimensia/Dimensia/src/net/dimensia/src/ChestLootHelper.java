@@ -4,6 +4,8 @@ import java.util.Random;
 
 public class ChestLootHelper
 {
+	private final Random random = new Random();
+	
 	public ItemStack[] getLowLevelChest_Surface()
 	{
 		int size = 2 + random.nextInt(7);
@@ -178,8 +180,4 @@ public class ChestLootHelper
 	{
 		return null;
 	}
-	
-	
-	
-	private final Random random = new Random();
 }

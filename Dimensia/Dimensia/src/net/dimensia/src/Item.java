@@ -41,6 +41,20 @@ import java.util.Vector;
  */
 public class Item 
 {
+	protected EnumToolMaterial material;
+	protected static int shiftedIndex;
+	protected int iconIndex;
+	protected int damage;
+	protected int maxStackSize;
+	protected int itemID;
+	protected int durability;
+	protected boolean isContainer;
+	protected String itemName;
+	protected int toolType;
+	protected int manaReq;
+	protected Vector<ItemStack> ammo;
+	protected EntityProjectile projectile;
+	
 	/**
 	 * Constructs a new <code>Item</code> that will be stored in the <code>itemsList[]</code> at the index 
 	 * of the itemID, allowing for easy access of the <code>Item</code> later. <code>Item</code> has a 
@@ -178,7 +192,7 @@ public class Item
 		return ammunition;
 	}
 	
-	public void onRightClick(World world, EntityPlayer entity)
+	public void onRightClick(World world, EntityLivingPlayer entity)
 	{
 	}
 	
@@ -207,7 +221,7 @@ public class Item
 	public static Item silverSword = new ItemToolSword(16).setDamageDone(11).setItemName("silver Sword").setIconIndex(2, 4).setToolMaterial(EnumToolMaterial.SILVER);	
 	
 	public static Item goldAxe = new ItemToolAxe(17).setDamageDone(9).setItemName("gold Axe").setIconIndex(4, 7).setToolMaterial(EnumToolMaterial.GOLD);	
-	public static Item goldPickaxe = new ItemToolPickaxe(18).setDamageDone(7).setItemName("gold Pickaxe").setIconIndex(4, 6).setToolMaterial(EnumToolMaterial.GOLD);	
+	public static Item goldPickaxe = new ItemToolPickaxe(18).setDamageDone(7).setItemName("gold Pickaxe").setIconIndex(4, 6).setToolMaterial(EnumToolMaterial.GOD);	
 	public static Item goldHammer = new ItemToolHammer(19).setDamageDone(8).setItemName("gold Hammer").setIconIndex(4, 5).setToolMaterial(EnumToolMaterial.GOLD);
 	public static Item goldSword = new ItemToolSword(20).setDamageDone(14).setItemName("gold Sword").setIconIndex(4, 4).setToolMaterial(EnumToolMaterial.GOLD);	
 	
@@ -324,18 +338,4 @@ public class Item
 	public static Item swiftnessPotion4 = new ItemPotionSwiftness(394, 30, 4).setIconIndex(0, 2).setItemName("swiftness potion 4");
 	
 	
-	
-	protected EnumToolMaterial material;
-	protected static int shiftedIndex;
-	protected int iconIndex;
-	protected int damage;
-	protected int maxStackSize;
-	protected int itemID;
-	protected int durability;
-	protected boolean isContainer;
-	protected String itemName;
-	protected int toolType;
-	protected int manaReq;
-	protected Vector<ItemStack> ammo;
-	protected EntityProjectile projectile;
 }

@@ -208,7 +208,8 @@ Alpha 1.0.16
 		>>Combat is completely broken.
 		>>Stuns persist forever
 		
-Alpha 1.0.2
+Alpha 1.0.17.1
+	Added linux support to the game and launcher(probably)
 	Implemented AI
 	Added NPCs
 	Implemented projecitles
@@ -216,7 +217,97 @@ Alpha 1.0.2
 	Todo:
 		implement quests
 
-Alpha 1.1.0?
-	ADD SAVE FILE PROTECTION
-	>>Need BreakCactus(). (Like BreakTree())
+Alpha 1.0.17.2
+	Moved player from world.java->gameengine.java
+
+Alpha 1.0.17.3
+	Bug fixes from everything
+	Updated ChunkLoader
+	Biomes are now stored in the chunk, not world (hopefully)
+	
+Alpha 1.0.17.4
+	Added new world classes, worldgen classes, and render classes (for dimensions)
+	Added way to tell which dimension the player is in
+	Players now regenerate 2% of max health and mana / 5 seconds (no matter what, stacks with ooc regen)
+	Way more bug fixes 
+		>>including the ability to actually create worlds again
+		>>Worlds now save when closed and reopened
+	Added getBiome(str) and getBiomeColumn(str) to world, replacing the biome Map<String,Chunk>
+	Fixed EntityLiving.registerStatusEffect(...)
+	Fixed Monsters not spawning
+	Nerfed monster spawn rate by ~20%-30%
+	
+	
+	Notable bug: it seems that after saving a world, sometimes the chunks can be corrupted 
+		To fix: try stepping through the entire generation of a world, seeing where chunk gen fails.
+				wierdly, it seems to only fail to load when run, not in debug mode. There's something
+				to that probably. Likely issue where a chunk is never saved right?
+			Note(2ish); possibly worldgen issue
+			
+Alpha 1.0.18
+	Increased monster stun time from 0.25->0.4 seconds on hit
+	
+	Starting restructuring by moving variables to the top of classes
+		>>Removed Cave class
+		>>Fixed Variable placement and class inheritance names (hopefully)
+		>>Standardized Imports
+		>>Cleaned up some imports
+		>>Updated metadatahelper with comments
+
+	
+	Bug fixes:
+		Fixed basespeed for entityliving. Basespeed describes how fast something moves in pixels/frame.
+			Ex. basespeed of 6 is 20 blocks/sec of speed.
+		Fixed status effects being shared between npcs
+		Fixed reference errors in the entity classes
+		Added Copy constructors everywhere and depreciated the remaining clone methods that arent
+			causing damage at this time.
+	
+	Possible Bug: super() not super(entity) is being called in copy constructors, super() not called
+		at all in blockchest
+		
+
+	Fix knowing what chunks are loaded... Hashtable of (x,y) keys?		
+	TEXTURE LOADER should be fixed!
+	tESSellator...		
+	What does MathHelper.angleMousePlayer(...) do?
+	
+Alpha 1.0.19.01
+	Consolidated branches into one block
+	Consolidated the treebases into one block
+	Consolidated grass and snowygrass into one block
+	Improved functionality of Block.getBitMap()
+	Improved functionality of World.updateBlockBitMap(...)
+	Changed block calls in WorldGenEarth from World.getBlock(...)/World.setBlock(...) to World.getBlockGenerate(...)/World.setBlockGenerate(...)
+	Removed WorldGenEarth.GetBitMap(...)
+	Extracted World.updateGeneralBitMap(...) and World.updatePillarBitMap(...) from World.updateBlockBitMap(...)
+	Extracted WorldGenEarth.generateTree(...) from WorldGenEarth.GenerateForest(...)
+	
+	Bug fixes:
+		Fixed textures not being chosen correctly (overflow in IconIndex)
+		Fixed trees and cacti not responding correctly to mining
+		Added documentation for MathHelper.angleMousePlayer(...)
+
+Alpha 1.0.19.5
+	Moved GenerateTree(...) from WorldGenEarth to World, renamed growTree(...)
+	Extracted and moved placeGrass(...) to World
+	Documentation for WorldGen improved/added	
+	Documentation for World updated
+	
+	Improved AI:
+		Added chase and retreat behavior
+		Extracted AIMoveLeft(...)
+		Extracted AIMoveRight(...)
+		Modified isWalkingSafe(...) to search a wider range
+		Documentation for AI functions added	
+		Documentation for AIManager added	
+	
+	Bug fixes:
+		Fixed bitmaps not being set correctly
+		
+	Notable bugs:
+		Slimes occassionally walk through walls?
+		Weather appears to be broken.
+		Errors on treegen caused by being located at the edge of the map
+		
 	

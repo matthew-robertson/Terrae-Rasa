@@ -16,6 +16,10 @@ public enum EnumArmor
 	IRON(2, 4, 2),
 	SILVER(3, 4, 2),
 	GOLD(4, 5, 3);
+
+	public int helmDefense;
+	public int bodyDefense;
+	public int greavesDefense;
 	
 	EnumArmor(int helmDef, int bodyDef, int greavesDef)
 	{
@@ -38,9 +42,4 @@ public enum EnumArmor
 	{
 		return greavesDefense;
 	}
-	
-	public int helmDefense;
-	public int bodyDefense;
-	public int greavesDefense;
-	
 }

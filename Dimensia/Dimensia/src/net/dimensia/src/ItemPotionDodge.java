@@ -7,9 +7,9 @@ public class ItemPotionDodge extends ItemPotion
 		super(i, duration, tier);
 	}
 	
-	public void onRightClick(World world, EntityPlayer entity)
+	public void onRightClick(World world, EntityLivingPlayer player)
 	{
-		entity.registerStatusEffect(new StatusEffectDodgeBuff(durationSeconds, tier));
-		world.player.inventory.removeItemsFromInventoryStack(1, world.player.selectedSlot);
+		player.registerStatusEffect(new StatusEffectDodgeBuff(durationSeconds, tier));
+		player.inventory.removeItemsFromInventoryStack(1, player.selectedSlot);
 	}
 }

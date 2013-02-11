@@ -2,13 +2,18 @@ package net.dimensia.src;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.concurrent.Callable;
 import java.util.zip.GZIPOutputStream;
 
 public class CallableSaveChunk implements Callable<Boolean>
 {
+	private String basepath;
+	private String worldName;
+	private Chunk chunk;
+	private int x;
+	private int y;
+	
 	public CallableSaveChunk(Chunk chunk, int x, int y, String basepath, String worldName)
 	{
 		this.chunk = chunk;
@@ -20,7 +25,7 @@ public class CallableSaveChunk implements Callable<Boolean>
 	
 	public Boolean call() throws Exception 
 	{
-		String fileName = (basepath + "/World Saves/" + worldName + "/Earth/" + x + "," + y + ".wdat"); 
+		String fileName = (basepath + "/" + x + "," + y + ".wdat"); 
 		GZIPOutputStream fileWriter = new GZIPOutputStream(new FileOutputStream(new File(fileName))); //Open an output stream
 	    ByteArrayOutputStream bos = new ByteArrayOutputStream(); //Convert world to byte[]
 		ObjectOutputStream s = new ObjectOutputStream(bos); //open the OOS, used to save serialized objects to file
@@ -36,10 +41,4 @@ public class CallableSaveChunk implements Callable<Boolean>
 		
 		return true;
 	}
-	
-	private String basepath;
-	private String worldName;
-	private Chunk chunk;
-	private int x;
-	private int y;
 }

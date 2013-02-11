@@ -13,16 +13,13 @@ public enum EnumStatusEffects
 	BUFF_ATTACK_SPEED,
 	BUFF_CRITICAL_STRIKE,
 	BUFF_DODGE,
-	
-	DEBUFF_STUN_1, //
-	
-	DEBUFF_POISON, ///
-	DEBUFF_BLEEDING,///
-	DEBUFF_MOVEMENT_SPEED, //(dazed)
+	DEBUFF_STUN_1, 
+	DEBUFF_POISON, 
+	DEBUFF_BLEEDING,
+	DEBUFF_MOVEMENT_SPEED, //A dazed effect
 	/**
 	 * Fatal Woulds leech your strength and vitality. -5% max health and damage per second until dead. HEAVENS_REPRIEVE still works 
 	 * and prevents dead (gives % actual max health, not lower amount)
 	 */
-	DEBUFF_FATAL_WOUNDS;//
-	
+	DEBUFF_FATAL_WOUNDS;
 }

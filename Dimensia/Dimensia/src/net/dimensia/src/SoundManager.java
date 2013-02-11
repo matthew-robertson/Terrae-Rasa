@@ -19,6 +19,14 @@ import org.lwjgl.openal.AL10;
  */
 public class SoundManager
 {
+	private int[] buffers = new int[256]; // We support at most 256 buffers
+	private int[] sources; //Number of sources is limited tby user (and hardware)
+	private IntBuffer scratchBuffer = BufferUtils.createIntBuffer(256); //Our internal scratch buffer
+	public boolean soundOutput; // Whether we're running in no sound mode
+	private int bufferIndex; //Current index in our buffers 
+	private int sourceIndex; //Current index in our source list
+	public float volume; //0.0f - 1.0f indicating % of volume
+	
 	 /**
      * Initializes the SoundManager
      * @param channels Number of channels to create
@@ -205,11 +213,5 @@ public class SoundManager
   	//public static int SOUND_SHOT; //<<Sound declaration
 	
   	
-  	private int[] buffers = new int[256]; // We support at most 256 buffers
-	private int[] sources; //Number of sources is limited tby user (and hardware)
-	private IntBuffer scratchBuffer = BufferUtils.createIntBuffer(256); //Our internal scratch buffer
-	public boolean soundOutput; // Whether we're running in no sound mode
-	private int bufferIndex; //Current index in our buffers 
-	private int sourceIndex; //Current index in our source list
-	public float volume; //0.0f - 1.0f indicating % of volume
+  	
 }

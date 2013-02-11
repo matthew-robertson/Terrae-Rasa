@@ -1,8 +1,15 @@
 package net.dimensia.src;
 
-
 public abstract class Weather 
 {
+	protected int ticksLeft;
+	protected int averageGroundLevel;
+	protected int y;
+	protected int height;
+	protected int x;
+	protected int width;
+	protected Biome weatherLocation;
+	
 	public abstract void update(World world);
 	
 	public abstract void initialize(World world);
@@ -15,12 +22,4 @@ public abstract class Weather
 	{
 		ticksLeft -= i;
 	}
-	
-	protected int ticksLeft;
-	protected int averageGroundLevel;
-	protected int y;
-	protected int height;
-	protected int x;
-	protected int width;
-	protected Biome weatherLocation;
 }

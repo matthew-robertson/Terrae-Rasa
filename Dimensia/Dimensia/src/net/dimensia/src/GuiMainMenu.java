@@ -18,9 +18,44 @@ import org.lwjgl.opengl.GL11;
  * @version     1.0
  * @since       1.0
  */
-
 public class GuiMainMenu extends Render
 {
+	private FileManager fileManager;	
+	private String[] worldNames;
+	private String[] playerNames;
+	private int totalPlayers;
+	private int totalWorlds;		
+	private GuiResizableText[] mainMenuTextAreas;
+	private GuiResizableText[] playMenuTextAreas;
+	private GuiResizableText[] worldMenuTextAreas;	
+	private GuiTextbox characterName;
+	private GuiButton characterMode;
+	private GuiResizableText createNewCharacter;
+	private GuiResizableText stopCreatingCharacter;	
+	private GuiTextbox worldName;
+	private GuiButton worldMode;
+	private GuiButton worldSize;
+	private GuiResizableText createNewWorld;
+	private GuiResizableText stopCreatingWorld;		
+	private GuiResizableText deleteWorldBack;
+	private GuiResizableText deleteWorldConfirm;
+	private GuiResizableText deleteWorldMessage;
+	private GuiResizableText deletePlayerBack;
+	private GuiResizableText deletePlayerConfirm;
+	private GuiResizableText deletePlayerMessage;	
+	private boolean isCreatingCharacter;
+	private boolean isCreatingWorld;
+	private boolean isPlayMenuOpen;
+	private boolean isWorldMenuOpen;	
+	private float logoAngle; //Angle of tilt for logo rotation
+	private int logoModifier; //Direction modifier for logo rotation
+	private boolean isDeletingCharacter;
+	private boolean isDeletingWorld;
+	private int deletingIndex;	
+	private int playerIndex;
+	private int worldIndex;	
+	private boolean isWaitingToDelete;
+	
 	/**
 	 * Constructs an instance of the main menu. This involves initializing the menu components and 
 	 * the fileManager object used for I/O.
@@ -237,8 +272,7 @@ public class GuiMainMenu extends Render
 		}
 		if(buttonPushed == 10) //Delete Character
 		{
-			isWaitingToDelete = true;
-			
+			isWaitingToDelete = true;			
 		}
 		if(buttonPushed == 11) //Back to Main
 		{
@@ -400,7 +434,7 @@ public class GuiMainMenu extends Render
 			worldIndex = index;
 			try 
 			{ //call the startGame method of Dimensia with the specified world and player, they of course have to be loaded though
-				Dimensia.dimensia.startGame(fileManager.loadWorld(worldNames[worldIndex]), fileManager.loadPlayer(playerNames[playerIndex]));
+				Dimensia.startGame(fileManager.loadWorld("Earth", worldNames[worldIndex]), fileManager.loadPlayer(playerNames[playerIndex]));
 			}
 			catch (Exception e)
 			{
@@ -745,40 +779,4 @@ public class GuiMainMenu extends Render
 		GL11.glColor4f(1, 1, 1, 1);
 		trueTypeFont.drawString(0, (Display.getHeight() / 2) - 20, Dimensia.getVersion(), 0.5f, -0.5f, TrueTypeFont.ALIGN_LEFT);
 	}
-	
-	private FileManager fileManager;	
-	private String[] worldNames;
-	private String[] playerNames;
-	private int totalPlayers;
-	private int totalWorlds;		
-	private GuiResizableText[] mainMenuTextAreas;
-	private GuiResizableText[] playMenuTextAreas;
-	private GuiResizableText[] worldMenuTextAreas;	
-	private GuiTextbox characterName;
-	private GuiButton characterMode;
-	private GuiResizableText createNewCharacter;
-	private GuiResizableText stopCreatingCharacter;	
-	private GuiTextbox worldName;
-	private GuiButton worldMode;
-	private GuiButton worldSize;
-	private GuiResizableText createNewWorld;
-	private GuiResizableText stopCreatingWorld;		
-	private GuiResizableText deleteWorldBack;
-	private GuiResizableText deleteWorldConfirm;
-	private GuiResizableText deleteWorldMessage;
-	private GuiResizableText deletePlayerBack;
-	private GuiResizableText deletePlayerConfirm;
-	private GuiResizableText deletePlayerMessage;	
-	private boolean isCreatingCharacter;
-	private boolean isCreatingWorld;
-	private boolean isPlayMenuOpen;
-	private boolean isWorldMenuOpen;	
-	private float logoAngle; //Angle of tilt for logo rotation
-	private int logoModifier; //Direction modifier for logo rotation
-	private boolean isDeletingCharacter;
-	private boolean isDeletingWorld;
-	private int deletingIndex;	
-	private int playerIndex;
-	private int worldIndex;	
-	private boolean isWaitingToDelete;	
 }

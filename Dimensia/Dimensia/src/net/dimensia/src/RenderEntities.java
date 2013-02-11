@@ -6,7 +6,7 @@ public class RenderEntities extends Render
 	/**
 	 * Renders the player entity
 	 */
-	public void renderPlayer(World world, EntityPlayer player)
+	public void renderPlayer(World world, EntityLivingPlayer player)
 	{
 		GL11.glColor4f(1, 1, 1, 1);
 		if(player.isFacingRight) //facing right (default)
@@ -43,7 +43,7 @@ public class RenderEntities extends Render
 	{
 		for(int i = 0; i < world.entityList.size(); i++)
 		{
-			renderEntityEnemy(world.entityList.get(i).getTexture(), (EntityEnemy) world.entityList.get(i));
+			renderEntityLivingNPCEnemy(world.entityList.get(i).getTexture(), (EntityLivingNPCEnemy) world.entityList.get(i));
 		}
 	}
 	
@@ -52,7 +52,7 @@ public class RenderEntities extends Render
 	 */
 	public void renderNPCs(World world){
 		for(int i = 0; i < world.npcList.size(); i++){
-			renderEntityNPC(world.npcList.get(i).getTexture(), (EntityNPC) world.npcList.get(i));
+			renderEntityLivingNPC(world.npcList.get(i).getTexture(), (EntityLivingNPC) world.npcList.get(i));
 		}
 	}
 
@@ -73,7 +73,7 @@ public class RenderEntities extends Render
 	 * @param tex texture of entity being drawn <<<< likely being replaced
 	 * @param enemy enemy to draw
 	 */
-	public void renderEntityEnemy(Texture tex, EntityEnemy enemy)
+	public void renderEntityLivingNPCEnemy(Texture tex, EntityLivingNPCEnemy enemy)
 	{
 		GL11.glColor4f(1, 1, 1, 1);
 		float x = enemy.x;
@@ -81,6 +81,8 @@ public class RenderEntities extends Render
         float eh = enemy.getHeight();
         float ew = enemy.getWidth();
 				
+        //System.out.println("[RenderEntities]" + enemy + " " + tex);
+        
 		tex.bind(); 
         t.startDrawingQuads();
         t.addVertexWithUV(x, y + eh, 0, 0, 1);
@@ -95,7 +97,7 @@ public class RenderEntities extends Render
 	 * @param tex texture of entity being drawn <<<< likely being replaced
 	 * @param enemy enemy to draw
 	 */
-	public void renderEntityNPC(Texture tex, EntityNPC npc)
+	public void renderEntityLivingNPC(Texture tex, EntityLivingNPC npc)
 	{
 		GL11.glColor4f(1, 1, 1, 1);
 		float x = npc.x;

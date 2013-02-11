@@ -5,6 +5,8 @@ package net.dimensia.src;
  */
 public class SoundEngine 
 {
+	private final String BASE_PATH;
+
 	public SoundEngine()
 	{
 		String osName = System.getProperty("os.name");
@@ -31,6 +33,4 @@ public class SoundEngine
 	{
 		return BASE_PATH;
 	}
-	
-	private final String BASE_PATH;
 }

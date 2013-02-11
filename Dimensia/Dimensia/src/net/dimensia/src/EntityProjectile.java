@@ -9,7 +9,32 @@ package net.dimensia.src;
  * @author Matt
  * 
  */
-public class EntityProjectile extends Entity implements Cloneable{
+public class EntityProjectile extends Entity 
+{
+	private static final long serialVersionUID = 1L;
+	protected char type;
+	protected int projectileId;
+	protected double xVel;
+	protected double yVel;
+	protected int damage;
+	float xDisplacement;
+	float yDisplacement;
+	protected boolean active;
+	protected boolean isFriendly;
+	protected boolean isHostile;
+	protected float speed;
+	protected String name;
+	protected int direction;
+	protected int blockWidth;
+	protected int width;
+	protected int blockHeight;
+	protected int height;
+	protected float criticalStrikeChance;
+	protected int ticksActive;
+	protected int iconIndex;
+	protected ItemStack drop;
+	protected int ticksNonActive;
+	
 	public EntityProjectile(int i, String name, int damage, char c, int w, int h, float s){
 		projectileId = i;
 		type = c;
@@ -40,23 +65,32 @@ public class EntityProjectile extends Entity implements Cloneable{
 		projectileList[i] = this;
 	}
 	
-	/**
-	 * Overrides Object.clone() to provide cloning functionality to EntityProjectile.
-	 * Creates a deep copy of the EntityProjectile instance on which the method is 
-	 * called.
-	 * @return a deep copy of the EntityProjectile
-	 */
-	public EntityProjectile clone()
+	public EntityProjectile(EntityProjectile entity)
 	{
-		try
-		{
-			return (EntityProjectile) super.clone();
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-		return null;
+		super(entity);
+
+		this.type = entity.type;
+		this.projectileId = entity.projectileId;
+		this.xVel = entity.xVel;
+		this.yVel = entity.yVel;
+		this.damage = entity.damage;
+		this.xDisplacement = entity.xDisplacement;
+		this.yDisplacement = entity.yDisplacement;
+		this.active = entity.active; 
+		this.isFriendly = entity.isFriendly;
+		this.isHostile = entity.isHostile;
+		this.speed = entity.speed;
+		this.name = entity.name;
+		this.direction = entity.direction;
+		this.blockWidth = entity.blockWidth;
+		this.width = entity.width;
+		this.blockHeight = entity.blockHeight;
+		this.height = entity.height;
+		this.criticalStrikeChance = entity.criticalStrikeChance;
+		this.ticksActive = entity.ticksActive;
+		this.iconIndex = entity.iconIndex;
+		this.drop = entity.drop;
+		this.ticksNonActive = entity.ticksNonActive;
 	}
 	
 	/**
@@ -463,29 +497,7 @@ public class EntityProjectile extends Entity implements Cloneable{
 	
 	public EntityProjectile[] projectileList = new EntityProjectile[2];
 	
-	public static EntityProjectile magicMissile = new EntityProjectile(0, "Magic Missile", 5, 'm', 1, 1, 7f).setAffectedByGravity(false).setIconIndex(0,0).setIsFriendly(true);
-	public static EntityProjectile woodenArrow = new EntityProjectile(1, "wooden Arrow", 7, 'b', 1, 1, 8f).setIconIndex(0,1).setIsFriendly(true);
+	public final static EntityProjectile magicMissile = new EntityProjectile(0, "Magic Missile", 5, 'm', 1, 1, 7f).setAffectedByGravity(false).setIconIndex(0,0).setIsFriendly(true);
+	public final static EntityProjectile woodenArrow = new EntityProjectile(1, "wooden Arrow", 7, 'b', 1, 1, 8f).setIconIndex(0,1).setIsFriendly(true);
 	
-	protected char type;
-	protected int projectileId;
-	protected double xVel;
-	protected double yVel;
-	protected int damage;
-	float xDisplacement;
-	float yDisplacement;
-	protected boolean active;
-	protected boolean isFriendly;
-	protected boolean isHostile;
-	protected float speed;
-	protected String name;
-	protected int direction;
-	protected int blockWidth;
-	protected int width;
-	protected int blockHeight;
-	protected int height;
-	protected float criticalStrikeChance;
-	protected int ticksActive;
-	protected int iconIndex;
-	protected ItemStack drop;
-	protected int ticksNonActive;
 }

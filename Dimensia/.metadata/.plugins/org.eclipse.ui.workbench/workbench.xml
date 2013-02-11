@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<workbench progressCount="17" version="2.0">
+<workbench progressCount="12" version="2.0">
 <workbenchAdvisor/>
-<window height="728" maximized="true" width="1024" x="190" y="-22">
+<window height="728" maximized="true" width="1024" x="157" y="40">
 <fastViewData fastViewLocation="1024"/>
 <perspectiveBar>
 <itemSize x="160"/>
@@ -40,74 +40,53 @@
 <part id="0"/>
 <part id="1"/>
 <part id="2"/>
-<part id="5"/>
-<part id="3"/>
 <part id="4"/>
-<part id="10"/>
-<part id="6"/>
-<part id="7"/>
-<part id="8"/>
-<part id="9"/>
-<part id="11"/>
-<part id="12"/>
+<part id="3"/>
 </presentation>
 </folder>
 </info>
 </editorArea>
 <editor id="org.eclipse.ui.DefaultTextEditor" name="Changelog.txt" partName="Changelog.txt" path="C:/Users/Matt/Desktop/Dimensia/Dimensia/Changelog.txt" title="Changelog.txt" tooltip="Dimensia/Changelog.txt" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/Dimensia/Changelog.txt"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="10532" selectionTopPixel="2753"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="14582" selectionTopPixel="4088"/>
 </editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="MathHelper.java" partName="MathHelper.java" path="C:/Users/Matt/Desktop/Dimensia/Dimensia/src/net/dimensia/src/MathHelper.java" title="MathHelper.java" tooltip="Dimensia/src/net/dimensia/src/MathHelper.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/Dimensia/src/net/dimensia/src/MathHelper.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="773" selectionTopPixel="240"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="EntityLiving.java" partName="EntityLiving.java" path="C:/Users/Matt/Desktop/Dimensia/Dimensia/src/net/dimensia/src/EntityLiving.java" title="EntityLiving.java" tooltip="Dimensia/src/net/dimensia/src/EntityLiving.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/Dimensia/src/net/dimensia/src/EntityLiving.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="6099" selectionTopPixel="2153"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="Item.java" partName="Item.java" path="C:/Users/Matt/Desktop/Dimensia/Dimensia/src/net/dimensia/src/Item.java" title="Item.java" tooltip="Dimensia/src/net/dimensia/src/Item.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/Dimensia/src/net/dimensia/src/Item.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="14458" selectionTopPixel="3840"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ItemStack.java" partName="ItemStack.java" path="C:/Users/Matt/Desktop/Dimensia/Dimensia/src/net/dimensia/src/ItemStack.java" title="ItemStack.java" tooltip="Dimensia/src/net/dimensia/src/ItemStack.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/Dimensia/src/net/dimensia/src/ItemStack.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="222" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="Keys.java" partName="Keys.java" path="C:/Users/Matt/Desktop/Dimensia/Dimensia/src/net/dimensia/src/Keys.java" title="Keys.java" tooltip="Dimensia/src/net/dimensia/src/Keys.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/Dimensia/src/net/dimensia/src/Keys.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="5145" selectionTopPixel="2618"/>
-</editor>
-<editor activePart="true" focus="true" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="Block.java" partName="Block.java" path="C:/Users/Matt/Desktop/Dimensia/Dimensia/src/net/dimensia/src/Block.java" title="Block.java" tooltip="Dimensia/src/net/dimensia/src/Block.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/Dimensia/src/net/dimensia/src/Block.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="10160" selectionTopPixel="5445"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ItemRanged.java" partName="ItemRanged.java" path="C:/Users/Matt/Desktop/Dimensia/Dimensia/src/net/dimensia/src/ItemRanged.java" title="ItemRanged.java" tooltip="Dimensia/src/net/dimensia/src/ItemRanged.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/Dimensia/src/net/dimensia/src/ItemRanged.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="169" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="WeatherSnow.java" partName="WeatherSnow.java" path="C:/Users/Matt/Desktop/Dimensia/Dimensia/src/net/dimensia/src/WeatherSnow.java" title="WeatherSnow.java" tooltip="Dimensia/src/net/dimensia/src/WeatherSnow.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/Dimensia/src/net/dimensia/src/WeatherSnow.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="4014" selectionTopPixel="1058"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="Chunk.java" partName="Chunk.java" path="C:/Users/Matt/Desktop/Dimensia/Dimensia/src/net/dimensia/src/Chunk.java" title="Chunk.java" tooltip="Dimensia/src/net/dimensia/src/Chunk.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/Dimensia/src/net/dimensia/src/Chunk.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="3152" selectionTopPixel="1395"/>
+<editor id="org.eclipse.ui.DefaultTextEditor" name="Todo.txt" partName="Todo.txt" path="C:/Users/Matt/Desktop/Dimensia/Dimensia/Todo.txt" title="Todo.txt" tooltip="Dimensia/Todo.txt" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/Dimensia/Todo.txt"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="342" selectionTopPixel="0"/>
 </editor>
 <editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="AIManager.java" partName="AIManager.java" path="C:/Users/Matt/Desktop/Dimensia/Dimensia/src/net/dimensia/src/AIManager.java" title="AIManager.java" tooltip="Dimensia/src/net/dimensia/src/AIManager.java" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/Dimensia/src/net/dimensia/src/AIManager.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="852" selectionTopPixel="0"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1113" selectionTopPixel="0"/>
 </editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="SpawnManager.java" partName="SpawnManager.java" path="C:/Users/Matt/Desktop/Dimensia/Dimensia/src/net/dimensia/src/SpawnManager.java" title="SpawnManager.java" tooltip="Dimensia/src/net/dimensia/src/SpawnManager.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/Dimensia/src/net/dimensia/src/SpawnManager.java"/>
-<editorState selectionHorizontalPixel="690" selectionLength="0" selectionOffset="5149" selectionTopPixel="2520"/>
+<editor activePart="true" focus="true" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="World.java" partName="World.java" path="C:/Users/Matt/Desktop/Dimensia/Dimensia/src/net/dimensia/src/World.java" title="World.java" tooltip="Dimensia/src/net/dimensia/src/World.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/Dimensia/src/net/dimensia/src/World.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="48237" selectionTopPixel="20595"/>
 </editor>
 <editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="WorldGenEarth.java" partName="WorldGenEarth.java" path="C:/Users/Matt/Desktop/Dimensia/Dimensia/src/net/dimensia/src/WorldGenEarth.java" title="WorldGenEarth.java" tooltip="Dimensia/src/net/dimensia/src/WorldGenEarth.java" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/Dimensia/src/net/dimensia/src/WorldGenEarth.java"/>
-<editorState selectionHorizontalPixel="35" selectionLength="0" selectionOffset="9973" selectionTopPixel="3015"/>
+<editorState selectionHorizontalPixel="29" selectionLength="0" selectionOffset="7772" selectionTopPixel="2663"/>
 </editor>
 </editors>
 <views>
+<view id="org.eclipse.search.ui.views.SearchView" partName="Search">
+<viewState isPinned="false">
+<view IMemento.internal.id="org.eclipse.jdt.ui.JavaSearchResultPage" org.eclipse.jdt.search.resultpage.grouping="3" org.eclipse.jdt.search.resultpage.limit="1000" org.eclipse.jdt.search.resultpage.limit_enabled="TRUE" org.eclipse.jdt.search.resultpage.sorting="1" org.eclipse.search.lastActivation="1" org.eclipse.search.resultpage.layout="2"/>
+<view IMemento.internal.id="" org.eclipse.search.lastActivation="0"/>
+</viewState>
+</view>
+<view id="org.eclipse.debug.ui.DebugView" partName="Debug">
+<viewState/>
+</view>
+<view id="org.eclipse.ui.views.TaskList" partName="Tasks"/>
+<view id="org.eclipse.debug.ui.VariableView" partName="Variables">
+<viewState/>
+</view>
+<view id="org.eclipse.debug.ui.BreakpointView" partName="Breakpoints">
+<viewState/>
+</view>
+<view id="org.eclipse.ui.views.ContentOutline" partName="Outline">
+<viewState/>
+</view>
 <view id="org.eclipse.ui.navigator.ProjectExplorer" partName="Project Explorer">
 <viewState CommonNavigator.LINKING_ENABLED="0" org.eclipse.ui.navigator.resources.workingSets.showTopLevelWorkingSets="0"/>
 </view>
@@ -124,25 +103,18 @@
 </viewState>
 </view>
 <view id="org.eclipse.ui.views.PropertySheet" partName="Properties"/>
-<view id="org.eclipse.search.ui.views.SearchView" partName="Search">
-<viewState isPinned="false">
-<view IMemento.internal.id="org.eclipse.search.text.FileSearchResultPage" org.eclipse.search.lastActivation="4" org.eclipse.search.resultpage.layout="2" org.eclipse.search.resultpage.limit="1000" org.eclipse.search.resultpage.sorting="2"/>
-<view IMemento.internal.id="org.eclipse.jdt.ui.JavaSearchResultPage" org.eclipse.jdt.search.resultpage.grouping="3" org.eclipse.jdt.search.resultpage.limit="1000" org.eclipse.jdt.search.resultpage.limit_enabled="TRUE" org.eclipse.jdt.search.resultpage.sorting="1" org.eclipse.search.lastActivation="3" org.eclipse.search.resultpage.layout="2"/>
-<view IMemento.internal.id="" org.eclipse.search.lastActivation="0"/>
-</viewState>
-</view>
 <view id="org.eclipse.ui.views.ProblemView" partName="Problems">
 <viewState PRIMARY_SORT_FIELD="org.eclipse.ui.ide.severityAndDescriptionField" categoryGroup="org.eclipse.ui.ide.severity" markerContentGenerator="org.eclipse.ui.ide.problemsGenerator" partName="Problems">
-<columnWidths org.eclipse.ui.ide.locationField="90" org.eclipse.ui.ide.markerType="90" org.eclipse.ui.ide.pathField="120" org.eclipse.ui.ide.resourceField="90" org.eclipse.ui.ide.severityAndDescriptionField="300"/>
+<expanded>
+<category IMemento.internal.id="Warnings (34 items)"/>
+</expanded>
+<columnWidths org.eclipse.ui.ide.locationField="90" org.eclipse.ui.ide.markerType="653" org.eclipse.ui.ide.pathField="120" org.eclipse.ui.ide.resourceField="90" org.eclipse.ui.ide.severityAndDescriptionField="300"/>
 <visible IMemento.internal.id="org.eclipse.ui.ide.severityAndDescriptionField"/>
 <visible IMemento.internal.id="org.eclipse.ui.ide.resourceField"/>
 <visible IMemento.internal.id="org.eclipse.ui.ide.pathField"/>
 <visible IMemento.internal.id="org.eclipse.ui.ide.locationField"/>
 <visible IMemento.internal.id="org.eclipse.ui.ide.markerType"/>
 </viewState>
-</view>
-<view id="org.eclipse.ui.console.ConsoleView" partName="Console">
-<viewState/>
 </view>
 <view id="org.eclipse.jdt.ui.PackageExplorer" partName="Package Explorer">
 <viewState group_libraries="1" layout="2" linkWithEditor="0" rootMode="1" workingSetName="Aggregate for window 1337199484284">
@@ -173,10 +145,10 @@
 </customFilters>
 </viewState>
 </view>
-<view id="org.eclipse.jdt.ui.SourceView" partName="Declaration"/>
-<view id="org.eclipse.ui.views.ContentOutline" partName="Outline">
+<view id="org.eclipse.ui.console.ConsoleView" partName="Console">
 <viewState/>
 </view>
+<view id="org.eclipse.jdt.ui.SourceView" partName="Declaration"/>
 <view id="org.eclipse.jdt.ui.JavadocView" partName="Javadoc"/>
 </views>
 <perspectives activePart="org.eclipse.jdt.ui.CompilationUnitEditor" activePerspective="org.eclipse.jdt.ui.JavaPerspective">
@@ -308,11 +280,11 @@
 <alwaysOnActionSet id="org.eclipse.debug.ui.breakpointActionSet"/>
 <alwaysOnActionSet id="org.eclipse.jdt.debug.ui.JDTDebugActionSet"/>
 <alwaysOnActionSet id="org.eclipse.jdt.junit.JUnitActionSet"/>
-<alwaysOnActionSet id="org.eclipse.debug.ui.debugActionSet"/>
 <alwaysOnActionSet id="adt.actionSet.wizards"/>
-<alwaysOnActionSet id="adt.actionSet.refactorings"/>
 <alwaysOnActionSet id="adt.actionSet.avdManager"/>
 <alwaysOnActionSet id="adt.actionSet.lint"/>
+<alwaysOnActionSet id="adt.actionSet.refactorings"/>
+<alwaysOnActionSet id="org.eclipse.debug.ui.debugActionSet"/>
 <show_view_action id="org.eclipse.jdt.ui.PackageExplorer"/>
 <show_view_action id="org.eclipse.jdt.ui.TypeHierarchy"/>
 <show_view_action id="org.eclipse.jdt.ui.SourceView"/>
@@ -351,14 +323,24 @@
 <hide_toolbar_item_id id="org.eclipse.jdt.ui.actions.OpenProjectWizard"/>
 <hide_toolbar_item_id id="org.eclipse.ui.edit.text.toggleShowSelectedElementOnly"/>
 <view id="org.eclipse.jdt.ui.PackageExplorer"/>
-<view id="org.eclipse.ui.console.ConsoleView"/>
+<view id="org.eclipse.debug.ui.DebugView"/>
 <fastViewBars>
 <fastViewBar fastViewLocation="1024" id="bottom" orientation="256" selectedTabId="org.eclipse.search.ui.views.SearchView" style="0">
 <fastViews>
-<view id="org.eclipse.ui.views.ProblemView" ratio="0.29855537"/>
+<view id="org.eclipse.ui.views.ProblemView" ratio="0.2975078"/>
 <view id="org.eclipse.jdt.ui.JavadocView" ratio="0.3"/>
 <view id="org.eclipse.jdt.ui.SourceView" ratio="0.3"/>
-<view id="org.eclipse.search.ui.views.SearchView" ratio="0.29855537"/>
+<view id="org.eclipse.search.ui.views.SearchView" ratio="0.2975078"/>
+</fastViews>
+</fastViewBar>
+<fastViewBar fastViewLocation="131072" id="right" orientation="512" selectedTabId="org.eclipse.ui.views.ContentOutline" style="0">
+<fastViews>
+<view id="org.eclipse.ui.views.ContentOutline" ratio="0.29676935"/>
+</fastViews>
+</fastViewBar>
+<fastViewBar fastViewLocation="1024" id="org.eclipse.ui.internal.ViewStack@1ef74cd" orientation="256" selectedTabId="org.eclipse.ui.console.ConsoleView" style="0">
+<fastViews>
+<view id="org.eclipse.ui.console.ConsoleView" ratio="0.29695025"/>
 </fastViews>
 </fastViewBar>
 </fastViewBars>
@@ -385,7 +367,7 @@
 <page content="org.eclipse.ui.cheatsheets.views.CheatSheetView" label="LabelNotFound"/>
 </folder>
 </info>
-<info part="org.eclipse.ui.editorss" ratio="0.19630997" ratioLeft="266" ratioRight="1089" relationship="2" relative="left"/>
+<info part="org.eclipse.ui.editorss" ratio="0.2003012" ratioLeft="266" ratioRight="1062" relationship="2" relative="left"/>
 <info folder="true" part="bottom" ratio="0.74958813" ratioLeft="455" ratioRight="152" relationship="4" relative="org.eclipse.ui.editorss">
 <folder appearance="2" expanded="2">
 <page content="org.eclipse.ui.views.ProblemView" label="LabelNotFound"/>
@@ -397,7 +379,7 @@
 <presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory"/>
 </folder>
 </info>
-<info folder="true" part="org.eclipse.ui.internal.ViewStack@4086d2c7" ratio="0.7493333" ratioLeft="562" ratioRight="188" relationship="2" relative="org.eclipse.ui.editorss">
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@4086d2c7" ratio="0.73849165" ratioLeft="754" ratioRight="267" relationship="2" relative="org.eclipse.ui.editorss">
 <folder appearance="2" expanded="2">
 <page content="org.eclipse.mylyn.tasks.ui.views.tasks" label="LabelNotFound"/>
 <presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory"/>
@@ -412,9 +394,11 @@
 </folder>
 </info>
 <info folder="true" part="org.eclipse.ui.internal.ViewStack@7c43f2f2" ratio="0.8108614" ratioLeft="866" ratioRight="202" relationship="2" relative="org.eclipse.ui.editorss">
-<folder appearance="2" expanded="2">
-<page content="org.eclipse.debug.ui.DebugView" label="LabelNotFound"/>
-<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory"/>
+<folder activePageID="org.eclipse.debug.ui.DebugView" appearance="2" expanded="2">
+<page content="org.eclipse.debug.ui.DebugView" label="Debug"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
+<part id="0"/>
+</presentation>
 </folder>
 </info>
 <info folder="true" part="org.eclipse.ui.internal.ViewStack@6ff3564e" ratio="0.6516854" ratioLeft="696" ratioRight="372" relationship="2" relative="org.eclipse.ui.editorss">
@@ -423,11 +407,102 @@
 <presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory"/>
 </folder>
 </info>
-<info folder="true" part="org.eclipse.ui.internal.ViewStack@1ef74cd" ratio="0.7677419" ratioLeft="476" ratioRight="144" relationship="4" relative="org.eclipse.ui.editorss">
-<folder activePageID="org.eclipse.ui.console.ConsoleView" appearance="2" expanded="2">
-<page content="org.eclipse.ui.console.ConsoleView" label="Console"/>
-<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
-<part id="0"/>
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@1ef74cd" ratio="0.7483871" ratioLeft="464" ratioRight="156" relationship="4" relative="org.eclipse.ui.editorss">
+<folder appearance="2" expanded="2">
+<page content="org.eclipse.ui.console.ConsoleView" label="LabelNotFound"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory"/>
+</folder>
+</info>
+</mainWindow>
+</layout>
+</perspective>
+<perspective editorAreaTrimState="2" editorAreaVisible="1" fixed="0" version="0.016">
+<descriptor class="org.eclipse.debug.internal.ui.DebugPerspectiveFactory" id="org.eclipse.debug.ui.DebugPerspective" label="Debug"/>
+<alwaysOnActionSet id="org.eclipse.mylyn.context.ui.actionSet"/>
+<alwaysOnActionSet id="org.eclipse.mylyn.doc.actionSet"/>
+<alwaysOnActionSet id="org.eclipse.mylyn.tasks.ui.navigation"/>
+<alwaysOnActionSet id="org.eclipse.ui.cheatsheets.actionSet"/>
+<alwaysOnActionSet id="org.eclipse.rse.core.search.searchActionSet"/>
+<alwaysOnActionSet id="org.eclipse.search.searchActionSet"/>
+<alwaysOnActionSet id="org.eclipse.ui.edit.text.actionSet.annotationNavigation"/>
+<alwaysOnActionSet id="org.eclipse.ui.edit.text.actionSet.navigation"/>
+<alwaysOnActionSet id="org.eclipse.ui.edit.text.actionSet.convertLineDelimitersTo"/>
+<alwaysOnActionSet id="org.eclipse.ui.externaltools.ExternalToolsSet"/>
+<alwaysOnActionSet id="org.eclipse.ui.actionSet.keyBindings"/>
+<alwaysOnActionSet id="org.eclipse.ui.actionSet.openFiles"/>
+<alwaysOnActionSet id="org.eclipse.debug.ui.launchActionSet"/>
+<alwaysOnActionSet id="org.eclipse.ui.NavigateActionSet"/>
+<alwaysOnActionSet id="org.eclipse.debug.ui.breakpointActionSet"/>
+<alwaysOnActionSet id="org.eclipse.jdt.debug.ui.JDTDebugActionSet"/>
+<alwaysOnActionSet id="org.eclipse.jdt.ui.JavaActionSet"/>
+<alwaysOnActionSet id="org.eclipse.debug.ui.debugActionSet"/>
+<show_view_action id="org.eclipse.debug.ui.DebugView"/>
+<show_view_action id="org.eclipse.debug.ui.VariableView"/>
+<show_view_action id="org.eclipse.debug.ui.BreakpointView"/>
+<show_view_action id="org.eclipse.debug.ui.ExpressionView"/>
+<show_view_action id="org.eclipse.ui.views.ContentOutline"/>
+<show_view_action id="org.eclipse.ui.console.ConsoleView"/>
+<show_view_action id="org.eclipse.ui.views.TaskList"/>
+<show_view_action id="org.eclipse.ant.ui.views.AntView"/>
+<show_view_action id="org.eclipse.datatools.sqltools.result.resultView"/>
+<show_view_action id="org.eclipse.pde.runtime.LogView"/>
+<show_view_action id="org.eclipse.jdt.debug.ui.DisplayView"/>
+<perspective_action id="org.eclipse.datatools.sqltools.sqleditor.perspectives.EditorPerspective"/>
+<perspective_action id="org.eclipse.jdt.ui.JavaPerspective"/>
+<perspective_action id="org.eclipse.jdt.ui.JavaBrowsingPerspective"/>
+<perspective_action id="org.eclipse.wst.jsdt.ui.JavaPerspective"/>
+<perspective_action id="org.eclipse.wst.xml.ui.perspective"/>
+<hide_toolbar_item_id id="org.eclipse.jdt.ui.actions.OpenProjectWizard"/>
+<hide_toolbar_item_id id="org.eclipse.ui.edit.text.toggleShowSelectedElementOnly"/>
+<view id="org.eclipse.debug.ui.DebugView"/>
+<view id="org.eclipse.wst.server.ui.ServersView" removed="true"/>
+<view id="org.eclipse.ui.console.ConsoleView"/>
+<view id="org.eclipse.ui.views.TaskList"/>
+<view id="org.eclipse.debug.ui.VariableView"/>
+<view id="org.eclipse.debug.ui.BreakpointView"/>
+<view id="org.eclipse.ui.views.ContentOutline"/>
+<fastViewBars/>
+<layout>&#x0A;<mainWindow>&#x0A;<info folder="true" part="org.eclipse.debug.internal.ui.NavigatorFolderView">&#x0A;<folder activePageID="org.eclipse.debug.ui.DebugView" appearance="2" expanded="2">&#x0A;<page content="org.eclipse.debug.ui.DebugView" label="Debug"/>
+<page content="org.eclipse.wst.server.ui.ServersView" label="Servers"/>
+<page content="org.eclipse.ui.views.ResourceNavigator" label="LabelNotFound"/>
+<page content="org.eclipse.jdt.ui.PackageExplorer" label="LabelNotFound"/>
+<page content="org.eclipse.jdt.ui.TypeHierarchy" label="LabelNotFound"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">&#x0A;<part id="0"/>
+<part id="1"/>
+</presentation>
+</folder>
+</info>
+<info folder="true" part="stickyFolderRight" ratio="0.74980146" ratioLeft="944" ratioRight="315" relationship="2" relative="org.eclipse.debug.internal.ui.NavigatorFolderView">&#x0A;<folder appearance="2" expanded="2">&#x0A;<page content="org.eclipse.help.ui.HelpView" label="LabelNotFound"/>
+<page content="org.eclipse.ui.internal.introview" label="LabelNotFound"/>
+<page content="org.eclipse.ui.cheatsheets.views.CheatSheetView" label="LabelNotFound"/>
+</folder>
+</info>
+<info folder="true" part="org.eclipse.debug.internal.ui.ConsoleFolderView" ratio="0.7492212" ratioLeft="481" ratioRight="161" relationship="4" relative="org.eclipse.debug.internal.ui.NavigatorFolderView">&#x0A;<folder activePageID="org.eclipse.ui.console.ConsoleView" appearance="2" expanded="2">&#x0A;<page content="org.eclipse.ui.console.ConsoleView" label="Console"/>
+<page content="org.eclipse.ui.views.TaskList" label="Tasks"/>
+<page content="org.eclipse.ui.views.BookmarkView" label="LabelNotFound"/>
+<page content="org.eclipse.ui.views.PropertySheet" label="LabelNotFound"/>
+<page content="org.eclipse.datatools.sqltools.result.resultView" label="LabelNotFound"/>
+<page content="org.eclipse.jdt.debug.ui.DisplayView" label="LabelNotFound"/>
+<page content="org.eclipse.search.SearchResultView" label="LabelNotFound"/>
+<page content="org.eclipse.wst.xsl.jaxp.debug.ui.view1" label="LabelNotFound"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">&#x0A;<part id="0"/>
+<part id="1"/>
+</presentation>
+</folder>
+</info>
+<info part="org.eclipse.ui.editorss" ratio="0.44906446" ratioLeft="216" ratioRight="265" relationship="4" relative="org.eclipse.debug.internal.ui.NavigatorFolderView"/>
+<info folder="true" part="org.eclipse.debug.internal.ui.OutlineFolderView" ratio="0.74980146" ratioLeft="944" ratioRight="315" relationship="2" relative="org.eclipse.ui.editorss">&#x0A;<folder activePageID="org.eclipse.ui.views.ContentOutline" appearance="2" expanded="2">&#x0A;<page content="org.eclipse.ui.views.ContentOutline" label="Outline"/>
+<page content="org.eclipse.ant.ui.views.AntView" label="LabelNotFound"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">&#x0A;<part id="0"/>
+</presentation>
+</folder>
+</info>
+<info folder="true" part="org.eclipse.debug.internal.ui.ToolsFolderView" ratio="0.49960285" ratioLeft="629" ratioRight="630" relationship="2" relative="org.eclipse.debug.internal.ui.NavigatorFolderView">&#x0A;<folder activePageID="org.eclipse.debug.ui.BreakpointView" appearance="2" expanded="2">&#x0A;<page content="org.eclipse.debug.ui.VariableView" label="Variables"/>
+<page content="org.eclipse.debug.ui.BreakpointView" label="Breakpoints"/>
+<page content="org.eclipse.debug.ui.ExpressionView" label="LabelNotFound"/>
+<page content="org.eclipse.debug.ui.RegisterView" label="LabelNotFound"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">&#x0A;<part id="0"/>
+<part id="1"/>
 </presentation>
 </folder>
 </info>
@@ -438,186 +513,167 @@
 <workingSets/>
 <navigationHistory>
 <editors>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/Dimensia/src/net/dimensia/src/Block.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/Dimensia/src/net/dimensia/src/Render.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/Dimensia/src/net/dimensia/src/WeatherSnow.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/Dimensia/src/net/dimensia/src/RenderEntities.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/Dimensia/src/net/dimensia/src/RenderBlocks.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/Dimensia/src/net/dimensia/src/RenderGlobal.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/Dimensia/src/net/dimensia/src/RenderParticles.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/Dimensia/src/net/dimensia/src/RenderUI.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/Dimensia/src/net/dimensia/src/RenderWorld.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.ui.DefaultTextEditor" path="/Dimensia/Changelog.txt"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/Dimensia/src/net/dimensia/src/AIManager.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/Dimensia/src/net/dimensia/src/EntityLiving.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/Dimensia/src/net/dimensia/src/Lesson13.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/Dimensia/src/net/dimensia/src/SpawnManager.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/Dimensia/src/net/dimensia/src/EntityLivingNPC.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/Dimensia/src/net/dimensia/src/EntityLivingPlayer.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/Dimensia/src/net/dimensia/src/WorldGenEarth.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.ui.DefaultTextEditor" path="/Dimensia/Changelog.txt"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.ui.DefaultTextEditor" path="/Dimensia/Changelog.txt"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.ui.DefaultTextEditor" path="/Dimensia/Todo.txt"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/Dimensia Server/src/net/dimensia/server/DimensiaServer.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/Dimensia Server/src/net/dimensia/server/Client_Test.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/Dimensia/src/net/dimensia/src/WorldGenEarth.java"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/Dimensia/src/net/dimensia/src/World.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/Dimensia/src/net/dimensia/src/SpawnManager.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/Dimensia/src/net/dimensia/src/Block.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/Dimensia/src/net/dimensia/src/WorldGenEarth.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.ui.DefaultTextEditor" path="/Dimensia/Changelog.txt"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/Dimensia/src/net/dimensia/src/MathHelper.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/Dimensia/src/net/dimensia/src/EntityLiving.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/Dimensia/src/net/dimensia/src/Item.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/Dimensia/src/net/dimensia/src/ItemStack.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/Dimensia/src/net/dimensia/src/Keys.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/Dimensia/src/net/dimensia/src/ItemRanged.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/Dimensia/src/net/dimensia/src/WeatherSnow.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/Dimensia/src/net/dimensia/src/Chunk.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/Dimensia/src/net/dimensia/src/AIManager.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/Dimensia/src/net/dimensia/src/SpawnManager.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/Dimensia/src/net/dimensia/src/WorldGenEarth.java"/>
 </editors>
-<item historyLabel="RenderEntities.java" index="3">
-<position info="not_deleted" x="4840" y="0"/>
+<item historyLabel="EntityLivingNPC.java" index="1">
+<position info="not_deleted" x="1560" y="0"/>
 </item>
-<item historyLabel="RenderGlobal.java" index="5">
+<item historyLabel="WorldGenEarth.java" index="3">
+<position info="not_deleted" x="21509" y="0"/>
+</item>
+<item historyLabel="EntityLivingPlayer.java" index="2">
+<position info="not_deleted" x="340" y="0"/>
+</item>
+<item historyLabel="Changelog.txt" index="4">
+<position info="not_deleted" x="14301" y="0"/>
+</item>
+<item historyLabel="AIManager.java" index="0">
+<position info="not_deleted" x="2408" y="0"/>
+</item>
+<item historyLabel="Changelog.txt" index="5">
+<position info="not_deleted" x="14301" y="0"/>
+</item>
+<item historyLabel="Todo.txt" index="6">
+<position info="not_deleted" x="342" y="0"/>
+</item>
+<item historyLabel="DimensiaServer.java" index="7">
 <position info="not_deleted" x="0" y="0"/>
 </item>
-<item historyLabel="RenderEntities.java" index="3">
-<position info="not_deleted" x="4840" y="0"/>
-</item>
-<item historyLabel="RenderParticles.java" index="6">
-<position info="not_deleted" x="481" y="0"/>
-</item>
-<item historyLabel="RenderEntities.java" index="3">
-<position info="not_deleted" x="4840" y="0"/>
-</item>
-<item historyLabel="RenderUI.java" index="7">
-<position info="not_deleted" x="905" y="0"/>
-</item>
-<item historyLabel="RenderWorld.java" index="8">
-<position info="not_deleted" x="1375" y="0"/>
-</item>
-<item historyLabel="RenderEntities.java" index="3">
-<position info="not_deleted" x="4858" y="0"/>
-</item>
-<item historyLabel="RenderWorld.java" index="8">
-<position info="not_deleted" x="1375" y="0"/>
-</item>
-<item historyLabel="RenderUI.java" index="7">
-<position info="not_deleted" x="905" y="0"/>
-</item>
-<item historyLabel="RenderBlocks.java" index="4">
-<position info="not_deleted" x="712" y="0"/>
-</item>
-<item historyLabel="Render.java" index="1">
-<position info="not_deleted" x="3503" y="0"/>
-</item>
-<item historyLabel="RenderBlocks.java" index="4">
-<position info="not_deleted" x="207" y="0"/>
-</item>
-<item historyLabel="WeatherSnow.java" index="2">
-<position info="not_deleted" x="4014" y="0"/>
-</item>
-<item historyLabel="Block.java" index="0">
-<position info="not_deleted" x="6776" y="0"/>
-</item>
-<item historyLabel="Changelog.txt" index="9">
-<position info="not_deleted" x="9952" y="0"/>
-</item>
-<item historyLabel="Changelog.txt" index="9">
-<position info="not_deleted" x="9732" y="0"/>
-</item>
-<item historyLabel="AIManager.java" index="10">
-<position info="not_deleted" x="1367" y="0"/>
-</item>
-<item historyLabel="EntityLiving.java" index="11">
-<position info="not_deleted" x="5694" y="0"/>
-</item>
-<item historyLabel="EntityLiving.java" index="11">
-<position info="not_deleted" x="7880" y="0"/>
-</item>
-<item historyLabel="AIManager.java" index="10">
-<position info="not_deleted" x="1368" y="0"/>
-</item>
-<item historyLabel="EntityLiving.java" index="11">
-<position info="not_deleted" x="7880" y="0"/>
-</item>
-<item historyLabel="EntityLiving.java" index="11">
-<position info="not_deleted" x="6097" y="0"/>
-</item>
-<item historyLabel="EntityLiving.java" index="11">
-<position info="not_deleted" x="6099" y="0"/>
-</item>
-<item historyLabel="AIManager.java" index="10">
-<position info="not_deleted" x="1368" y="0"/>
-</item>
-<item historyLabel="AIManager.java" index="10">
-<position info="not_deleted" x="295" y="0"/>
-</item>
-<item historyLabel="Lesson13.java" index="12">
-<position info="not_deleted" x="873" y="0"/>
-</item>
-<item historyLabel="AIManager.java" index="10">
-<position info="not_deleted" x="305" y="0"/>
-</item>
-<item historyLabel="SpawnManager.java" index="13">
-<position info="not_deleted" x="4840" y="0"/>
-</item>
-<item historyLabel="World.java" index="14">
-<position info="not_deleted" x="17337" y="0"/>
-</item>
-<item historyLabel="AIManager.java" index="10">
-<position info="not_deleted" x="852" y="0"/>
-</item>
-<item historyLabel="SpawnManager.java" index="15">
+<item historyLabel="DimensiaServer.java" index="7">
 <position info="not_deleted" x="0" y="0"/>
 </item>
-<item historyLabel="Block.java" index="16">
-<position info="not_deleted" x="11282" y="0"/>
-</item>
-<item historyLabel="WorldGenEarth.java" index="17">
+<item historyLabel="Client_Test.java" index="8">
 <position info="not_deleted" x="0" y="0"/>
 </item>
-<item historyLabel="WorldGenEarth.java" index="17">
-<position info="not_deleted" x="10297" y="0"/>
+<item historyLabel="DimensiaServer.java" index="7">
+<position info="not_deleted" x="417" y="0"/>
 </item>
-<item historyLabel="Block.java" index="16">
-<position info="not_deleted" x="11282" y="0"/>
+<item historyLabel="Client_Test.java" index="8">
+<position info="not_deleted" x="0" y="0"/>
 </item>
-<item historyLabel="WorldGenEarth.java" index="17">
-<position info="not_deleted" x="9973" y="0"/>
+<item historyLabel="Todo.txt" index="6">
+<position info="not_deleted" x="342" y="0"/>
 </item>
-<item historyLabel="Block.java" index="16">
-<position info="not_deleted" x="11282" y="0"/>
+<item historyLabel="AIManager.java" index="0">
+<position info="not_deleted" x="5122" y="0"/>
 </item>
-<item historyLabel="Changelog.txt" index="18">
-<position info="not_deleted" x="10532" y="0"/>
+<item historyLabel="WorldGenEarth.java" index="9">
+<position info="not_deleted" x="268" y="0"/>
 </item>
-<item historyLabel="MathHelper.java" index="19">
-<position info="not_deleted" x="773" y="0"/>
+<item historyLabel="AIManager.java" index="0">
+<position info="not_deleted" x="1113" y="0"/>
 </item>
-<item historyLabel="EntityLiving.java" index="20">
-<position info="not_deleted" x="6099" y="0"/>
+<item historyLabel="WorldGenEarth.java" index="9">
+<position info="not_deleted" x="268" y="0"/>
 </item>
-<item historyLabel="Item.java" index="21">
-<position info="not_deleted" x="14458" y="0"/>
+<item historyLabel="AIManager.java" index="0">
+<position info="not_deleted" x="1113" y="0"/>
 </item>
-<item historyLabel="ItemStack.java" index="22">
-<position info="not_deleted" x="222" y="0"/>
+<item historyLabel="WorldGenEarth.java" index="9">
+<position info="not_deleted" x="268" y="0"/>
 </item>
-<item historyLabel="Keys.java" index="23">
-<position info="not_deleted" x="5145" y="0"/>
+<item historyLabel="AIManager.java" index="0">
+<position info="not_deleted" x="1040" y="0"/>
 </item>
-<item historyLabel="ItemRanged.java" index="24">
-<position info="not_deleted" x="169" y="0"/>
+<item historyLabel="WorldGenEarth.java" index="9">
+<position info="not_deleted" x="268" y="0"/>
 </item>
-<item historyLabel="WeatherSnow.java" index="25">
-<position info="not_deleted" x="4014" y="0"/>
+<item historyLabel="AIManager.java" index="0">
+<position info="not_deleted" x="1040" y="0"/>
 </item>
-<item historyLabel="Chunk.java" index="26">
-<position info="not_deleted" x="3152" y="0"/>
+<item historyLabel="WorldGenEarth.java" index="9">
+<position info="not_deleted" x="268" y="0"/>
 </item>
-<item historyLabel="AIManager.java" index="27">
-<position info="not_deleted" x="852" y="0"/>
+<item historyLabel="AIManager.java" index="0">
+<position info="not_deleted" x="1040" y="0"/>
 </item>
-<item historyLabel="SpawnManager.java" index="28">
-<position info="not_deleted" x="5149" y="0"/>
+<item historyLabel="WorldGenEarth.java" index="9">
+<position info="not_deleted" x="268" y="0"/>
 </item>
-<item active="true" historyLabel="WorldGenEarth.java" index="29">
-<position info="not_deleted" x="9973" y="0"/>
+<item historyLabel="AIManager.java" index="0">
+<position info="not_deleted" x="1040" y="0"/>
+</item>
+<item historyLabel="WorldGenEarth.java" index="9">
+<position info="not_deleted" x="268" y="0"/>
+</item>
+<item historyLabel="AIManager.java" index="0">
+<position info="not_deleted" x="1040" y="0"/>
+</item>
+<item historyLabel="WorldGenEarth.java" index="9">
+<position info="not_deleted" x="268" y="0"/>
+</item>
+<item historyLabel="AIManager.java" index="0">
+<position info="not_deleted" x="253" y="0"/>
+</item>
+<item historyLabel="WorldGenEarth.java" index="9">
+<position info="not_deleted" x="268" y="0"/>
+</item>
+<item historyLabel="AIManager.java" index="0">
+<position info="not_deleted" x="1040" y="0"/>
+</item>
+<item historyLabel="WorldGenEarth.java" index="9">
+<position info="not_deleted" x="268" y="0"/>
+</item>
+<item historyLabel="World.java" index="10">
+<position info="not_deleted" x="1914" y="0"/>
+</item>
+<item historyLabel="Changelog.txt" index="5">
+<position info="not_deleted" x="14582" y="0"/>
+</item>
+<item historyLabel="AIManager.java" index="0">
+<position info="not_deleted" x="1045" y="0"/>
+</item>
+<item historyLabel="WorldGenEarth.java" index="9">
+<position info="not_deleted" x="741" y="0"/>
+</item>
+<item historyLabel="World.java" index="10">
+<position info="not_deleted" x="1946" y="0"/>
+</item>
+<item historyLabel="AIManager.java" index="0">
+<position info="not_deleted" x="1045" y="0"/>
+</item>
+<item historyLabel="WorldGenEarth.java" index="9">
+<position info="not_deleted" x="741" y="0"/>
+</item>
+<item historyLabel="AIManager.java" index="0">
+<position info="not_deleted" x="1113" y="0"/>
+</item>
+<item historyLabel="WorldGenEarth.java" index="9">
+<position info="not_deleted" x="741" y="0"/>
+</item>
+<item historyLabel="World.java" index="10">
+<position/>
+</item>
+<item historyLabel="WorldGenEarth.java" index="9">
+<position info="not_deleted" x="7772" y="0"/>
+</item>
+<item historyLabel="World.java" index="10">
+<position info="not_deleted" x="54844" y="147"/>
+</item>
+<item historyLabel="World.java" index="10">
+<position info="not_deleted" x="51733" y="77"/>
+</item>
+<item historyLabel="World.java" index="10">
+<position info="not_deleted" x="51729" y="0"/>
+</item>
+<item historyLabel="World.java" index="10">
+<position info="not_deleted" x="49210" y="147"/>
+</item>
+<item historyLabel="World.java" index="10">
+<position info="not_deleted" x="48472" y="0"/>
+</item>
+<item active="true" historyLabel="World.java" index="10">
+<position info="not_deleted" x="48610" y="0"/>
 </item>
 </navigationHistory>
 <input factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/" type="8"/>
@@ -625,6 +681,13 @@
 <workbenchWindowAdvisor/>
 <actionBarAdvisor/>
 <trimLayout>
+<trimArea IMemento.internal.id="16384">
+<trimItem IMemento.internal.id="left"/>
+</trimArea>
+<trimArea IMemento.internal.id="131072">
+<trimItem IMemento.internal.id="right"/>
+<trimItem IMemento.internal.id="org.eclipse.ui.internal.ViewStack@7c43f2f2"/>
+</trimArea>
 <trimArea IMemento.internal.id="128">
 <trimItem IMemento.internal.id="org.eclipse.ui.internal.WorkbenchWindow.topBar"/>
 </trimArea>
@@ -633,54 +696,55 @@
 <trimItem IMemento.internal.id="org.eclipse.jface.action.StatusLineManager"/>
 <trimItem IMemento.internal.id="org.eclipse.ui.internal.progress.ProgressRegion"/>
 <trimItem IMemento.internal.id="bottom"/>
+<trimItem IMemento.internal.id="org.eclipse.ui.internal.ViewStack@1ef74cd"/>
 </trimArea>
 </trimLayout>
 </window>
 <mruList>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="Client_Test.java" tooltip="Dimensia Server/src/net/dimensia/server/Client_Test.java">
+<persistable path="/Dimensia Server/src/net/dimensia/server/Client_Test.java"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="DimensiaServer.java" tooltip="Dimensia Server/src/net/dimensia/server/DimensiaServer.java">
+<persistable path="/Dimensia Server/src/net/dimensia/server/DimensiaServer.java"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="EntityLivingNPCEnemy.java" tooltip="Dimensia/src/net/dimensia/src/EntityLivingNPCEnemy.java">
+<persistable path="/Dimensia/src/net/dimensia/src/EntityLivingNPCEnemy.java"/>
+</file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="WorldGenEarth.java" tooltip="Dimensia/src/net/dimensia/src/WorldGenEarth.java">
 <persistable path="/Dimensia/src/net/dimensia/src/WorldGenEarth.java"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="EntityLivingPlayer.java" tooltip="Dimensia/src/net/dimensia/src/EntityLivingPlayer.java">
+<persistable path="/Dimensia/src/net/dimensia/src/EntityLivingPlayer.java"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="EntityPlayer.java" tooltip="Dimensia/src/net/dimensia/src/EntityPlayer.java">
+<persistable path="/Dimensia/src/net/dimensia/src/EntityPlayer.java"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="World.java" tooltip="Dimensia/src/net/dimensia/src/World.java">
+<persistable path="/Dimensia/src/net/dimensia/src/World.java"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="Keys.java" tooltip="Dimensia/src/net/dimensia/src/Keys.java">
+<persistable path="/Dimensia/src/net/dimensia/src/Keys.java"/>
 </file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.ui.systemExternalEditor" name="terrain_ground.png" tooltip="Dimensia/src/Resources/terrain_ground.png">
 <persistable path="/Dimensia/src/Resources/terrain_ground.png"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.ui.systemExternalEditor" name="terrain.png" tooltip="Dimensia/src/Resources/terrain.png">
-<persistable path="/Dimensia/src/Resources/terrain.png"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="Block.java" tooltip="Dimensia/src/net/dimensia/src/Block.java">
+<persistable path="/Dimensia/src/net/dimensia/src/Block.java"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="SpawnManager.java" tooltip="Dimensia/src/net/dimensia/src/SpawnManager.java">
-<persistable path="/Dimensia/src/net/dimensia/src/SpawnManager.java"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="EntityLivingNPC.java" tooltip="Dimensia/src/net/dimensia/src/EntityLivingNPC.java">
+<persistable path="/Dimensia/src/net/dimensia/src/EntityLivingNPC.java"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="Lesson13.java" tooltip="Dimensia/src/net/dimensia/src/Lesson13.java">
-<persistable path="/Dimensia/src/net/dimensia/src/Lesson13.java"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="RenderWorld.java" tooltip="Dimensia/src/net/dimensia/src/RenderWorld.java">
-<persistable path="/Dimensia/src/net/dimensia/src/RenderWorld.java"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="RenderUI.java" tooltip="Dimensia/src/net/dimensia/src/RenderUI.java">
-<persistable path="/Dimensia/src/net/dimensia/src/RenderUI.java"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="RenderParticles.java" tooltip="Dimensia/src/net/dimensia/src/RenderParticles.java">
-<persistable path="/Dimensia/src/net/dimensia/src/RenderParticles.java"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="RenderGlobal.java" tooltip="Dimensia/src/net/dimensia/src/RenderGlobal.java">
-<persistable path="/Dimensia/src/net/dimensia/src/RenderGlobal.java"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="EntityNPC.java" tooltip="Dimensia/src/net/dimensia/src/EntityNPC.java">
-<persistable path="/Dimensia/src/net/dimensia/src/EntityNPC.java"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="EntityLiving.java" tooltip="Dimensia/src/net/dimensia/src/EntityLiving.java">
+<persistable path="/Dimensia/src/net/dimensia/src/EntityLiving.java"/>
 </file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="AIManager.java" tooltip="Dimensia/src/net/dimensia/src/AIManager.java">
 <persistable path="/Dimensia/src/net/dimensia/src/AIManager.java"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.ui.systemExternalEditor" name="terraria_background_2.png" tooltip="Dimensia/src/Resources/terraria_background_2.png">
-<persistable path="/Dimensia/src/Resources/terraria_background_2.png"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="GuiMainMenu.java" tooltip="Dimensia_Launcher/src/net/dimensia/launcher/GuiMainMenu.java">
+<persistable path="/Dimensia_Launcher/src/net/dimensia/launcher/GuiMainMenu.java"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="RenderEntities.java" tooltip="Dimensia/src/net/dimensia/src/RenderEntities.java">
-<persistable path="/Dimensia/src/net/dimensia/src/RenderEntities.java"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="Chunk.java" tooltip="Dimensia/src/net/dimensia/src/Chunk.java">
-<persistable path="/Dimensia/src/net/dimensia/src/Chunk.java"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="WeatherSnow.java" tooltip="Dimensia/src/net/dimensia/src/WeatherSnow.java">
-<persistable path="/Dimensia/src/net/dimensia/src/WeatherSnow.java"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="GuiDownload.java" tooltip="Dimensia_Launcher/src/net/dimensia/launcher/GuiDownload.java">
+<persistable path="/Dimensia_Launcher/src/net/dimensia/launcher/GuiDownload.java"/>
 </file>
 </mruList>
 </workbench>

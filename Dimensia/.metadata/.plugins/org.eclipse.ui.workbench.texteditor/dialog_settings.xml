@@ -2,8 +2,8 @@
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
 		<item value="257" key="DIALOG_WIDTH"/>
-		<item value="40" key="DIALOG_Y_ORIGIN"/>
-		<item value="1076" key="DIALOG_X_ORIGIN"/>
+		<item value="70" key="DIALOG_Y_ORIGIN"/>
+		<item value="987" key="DIALOG_X_ORIGIN"/>
 		<item value="380" key="DIALOG_HEIGHT"/>
 		<item value="1|Segoe UI|9.0|0|WINDOWS|1|-12|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI" key="DIALOG_FONT_NAME"/>
 	</section>
@@ -13,26 +13,26 @@
 		<item value="false" key="isRegEx"/>
 		<item value="false" key="incremental"/>
 		<item value="false" key="wholeword"/>
-		<item value="tree" key="selection"/>
+		<item value="desert" key="selection"/>
 		<list key="findhistory">
-			<item value="tree"/>
-			<item value=""/>
-			<item value="texture"/>
-			<item value="terr"/>
-			<item value="terrain"/>
-			<item value="print"/>
-			<item value="derp"/>
-			<item value="dirt"/>
+			<item value="desert"/>
+			<item value="de"/>
+			<item value="growtree"/>
+			<item value="placeG"/>
+			<item value="place"/>
+			<item value="int count"/>
+			<item value="count"/>
+			<item value="generatetree"/>
 		</list>
 		<list key="replacehistory">
+			<item value="getBlockID"/>
+			<item value="getBlockId"/>
+			<item value=".equals("/>
 			<item value="setBlockGenerate("/>
 			<item value="getBlockGenerate("/>
 			<item value="getWidth()"/>
 			<item value="getHeight()"/>
 			<item value="setBlock"/>
-			<item value="getBlock"/>
-			<item value="getBlockAtPosition("/>
-			<item value="Remove"/>
 		</list>
 	</section>
 </section>

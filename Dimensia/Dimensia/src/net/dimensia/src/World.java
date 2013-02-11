@@ -1,4 +1,5 @@
 package net.dimensia.src;
+
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -7,9 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.zip.GZIPInputStream;
@@ -21,7 +20,7 @@ import org.lwjgl.opengl.Display;
  * <code>World implements Serializable</code>
  * <code>World</code> implements many of the key features for Dimensia to actually run properly and update. 
  * <br><br>
- * All players, chunks, Biomes, EntityEnemies, EntityItemStacks, TemporaryText, Weather are stored in the 
+ * All players, chunks, Biomes, EntityEnemies, EntityLivingItemStacks, TemporaryText, Weather are stored in the 
  * World class. 
  * <br><br>
  * Methods exist to perform hittests between anything requiring it (monster and player, etc); as well as
@@ -30,7 +29,7 @@ import org.lwjgl.opengl.Display;
  * interfere with it. 
  * <br><br>
  * Other methods of interest, aside from onWorldTick(), relate to block breaking or Block requests.
- * {@link #getBlock(int, int)} and {@link #setBlock(Block, int, int)} implement most of the features 
+ * {@link #getBlockGenerate(int, int)} and {@link #setBlockGenerate(Block, int, int)} implement most of the features 
  * required to "grandfather in" the old world.worldMap[][] style which has since been rendered obsolete 
  * by chunks. These methods are generally considered safe to use, with the same co-ordinates as the
  * previous world.worldMap[][] style. They should perform the division and modular division required 
@@ -39,8 +38,8 @@ import org.lwjgl.opengl.Display;
  * division/modular division every single request. 
  * <br><br>
  * The main methods relating to Block breaking and placement are {@link #breakBlock(int, int)} for breaking,
- * and {@link #placeBlock(int, int, Block)} for placing a Block. These methods differ from getBlock(int, int)
- * and setBlock(Block, int, int) significantly. These methods are for block placement and destruction while
+ * and {@link #placeBlock(int, int, Block)} for placing a Block. These methods differ from getBlockGenerate(int, int)
+ * and setBlockGenerate(Block, int, int) significantly. These methods are for block placement and destruction while
  * the game is running (generally the player would do this). As a result, they must obey the rules of 
  * the game. These methods are relatively simple in what they do, instantly breaking and dropping or placing
  * a block upon call, but with regard to the rules of the game. They do not actually decrease inventory 
@@ -56,6 +55,36 @@ import org.lwjgl.opengl.Display;
 public class World implements Serializable
 {
 	private static final long serialVersionUID = 1L;	
+	/**TEMP FIX TO KNOWING WHAT CHUNKS ARE LOADED. THIS IS INADVISABLE**/
+	public boolean[][] loadedChunks_B = new boolean[40][40];
+	
+	public Weather weather;
+	public List<EntityLivingItemStack> itemsList;
+	public List<TemporaryTextStore> temporaryText; 
+	public List<EntityLivingNPCEnemy> entityList;
+	public List<EntityLivingNPC> npcList;
+	public List<EntityProjectile> projectileList;
+	public SpawnManager manager;
+	
+	private int[] generatedHeightMap;
+	private int averageSkyHeight;
+	private int totalBiomes;
+	private List<Position> loadedChunks;
+	private int chunkWidth;
+	private int chunkHeight;
+	private ChunkManager chunkManager;
+	private boolean weatherFinished;
+	private EnumDifficulty difficulty;
+	private final Random random = new Random();
+	private final int GAMETICKSPERDAY = 28800; 
+	private final int GAMETICKSPERHOUR = 1200;
+	private String worldName;
+	private long worldTime;
+	private ConcurrentHashMap<String, Chunk> chunks;
+	private int width; //Width in blocks, not pixels
+	private int height; //Height in blocks, not pixels
+	private float previousLightLevel;
+	private EntityLivingNPCEnemy[] spawnList;
 	
 	/**
 	 * Reconstructs a world from a save file. This is the first step.
@@ -63,14 +92,15 @@ public class World implements Serializable
 	public World()
 	{
 		chunks = new ConcurrentHashMap<String, Chunk>(10);
-		entityList = new ArrayList<EntityEnemy>(255);
+		entityList = new ArrayList<EntityLivingNPCEnemy>(255);
 		projectileList = new ArrayList<EntityProjectile>(255);
-		npcList = new ArrayList<EntityNPC>(255);
+		npcList = new ArrayList<EntityLivingNPC>(255);
 		temporaryText = new ArrayList<TemporaryTextStore>(100);
-		itemsList = new ArrayList<EntityItemStack>(250);
+		itemsList = new ArrayList<EntityLivingItemStack>(250);
 		loadedChunks = new ArrayList<Position>(25);
 		loadedChunks_B = new boolean[40][40];	
 		manager = new SpawnManager();
+		checkChunks();
 	}
 	
 	/**
@@ -84,16 +114,14 @@ public class World implements Serializable
 	 */
 	public World(String name, int width, int height, EnumDifficulty difficulty)
 	{
-		biomes = new HashMap<String, Biome>();
-		biomesByColumn = new HashMap<String, String>();
 		chunks = new ConcurrentHashMap<String, Chunk>(10);
 		this.width = width;
 		this.height = height; 
-		entityList = new ArrayList<EntityEnemy>(255);
+		entityList = new ArrayList<EntityLivingNPCEnemy>(255);
 		projectileList = new ArrayList<EntityProjectile>(255);
-		npcList = new ArrayList<EntityNPC>(255);
+		npcList = new ArrayList<EntityLivingNPC>(255);
 		temporaryText = new ArrayList<TemporaryTextStore>(100);
-		itemsList = new ArrayList<EntityItemStack>(250);
+		itemsList = new ArrayList<EntityLivingItemStack>(250);
 		loadedChunks = new ArrayList<Position>(25);
 		worldTime = (long) (6.5 * GAMETICKSPERHOUR);
 		worldName = name;
@@ -108,7 +136,7 @@ public class World implements Serializable
 	}
 		
 	/**
-	 * Finishes reconstructing a world object from disk. This is the 3rd and final step where anything dependant on
+	 * Finishes reconstructing a world object from disk. This is the 3rd and final step where anything dependent on
 	 * variables saved to disk should be created/executed.
 	 */
 	public void finishWorldReconstruction()
@@ -121,8 +149,16 @@ public class World implements Serializable
 	 * @param player the player to be added
 	 * @return the player with updated position (x, y)
 	 */
-	public EntityPlayer spawnPlayer(EntityPlayer player) 
+	public EntityLivingPlayer spawnPlayer(EntityLivingPlayer player) 
 	{
+		if(player.inventory.isEmpty())
+		{
+			player.inventory.pickUpItemStack(this, player, new ItemStack(Item.copperSword));
+			player.inventory.pickUpItemStack(this, player, new ItemStack(Item.copperPickaxe));
+			player.inventory.pickUpItemStack(this, player, new ItemStack(Item.copperAxe));
+			player.inventory.pickUpItemStack(this, player, new ItemStack(Block.craftingTable));
+		}
+		
 		player.respawnXPos = getWorldCenterOrtho();
 		for(int i = 0; i < height - 1; i++)
 		{
@@ -140,15 +176,6 @@ public class World implements Serializable
 		return player;
 	}
 	
-	public void printHashTable() 
-	 {
-		for (Map.Entry<String, String> entry : biomesByColumn.entrySet()) {
-		    String key = entry.getKey();
-		    Object value = entry.getValue();
-		    System.out.println(value);
-		}
-	 }
-	
 	/**
 	 * Opens the worlddata.dat file and applies all the data to the reconstructed world. Then final reconstruction is performed.
 	 * @param BASE_PATH the base path for the Dimensia folder, stored on disk
@@ -157,10 +184,10 @@ public class World implements Serializable
 	 * @throws IOException indicates the load operation has failed to perform the required I/O. This error is critical
 	 * @throws ClassNotFoundException indicates casting of an object has failed, due to incorrect class version or the class not existing
 	 */
-	public void loadAndApplyWorldData(final String BASE_PATH, String worldName) throws FileNotFoundException, IOException, ClassNotFoundException
+	public void loadAndApplyWorldData(final String BASE_PATH, String worldName, String dir) throws FileNotFoundException, IOException, ClassNotFoundException
 	{
 		//Open an input stream for the file
-		ObjectInputStream ois = new ObjectInputStream(new DataInputStream(new GZIPInputStream(new FileInputStream(BASE_PATH + "/World Saves/" + worldName + "/worlddata.dat")))); 
+		ObjectInputStream ois = new ObjectInputStream(new DataInputStream(new GZIPInputStream(new FileInputStream(BASE_PATH + "/World Saves/" + worldName + "/" + dir + "/worlddata.dat")))); 
 		
 		/**
 		Variables are loaded in the following order:
@@ -188,9 +215,7 @@ public class World implements Serializable
 		worldTime = Long.valueOf((ois.readObject()).toString()).longValue();
 		totalBiomes = Integer.valueOf((ois.readObject()).toString()).intValue();
 		difficulty = (EnumDifficulty)ois.readObject();
-		biomes = (HashMap<String, Biome>)ois.readObject();
-		biomesByColumn = (HashMap<String, String>)ois.readObject();
-		itemsList = (ArrayList<EntityItemStack>)ois.readObject();
+		itemsList = (ArrayList<EntityLivingItemStack>)ois.readObject();
 		
 		System.out.println("Loaded And Applied World Data");
 		ois.close();
@@ -203,11 +228,11 @@ public class World implements Serializable
 	 * Adds a player to the world. Currently multiplayer placeholder.
 	 * @param player the player to add
 	 */
-	public void addPlayerToWorld(EntityPlayer player)
+	public void addPlayerToWorld(EntityLivingPlayer player)
 	{
 		requestRequiredChunks(getWorldCenterBlock(), averageSkyHeight);
 		chunkManager.addAllLoadedChunks_Wait(this, chunks);
-		this.player = spawnPlayer(player);
+		player = spawnPlayer(player);
 	}
 	
 	/**
@@ -230,7 +255,7 @@ public class World implements Serializable
 		{
 			for(int k = upOff; k <= downOff; k++) 
 			{
-				chunkManager.requestChunk(this, chunks, i, k);
+				chunkManager.requestChunk("Earth", this, chunks, i, k);
 			}
 		}
 	}
@@ -288,16 +313,7 @@ public class World implements Serializable
 		float time = (float)(worldTime) / GAMETICKSPERHOUR; 
 		return (time < 4 || time > 20) ? 0.8f : (time >= 4 && time <= 8) ? ((8 - time) / 5) : (time >= 16 && time <= 20) ? (Math.abs(time - 16) / 5) : 0.0f;
 	}
-	
-	/**
-	 * Gets the world's only player. Currently filler for an improved multiplayer method.
-	 * @return the world's only player
-	 */
-	public EntityPlayer getPlayer()
-	{
-		return player;
-	}
-	
+		
 	/**
 	 * Gets the center of the world, with a block value. This is xsize / 2 
 	 * @return xsize / 2 (giving the center block of the world)
@@ -317,19 +333,19 @@ public class World implements Serializable
 	}
 	
 	/**
-	 * Adds an entityEnemy to the entityList in this instance of World
+	 * Adds an EntityLivingNPCEnemy to the entityList in this instance of World
 	 * @param enemy the enemy to add to entityList
 	 */
-	public void addEntityToEntityList(EntityEnemy enemy)
+	public void addEntityToEntityList(EntityLivingNPCEnemy enemy)
 	{
 		entityList.add(enemy);
 	}
 	
 	/**
-	 * Adds an entityNPC to the npcList in this instance of World
+	 * Adds an EntityLivingNPC to the npcList in this instance of World
 	 * @param npc the npc to add to entityList
 	 */
-	public void addEntityToEntityList(EntityNPC npc)
+	public void addEntityToEntityList(EntityLivingNPC npc)
 	{
 		npcList.add(npc);
 	}
@@ -344,10 +360,10 @@ public class World implements Serializable
 	}
 
 	/**
-	 * Adds an EntityItemStack to the itemsList in this instance of World
-	 * @param stack the EntityItemStack to add to itemsList
+	 * Adds an EntityLivingItemStack to the itemsList in this instance of World
+	 * @param stack the EntityLivingItemStack to add to itemsList
 	 */
-	public void addItemStackToItemList(EntityItemStack stack)
+	public void addItemStackToItemList(EntityLivingItemStack stack)
 	{
 		itemsList.add(stack);
 	}
@@ -369,27 +385,27 @@ public class World implements Serializable
 	/**
 	 * Calls all the methods to update the world and its inhabitants
 	 */
-	public void onWorldTick()
+	public void onWorldTick(EntityLivingPlayer player)
 	{		
-		spawnMonsters();				
+		//spawnMonsters(player);				
 		causeWeather();		
 		//update the player
 		player.onWorldTick(this); 
 		//Update Entities
-		updateMonsters(); 
-		updateNPCs();
-		updateProjectiles();
+		updateMonsters(player); 
+		updateNPCs(player);
+		updateProjectiles(player);
 		updateTemporaryText();
-		updateEntityItemStacks();
+		updateEntityLivingItemStacks();
 		//Hittests
-		performPlayerMonsterHittests(); 
-		performProjectileHittests();
-		performPlayerItemHittests();
-		performEnemyToolHittests();
+		performPlayerMonsterHittests(player); 
+		performProjectileHittests(player);
+		performPlayerItemHittests(player);
+		performEnemyToolHittests(player);
 		//Update the time
 		updateWorldTime();
 		//checkChunks();
-		updateChunks();
+		updateChunks(player);
 		updateMonsterStatusEffects();
 		if(chunkManager.isAnyLoadOperationDone())
 		{
@@ -433,7 +449,7 @@ public class World implements Serializable
 	/**
 	 * Applies gravity to all itemstacks entities
 	 */
-	private void updateEntityItemStacks()
+	private void updateEntityLivingItemStacks()
 	{
 		for(int i = 0; i < itemsList.size(); i++)
 		{
@@ -444,7 +460,7 @@ public class World implements Serializable
 	/**
 	 * Picks up itemstacks that the player is standing on (or very near to)
 	 */
-	private void performPlayerItemHittests()
+	private void performPlayerItemHittests(EntityLivingPlayer player)
 	{
 		for(int i = 0; i < itemsList.size(); i++)
 		{
@@ -452,7 +468,7 @@ public class World implements Serializable
 																  player.x + (player.width / 2), player.y + (player.height / 2));
 			if(distance <= itemsList.get(i).width * 1.75 && itemsList.get(i).ticksBeforePickup <= 0) 
 			{ //is the player near the itemstack, and can it be picked up yet?
-				ItemStack stack = player.inventory.pickUpItemStack(itemsList.get(i).stack); //if so try to pick it up
+				ItemStack stack = player.inventory.pickUpItemStack(this, player, itemsList.get(i).stack); //if so try to pick it up
 				
 				if(stack == null) //nothing's left, remove the null element
 				{
@@ -473,15 +489,15 @@ public class World implements Serializable
 	/**
 	 * applies AI to npcs
 	 */
-	private void updateNPCs(){
+	private void updateNPCs(EntityLivingPlayer player){
 		for (int i = 0; i < npcList.size(); i++){
 			if (npcList.get(i).isDead()){
 				npcList.remove(i);
 				continue;
 			}
-			npcList.get(i).applyAI(this);
+			npcList.get(i).applyAI(this, player);
 			
-			if(player.inBounds(npcList.get(i).x, npcList.get(i).y, npcList.get(i).width, npcList.get(i).height)){
+			if(npcList.get(i).inBounds(player.x, player.y, player.width, player.height)){
 				npcList.get(i).onPlayerNear();
 			}
 			npcList.get(i).applyGravity(this);
@@ -489,8 +505,10 @@ public class World implements Serializable
 	}
 	
 	/**
+	 * 
+	 * @param player
 	 */
-	private void updateMonsters()
+	private void updateMonsters(EntityLivingPlayer player)
 	{
 		final int OUT_OF_RANGE = (int) ((Display.getHeight() > Display.getWidth()) ? Display.getHeight() * 0.75 : Display.getWidth() * 0.75);
 		for(int i = 0; i < entityList.size(); i++)
@@ -502,7 +520,7 @@ public class World implements Serializable
 				{
 					for(ItemStack stack : drops) //drop each of them
 					{
-						addItemStackToItemList(new EntityItemStack(entityList.get(i).x - 1, entityList.get(i).y - 1, stack));
+						addItemStackToItemList(new EntityLivingItemStack(entityList.get(i).x - 1, entityList.get(i).y - 1, stack));
 					}
 				}
 				entityList.remove(i);
@@ -514,59 +532,90 @@ public class World implements Serializable
 				//System.out.println("Entity Removed @" + i);
 				continue;
 			}
-			entityList.get(i).applyAI(this); //otherwise apply AI
+			entityList.get(i).applyAI(this, player); //otherwise apply AI
 		}
 	}
 	
-	private int updateBlockBitMap(int x, int y){
+	/**
+	 * Method designed to handle the updating of all blocks
+	 * @param x - x location in the world
+	 * @param y - location in the world
+	 * @return - updated bitmap
+	 */
+	
+	public int updateBlockBitMap(int x, int y){
 		int bit = getBlockGenerate(x,y).getBitMap();
 		//If the block is standard
 		if (getBlockGenerate(x, y).getTileMap() == 'g'){
-			bit = 0;
-			if (getBlockGenerate(x, y - 1).isSolid){
-				bit += 1;
-			}
-			if (getBlockGenerate(x, y + 1).isSolid){
-				bit += 4;
-			}
-			if (getBlockGenerate(x - 1, y).isSolid){
-				bit += 8;
-			}
-			if (getBlockGenerate(x + 1, y).isSolid){
-				bit += 2;
-			}
-			if (getBlockGenerate(x, y) instanceof BlockGrass && (bit == 15 || bit == 11)){
-				setBlockGenerate(Block.dirt.setBitMap(bit), x,y);
-			}
+			return updateGeneralBitMap(x, y);
 		}
 		//if the block requires special actions
-		else if (getBlockGenerate(x, y).getTileMap() == 's'){
-			if (getBlockGenerate(x, y) instanceof BlockPillar){
-				if (getBlockGenerate(x, y + 1) instanceof BlockPillar){
-					bit = 1;
-				}
-				
-				else {
-					bit = 2;
-				}
-				
-				if (!getBlockGenerate(x, y - 1).isOveridable && !(getBlockGenerate(x, y - 1) instanceof BlockPillar)){
-					System.out.println(getBlockGenerate(x, y-1).getBlockName());
-					bit = 0;					
-				}
-				
-				if (!getBlockGenerate(x, y - 1).isOveridable && !getBlockGenerate(x, y + 1).isOveridable && !(getBlockGenerate(x, y + 1) instanceof BlockPillar) && !(getBlockGenerate(x, y - 1) instanceof BlockPillar)){
-					bit = 3;
-				}
-			}
+		//If the block is a pillar
+		else if (getBlockGenerate(x, y).getTileMap() == 'p'){
+			return updatePillarBitMap(x, y);	
 		}
 		return bit;
 	}
 	
 	/**
-	 * Updates (and possibly removes) projectiles
+	 * Method to determine the bitmap
+	 * @param x - location of the block on the x axis
+	 * @param y - location of the block on the y axis
+	 * @return bit - the int to be used for calculating which texture to use
 	 */
-	private void updateProjectiles()
+	private int updateGeneralBitMap(int x, int y){
+		int bit = 0;
+		if (getBlockGenerate(x, y - 1).isSolid){
+			bit += 1;
+		}
+		if (getBlockGenerate(x, y + 1).isSolid){
+			bit += 4;
+		}
+		if (getBlockGenerate(x - 1, y).isSolid){
+			bit += 8;
+		}
+		if (getBlockGenerate(x + 1, y).isSolid){
+			bit += 2;
+		}
+		if (getBlockGenerate(x, y) instanceof BlockGrass && (bit == 15 || bit == 11 || bit == 27 || bit == 31)){
+			setBlockGenerate(Block.dirt.setBitMap(bit), x,y);
+		}
+		return bit;
+	}
+	
+	/**
+	 * Subroutine for updateBlockBitMap, specific for pillars.
+	 * @param x - location of the block on the x axis
+	 * @param y - location of the block on the y axis
+	 * @return bit - the int to be used to calculate which texture to use
+	 */
+	
+	private int updatePillarBitMap(int x, int y){
+		int bit;
+		if (getBlockGenerate(x, y + 1) instanceof BlockPillar){
+			bit = 1;
+		}
+		
+		else {
+			bit = 2;
+		}
+		
+		if (!getBlockGenerate(x, y - 1).isOveridable && !(getBlockGenerate(x, y - 1) instanceof BlockPillar)){
+			System.out.println(getBlockGenerate(x, y-1).getBlockID());
+			bit = 0;					
+		}
+		
+		if (!getBlockGenerate(x, y - 1).isOveridable && !getBlockGenerate(x, y + 1).isOveridable && !(getBlockGenerate(x, y + 1) instanceof BlockPillar) && !(getBlockGenerate(x, y - 1) instanceof BlockPillar)){
+			bit = 3;
+		}
+		return bit;
+	}	
+	
+	/**
+	 * Updates (and possibly removes) projectiles
+	 * @param player - player to compare distances against
+	 */
+	private void updateProjectiles(EntityLivingPlayer player)
 	{
 		final int OUT_OF_RANGE = (int) ((Display.getHeight() > Display.getWidth()) ? Display.getHeight() * 0.75 : Display.getWidth() * 0.75);
 		for(int i = 0; i < projectileList.size(); i++)
@@ -582,7 +631,7 @@ public class World implements Serializable
 			if(((MathHelper.distanceBetweenTwoPoints(player.x, player.y, projectileList.get(i).x, projectileList.get(i).y) > OUT_OF_RANGE) || projectileList.get(i).ticksNonActive > 80) && projectileList.get(i).getType() != 'm')
 			{ //If the projectile is too far away, remove it
 				if (projectileList.get(i).ticksNonActive > 1 && projectileList.get(i).getDrop() != null){
-					addItemStackToItemList(new EntityItemStack(projectileList.get(i).x - 1, projectileList.get(i).y - 1, projectileList.get(i).getDrop()));
+					addItemStackToItemList(new EntityLivingItemStack(projectileList.get(i).x - 1, projectileList.get(i).y - 1, projectileList.get(i).getDrop()));
 				}
 				projectileList.remove(i);
 				continue;
@@ -597,7 +646,7 @@ public class World implements Serializable
 	/**
 	 * Sees if any monsters have hit (are in range of) the player
 	 */
-	private void performPlayerMonsterHittests()
+	private void performPlayerMonsterHittests(EntityLivingPlayer player)
 	{
 		for(int i = 0; i < entityList.size(); i++)
 		{
@@ -611,7 +660,7 @@ public class World implements Serializable
 	/**
 	 * Sees if any projectiles have hit (are in range of) players or npcs
 	 */
-	private void performProjectileHittests()
+	private void performProjectileHittests(EntityLivingPlayer player)
 	{
 		for (int i = 0; i < projectileList.size(); i++){
 			if (projectileList.get(i).isFriendly){
@@ -626,7 +675,6 @@ public class World implements Serializable
 			if (projectileList.get(i).isHostile){
 				if(player.inBounds(projectileList.get(i).x, projectileList.get(i).y, projectileList.get(i).width, projectileList.get(i).height))
 				{ //If the projectile is in bounds of the player, damage them
-					System.out.println("Hai!");
 					player.damageEntity(this, projectileList.get(i).damage, ((Math.random() < projectileList.get(i).criticalStrikeChance) ? true : false));
 				}
 			}
@@ -652,18 +700,19 @@ public class World implements Serializable
 	 * Attempts to spawn monsters, based on random numbers
 	 * @return number of monsters successfully spawned
 	 */
-	private int spawnMonsters()
+	private int spawnMonsters(EntityLivingPlayer player)
 	{
-		int totalTries = 3 + random.nextInt(4);
+		int totalTries = 2 + random.nextInt(4);
 		//int totalTries = 500;		
 		//WARNING, THE LINE ABOVE IS VERY, VERY AGGRESSIVE SPAWNING. NOT INTENDED FOR RELEASE BUT TESTING INSTEAD
 		
 		float time = (float)(worldTime) / GAMETICKSPERHOUR; 
 		if(time < 4 || time > 20) //spawn more at night
 		{
-			totalTries += (4 + random.nextInt(3));
+			totalTries += (3 + random.nextInt(3));
 		}	
 		
+		String active = "";
 		int counter = 0;
 		int entitych = 0;
 		
@@ -697,8 +746,15 @@ public class World implements Serializable
 				yoff = MathHelper.returnIntegerInWorldMapBounds_Y(this, (int)(player.y / 6) + random.nextInt(60) + yscreensize_b);
 			}
 			
-					
-			active = biomesByColumn.get(""+(int)(xoff)).toLowerCase();
+			active = getBiomeColumn(""+(int)(xoff));
+			
+			if(active == null) //Should indicate the chunk isnt loaded (good failsafe)
+			{
+				continue;
+			}
+			
+			active = active.toLowerCase();
+			
 			if (active.equals("forest")){
 				if (time < 4 || time > 20){
 					spawnList = manager.getForestNightEnemiesAsArray();
@@ -757,7 +813,7 @@ public class World implements Serializable
 				if((!getBlock(xoff, (yoff + 3)).isPassable() || !getBlock(xoff + 1, (yoff + 3)).isPassable())) //make sure there's actually ground to spawn on
 				{
 					//System.out.println("Entity spawn @" + "(" + xoff + "," + yoff + ")" + ". With player position of (" + player.x / 6 + "," + player.y / 6 + ")");
-					EntityEnemy enemy = spawnList[entitych].clone();
+					EntityLivingNPCEnemy enemy = new EntityLivingNPCEnemy(spawnList[entitych]);
 					enemy.setPosition(xoff * 6, yoff * 6);
 					entityList.add(enemy);
 					counter++;
@@ -789,15 +845,23 @@ public class World implements Serializable
 			}
 		}
 		
-		for(Map.Entry<String, Biome> entry : biomes.entrySet())
+		/*
+		for (ConcurrentHashMap.Entry<String, Chunk> entry : chunks.entrySet()) 
 		{
-			if(entry.getValue().biomeID == Biome.arctic.biomeID) //if the biome is arctic
+		    System.out.println(entry.getValue().getBiome());
+		}
+		*/
+		
+		for(ConcurrentHashMap.Entry<String, Chunk> entry: chunks.entrySet())
+		{
+			Biome biome = entry.getValue().getBiome();			
+			if(biome != null && biome.biomeID == Biome.arctic.biomeID) //if the biome is arctic
 			{
 				if(random.nextInt(150000) == 0) //and a random chance is met
 				{
 					if(weather == null) //and it's null (not in use)
 					{
-						weather = new WeatherSnow(this, entry.getValue(), averageSkyHeight); //cause weather!
+						weather = new WeatherSnow(this, biome, averageSkyHeight); //cause weather!
 						weatherFinished = false;
 					}
 				}
@@ -805,7 +869,7 @@ public class World implements Serializable
 		}
 	}
 	
-	private void performEnemyToolHittests() //Work in progress, not yet fully implemented
+	private void performEnemyToolHittests(EntityLivingPlayer player) //Work in progress, not yet fully implemented
 	{
 		if(!player.hasSwungTool || (player.inventory.getMainInventoryStack(player.selectedSlot) == null) || !(Item.itemsList[player.inventory.getMainInventoryStack(player.selectedSlot).getItemID()] instanceof ItemTool))
 		{
@@ -861,7 +925,8 @@ public class World implements Serializable
 					 */
 					int knockBack = (int) (player.knockbackModifier * 6);
 					String direction = player.getDirectionOfQuadRelativeToEntityPosition(entityList.get(i).x, entityList.get(i).y, entityList.get(i).width, entityList.get(i).height);
-					System.out.println(knockBack + " " + direction + " " + ((knockBack % 6 == 0) ? (knockBack / 6) : (knockBack / 6) + 1));
+					
+					//System.out.println("@index=" + i + "!knock_back@time= || " + knockBack + " " + direction + " " + ((knockBack % 6 == 0) ? (knockBack / 6) : (knockBack / 6) + 1));
 					if(direction.equals("right"))
 					{
 						for(int k = 0; k < ((knockBack % 6 == 0) ? (knockBack / 6) : (knockBack / 6) + 1); k++)
@@ -876,7 +941,10 @@ public class World implements Serializable
 							entityList.get(i).moveEntityLeft(this, knockBack);
 						}
 					}
-					entityList.get(i).registerStatusEffect(new StatusEffectStun(0.25f, 1));
+					
+
+					entityList.get(i).registerStatusEffect(new StatusEffectStun(0.4f, 1));
+					
 				}
 			}
 		}
@@ -904,14 +972,14 @@ public class World implements Serializable
 	 * @param mx x position in the 'world map'
 	 * @param my y position in the 'world map'
 	 */
-	private void handleBlockBreakEvent(int mx, int my)
+	private void handleBlockBreakEvent(EntityLivingPlayer player, int mx, int my)
 	{
 		if(!getBlock(mx, my).hasMetaData) //normal block
 		{
 			ItemStack stack = getBlock(mx, my).getDroppedItem();
 			if(stack != null) //if there's an item to drop, add it to the list of dropped items
 			{
-				addItemStackToItemList(new EntityItemStack((mx * 6) - 1, (my * 6) - 2, stack));
+				addItemStackToItemList(new EntityLivingItemStack((mx * 6) - 1, (my * 6) - 2, stack));
 			}
 			
 			setBlock(Block.air, mx, my); //replace it with air
@@ -952,7 +1020,7 @@ public class World implements Serializable
 				{
 					if(stacks[i] != null)
 					{
-						addItemStackToItemList(new EntityItemStack((mx * 6) + random.nextInt(8) - 2, (my * 6) + random.nextInt(8) - 2, stacks[i])); //drop the item into the world
+						addItemStackToItemList(new EntityLivingItemStack((mx * 6) + random.nextInt(8) - 2, (my * 6) + random.nextInt(8) - 2, stacks[i])); //drop the item into the world
 					}
 				}
 				
@@ -1001,7 +1069,7 @@ public class World implements Serializable
 					}					
 				}
 				
-				addItemStackToItemList(new EntityItemStack((mx * 6) - 1, (my * 6) - 2, stack)); //drop the item into the world
+				addItemStackToItemList(new EntityLivingItemStack((mx * 6) - 1, (my * 6) - 2, stack)); //drop the item into the world
 			}
 		}		
 		getBlockGenerate(mx-1,my).setBitMap(updateBlockBitMap(mx-1, my));
@@ -1019,7 +1087,7 @@ public class World implements Serializable
 	 * @param my y position in the worldmap array, of the block being placed
 	 * @param block the block to be placed
 	 */
-	public void placeBlock(int mx, int my, Block block)
+	public void placeBlock(EntityLivingPlayer player, int mx, int my, Block block)
 	{
 		if(block.hasMetaData) //if the block is large
 		{
@@ -1110,7 +1178,7 @@ public class World implements Serializable
 				}
 			}
 			//Make more generic later
-			player.inventory.removeItemsFromInventory(new ItemStack(block, 1)); //take the item from the player's inventory
+			player.inventory.removeItemsFromInventory(this, player, new ItemStack(block, 1)); //take the item from the player's inventory
 		}
 		else
 		{
@@ -1118,7 +1186,7 @@ public class World implements Serializable
 				(getBlock(mx-1, my).getIsSolid() || getBlock(mx, my-1).getIsSolid() || getBlock(mx, my+1).getIsSolid() || getBlock(mx+1, my).getIsSolid())) //can the block be placed
 			{
 				setBlock(block, mx, my); //place it
-				player.inventory.removeItemsFromInventory(new ItemStack(block, 1)); //remove the items from inventory	
+				player.inventory.removeItemsFromInventory(this, player, new ItemStack(block, 1)); //remove the items from inventory	
 			}
 		}
 		getBlockGenerate(mx-1,my).setBitMap(updateBlockBitMap(mx-1, my));
@@ -1142,32 +1210,28 @@ public class World implements Serializable
 	 * @param mx x position in worldmap array, of the BlockWood
 	 * @param my y position in the worldmap array, of the BlockWood
 	 */
-	public void breakTree(int mx, int my){
+	public void breakTree(EntityLivingPlayer player, int mx, int my){
 		do{
-			if (getBlock(mx, my-1).getBlockName() == Block.tree.getBlockName()){ //If there's a tree above, break it
-				handleBlockBreakEvent(mx, my-1);
+			if (getBlock(mx, my-1).getBlockID() == Block.tree.getBlockID()){ //If there's a tree above, break it
+				handleBlockBreakEvent(player, mx, my-1);
 			}
-			if (getBlock(mx-1, my).getBlockName() == Block.branchleft.getBlockName() || getBlock(mx-1, my).getBlockName() == Block.sbranchleft.getBlockName() 
-				|| getBlock(mx-1, my) == Block.branchleftb || getBlock(mx-1, my) == Block.branchleftd 
-				|| getBlock(mx-1, my) == Block.branchleftdb || getBlock(mx-1, my) == Block.treebl){
-				handleBlockBreakEvent(mx - 1, my); //If there is a left branch/base on the same level, break it
+			if (getBlock(mx-1, my).getBlockID() == Block.treebranch.getBlockID() || getBlock(mx-1, my).getBlockID() == Block.treebase.getBlockID()){
+				handleBlockBreakEvent(player, mx - 1, my); //If there is a left branch/base on the same level, break it
 			}
-			if (getBlock(mx+1, my) == Block.branchright || getBlock(mx+1, my) == Block.sbranchright 
-				|| getBlock(mx+1, my) == Block.branchrightb || getBlock(mx+1, my) == Block.branchrightd 
-				|| getBlock(mx+1, my) == Block.branchrightdb || getBlock(mx+1, my) == Block.treebr){
-				handleBlockBreakEvent(mx + 1, my); //Same for right branches/bases
+			if (getBlock(mx+1, my).getBlockID() == Block.treebranch.getBlockID() || getBlock(mx+1, my).getBlockID() == Block.treebase.getBlockID()){
+				handleBlockBreakEvent(player, mx + 1, my); //Same for right branches/bases
 			}
-			if (getBlock(mx, my - 1) == Block.treetopc2 || getBlock(mx, my - 1) == Block.streetopc2){
-				handleBlockBreakEvent(mx + 1, my - 1); //Break a canopy
-				handleBlockBreakEvent(mx + 1, my - 2);
-				handleBlockBreakEvent(mx, my - 1);
-				handleBlockBreakEvent(mx, my - 2);
-				handleBlockBreakEvent(mx - 1, my - 1);
-				handleBlockBreakEvent(mx - 1, my - 2);
+			if (getBlock(mx, my - 1).getBlockID() == Block.treetopc2.getBlockID()){
+				handleBlockBreakEvent(player, mx + 1, my - 1); //Break a canopy
+				handleBlockBreakEvent(player, mx + 1, my - 2);
+				handleBlockBreakEvent(player, mx, my - 1);
+				handleBlockBreakEvent(player, mx, my - 2);
+				handleBlockBreakEvent(player, mx - 1, my - 1);
+				handleBlockBreakEvent(player, mx - 1, my - 2);
 			}
 			my--; //Move the check upwards 1 block
-		}while (getBlock(mx, my-1) == Block.tree  //Loop as long as part of the tree is above
-			|| getBlock(mx, my-1) == Block.treetopc2 || getBlock(mx, my-1) == Block.streetopc2);
+		}while (getBlock(mx, my-1).getBlockID() == Block.tree.getBlockID()  //Loop as long as part of the tree is above
+			|| getBlock(mx, my-1).getBlockID() == Block.treetopc2.getBlockID());
 	}
 
 	/**
@@ -1226,13 +1290,13 @@ public class World implements Serializable
 	 * @param mx the x position of the first block in worldMap
 	 * @param my the y position of the first block in worldMap
 	 */
-	public void breakCactus(int mx, int my)
+	public void breakCactus(EntityLivingPlayer player, int mx, int my)
 	{
 		do
 		{
 			if (getBlock(mx, my-1) == Block.cactus) //If there's a cactus block above, break it
 			{ 
-				handleBlockBreakEvent(mx, my-1);
+				handleBlockBreakEvent(player, mx, my-1);
 			}
 			my--;
 		}while(getBlock(mx, my-1) == Block.cactus);
@@ -1252,12 +1316,11 @@ public class World implements Serializable
 	 * @param x the x position of the block to break (in the 'world map')
 	 * @param y the y position of the block to break (in the 'world map')
 	 */
-	public void breakBlock(int x, int y)
+	public void breakBlock(EntityLivingPlayer player, int x, int y)
 	{
-		handleBlockBreakEvent(x, y);
-				
-		breakCactus(x, y);
-		breakTree(x, y);
+		handleBlockBreakEvent(player, x, y);
+		breakCactus(player, x, y);
+		breakTree(player, x, y);
 	}
 
 	/**
@@ -1321,6 +1384,110 @@ public class World implements Serializable
 	{
 		return chunks.get((int)(x / Chunk.getChunkWidth()) + "," + (int)(y / Chunk.getChunkHeight())).getBlock((int)x % Chunk.getChunkWidth(), (int)y % Chunk.getChunkHeight());
 	}
+	
+	/**
+	 * Method designed to grow (or at least attempt to grow) a tree
+	 * @param space - How high/wide the space between trees and terrain must be
+	 * @param x - x location on the world
+	 * @param y - y location on the world
+	 */
+	public void growTree(int space, int x, int y){
+		boolean isOpen = true;
+		int height = (int)(Math.random() * 5 + 4); //Determine the height of the tree
+		if (y-height-space <= 0 || x <= 2 || x >= getWidth() - 2 || y >= getHeight()){ //If the tree would go off the map
+			isOpen = false;
+		}
+		//If there is room for the tree up and to the left/right	
+		if (isOpen){
+			for (int j = y; j >= y - height - space; j--){
+				for (int i = x - space; i <= x + space; i++){
+					if (!getBlockGenerate(i, j).getIsOveridable()){
+						isOpen = false;
+						break;
+					}
+				}
+				if (!isOpen) break;			
+			}
+		}
+		if (isOpen){
+			setBlockGenerate(Block.dirt, x, y + 1);
+			int count = 1;
+			
+			if ((getBlockGenerate(x-1, y+1).getBlockID() == Block.grass.getBlockID()|| getBlockGenerate(x-1, y+1).getBlockID() == Block.dirt.getBlockID())){
+				setBlockGenerate(Block.treebase.setBitMap(0), x-1, y);
+				setBlockGenerate(Block.dirt, x-1, y+1);
+			}
+			
+			if ((getBlockGenerate(x+1, y+1).getBlockID() == Block.grass.getBlockID()|| getBlockGenerate(x+1, y+1).getBlockID() == Block.dirt.getBlockID())){
+				setBlockGenerate(Block.treebase.setBitMap(3), x+1, y);
+				setBlockGenerate(Block.dirt, x+1, y+1);
+			}
+			
+			for (int k = y; k >= y - height; k--){ //Place the tree
+				if (getBlockGenerate(x, k).getBlockID() == Block.air.getBlockID()){ //If the cell is empty
+					if (k == y-height){ //If at the top of the tree
+						setBlockGenerate(Block.treetopr2, x+1, k); //Place the tree top
+						setBlockGenerate(Block.treetopr1, x+1, k-1);
+						setBlockGenerate(Block.treetopc2, x, k);
+						setBlockGenerate(Block.treetopc1, x, k-1);
+						setBlockGenerate(Block.treetopl2, x-1, k);
+						setBlockGenerate(Block.treetop, x-1, k-1);
+					}
+					else{
+						setBlockGenerate(Block.tree.setBitMap(1), x, k); //Otherwise, place a tree trunk
+					}
+					if (count > 2 && k > y - height + 1){ //For each slice of tree, if it is more than the third log, determine if there should be a branch
+						int branchl = (int)(Math.random()*60); //Decide if a block should be placed left
+						int branchr = (int)(Math.random()*60); //Decide if a branch should be placed right
+						
+						if (branchl < 5){
+							setBlockGenerate(Block.treebranch.setBitMap(branchl * 2), x-1, k);
+						}
+						if (branchr < 5){
+							setBlockGenerate(Block.treebranch.setBitMap(branchr * 2 + 1), x+1, k);
+						}															
+					}
+					count++; //increment the counter 
+				}
+				else{
+					break;
+				}
+			}
+		}
+	}
+	
+	/**
+	 * A method designed to convert all exposed dirt above the minimum height to grass
+	 * Note: We'll probably want to make it work via light value, rather than via y-value.
+	 * @param x - the x-value to start at
+	 * @param w - the width of the area to convert
+	 * @param minHeight - the lowest y value a dirt block can have and still be converted
+	 * @param maxHeight - the highest y value to check
+	 */
+	public void placeGrass(int x, int w, int minHeight, int maxHeight){
+		for(int j = maxHeight; j > minHeight; j--){ //go through the the y-axis of the world
+			for(int k = 1; k < x + w; k++){ //x-axis	
+				//Search above, left and right of dirt block for air
+				if (getBlockGenerate(k, j).getBlockID() == Block.dirt.getBlockID()){
+					if (k > 0){
+						if (getBlockGenerate(k - 1, j).getBlockID() == Block.air.getBlockID()){
+							setBlockGenerate(Block.grass, k, j);
+						}
+					}
+					if (k < getWidth() - 1){
+						if (getBlockGenerate(k + 1, j).getBlockID() == Block.air.getBlockID()){
+							setBlockGenerate(Block.grass, k, j);
+						}
+					}
+					if (j > 0){
+						if (getBlockGenerate(k, j-1).getBlockID() == Block.air.getBlockID()){
+							setBlockGenerate(Block.grass, k, j);
+						}
+					}
+				}
+			}
+		}
+	}
 		
 	/**
 	 * Sets the block at the specified (x,y). Useful for easily setting a block at the specified location; Terrible for mass usage.
@@ -1361,7 +1528,7 @@ public class World implements Serializable
 	 */
 	public Chunk getChunk(int x, int y)
 	{
-		return chunks.get(x + "," + y);
+		return (chunks.get(x + "," + y) != null) ? chunks.get(x + "," + y) : new Chunk(Biome.forest, x, y);
 	}
 	
 	/**
@@ -1396,7 +1563,7 @@ public class World implements Serializable
 		{
 			e.printStackTrace();
 		}
-		return null;
+		return Block.air;
 	}
 		
 	/**
@@ -1414,7 +1581,7 @@ public class World implements Serializable
 		{ //Ensure the chunk exists
 			if(chunks.get((x / Chunk.getChunkWidth()) + "," + (y / Chunk.getChunkHeight())) == null)
 			{
-				registerChunk(new Chunk((int)(x / Chunk.getChunkWidth()), (int)(y / Chunk.getChunkHeight())), (x / Chunk.getChunkWidth()), (y / Chunk.getChunkHeight()));
+				registerChunk(new Chunk(Biome.forest, (int)(x / Chunk.getChunkWidth()), (int)(y / Chunk.getChunkHeight())), (x / Chunk.getChunkWidth()), (y / Chunk.getChunkHeight()));
 			}
 		}
 		catch(Exception e) 
@@ -1471,40 +1638,11 @@ public class World implements Serializable
 		return 1.0f;
 	}
 	
-	//This likely doesnt work at all. Description will occur when debugging is done
-	private void checkChunks()
-	{
-		for(int i = 0; i < width / Chunk.getChunkWidth(); i++)
-		{
-			for(int j = 0; j < height / Chunk.getChunkHeight(); j++)
-			{
-				if(chunks.get(i + "," + j) == null)
-				{
-					registerChunk(new Chunk(i, j), i, j);
-				}
-			}
-		}
-		/*
-		Enumeration<String> keys = chunks.keys();
-        while (keys.hasMoreElements()) 
-        {
-        	//The first call of this should be the worst, and force-save like 80% of the chunks. 
-        	//BEST DONE DURING INITIALIZATION? PROBABLY!
-        	Chunk chunk = chunks.get((String)(keys.nextElement()));
-            if((chunk.getX() < ((x >= 1) ? x - 1 : 0) || chunk.getX() > x + 1) &&
-               (chunk.getY() < ((y >= 1) ? y - 1 : 0) || chunk.getY() > y + 1))
-            {
-            	chunkManager.saveChunk(chunks, chunk.getX(), chunk.getY());            	
-            }           
-        }
-        */
-	}
-	
 	/**
 	 * Checks for chunks that need to be loaded or unloaded, based on the player's screen size. The range in which chunks stay loaded increases if the player's 
 	 * screen size is larger. (It's about ((width/2.2), (height/2.2))). 
 	 */
-	private void updateChunks()
+	private void updateChunks(EntityLivingPlayer player)
 	{
 		//How far to check for chunks (in blocks)
 		final int loadDistanceHorizontally = (((int)(Display.getWidth() / 2.2) + 3) > Chunk.getChunkWidth()) ? ((int)(Display.getWidth() / 2.2) + 3) : Chunk.getChunkWidth();
@@ -1529,7 +1667,7 @@ public class World implements Serializable
 					x != leftOff && x != rightOff && y != upOff && y != downOff)
 			{
 				//If a chunk isnt needed, request a save.
-				chunkManager.saveChunk(chunks, loadedChunks.get(i).x, loadedChunks.get(i).y);
+				chunkManager.saveChunk("Earth", chunks, loadedChunks.get(i).x, loadedChunks.get(i).y);
 				loadedChunks_B[loadedChunks.get(i).x][loadedChunks.get(i).y] = false;
 				loadedChunks.remove(i);
 			}
@@ -1540,7 +1678,7 @@ public class World implements Serializable
 			{
 				if(!loadedChunks_B[i][k]) //If a needed chunk isnt loaded, request it.
 				{
-					chunkManager.requestChunk(this, chunks, i, k);
+					chunkManager.requestChunk("Earth", this, chunks, i, k);
 				}
 			}
 		}
@@ -1566,26 +1704,27 @@ public class World implements Serializable
 	
 	/**
 	 * Saves all chunks loaded in chunks (ConcurrantHashMap) to disk.
+	 * @param dir the sub-directory to save the chunks in (ex. "Earth" for the overworld)
 	 */
-	private void saveAllRemainingChunks()
+	private void saveAllRemainingChunks(String dir)
 	{
 		Enumeration<String> keys = chunks.keys();
         while (keys.hasMoreElements()) 
         {
-        	String key = (String)(keys.nextElement());
-            Chunk chunk = chunks.get(key);
-            chunkManager.saveChunk(chunks, chunk.getX(), chunk.getY());		
+            Chunk chunk = chunks.get((String)(keys.nextElement()));
+            chunkManager.saveChunk(dir, chunks, chunk.getX(), chunk.getY());		
         }
 	}
 	
 	/**
 	 * Saves all the chunks loaded and the important variables in world to disk. The important variables are saved in the world's
 	 * main directory under the name "worlddata.dat" and the chunks are saved in the "Earth" directory (or the applicable dimension)
+	 * @param dir the sub-directory to save the world data in (Ex. "Earth" for the over-world)
 	 */
-	public void saveRemainingWorld()
+	public void saveRemainingWorld(String dir)
 	{
-		saveAllRemainingChunks();
-		chunkManager.saveWorldData(this);
+		saveAllRemainingChunks(dir);
+		chunkManager.saveWorldData(this, dir);
 	}
 	
 	/**
@@ -1618,38 +1757,54 @@ public class World implements Serializable
 		return difficulty;
 	}
 	
-	/**TEMP FIX TO KNOWING WHAT CHUNKS ARE LOADED. THIS IS INADVISABLE**/
-	public boolean[][] loadedChunks_B = new boolean[40][40];
+	public void setChunk(Chunk chunk, int x, int y)
+	{
+		chunks.put(x + "," + y, chunk);
+	}
 	
-	public Weather weather;
-	public List<EntityItemStack> itemsList;
-	public List<TemporaryTextStore> temporaryText; 
-	public Map<String, Biome> biomes; //Biomes of the world
-	public Map<String, String> biomesByColumn; //Biomes of the world by X value	
-	public EntityPlayer player;
-	public List<EntityEnemy> entityList;
-	public List<EntityNPC> npcList;
-	public List<EntityProjectile> projectileList;
-	public SpawnManager manager;
+	private void checkChunks()
+	{
+		for(int i = 0; i < width / Chunk.getChunkWidth(); i++)
+		{
+			for(int j = 0; j < height / Chunk.getChunkHeight(); j++)
+			{
+				if(chunks.get(i + "," + j) == null)
+				{
+					registerChunk(new Chunk(Biome.forest, i, j), i, j);
+				}
+			}
+		}
+	}
 	
-	private int[] generatedHeightMap;
-	private int averageSkyHeight;
-	private int totalBiomes;
-	private List<Position> loadedChunks;
-	private int chunkWidth;
-	private int chunkHeight;
-	private String active;
-	private ChunkManager chunkManager;
-	private boolean weatherFinished;
-	private EnumDifficulty difficulty;
-	private final Random random = new Random();
-	private final int GAMETICKSPERDAY = 28800; 
-	private final int GAMETICKSPERHOUR = 1200;
-	private String worldName;
-	private long worldTime;
-	private ConcurrentHashMap<String, Chunk> chunks;
-	private int width; //Width in blocks, not pixels
-	private int height; //Height in blocks, not pixels
-	private float previousLightLevel;
-	private EntityEnemy[] spawnList;
+	/**
+	 * Gets the biome for the specified chunk value, NOT block value
+	 * @param pos a string in the form of "x", indicating which chunk to check for a biome
+	 * @return the chunk's biome if it's loaded, otherwise null if it isnt
+	 */
+	public Biome getBiome(String pos)
+	{
+		int x = (Integer.parseInt(pos)) / Chunk.getChunkWidth();
+		for(int i = 0; i < height / Chunk.getChunkHeight(); i++)
+		{
+			Chunk chunk = chunks.get(x + "," + i);
+			if(chunk != null)
+			{
+				return chunk.getBiome();
+			}
+		}
+		
+		return null;
+	}
+	
+	public String getBiomeColumn(String pos)
+	{
+		Biome biome = getBiome(pos);
+		
+		if(biome != null)
+		{
+			return biome.getBiomeName();
+		}
+		
+		return null;
+	}
 }

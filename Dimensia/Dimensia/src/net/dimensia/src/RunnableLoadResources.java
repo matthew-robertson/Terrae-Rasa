@@ -4,7 +4,8 @@ import java.awt.Font;
 
 import net.dimensia.client.Dimensia;
 
-public class RunnableLoadResources extends Render implements Runnable
+public class RunnableLoadResources extends Render 
+		implements Runnable
 {
 	public void run() 
 	{

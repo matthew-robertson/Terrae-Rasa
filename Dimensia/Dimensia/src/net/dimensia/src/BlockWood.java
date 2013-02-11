@@ -1,6 +1,6 @@
 package net.dimensia.src;
-import java.io.Serializable;
 
+import java.io.Serializable;
 
 public class BlockWood extends Block implements Serializable
 {
@@ -15,5 +15,4 @@ public class BlockWood extends Block implements Serializable
 	{
 		return new ItemStack(Block.plank, 1);
 	}
-	
 }

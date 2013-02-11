@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <session version="1.0">
-<refactoring accessors="true" comment="Delete element from project &apos;Dimensia&apos;&#x0D;&#x0A;- Original project: &apos;Dimensia&apos;&#x0D;&#x0A;- Original element: &apos;net.dimensia.src.Lesson13.java&apos;" description="Delete element" element1="/src&lt;net.dimensia.src{Lesson13.java" elements="1" flags="589830" id="org.eclipse.jdt.ui.delete" resources="0" stamp="1348009084306" subPackages="false" version="1.0"/>
+<refactoring comment="Move element &apos;WorldHell.java&apos; to &apos;Dimensia/src/net.dimensia.src&apos;&#x0A;- Original project: &apos;Dimensia&apos;&#x0A;- Destination element: &apos;Dimensia/src/net.dimensia.src&apos;&#x0A;- Original element: &apos;net.dimensia.client.WorldHell.java&apos;&#x0A;- Update references to refactored element" description="Move compilation unit" destination="/src&lt;net.dimensia.src" element1="/src&lt;net.dimensia.client{WorldHell.java" files="0" flags="589830" folders="0" id="org.eclipse.jdt.ui.move" patterns="*" policy="org.eclipse.jdt.ui.moveResources" qualified="false" references="true" stamp="1347766809567" units="1" version="1.0"/>
 </session>

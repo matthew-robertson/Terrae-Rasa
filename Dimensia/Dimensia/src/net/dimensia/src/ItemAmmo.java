@@ -1,6 +1,5 @@
 package net.dimensia.src;
 
-
 public class ItemAmmo extends Item
 {
 	protected ItemAmmo(int i)
@@ -13,5 +12,4 @@ public class ItemAmmo extends Item
 		this.projectile = projectile;
 		return this;
 	}
-	
 }

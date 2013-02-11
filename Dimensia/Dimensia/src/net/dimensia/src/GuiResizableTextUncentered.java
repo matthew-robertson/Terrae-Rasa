@@ -29,6 +29,24 @@ import org.lwjgl.opengl.GL11;
  */
 public class GuiResizableTextUncentered 
 {	
+	private final int RIGHT_SIDE_OFFSET = 20;
+	private final int BUTTON_HEIGHT = 20;
+	private ALIGN hAlignment;
+	private ALIGN vAlignment;
+	private static TrueTypeFont trueTypeFont; /*This has pretty heavy overhead to create. Should it be static?*/
+	private int screenX;
+	private int screenY;
+	private float maxScale;
+	private float baseScale;
+	private float scale;
+	private float x;
+	private float y;
+	private float mouseY;
+	private float mouseWidth;
+	private float mouseHeight;
+	private float mouseX;	
+	private String text;
+	
 	/**
 	 * V, H are for vertical and horizontal
 	 * If align_right the x,y are how far from the right of the screen to draw the button, same with align bottom
@@ -78,9 +96,9 @@ public class GuiResizableTextUncentered
 	/**
 	 * This is a special extension, used for the inventory. This saves and quits to the main menu
 	 */
-	public void saveAndQuit(World world)
+	public void saveAndQuit(World world, EntityLivingPlayer player)
 	{
-		new FileManager().saveAndQuitGame(world);
+		new FileManager().saveAndQuitGame();
 	}
 		
 	/**
@@ -188,26 +206,4 @@ public class GuiResizableTextUncentered
 		scale = base;
 		maxScale = max;
 	}
-	
-	private final int RIGHT_SIDE_OFFSET = 20;
-	private final int BUTTON_HEIGHT = 20;
-	private ALIGN hAlignment;
-	private ALIGN vAlignment;
-	private static TrueTypeFont trueTypeFont; /*This has pretty heavy overhead to create. Should it be static?*/
-	private int screenX;
-	private int screenY;
-	private float maxScale;
-	private float baseScale;
-	private float scale;
-	private float x;
-	private float y;
-	private float mouseY;
-	private float mouseWidth;
-	private float mouseHeight;
-	private float mouseX;	
-	private String text;
 }
-
-
-
-

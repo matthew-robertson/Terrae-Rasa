@@ -1,0 +1,271 @@
+package net.dimensia.client;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import net.dimensia.src.Block;
+import net.dimensia.src.EntityPlayer;
+import net.dimensia.src.EnumDifficulty;
+import net.dimensia.src.FileManager;
+import net.dimensia.src.GuiMainMenu;
+import net.dimensia.src.Item;
+import net.dimensia.src.ItemStack;
+import net.dimensia.src.Keys;
+import net.dimensia.src.LightingEngine;
+import net.dimensia.src.MouseInput;
+import net.dimensia.src.RenderGlobal;
+import net.dimensia.src.SoundManager;
+import net.dimensia.src.World;
+import net.dimensia.src.WorldHell;
+import net.dimensia.src.WorldSky;
+
+import org.lwjgl.opengl.Display;
+
+public class GameEngine 
+{
+	public final static int RENDER_MODE_WORLD_EARTH = 1,
+							   RENDER_MODE_WORLD_HELL = 2,
+							   RENDER_MODE_WORLD_SKY  = 3;
+	
+	public GameEngine()
+	{
+		renderMode = RENDER_MODE_WORLD_EARTH;
+	}
+	
+	public void setWorld(World world)
+	{
+		this.world = world;
+	}
+	
+	public void run()
+	{
+		//Variables for the gameloop cap (20 times / second)
+        final int TICKS_PER_SECOND = 20;
+		final int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
+		final int MAX_FRAMESKIP = 5;
+		long next_game_tick = System.currentTimeMillis();
+		long start, end;
+		int loops;
+		
+	    while(!Dimensia.done) //Main Game Loop
+	    {
+	    	start = System.currentTimeMillis();
+	    	
+	        loops = 0;
+	        while(System.currentTimeMillis() > next_game_tick && loops < MAX_FRAMESKIP) //Update the game 20 times/second 
+	        {
+	        	if(!Dimensia.isMainMenuOpen) //Handle game inputs if the main menu isnt open (aka the game is being played)
+	        	{
+	        		MouseInput.mouse(world, player);
+	        		Keys.keyboard(world, player);	            
+	        		
+	        		if(renderMode == RENDER_MODE_WORLD_EARTH) //Player is in the overworld ('earth')
+	        		{
+	        			world.onWorldTick(player);
+	        		}
+	        		else if(renderMode == RENDER_MODE_WORLD_HELL) //Player is in the hell dimension 
+	        		{
+	        			
+	        		}
+	        		else if(renderMode == RENDER_MODE_WORLD_SKY) //Player is in the sky dimension
+	        		{
+	        			
+	        		}
+	        	}
+	        	
+				if(Dimensia.needsResized || Dimensia.width < 640 || Dimensia.height < 400) //If the window needs resized, resize it
+				{
+					Dimensia.dimensia.resizeWindow();
+					Dimensia.needsResized = false;
+				}
+	        	 
+	        	next_game_tick += SKIP_TICKS;
+	            loops++;
+	            
+	            /*
+	            if(System.currentTimeMillis() - next_game_tick  > 1000)
+	            {
+	            	next_game_tick = System.currentTimeMillis();
+	            	break;
+	            }
+	            */
+	        }
+	        Display.update();
+            
+	        if(Dimensia.isMainMenuOpen) //if the main menu is open, render that, otherwise render the game
+	        {
+	        	mainMenu.render();
+		    }
+	        else
+	        {
+	        	if(renderMode == RENDER_MODE_WORLD_EARTH)
+	    		{
+	        	 	RenderGlobal.render(world, player, renderMode); //Renders Everything on the screen for the game
+	     		}
+	    		else if(renderMode == RENDER_MODE_WORLD_HELL)
+	    		{
+	    		 	RenderGlobal.render(worldHell, player, renderMode); //Renders Everything on the screen for the game
+	    		}
+	    		else if(renderMode == RENDER_MODE_WORLD_SKY)
+	    		{
+	    		 	RenderGlobal.render(worldSky, player, renderMode); //Renders Everything on the screen for the game
+	    		}
+	    	}
+	        
+        	end = System.currentTimeMillis();        	
+       //     System.out.println(end - start);
+	    }     
+	}
+	
+	/**
+	 * Starts a game from the main menu.
+	 * @param world the world to play on.
+	 * @param player the player to play on.
+	 */
+	public void startGame(World world, EntityPlayer player)
+	{
+		this.world = world;
+		this.player = player;
+		world.addPlayerToWorld(player);
+		Dimensia.isMainMenuOpen = false;
+		mainMenu = null;
+	}
+	
+	/**
+	 * Misc. things required to initalize the game
+	 */
+	public void init()
+	{
+		mainMenu = new GuiMainMenu();
+		
+		if(Dimensia.initInDebugMode)
+		{
+			Dimensia.isMainMenuOpen = false;
+			FileManager fileManager = new FileManager();
+			world = fileManager.generateNewWorld("World", 1200, 800, EnumDifficulty.EASY);//EnumWorldSize.LARGE.getWidth(), EnumWorldSize.LARGE.getHeight());
+			player = fileManager.generateAndSavePlayer("!!", EnumDifficulty.NORMAL);//new EntityPlayer("Test player", EnumDifficulty.NORMAL);
+			world.addPlayerToWorld(player);
+			world.assessForAverageSky();
+			
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.woodTable, 100));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.torch, 100));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.chest, 100));
+			//*
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.healthPotion1, 100));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.healthPotion2, 100));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.manaPotion1, 100));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.manaPotion2, 100));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.manaStar, 100));
+			/**/
+			
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.furnace, 100));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.craftingTable, 6));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.plank, 100));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldPickaxe));
+		
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.copperIngot, 100));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ironIngot, 6));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.copperCoin, 5));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.woodenArrow, 5));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.woodenArrow, 5));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.woodenArrow, 5));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.woodenArrow, 5));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.woodenArrow, 5));
+			
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.copperOre, 100));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.tinOre, 100));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldOre, 15));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.tinIngot, 100));
+			
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldHelmet));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldHelmet));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldBody));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldGreaves));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.bronzeHelmet));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.bronzeBody));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.bronzeGreaves));
+
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.rocketBoots));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.heartCrystal, 2));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.manaCrystal, 2));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.angelsSigil, 2));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ringOfVigor, 5));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.regenerationPotion2, 5));
+			//world.player.registerStatusEffect(new StatusEffectDazed(500000, 1));
+			LightingEngine.applySunlight(world);
+		}		
+	}
+
+	public World getWorld()
+	{
+		return world;
+	}
+	
+	public void changeWorld(int newMode)
+			throws IOException, ClassNotFoundException
+	{
+		String worldName = "";
+		if(renderMode == RENDER_MODE_WORLD_EARTH)
+		{
+			worldName = world.getWorldName();
+			world.saveRemainingWorld("Earth");
+			world = null;
+		}
+		else if(renderMode == RENDER_MODE_WORLD_HELL)
+		{
+			worldName = worldHell.getWorldName();
+			worldHell.saveRemainingWorld("Hell");
+			worldHell = null;
+		}
+		else if(renderMode == RENDER_MODE_WORLD_SKY)
+		{
+			worldName = worldSky.getWorldName();
+			worldSky.saveRemainingWorld("Sky");
+			worldSky = null;
+		}
+		
+		this.renderMode = newMode;
+		FileManager manager = new FileManager();
+		
+		if(renderMode == RENDER_MODE_WORLD_EARTH)
+		{
+			manager.loadWorld("Earth", worldName);
+		}
+		else if(renderMode == RENDER_MODE_WORLD_HELL)
+		{
+			manager.loadWorld("Hell", worldName);
+		}
+		else if(renderMode == RENDER_MODE_WORLD_SKY)
+		{
+			manager.loadWorld("Sky", worldName);
+		}
+	}
+	
+	public void closeGameToMenu() 
+			throws FileNotFoundException, IOException
+	{
+		FileManager manager = new FileManager();
+		manager.savePlayer(player);
+	
+		if(renderMode == RENDER_MODE_WORLD_EARTH)
+		{
+			world.saveRemainingWorld("Earth");
+		}
+		else if(renderMode == RENDER_MODE_WORLD_HELL)
+		{
+			world.saveRemainingWorld("Hell");
+		}
+		else if(renderMode == RENDER_MODE_WORLD_SKY)
+		{
+			world.saveRemainingWorld("Sky");
+		}
+	}
+	
+	public int renderMode;
+	public SoundManager soundManager;
+	public GuiMainMenu mainMenu;
+	public World world;
+	public WorldHell worldHell;
+	public WorldSky worldSky;
+	public EntityPlayer player;
+}

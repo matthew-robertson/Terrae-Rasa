@@ -16,6 +16,8 @@ import java.util.List;
  * <li>Damage the entity: {@link #damageEntity(World, int, boolean)} 
  * <li>Handle a jump: {@link #hasJumped()}
  * <li>Handle movement: {@link #moveEntityDown(World)}, {@link #moveEntityUp(World)}, {@link #moveEntityLeft(World)}, {@link #moveEntityRight(World)}
+ * <li>Determine movement: {@link #isWalkingSafe(World, boolean)}, {@link #isJumpNeeded(World, boolean, boolean)}, {@link #isJumpPossibleAndNeeded(World, boolean, boolean)}
+ * <li>Launch projectiles: {@link #launchProjectile(World, EntityProjectile)}
  * <li>Heal the entity: {@link #healEntity(World, int)}
  * <li>Implement custom death behaviour: {@link #onDeath()}
  * <br><br>
@@ -30,6 +32,45 @@ import java.util.List;
 public class EntityLiving extends Entity
 {
 	private static final long serialVersionUID = 1L;
+	public boolean isFireImmune;
+	public float attackSpeedModifier;
+	public float knockbackModifier;
+	public float damageSoakModifier;
+	public float meleeDamageModifier;
+	public float rangeDamageModifier;
+	public float magicDamageModifier;
+	public float allDamageModifier;
+	public boolean isStunned;
+	public List<StatusEffect> statusEffects;
+	public int ticksFallen;
+	/** (chance to crit / 100) */
+	public float criticalStrikeChance; 
+	/** (Chance to dodge / 100) */
+	public float dodgeChance;
+	public boolean isImmuneToCrits;
+	public boolean isImmuneToFallDamage;
+	public boolean isImmuneToFireDamage;
+	public int invincibilityTicks;
+	public int textureWidth;
+	public int textureHeight;
+	public float width;
+	public float height;
+	public float blockWidth;
+	public float blockHeight;
+	public float distanceFallen;
+	public float maxHeightFallenSafely;
+	public float baseSpeed;
+	public float movementSpeedModifier;
+	public int maxHealth;
+	public int maxMana;
+	public float mana;
+	public float defense;
+	public float health;
+	public int wanderLeft;
+	public int wanderRight;
+	public boolean alert;
+	public int ticksSinceLastWander;
+	public int ticksSinceLastProjectile;
 	
 	/**
 	 * Overrides Entity's constructor, and constructs a new EntityLiving. 
@@ -84,70 +125,82 @@ public class EntityLiving extends Entity
 		isImmuneToCrits = false;
 		criticalStrikeChance = 0.05f;
 		statusEffects = new ArrayList<StatusEffect>();
+		
 		x = 0;
 		y = 0;	
 		isStunned = false;
 	}
-	/**
-	 * Launch a player projectile
-	 * @param world = current world
-	 * @param xt = x position to create the projectile at
-	 * @param yt = y position to create the projectile at
-	 * @param item = Item to be used to launch projectile (what projectile is needed)
-	 */
-	public void launchProjectile(World world, float xt, float yt, Item item){
-		if (item instanceof ItemRanged){
-			ItemStack[] ammo = item.getAmmoAsArray();
-			for (int i = 0; i < ammo.length; i++){				
-				if (world.player.inventory.doesPartialStackExist(ammo[i]) != -1){
-					int angle = MathHelper.angleMousePlayer(xt, yt, x, y) - 90;
-					if (angle < 0){
-						angle += 360;
-					}
-					if (world.player.isFacingRight){
-						world.addEntityToProjectileList(Item.itemsList[ammo[i].getItemID()].getProjectile().clone().setDrop(Item.itemsList[ammo[i].getItemID()]).setXLocAndYLoc(x, y)
-								.setDirection(angle).setDamage((Item.itemsList[ammo[i].getItemID()].getProjectile().getDamage() + item.getDamage())));
-					}
-					else{
-						world.addEntityToProjectileList(Item.itemsList[ammo[i].getItemID()].getProjectile().clone().setDrop(Item.itemsList[ammo[i].getItemID()]).setXLocAndYLoc(x, y)
-								.setDirection(angle).setDamage((Item.itemsList[ammo[i].getItemID()].getProjectile().getDamage() + item.getDamage())));
-					}
-					world.player.inventory.removeItemsFromInventoryStack(1, world.player.inventory.doesPartialStackExist(ammo[i]));
-				}
-			}
-		}
-		if (item instanceof ItemMagic){
-			if (mana >= item.getManaReq()){
-				int angle = MathHelper.angleMousePlayer(xt, yt, x, y) - 90;
-				if (angle < 0){
-					angle += 360;
-				}
-				world.addEntityToProjectileList(item.getProjectile().clone().setXLocAndYLoc(x, y)
-						.setDirection(angle).setDamage(item.getProjectile().getDamage()));
-				mana -= item.getManaReq();
-			}
-		}
+	
+	public EntityLiving(EntityLiving entity)
+	{
+		super(entity);
+
+		this.isFireImmune = entity.isFireImmune;
+		this.attackSpeedModifier = entity.attackSpeedModifier;
+		this.knockbackModifier = entity.knockbackModifier;
+		this.damageSoakModifier = entity.damageSoakModifier;
+		this.meleeDamageModifier = entity.meleeDamageModifier;
+		this.rangeDamageModifier = entity.rangeDamageModifier;
+		this.magicDamageModifier = entity.magicDamageModifier;
+		this.allDamageModifier = entity.allDamageModifier;
+		this.isStunned = entity.isStunned;
+	
+		this.statusEffects = new ArrayList<StatusEffect>();
 		
+		for(int i = 0; i < entity.statusEffects.size(); i++)
+		{
+			this.statusEffects.add(new StatusEffect(entity.statusEffects.get(i)));
+		}
+		this.ticksFallen = entity.ticksFallen;
+		this.criticalStrikeChance = entity.criticalStrikeChance; 
+		this.dodgeChance = entity.dodgeChance;
+		this.isImmuneToCrits = entity.isImmuneToCrits;
+		this.isImmuneToFallDamage = entity.isImmuneToFallDamage;
+		this.isImmuneToFireDamage = entity.isImmuneToFireDamage;
+		this.invincibilityTicks = entity.invincibilityTicks;
+		this.textureWidth = entity.textureWidth;
+		this.textureHeight = entity.textureHeight;
+		this.width = entity.width;
+		this.height = entity.height;
+		this.blockWidth = entity.blockWidth;
+		this.blockHeight = entity.blockHeight;
+		this.distanceFallen = entity.distanceFallen;
+		this.maxHeightFallenSafely = entity.maxHeightFallenSafely;
+		this.baseSpeed = entity.baseSpeed;
+		this.movementSpeedModifier = entity.movementSpeedModifier;
+		this.maxHealth = entity.maxHealth;
+		this.maxMana = entity.maxMana;
+		this.mana = entity.mana;
+		this.defense = entity.defense;
+		this.health = entity.health;
+		this.wanderLeft = entity.wanderLeft;
+		this.wanderRight = entity.wanderRight;
+		this.alert = entity.alert;
+		this.ticksSinceLastWander = entity.ticksSinceLastWander;
+		this.ticksSinceLastProjectile = entity.ticksSinceLastProjectile;
 	}
 	
 	/** 
 	 * launch NPC projectiles
+	 * @param world - current world
+	 * @param angle - the angle at which to launch the projectile
+	 * @param projectile - the projectile to launch
 	 */
 	public void launchProjectile(World world, int angle, EntityProjectile projectile){
-		world.addEntityToProjectileList(projectile.clone().setXLocAndYLoc(x, y)
+		world.addEntityToProjectileList(new EntityProjectile(projectile).setXLocAndYLoc(x, y)
 				.setDirection(angle).setDamage(projectile.getDamage()));
 	}
 	
 	/**
-	 * checks if a jump is required to progress
-	 * @param world current world
-	 * @param direction true - right, false - left
+	 * Checks if a jump is required to progress
+	 * @param world - current world
+	 * @param direction - true if moving right, false if left
 	 * @return true if jump is needed, false if not
 	 */
 	public int isJumpRequired(World world, boolean direction, boolean up){
 		float heightCheck;
 		
-		if ((alert && world.player.y < y) || (up && !alert)){
+		if ((alert) || (up && !alert)){
 			heightCheck = upwardJumpHeight / 6;
 		}
 		else {
@@ -162,7 +215,7 @@ public class EntityLiving extends Entity
 						if (up){
 							return i;
 						}
-						else return 0;
+						else return -1;
 					}
 			}
 		}
@@ -174,7 +227,7 @@ public class EntityLiving extends Entity
 					if (up){
 						return i;
 					}
-					else return 0;
+					else return -1;
 				 }
 			}
 		}
@@ -184,8 +237,8 @@ public class EntityLiving extends Entity
 	
 	/**
 	 * Checks to see if a jump is possible on the given side
-	 * @param world current world
-	 * @param direction true = right, false = left
+	 * @param world - current world
+	 * @param direction - true if moving right, false if left
 	 * @return true if jump is possible, false if not
 	 */
 	public boolean isJumpPossibleAndNeeded(World world, boolean direction, boolean up){
@@ -232,20 +285,20 @@ public class EntityLiving extends Entity
 		}
 		return false;
 	}
+	
 	/**
 	 * Checks to see if it is safe for the actor to move in the provided direction
-	 * @param world
-	 * @param direction
-	 * @return
+	 * @param world - the current world
+	 * @param direction - true if attempting to move right, false if moving left
+	 * @return - true if it's safe to walk (a block is solid and the actor will land on it, up to it's maximum safe fall distance down, and it's width wide)
 	 */
 	public boolean isWalkingSafe(World world, boolean direction){
 		//If checking the right side
 		if (direction){
 			//Check all the blocks in a line up to the npc's block width if any are solid, return true
-			for (int i = 0; i < blockWidth; i++){
-				if (world.getBlockGenerate((int)(x + width) / 6 - 1 + i, (int)(y + height) / 6).getIsSolid()
-				|| world.getBlockGenerate((int)(x + width) / 6 - 1 + i, (int)(y + height) / 6 + 1).getIsSolid() 
-				|| world.getBlockGenerate((int)(x + width) / 6 - 1 + i, (int)(y + height) / 6 + 2).getIsSolid()){
+			for (int i = 0; i <= blockWidth; i++){
+				for (int j = 0; j <= (maxHeightFallenSafely / 6); j++)
+				if (world.getBlockGenerate((int)(x + width) / 6 - 1 + i, (int)(y + height) / 6 + j).getIsSolid()){
 					return true;							 
 				}
 			}
@@ -255,10 +308,10 @@ public class EntityLiving extends Entity
 		else if (!direction){
 			//Check all the blocks in a line up to the npc's block width if any are solid, return true
 			for (int i = 0; i <= blockWidth; i++){						
-				 if (world.getBlockGenerate((int)(x) / 6 - i, (int)(y + height) / 6).getIsSolid()
-				  || world.getBlockGenerate((int)(x) / 6 - i, (int)(y + height) / 6 + 1).getIsSolid()
-				  || world.getBlockGenerate((int)(x) / 6 - i, (int)(y + height) / 6 + 2).getIsSolid()){
-					return true;
+				for (int j = 0; j <= (maxHeightFallenSafely / 6); j++){ 
+					if (world.getBlockGenerate((int)(x) / 6 - i, (int)(y + height) / 6 + j).getIsSolid()){
+						return true;
+					}
 				 }
 			}
 		}
@@ -303,7 +356,7 @@ public class EntityLiving extends Entity
 		
 		if(isDead()) //is the entity has died, perform the appropriate action
 		{
-			onDeath();
+			onDeath(world);
 		}		
 	}
 	
@@ -333,7 +386,7 @@ public class EntityLiving extends Entity
 	/**
 	 * Handles special death events. Generally this should be done by extending EntityLiving and overriding this method
 	 */
-	public void onDeath()
+	public void onDeath(World world)
 	{		
 	}
 	
@@ -625,17 +678,19 @@ public class EntityLiving extends Entity
 		
 		for(int i = 0; i < loops; i++)
 		{
-			float f = canMoveRight(world);
+			float possibleMovement = canMoveRight(world);
 			
-			if(x + f < (world.getWidth() * 6) && f >= movementValue) //full movement
-				x += f;
-			else if(f > 0) //partial movement
-				x += f;
+			float actualMovement = movementValue % 6;
+			
+			if(x + possibleMovement < (world.getWidth() * 6) && possibleMovement >= movementValue) //full movement
+				x += actualMovement;
+			else if(possibleMovement > 0) //partial movement
+				x += actualMovement;
 			
 			if(x > world.getWidth() * 6 - width - 6) //bounds check
 				x = (world.getWidth() * 6) - width - 6;
 
-			movementValue -= f;
+			movementValue -= actualMovement;
 		}
 	}
 	
@@ -654,22 +709,23 @@ public class EntityLiving extends Entity
 		
 		for(int i = 0; i < loops; i++)
 		{
-			float f = canMoveLeft(world);
+			float possibleMovement = canMoveLeft(world);
+			float actualMovement = movementValue % 6;
 			
-			if((x - f) >= 0 && f >= movementValue) //full movement
-				x -= f;   
-			else if(f > 0) //partial movement
-				x -= f;
+			if((x - possibleMovement) >= 0 && possibleMovement >= movementValue) //full movement
+				x -= actualMovement;
+			else if(possibleMovement > 0) //partial movement
+				x -= actualMovement;
 			
 			if(x < 0)//out of bounds check
 				x = 0;
 			
-			movementValue -= f;
+			movementValue -= actualMovement;
 		}
 	}
 	
 	/**
-	 * Tries to move the entity right. This version of the method dictates how far to move right
+	 * Tries to move the entity right. This version of the method dictates how far to move right. Basespeed is NOT Applied!
 	 * @param movementValue the distance to move right, if possible
 	 */
 	public void moveEntityRight(World world, float movementValue)
@@ -683,22 +739,24 @@ public class EntityLiving extends Entity
 		
 		for(int i = 0; i < loops; i++)
 		{
-			float f = canMoveRight(world);
+			float possibleMovement = canMoveRight(world);
 			
-			if(x + f < (world.getWidth() * 6) && f >= movementValue) //full movement
-				x += f;
-			else if(f > 0) //partial movement
-				x += f;
+			float actualMovement = movementValue % 6;
+			
+			if(x + possibleMovement < (world.getWidth() * 6) && possibleMovement >= movementValue) //full movement
+				x += actualMovement;
+			else if(possibleMovement > 0) //partial movement
+				x += actualMovement;
 			
 			if(x > world.getWidth() * 6 - width - 6) //bounds check
 				x = (world.getWidth() * 6) - width - 6;
 
-			movementValue -= f;
+			movementValue -= actualMovement;
 		}
 	}
 	
 	/**
-	 * Tries to move the entity left. This version of the method dictates how far to move left.
+	 * Tries to move the entity left. This version of the method dictates how far to move left. Basespeed is NOT Applied!
 	 * @param movementValue the distance to move left, it possible
 	 */
 	public void moveEntityLeft(World world, float movementValue) 
@@ -712,17 +770,18 @@ public class EntityLiving extends Entity
 		
 		for(int i = 0; i < loops; i++)
 		{
-			float f = canMoveLeft(world);
+			float possibleMovement = canMoveLeft(world);
+			float actualMovement = movementValue % 6;
 			
-			if((x - f) >= 0 && f >= movementValue) //full movement
-				x -= f;   
-			else if(f > 0) //partial movement
-				x -= f;
+			if((x - possibleMovement) >= 0 && possibleMovement >= movementValue) //full movement
+				x -= actualMovement;
+			else if(possibleMovement > 0) //partial movement
+				x -= actualMovement;
 			
 			if(x < 0)//out of bounds check
 				x = 0;
 			
-			movementValue -= f;
+			movementValue -= actualMovement;
 		}
 	}
 	
@@ -827,6 +886,8 @@ public class EntityLiving extends Entity
 			}
 		}
 		
+		
+		
 		if(flag && y + fallSpeed < world.getHeight() * 6) //Normal Gravity
 		{
 			return fallSpeed;
@@ -860,7 +921,7 @@ public class EntityLiving extends Entity
 		}
 		for(int i = 0; i < statusEffects.size(); i++)
 		{
-			if(!(this instanceof EntityPlayer))
+			if(!(this instanceof EntityLivingPlayer))
 			{
 				System.out.println(i + ">" + statusEffects.get(i) + " TIME_REMAINING = " + statusEffects.get(i).ticksLeft);
 			}
@@ -879,28 +940,38 @@ public class EntityLiving extends Entity
 		{
 			if(statusEffects.get(i).toString().equals(effect.toString()))
 			{
-				if(statusEffects.get(i).tier >= effect.tier)
+				System.out.println("StatusEffectMatch=" + effect.toString());
+				
+				if(statusEffects.get(i).tier <= effect.tier)
 				{
-					if(statusEffects.get(i).tier == effect.tier && statusEffects.get(i).ticksLeft < effect.ticksLeft)
+					if(statusEffects.get(i).tier == effect.tier && statusEffects.get(i).ticksLeft > effect.ticksLeft)
 					{
-						continue;
+						return false;
 					}
 					else
 					{
+						if(!statusEffects.get(i).reapplicationSkipsRemovalEffect)
+						{
+							statusEffects.get(i).removeInitialEffect(this);
+						}
 						statusEffects.remove(i);
-						break;
+						
+						effect.applyInitialEffect(this);
+						statusEffects.add(effect);
+						System.out.println("Effect registered>>" + effect);
+						return true;
 					}
 				}
 				else
 				{
-					continue;
+					return false;
 				}
 			}
 		}
 		
 		effect.applyInitialEffect(this);
 		statusEffects.add(effect);
-		System.out.println("Effect registered>>" + effect);
+		System.out.println(this + "->Effect registered>>" + effect);
 		return true;
 	}
 	
@@ -908,44 +979,4 @@ public class EntityLiving extends Entity
 		upwardJumpHeight = i;
 		return this;
 	}
-	
-	public boolean isFireImmune;
-	public float attackSpeedModifier;
-	public float knockbackModifier;
-	public float damageSoakModifier;
-	public float meleeDamageModifier;
-	public float rangeDamageModifier;
-	public float magicDamageModifier;
-	public float allDamageModifier;
-	public boolean isStunned;
-	public List<StatusEffect> statusEffects;
-	public int ticksFallen;
-	/** (chance to crit / 100) */
-	public float criticalStrikeChance; 
-	/** (Chance to dodge / 100) */
-	public float dodgeChance;
-	public boolean isImmuneToCrits;
-	public boolean isImmuneToFallDamage;
-	public boolean isImmuneToFireDamage;
-	public int invincibilityTicks;
-	public int textureWidth;
-	public int textureHeight;
-	public float width;
-	public float height;
-	public float blockWidth;
-	public float blockHeight;
-	public float distanceFallen;
-	public float maxHeightFallenSafely;
-	public float baseSpeed;
-	public float movementSpeedModifier;
-	public int maxHealth;
-	public int maxMana;
-	public float mana;
-	public float defense;
-	public float health;
-	public int wanderLeft;
-	public int wanderRight;
-	public boolean alert;
-	public int ticksSinceLastWander;
-	public int ticksSinceLastProjectile;
 }

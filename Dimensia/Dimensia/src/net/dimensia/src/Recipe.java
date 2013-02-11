@@ -2,10 +2,14 @@ package net.dimensia.src;
 
 import java.io.Serializable;
 
-
-public class Recipe implements Serializable
+public class Recipe 
+		implements Serializable
 {
 	private static final long serialVersionUID = 1L;
+	/** What the recipe yields */
+	private ItemStack result; 
+	/** What the recipe requires. */
+	private ItemStack[] recipe; 
 	
 	public Recipe(RecipeManager manager, ItemStack result, char type, ItemStack[] stacks)
 	{
@@ -40,7 +44,4 @@ public class Recipe implements Serializable
 	{
 		return recipe;
 	}
-	
-	private ItemStack result; //What the recipe yields
-	private ItemStack[] recipe; //What the recipe requires.
 }
