@@ -14,6 +14,16 @@ import org.lwjgl.opengl.Display;
 public class MathHelper 
 {	
 	/**
+	 * Returns a value between 0.0F and 1.0F, preferring the original value given if possible
+	 * @param f the value to check
+	 * @return the original value, if between 0.0F and 1.0F; 0.0F if the value is below 0.0F; 1.0F if the value is above 1.0F
+	 */ 
+	public static float sat(float f)
+	{
+		return (f > 1.0F) ? 1.0F : (f < 0.0F) ? 0.0F : f;
+	}
+	
+	/**
 	 * Inverses the value of the given integer. If it's negative then return a positive number; if it's positive return a negative number.
 	 * @return the reversed value of the given Integer
 	 */	
