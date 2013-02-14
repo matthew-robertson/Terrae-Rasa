@@ -6,6 +6,7 @@ import java.io.IOException;
 import net.dimensia.src.Block;
 import net.dimensia.src.EntityLivingPlayer;
 import net.dimensia.src.EnumDifficulty;
+import net.dimensia.src.ErrorUtils;
 import net.dimensia.src.FileManager;
 import net.dimensia.src.GuiMainMenu;
 import net.dimensia.src.Item;
@@ -46,82 +47,96 @@ public class GameEngine
 	
 	public void run()
 	{
-		//Variables for the gameloop cap (20 times / second)
-        final int TICKS_PER_SECOND = 20;
-		final int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
-		final int MAX_FRAMESKIP = 5;
-		long next_game_tick = System.currentTimeMillis();
-		long start, end;
-		int loops;
-		
-	    while(!Dimensia.done) //Main Game Loop
-	    {
-	    	start = System.currentTimeMillis();
-	    	
-	        loops = 0;
-	        while(System.currentTimeMillis() > next_game_tick && loops < MAX_FRAMESKIP) //Update the game 20 times/second 
-	        {
-	        	if(!Dimensia.isMainMenuOpen) //Handle game inputs if the main menu isnt open (aka the game is being played)
-	        	{
-	        		MouseInput.mouse(world, player);
-	        		Keys.keyboard(world, player);	            
-	        		
-	        		if(renderMode == RENDER_MODE_WORLD_EARTH) //Player is in the overworld ('earth')
-	        		{
-	        			world.onWorldTick(player);
-	        		}
-	        		else if(renderMode == RENDER_MODE_WORLD_HELL) //Player is in the hell dimension 
-	        		{
-	        			
-	        		}
-	        		else if(renderMode == RENDER_MODE_WORLD_SKY) //Player is in the sky dimension
-	        		{
-	        			
-	        		}
-	        	}
-	        	
-				if(Dimensia.needsResized || Dimensia.width < 640 || Dimensia.height < 400) //If the window needs resized, resize it
-				{
-					Dimensia.dimensia.resizeWindow();
-					Dimensia.needsResized = false;
-				}
-	        	 
-	        	next_game_tick += SKIP_TICKS;
-	            loops++;
+		try
+		{
+			//Variables for the gameloop cap (20 times / second)
+	        final int TICKS_PER_SECOND = 20;
+			final int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
+			final int MAX_FRAMESKIP = 5;
+			long next_game_tick = System.currentTimeMillis();
+			long start, end;
+			int loops;
+			
+		    while(!Dimensia.done) //Main Game Loop
+		    {
+		    	start = System.currentTimeMillis();
+		    	
+		    	if(true)
+		    	throw new RuntimeException("Wheeee");
+		    	
+		        loops = 0;
+		        while(System.currentTimeMillis() > next_game_tick && loops < MAX_FRAMESKIP) //Update the game 20 times/second 
+		        {
+		        	if(!Dimensia.isMainMenuOpen) //Handle game inputs if the main menu isnt open (aka the game is being played)
+		        	{
+		        		MouseInput.mouse(world, player);
+		        		Keys.keyboard(world, player);	            
+		        		
+		        		if(renderMode == RENDER_MODE_WORLD_EARTH) //Player is in the overworld ('earth')
+		        		{
+		        			world.onWorldTick(player);
+		        		}
+		        		else if(renderMode == RENDER_MODE_WORLD_HELL) //Player is in the hell dimension 
+		        		{
+		        			
+		        		}
+		        		else if(renderMode == RENDER_MODE_WORLD_SKY) //Player is in the sky dimension
+		        		{
+		        			
+		        		}
+		        	}
+		        	
+					if(Dimensia.needsResized || Dimensia.width < 640 || Dimensia.height < 400) //If the window needs resized, resize it
+					{
+						Dimensia.dimensia.resizeWindow();
+						Dimensia.needsResized = false;
+					}
+		        	 
+		        	next_game_tick += SKIP_TICKS;
+		            loops++;
+		            
+		            /*
+		            if(System.currentTimeMillis() - next_game_tick  > 1000)
+		            {
+		            	next_game_tick = System.currentTimeMillis();
+		            	break;
+		            }
+		            */
+		        }
+		        Display.update();
 	            
-	            /*
-	            if(System.currentTimeMillis() - next_game_tick  > 1000)
-	            {
-	            	next_game_tick = System.currentTimeMillis();
-	            	break;
-	            }
-	            */
-	        }
-	        Display.update();
-            
-	        if(Dimensia.isMainMenuOpen) //if the main menu is open, render that, otherwise render the game
-	        {
-	        	mainMenu.render();
-		    }
-	        else
-	        {
-	        	if(renderMode == RENDER_MODE_WORLD_EARTH)
-	    		{
-	        	 	RenderGlobal.render(world, player, renderMode); //Renders Everything on the screen for the game
-	     		}
-	    		else if(renderMode == RENDER_MODE_WORLD_HELL)
-	    		{
-	    		 	RenderGlobal.render(worldHell, player, renderMode); //Renders Everything on the screen for the game
-	    		}
-	    		else if(renderMode == RENDER_MODE_WORLD_SKY)
-	    		{
-	    		 	RenderGlobal.render(worldSky, player, renderMode); //Renders Everything on the screen for the game
-	    		}
-	    	}
-	        
-        	end = System.currentTimeMillis();        	
-       //     System.out.println(end - start);
-	    }     
+		        if(Dimensia.isMainMenuOpen) //if the main menu is open, render that, otherwise render the game
+		        {
+		        	mainMenu.render();
+			    }
+		        else
+		        {
+		        	if(renderMode == RENDER_MODE_WORLD_EARTH)
+		    		{
+		        	 	RenderGlobal.render(world, player, renderMode); //Renders Everything on the screen for the game
+		     		}
+		    		else if(renderMode == RENDER_MODE_WORLD_HELL)
+		    		{
+		    		 	RenderGlobal.render(worldHell, player, renderMode); //Renders Everything on the screen for the game
+		    		}
+		    		else if(renderMode == RENDER_MODE_WORLD_SKY)
+		    		{
+		    		 	RenderGlobal.render(worldSky, player, renderMode); //Renders Everything on the screen for the game
+		    		}
+		    	}
+		        
+	        	end = System.currentTimeMillis();        	
+	       //     System.out.println(end - start);
+		    }     
+		}
+		catch(Exception e) //Fatal error catching
+		{
+			e.printStackTrace();
+			
+			ErrorUtils errorUtils = new ErrorUtils();
+			errorUtils.writeErrorToFile(e, true);
+			
+		}
 	}
 	
 	/**
