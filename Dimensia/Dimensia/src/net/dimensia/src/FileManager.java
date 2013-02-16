@@ -107,7 +107,7 @@ public class FileManager
 	public World generateNewWorld(String name, int w, int h, EnumDifficulty difficulty)
 	{
 		World world = new WorldGenEarth().generate(new World(name, w, h, difficulty));
-		LightingEngine.applySunlight(world);
+	//LightingEngine.applySunlight(world);
 		return world;
 	}
 	
@@ -122,7 +122,7 @@ public class FileManager
 	public WorldHell generateNewWorldHell(String name, int w, int h, EnumDifficulty difficulty)
 	{
 		WorldHell worldHell = (WorldHell) new WorldGenHell().generate(new WorldHell(name, w, h, difficulty));
-		LightingEngine.applySunlight(worldHell);
+	//	LightingEngine.applySunlight(worldHell);
 		return worldHell;
 	}
 	
@@ -137,7 +137,7 @@ public class FileManager
 	public WorldSky generateNewWorldSky(String name, int w, int h, EnumDifficulty difficulty)
 	{
 		WorldSky world = (WorldSky) new WorldGenSky().generate(new World(name, w, h, difficulty));
-		LightingEngine.applySunlight(world);
+	//	LightingEngine.applySunlight(world);
 		return world;
 	}
 	

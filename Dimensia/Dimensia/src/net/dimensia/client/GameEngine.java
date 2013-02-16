@@ -12,7 +12,6 @@ import net.dimensia.src.GuiMainMenu;
 import net.dimensia.src.Item;
 import net.dimensia.src.ItemStack;
 import net.dimensia.src.Keys;
-import net.dimensia.src.LightingEngine;
 import net.dimensia.src.MouseInput;
 import net.dimensia.src.RenderGlobal;
 import net.dimensia.src.SoundManager;
@@ -214,7 +213,7 @@ public class GameEngine
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ringOfVigor, 5));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.regenerationPotion2, 5));
 			//world.player.registerStatusEffect(new StatusEffectDazed(500000, 1));
-			LightingEngine.applySunlight(world);
+			
 		}		
 	}
 
