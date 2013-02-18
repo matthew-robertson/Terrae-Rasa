@@ -12,6 +12,7 @@ import net.dimensia.src.GuiMainMenu;
 import net.dimensia.src.Item;
 import net.dimensia.src.ItemStack;
 import net.dimensia.src.Keys;
+import net.dimensia.src.LightUtils;
 import net.dimensia.src.MouseInput;
 import net.dimensia.src.RenderGlobal;
 import net.dimensia.src.SoundManager;
@@ -59,10 +60,7 @@ public class GameEngine
 		    while(!Dimensia.done) //Main Game Loop
 		    {
 		    	start = System.currentTimeMillis();
-		    	
-		    	if(true)
-		    	throw new RuntimeException("Wheeee");
-		    	
+		    			    	
 		        loops = 0;
 		        while(System.currentTimeMillis() > next_game_tick && loops < MAX_FRAMESKIP) //Update the game 20 times/second 
 		        {
@@ -130,11 +128,9 @@ public class GameEngine
 		}
 		catch(Exception e) //Fatal error catching
 		{
-			e.printStackTrace();
-			
+			e.printStackTrace();			
 			ErrorUtils errorUtils = new ErrorUtils();
-			errorUtils.writeErrorToFile(e, true);
-			
+			errorUtils.writeErrorToFile(e, true);			
 		}
 	}
 	
@@ -167,8 +163,10 @@ public class GameEngine
 			player = fileManager.generateAndSavePlayer("!!", EnumDifficulty.NORMAL);//new EntityLivingPlayer("Test player", EnumDifficulty.NORMAL);
 			world.addPlayerToWorld(player);
 			world.assessForAverageSky();
+			LightUtils utils = new LightUtils();
+			utils.applyAmbient(world);
 			
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.woodTable, 100));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.stone, 100));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.torch, 100));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.chest, 100));
 			//*
