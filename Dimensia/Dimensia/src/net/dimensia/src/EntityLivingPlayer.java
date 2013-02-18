@@ -39,7 +39,8 @@ import org.lwjgl.input.Mouse;
  */
 public class EntityLivingPlayer extends EntityLiving
 {
-	private static final long serialVersionUID = 1L;	
+	private static final long serialVersionUID = 2L;
+	private final static int HEALTH_FROM_STAMINA = 10;
 	public int viewedChestX;
 	public int viewedChestY;
 	public boolean isViewingChest;	
@@ -47,6 +48,8 @@ public class EntityLivingPlayer extends EntityLiving
 	public int strength;
 	public int dexterity;
 	public int intellect;
+	public int stamina;
+	public int baseMaxHealth;
 	
 	public float respawnXPos;
 	public float respawnYPos;
@@ -95,6 +98,7 @@ public class EntityLivingPlayer extends EntityLiving
 	public EntityLivingPlayer(String name, EnumDifficulty difficulty)
 	{
 		super();		
+		stamina = 0;
 		isJumping = false;
 		movementSpeedModifier = 1.0f;		
 		baseSpeed = 5.0f;
@@ -114,10 +118,13 @@ public class EntityLivingPlayer extends EntityLiving
 		isInCombat = false;
 		ticksInCombat = 0;
 		ticksSinceLastCast = 0;
+		health = 100;
+		maxHealth = 100;
+		baseMaxHealth = 100;
 		if(Dimensia.initInDebugMode)
 		{
 			health = 1;
-			maxHealth = 400;
+			//maxHealth = 400;
 			mana = 1000;
 			maxMana = 20;
 			isAffectedByWalls = true; //pretty much no-clip
@@ -303,7 +310,7 @@ public class EntityLivingPlayer extends EntityLiving
 		{
 			moveEntityUp(world, jumpSpeed * movementSpeedModifier);			
 		}
-		else if(!isOnGround(world)) //otherwise, if the entity is in the air, make them fall
+		else if(!isOnGround(world) && isAffectedByGravity) //otherwise, if the entity is in the air, make them fall
 		{
 			moveEntityDown(world, MathHelper.getFallSpeed(fallSpeed * movementSpeedModifier, ticksFallen));
 			ticksFallen++;
@@ -490,6 +497,7 @@ public class EntityLivingPlayer extends EntityLiving
 		dexterity = 0;
 		intellect = 0;
 		strength = 0;
+		stamina = 0;
 				
 		for(int i = 0; i < inventory.getArmorInventoryLength(); i++) //for each slot, reapply the stats
 		{
@@ -499,12 +507,15 @@ public class EntityLivingPlayer extends EntityLiving
 				dexterity += item.getDexterity();
 				intellect += item.getIntellect();
 				strength += item.getStrength();
+				stamina += item.getStamina();
 			}
 		}
 		
 		rangeDamageModifier = 1.0f + 0.04f * dexterity;
 		meleeDamageModifier = 1.0f + 0.04f * strength;
 		magicDamageModifier = 1.0f + 0.04f * intellect;
+		maxHealth = baseMaxHealth + (stamina * HEALTH_FROM_STAMINA);
+		
 	}
 	
 	/**
@@ -1095,9 +1106,10 @@ public class EntityLivingPlayer extends EntityLiving
 	 */
 	public boolean boostMaxHealth(int increase) 
 	{
-		if(maxHealth + increase <= MAXIMUM_BASE_HEALTH)//if the player can have that much of a max health increase
+		if(baseMaxHealth + increase <= MAXIMUM_BASE_HEALTH)//if the player can have that much of a max health increase
 		{
 			maxHealth += increase; //increase max health
+			baseMaxHealth += increase;
 			return true;
 		}
 		return false;

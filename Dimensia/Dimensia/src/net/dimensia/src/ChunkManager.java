@@ -20,12 +20,12 @@ import net.dimensia.client.Dimensia;
  * World's chunk hashtable keys are in the following form: x,y
  *
  * NOTE: all x and y values used are for the chunk grid, not the blocks grid, or whatever(IE use
- * 1, not 300/600...)
+ * 1, not the chunk width or height...)
  */
 public class ChunkManager implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	private final List<Position> loadRequests;
+	private final List<Integer> loadRequests;
 	private final ExecutorService threadPool;
 	private final ArrayList<Future<Chunk>> scheduledLoadOperations;
 	private final ArrayList<Future<Boolean>> scheduledSaveOperations;
@@ -42,21 +42,15 @@ public class ChunkManager implements Serializable
 	 */
 	private class RequestedChunkData
 	{
-		public RequestedChunkData(String dir, int x, int y)
+		public RequestedChunkData(String dir, int x)
 		{
 			this.x = x;
-			this.y = y;
 			this.dir = dir;
 		}
 		
 		public int getX()
 		{
 			return x;
-		}
-		
-		public int getY()
-		{
-			return y;
 		}
 		
 		public String getDir()
@@ -66,7 +60,6 @@ public class ChunkManager implements Serializable
 		
 		private String dir;
 		private int x;
-		private int y;
 	}
 	
 	/**
@@ -74,18 +67,16 @@ public class ChunkManager implements Serializable
 	 * <ul>
 	 *  <li>String dir
 	 *  <li>int x
-	 *  <li>int y
 	 *  <li>Chunk chunk
 	 * </ul>
 	 */
 	private class SavingChunkData
 	{
-		public SavingChunkData(Chunk chunk, String dir, int x, int y)
+		public SavingChunkData(Chunk chunk, String dir, int x)
 		{
 			this.chunk = chunk;
 			this.dir = dir;
 			this.x = x;
-			this.y = y;
 		}
 		
 		public Chunk getChunk()
@@ -98,11 +89,6 @@ public class ChunkManager implements Serializable
 			return x;
 		}
 		
-		public int getY()
-		{
-			return y;
-		}
-		
 		public String getDir()
 		{
 			return dir;
@@ -111,7 +97,6 @@ public class ChunkManager implements Serializable
 		private String dir;
 		private Chunk chunk;
 		private int x;
-		private int y;
 	}
 	
 	/**
@@ -126,7 +111,7 @@ public class ChunkManager implements Serializable
 		scheduledLoadOperations = new ArrayList<Future<Chunk>>(4);
 		scheduledSaveOperations = new ArrayList<Future<Boolean>>(4);
 		this.worldName = worldName;
-		loadRequests = new ArrayList<Position>(8);
+		loadRequests = new ArrayList<Integer>(8);
 		
 		//Assign the BASE_PATH
 		String osName = System.getProperty("os.name").toLowerCase();
@@ -172,15 +157,15 @@ public class ChunkManager implements Serializable
 	 * @param y the y position of the chunk in the chunk grid
 	 * @return whether the chunk could be requested
 	 */
-	public boolean requestChunk(String directory, World world, ConcurrentHashMap<String, Chunk> chunks, int x, int y)
+	public boolean requestChunk(String directory, World world, ConcurrentHashMap<String, Chunk> chunks, int x)
 	{
 		//Check if the chunk is being requested in an invalid (out of bounds) position
-		if(x < 0 || x >= (world.getWidth() / Chunk.getChunkWidth()) || y < 0 || y >= (world.getHeight()) / Chunk.getChunkHeight())
+		if(x < 0 || x >= (world.getWidth() / Chunk.getChunkWidth()))
 		{
 			return false;
 		}
 		
-		String key = x + "," + y;
+		String key = ""+x;
 		//Check if the chunk is already loaded
 		for(int i = 0; i < loadRequests.size(); i++)
 		{
@@ -195,8 +180,8 @@ public class ChunkManager implements Serializable
 		if(chunks.get(key) == null)
 		{
 			//System.out.println("Load @" + key);
-			loadRequests.add(new Position(x, y));
-			processChunkRequest(directory, x, y);
+			loadRequests.add(x);
+			processChunkRequest(directory, x);
 			return true;
 		}
 		else
@@ -215,7 +200,7 @@ public class ChunkManager implements Serializable
 	 * @param y the y position of the chunk in the chunk grid
 	 * @return whether or not the save request succeeded
 	 */
-	public boolean saveChunk(String directory, ConcurrentHashMap<String, Chunk> chunks, int x, int y)
+	public boolean saveChunk(String directory, ConcurrentHashMap<String, Chunk> chunks, int x)
 	{
 		if(!new File(BASE_PATH + "/World Saves/" + worldName + "/" + directory).exists()) //Sub-Folder ('/worldName/Earth') for the chunks
 		{
@@ -223,7 +208,7 @@ public class ChunkManager implements Serializable
 			System.out.println("[ChunkManager] created directory @" + BASE_PATH + "/World Saves/" + worldName + "/" + directory);
 		}
 		
-		String key = x + "," + y;
+		String key = ""+x;
 		Chunk chunk = chunks.get(key);
 		chunks.remove(key);
 		
@@ -234,29 +219,29 @@ public class ChunkManager implements Serializable
 			//throw new RuntimeException("Tried to save chunk that doesnt exist @" + x + " " + y);
 		}
 		
-		processChunkSave(chunk, directory, x, y);
+		processChunkSave(chunk, directory, x);
 		return true;
 	}
 	
-	private void processChunkSave(Chunk chunk, String dir, int x, int y)
+	private void processChunkSave(Chunk chunk, String dir, int x)
 	{
-		submitSaveOperation(new SavingChunkData(chunk, dir, x, y));
+		submitSaveOperation(new SavingChunkData(chunk, dir, x));
 	}
 	
-	private void processChunkRequest(String dir,int x, int y)
+	private void processChunkRequest(String dir,int x)
 	{
-		submitLoadOperation(new RequestedChunkData(dir, x, y));
+		submitLoadOperation(new RequestedChunkData(dir, x));
 	}
 	
 	private void submitSaveOperation(SavingChunkData data)
 	{
-		Future<Boolean> event = threadPool.submit(new CallableSaveChunk(data.getChunk(), data.getX(), data.getY(), BASE_PATH + "/World Saves/" + worldName + "/" + data.getDir(), worldName));
+		Future<Boolean> event = threadPool.submit(new CallableSaveChunk(data.getChunk(), data.getX(), BASE_PATH + "/World Saves/" + worldName + "/" + data.getDir(), worldName));
 		scheduledSaveOperations.add(event);
 	}
 	
 	private void submitLoadOperation(RequestedChunkData data)	
 	{
-		Future<Chunk> event = threadPool.submit(new CallableLoadChunk(data.getX(), data.getY(), BASE_PATH + "/World Saves/" + worldName + "/" + data.getDir(), worldName));
+		Future<Chunk> event = threadPool.submit(new CallableLoadChunk(data.getX(), BASE_PATH + "/World Saves/" + worldName + "/" + data.getDir(), worldName));
 		scheduledLoadOperations.add(event);
 	}
 	
@@ -302,9 +287,9 @@ public class ChunkManager implements Serializable
 				{
 					e.printStackTrace();
 				}
-				String key = chunk.getX() + "," + chunk.getY();
+				String key = ""+chunk.getX();
 				chunks.put(key, chunk);
-				world.loadedChunks_B[chunk.getX()][chunk.getY()] = true;
+				world.chunksLoaded.put(""+chunk.getX(), true);
 				
 				for(int j = 0; j < loadRequests.size(); j++)
 				{
@@ -403,9 +388,9 @@ public class ChunkManager implements Serializable
 			}
 			
 			//Add the chunk to the world
-			String key = chunk.getX() + "," + chunk.getY();
+			String key = ""+chunk.getX();
 			chunks.put(key, chunk);
-			world.loadedChunks_B[chunk.getX()][chunk.getY()] = true;
+			world.chunksLoaded.put(""+chunk.getX(), true);
 			
 			//Remove the loadRequests data corresponding to the chunk
 			for(int j = 0; j < loadRequests.size(); j++)

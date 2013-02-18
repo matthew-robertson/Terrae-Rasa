@@ -9,12 +9,14 @@ public class ItemArmor extends Item
 	protected int dexterity;
 	protected int strength;
 	protected int intellect;
+	protected int stamina;
 	
 	protected ItemArmor(int i) 
 	{
 		super(i);
 		maxStackSize = 1;
 		intellect = 0;
+		stamina = 0;
 		dexterity = 0;
 		strength = 0;
 		armorType = EnumArmor.NOTHING;
@@ -113,4 +115,15 @@ public class ItemArmor extends Item
 	{
 		return isSavingRelic;
 	}	
+	
+	public ItemArmor setStamina(int i)
+	{
+		this.stamina = i;
+		return this;
+	}
+	
+	public int getStamina()
+	{
+		return stamina;
+	}
 }

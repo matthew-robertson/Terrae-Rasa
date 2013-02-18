@@ -12,27 +12,25 @@ public class CallableSaveChunk implements Callable<Boolean>
 	private String worldName;
 	private Chunk chunk;
 	private int x;
-	private int y;
 	
-	public CallableSaveChunk(Chunk chunk, int x, int y, String basepath, String worldName)
+	public CallableSaveChunk(Chunk chunk, int x, String basepath, String worldName)
 	{
 		this.chunk = chunk;
 		this.x = x;
-		this.y = y;
 		this.basepath = basepath;
 		this.worldName = worldName;
 	}
 	
 	public Boolean call() throws Exception 
 	{
-		String fileName = (basepath + "/" + x + "," + y + ".wdat"); 
+		String fileName = (basepath + "/" + x + ".wdat"); 
 		GZIPOutputStream fileWriter = new GZIPOutputStream(new FileOutputStream(new File(fileName))); //Open an output stream
 	    ByteArrayOutputStream bos = new ByteArrayOutputStream(); //Convert world to byte[]
 		ObjectOutputStream s = new ObjectOutputStream(bos); //open the OOS, used to save serialized objects to file
 		s.writeObject(chunk); //write the byte[] to the OOS
 		byte data[] = bos.toByteArray();
 		fileWriter.write(data, 0, data.length); //Actually save it to file
-		System.out.println("Chunk Saved to: " + fileName + " With Initial Size: " + data.length + " X: " + x + " Y: " + y);
+		System.out.println("Chunk Saved to: " + fileName + " With Initial Size: " + data.length + " X: " + x);
 		
 		//Cleanup: 
 		s.close();

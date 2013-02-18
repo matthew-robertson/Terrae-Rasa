@@ -456,7 +456,7 @@ public class Block implements Serializable, Cloneable
 	public static Block yellowflower = new Block(34).setBlockName("yellow flower").setBlockHardness(10.0f).setIconIndex(0, 1).setPassable(true).setIsOveridable(true).setIsSolid(false);
 	public static Block tallgrass = new Block(35).setBlockName("tall grass").setBlockHardness(10.0f).setIconIndex(0, 1).setPassable(true).setIsOveridable(true).setIsSolid(false);
 	public static Block snowCover = new Block(44).setBlockName("snow cover").setBlockHardness(10.0f).setIconIndex(9, 10).setPassable(true).setIsOveridable(true).setDroppedItem(new ItemStack(Item.snowball), 1, 1).setIsSolid(false);
-	public static Block torch = new Block(48).setBlockName("torch").setBlockHardness(0.0f).setIconIndex(0, 5).setPassable(true).setIsSolid(false);	
+	public static Block torch = new BlockLight(48).setLightStrengthAndRadius(1.0F, 10).setBlockName("torch").setBlockHardness(0.0f).setIconIndex(0, 0).setPassable(true).setIsSolid(false);	
 	public static Block adminium = new Block(49).setBlockName("adminium").setBlockHardness(8000.0f).setIconIndex(0,1);
 	public static Block plank = new Block(50).setBlockName("plank").setTileMap('g').setBlockHardness(30.0f).setIconIndex(0, 17).setBlockType(2);
 	public static Block sapling = new Block(51).setBlockName("sapling").setBlockHardness(5.0f).setIconIndex(10, 4).setBlockType(2).setIsOveridable(true).setIsSolid(false); 

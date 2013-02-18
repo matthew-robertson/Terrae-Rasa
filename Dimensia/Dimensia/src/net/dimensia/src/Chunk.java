@@ -26,27 +26,34 @@ import java.io.Serializable;
  * @version     1.0
  * @since       1.0
  */
-public class Chunk implements Serializable
+public class Chunk 
+		implements Serializable
 {
-	private static final long serialVersionUID = 1L;
+	/** V2 includes lighting */
+	private static final long serialVersionUID = 2L;
 	private Biome biome;
 	public final float[][] light;
+	public final float[][] diffuseLight;
+	public final float[][] ambientLight;
 	public final Block[][] backWalls;
 	public final Block[][] blocks;
 	private final int x;
-	private final int y;
 	private boolean wasChanged;
-	private static final int CHUNK_WIDTH = 300;
-	private static final int CHUNK_HEIGHT = 600;
+	private static final int CHUNK_WIDTH = 100;
+	private final int CHUNK_HEIGHT;
+	public boolean lightUpdated;
 	
 	/**
 	 * Constructs a new Chunk. Chunks are initialized with blocks[][] fully set to air, and backwalls[][]
 	 * fully set to air as well. All light values are 0.0f (no light).
+	 * @param biome the biome type of the chunk
 	 * @param x the x position of the chunk in the chunk grid
 	 * @param y the y position of the chunk in the chunk grid
+	 * @param height the height of the chunk - which should be the world's height
 	 */
-	public Chunk(Biome biome, int x, int y)
+	public Chunk(Biome biome, int x, final int height)
 	{
+		this.CHUNK_HEIGHT = height;
 		//this.biome = biome;
 		this.biome = Biome.forest;
 		blocks = new Block[CHUNK_WIDTH][CHUNK_HEIGHT];
@@ -61,8 +68,9 @@ public class Chunk implements Serializable
 		}
 		
 		light = new float[CHUNK_WIDTH][CHUNK_HEIGHT];
+		diffuseLight = new float[CHUNK_WIDTH][CHUNK_HEIGHT];
+		ambientLight = new float[CHUNK_WIDTH][CHUNK_HEIGHT];
 		this.x = x;
-		this.y = y;
 	}
 	
 	/**
@@ -75,10 +83,10 @@ public class Chunk implements Serializable
 	}
 	
 	/**
-	 * Gets the final CHUNK_HEIGHT, the block height of all chunks.
-	 * @return CHUNK_HEIGHT, the height of all chunks
+	 * Gets the height of this chunk, the height of a chunk can change based on the world size selected.
+	 * @return the height of this chunk
 	 */
-	public static final int getChunkHeight()
+	public final int getChunkHeight()
 	{
 		return CHUNK_HEIGHT;
 	}
@@ -142,6 +150,16 @@ public class Chunk implements Serializable
 		light[x][y] = strength;
 	}
 	
+	public synchronized void setDiffuseLight(float strength, int x, int y)
+	{
+		diffuseLight[x][y] = strength;
+	}
+	
+	public synchronized void setAmbientLight(float strength, int x, int y)
+	{
+		ambientLight[x][y] = strength;
+	}
+	
 	public synchronized void setChanged(boolean flag)
 	{
 		wasChanged = flag;
@@ -156,15 +174,6 @@ public class Chunk implements Serializable
 		return x;
 	}
 	
-	/**
-	 * Gets the y position of this Chunk, in the chunk map
-	 * @return the y position of this Chunk in the chunk map
-	 */
-	public final int getY()
-	{
-		return y;
-	}
-	
 	public void printLight()
 	{
 		for(int i = 0; i < CHUNK_WIDTH; i++)
@@ -177,18 +186,35 @@ public class Chunk implements Serializable
 		}
 	}
 	
-	/**
-	Likely World fields:
-		Hashtable<Chunk> chunks;
-		ChunkLoader chunkLoader;
-	Likely World Method(s):	
-		(called on world tick)
-		private void getChunkUpdates()
-		request Chunk update(add/remove)	
-	 */
-	/**
-	 * 
-	 */
+	public float getDiffuseLight(int x, int y)
+	{
+		return diffuseLight[x][y];
+	}
 	
+	public float getAmbientLight(int x, int y)
+	{
+		return ambientLight[x][y];
+	}
 	
+	public void updateChunkLight()
+	{
+		for(int i = 0; i < CHUNK_WIDTH; i++)
+		{
+			for(int k = 0; k < CHUNK_HEIGHT; k++)
+			{
+				light[i][k] = MathHelper.sat(1.0F - ambientLight[i][k] - diffuseLight[i][k]);
+			}
+		}	
+	}
+	
+	public void clearAmbientLight()
+	{
+		for(int i = 0; i < CHUNK_WIDTH; i++)
+		{
+			for(int k = 0; k < CHUNK_HEIGHT; k++)
+			{
+				ambientLight[i][k] = 0.0F;//MathHelper.sat(1.0F - ambientLight[i][k] - diffuseLight[i][k]);
+			}
+		}	
+	}	
 }

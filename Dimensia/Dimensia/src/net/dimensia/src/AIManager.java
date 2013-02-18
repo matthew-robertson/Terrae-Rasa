@@ -2,28 +2,6 @@ package net.dimensia.src;
 
 import java.util.Random;
 
-/**
- * AIManager serves to provide all EntityLivingNPC's with the methods needed to traverse the game world.
- * As such, it interfaces with EntityLivingNPC to control movement.
- * <br><br>
- * 
- * The general methods {@link #AIMoveLeft(world, EntityLicingNPC, boolean)} and {@link #AIMoveRight(world, EntityLicingNPC, boolean)}
- * serve as the basis for this movement, ensuring the actor moves safely.
- * <br><br>
- * 
- * Advanced AI movement functions are performed by {@link #AIChaseAndRetreat(World, EntityLiving, EntityLiving, boolean)} and {@link #AIWander(World, EntityLiving)},
- *  which handle the seeking and wandering of actors, respectively.
- * <br><br>
- * 
- * Assorted advanced AI functions are also handled here, namely speech, and the launching of projectiles.
- * {@link #AISpeech(String)}, {@link #AIProjectile(World, EntityLiving, int, int, EntityProjectile)}, and {@link #AIProjectile(World, EntityLiving, int, EntityProjectile)}
- * perform these tasks.
- * 
- * @author Alec Sobeck
- * @author Matt Robertson
- * @version 1.0
- * @since 1.0
- */
 public class AIManager {
 	/**
 	 * Has the AI speak the given string

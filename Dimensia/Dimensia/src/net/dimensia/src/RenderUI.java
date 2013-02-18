@@ -129,7 +129,7 @@ public class RenderUI extends Render
 	 */
 	private void attemptToRenderItemTooltip(World world, EntityLivingPlayer player)
 	{
-		if(player.inventory.getMainInventoryStack(player.selectedSlot) != null)
+		if(player.inventory.getMainInventoryStack(player.selectedSlot) != null && 1 == 2)
 		{
 			//player.inventory.getMainInventoryStack(player.selectedSlot).getItemName()
 			tooltipFont.drawString(getCameraX() + 150, getCameraY() + 100, "Hello Test", 0.2f, -1.0f);
@@ -533,12 +533,11 @@ public class RenderUI extends Render
 	 */
 	private void renderHeartsAndMana(World world, EntityLivingPlayer player)
 	{		
-		/*
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		GL11.glColor4f(1, 0, 0, 1);
+		GL11.glColor4f(0, 0, 0, 1);
 		int x1 = getCameraX() + 10;
 		int y1 = getCameraY() + 10;		
-		int newX = (int) (player.health / player.maxHealth * 100);
+		int newX = (int) (100);
 		int newY = 11;		
 		t.startDrawingQuads();
 		t.addVertexWithUV(x1, y1 + newY, 0, 0, 1);
@@ -547,7 +546,50 @@ public class RenderUI extends Render
 		t.addVertexWithUV(x1, y1, 0, 0, 0);
 		t.draw();			
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		*/
+		
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		GL11.glColor4f(1, 0, 0, 1);
+		x1 = getCameraX() + 10;
+		y1 = getCameraY() + 10;		
+		newX = (int) (player.health / player.maxHealth * 100);
+		newY = 11;		
+		t.startDrawingQuads();
+		t.addVertexWithUV(x1, y1 + newY, 0, 0, 1);
+		t.addVertexWithUV(x1 + newX, y1 + newY, 0, 1, 1);
+		t.addVertexWithUV(x1 + newX, y1, 0, 1, 0);
+		t.addVertexWithUV(x1, y1, 0, 0, 0);
+		t.draw();			
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		GL11.glColor4f(0, 0, 0, 1);
+		x1 = getCameraX() + 10;
+		y1 = getCameraY() + 25;		
+		newX = (int) (100);
+		newY = 11;		
+		t.startDrawingQuads();
+		t.addVertexWithUV(x1, y1 + newY, 0, 0, 1);
+		t.addVertexWithUV(x1 + newX, y1 + newY, 0, 1, 1);
+		t.addVertexWithUV(x1 + newX, y1, 0, 1, 0);
+		t.addVertexWithUV(x1, y1, 0, 0, 0);
+		t.draw();			
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		GL11.glColor4f(0, 0, 1, 1);
+		x1 = getCameraX() + 10;
+		y1 = getCameraY() + 25;		
+		newX = (int) (player.mana / player.maxMana * 100);
+		newY = 11;		
+		t.startDrawingQuads();
+		t.addVertexWithUV(x1, y1 + newY, 0, 0, 1);
+		t.addVertexWithUV(x1 + newX, y1 + newY, 0, 1, 1);
+		t.addVertexWithUV(x1 + newX, y1, 0, 1, 0);
+		t.addVertexWithUV(x1, y1, 0, 0, 0);
+		t.draw();			
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		
+		if(true) return;
 		
 		float heartsFull = (float)player.health / 20;	//How many hearts are full? (partial hearts are important too!)	
 		float partialHeartValue = heartsFull - ((int)(player.health / 20));
@@ -1140,10 +1182,16 @@ public class RenderUI extends Render
 	 */
 	private void renderText(World world, EntityLivingPlayer player)
 	{
-		GL11.glColor4f(1, 1, 1, 1);
-		//Health:
-		String health = new StringBuilder().append("Life: ").append((int)player.health).append(" / ").append(player.maxHealth).toString();
-		trueTypeFont.drawString((getCameraX() + 10), (getCameraY() + 15), health, 0.3f, -0.3f);
+		if(player.isInventoryOpen)
+		{
+			GL11.glColor4f(1, 1, 1, 1);
+			//Health:
+			String health = new StringBuilder().append((int)player.health).append(" / ").append(player.maxHealth).toString();
+			trueTypeFont.drawString((getCameraX() + 35), (getCameraY() + 22), health, 0.3f, -0.3f);
+			
+			String mana = new StringBuilder().append((int)player.mana).append(" / ").append(player.maxMana).toString();
+			trueTypeFont.drawString((getCameraX() + 40), (getCameraY() + 37), mana, 0.3f, -0.3f);
+		}
 		
 		if(player.isInventoryOpen)
 		{

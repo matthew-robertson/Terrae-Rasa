@@ -16,6 +16,8 @@ import java.util.List;
  * <li>Damage the entity: {@link #damageEntity(World, int, boolean)} 
  * <li>Handle a jump: {@link #hasJumped()}
  * <li>Handle movement: {@link #moveEntityDown(World)}, {@link #moveEntityUp(World)}, {@link #moveEntityLeft(World)}, {@link #moveEntityRight(World)}
+ * <li>Determine movement: {@link #isWalkingSafe(World, boolean)}, {@link #isJumpNeeded(World, boolean, boolean)}, {@link #isJumpPossibleAndNeeded(World, boolean, boolean)}
+ * <li>Launch projectiles: {@link #launchProjectile(World, EntityProjectile)}
  * <li>Heal the entity: {@link #healEntity(World, int)}
  * <li>Implement custom death behaviour: {@link #onDeath()}
  * <br><br>
@@ -180,6 +182,9 @@ public class EntityLiving extends Entity
 	
 	/** 
 	 * launch NPC projectiles
+	 * @param world - current world
+	 * @param angle - the angle at which to launch the projectile
+	 * @param projectile - the projectile to launch
 	 */
 	public void launchProjectile(World world, int angle, EntityProjectile projectile){
 		world.addEntityToProjectileList(new EntityProjectile(projectile).setXLocAndYLoc(x, y)
@@ -187,15 +192,15 @@ public class EntityLiving extends Entity
 	}
 	
 	/**
-	 * checks if a jump is required to progress
-	 * @param world current world
-	 * @param direction true - right, false - left
+	 * Checks if a jump is required to progress
+	 * @param world - current world
+	 * @param direction - true if moving right, false if left
 	 * @return true if jump is needed, false if not
 	 */
-	public int isJumpRequired(World world, EntityLivingPlayer player, boolean direction, boolean up){
+	public int isJumpRequired(World world, boolean direction, boolean up){
 		float heightCheck;
 		
-		if ((alert && player.y < y) || (up && !alert)){
+		if ((alert) || (up && !alert)){
 			heightCheck = upwardJumpHeight / 6;
 		}
 		else {
@@ -210,7 +215,7 @@ public class EntityLiving extends Entity
 						if (up){
 							return i;
 						}
-						else return 0;
+						else return -1;
 					}
 			}
 		}
@@ -222,7 +227,7 @@ public class EntityLiving extends Entity
 					if (up){
 						return i;
 					}
-					else return 0;
+					else return -1;
 				 }
 			}
 		}
@@ -232,12 +237,12 @@ public class EntityLiving extends Entity
 	
 	/**
 	 * Checks to see if a jump is possible on the given side
-	 * @param world current world
-	 * @param direction true = right, false = left
+	 * @param world - current world
+	 * @param direction - true if moving right, false if left
 	 * @return true if jump is possible, false if not
 	 */
-	public boolean isJumpPossibleAndNeeded(World world, EntityLivingPlayer player, boolean direction, boolean up){
-		int start = isJumpRequired(world, player, direction, up);
+	public boolean isJumpPossibleAndNeeded(World world, boolean direction, boolean up){
+		int start = isJumpRequired(world, direction, up);
 		if (start != -1){
 			int maxBlockHeight = 0;
 			int blockHeight = 0;
@@ -283,18 +288,17 @@ public class EntityLiving extends Entity
 	
 	/**
 	 * Checks to see if it is safe for the actor to move in the provided direction
-	 * @param world
-	 * @param direction
-	 * @return
+	 * @param world - the current world
+	 * @param direction - true if attempting to move right, false if moving left
+	 * @return - true if it's safe to walk (a block is solid and the actor will land on it, up to it's maximum safe fall distance down, and it's width wide)
 	 */
 	public boolean isWalkingSafe(World world, boolean direction){
 		//If checking the right side
 		if (direction){
 			//Check all the blocks in a line up to the npc's block width if any are solid, return true
-			for (int i = 0; i < blockWidth; i++){
-				if (world.getBlockGenerate((int)(x + width) / 6 - 1 + i, (int)(y + height) / 6).getIsSolid()
-				|| world.getBlockGenerate((int)(x + width) / 6 - 1 + i, (int)(y + height) / 6 + 1).getIsSolid() 
-				|| world.getBlockGenerate((int)(x + width) / 6 - 1 + i, (int)(y + height) / 6 + 2).getIsSolid()){
+			for (int i = 0; i <= blockWidth; i++){
+				for (int j = 0; j <= (maxHeightFallenSafely / 6); j++)
+				if (world.getBlockGenerate((int)(x + width) / 6 - 1 + i, (int)(y + height) / 6 + j).getIsSolid()){
 					return true;							 
 				}
 			}
@@ -304,10 +308,10 @@ public class EntityLiving extends Entity
 		else if (!direction){
 			//Check all the blocks in a line up to the npc's block width if any are solid, return true
 			for (int i = 0; i <= blockWidth; i++){						
-				 if (world.getBlockGenerate((int)(x) / 6 - i, (int)(y + height) / 6).getIsSolid()
-				  || world.getBlockGenerate((int)(x) / 6 - i, (int)(y + height) / 6 + 1).getIsSolid()
-				  || world.getBlockGenerate((int)(x) / 6 - i, (int)(y + height) / 6 + 2).getIsSolid()){
-					return true;
+				for (int j = 0; j <= (maxHeightFallenSafely / 6); j++){ 
+					if (world.getBlockGenerate((int)(x) / 6 - i, (int)(y + height) / 6 + j).getIsSolid()){
+						return true;
+					}
 				 }
 			}
 		}
@@ -463,7 +467,7 @@ public class EntityLiving extends Entity
 		{
 			moveEntityUp(world, jumpSpeed * movementSpeedModifier);			
 		}
-		else if(!isOnGround(world)) //otherwise, if the entity is in the air, make them fall
+		else if(!isOnGround(world) && isAffectedByGravity) //otherwise, if the entity is in the air, make them fall
 		{
 			moveEntityDown(world, MathHelper.getFallSpeed(fallSpeed * movementSpeedModifier, ticksFallen));
 			ticksFallen++;
@@ -674,13 +678,9 @@ public class EntityLiving extends Entity
 		
 		for(int i = 0; i < loops; i++)
 		{
-			float possibleMovement = canMoveRight(world);			
-			float actualMovement = movementValue % 6;
+			float possibleMovement = canMoveRight(world);
 			
-			if(actualMovement > possibleMovement)
-			{
-				actualMovement = possibleMovement;
-			}
+			float actualMovement = movementValue % 6;
 			
 			if(x + possibleMovement < (world.getWidth() * 6) && possibleMovement >= movementValue) //full movement
 				x += actualMovement;
@@ -712,11 +712,6 @@ public class EntityLiving extends Entity
 			float possibleMovement = canMoveLeft(world);
 			float actualMovement = movementValue % 6;
 			
-			if(actualMovement > possibleMovement)
-			{
-				actualMovement = possibleMovement;
-			}
-			
 			if((x - possibleMovement) >= 0 && possibleMovement >= movementValue) //full movement
 				x -= actualMovement;
 			else if(possibleMovement > 0) //partial movement
@@ -744,13 +739,9 @@ public class EntityLiving extends Entity
 		
 		for(int i = 0; i < loops; i++)
 		{
-			float possibleMovement = canMoveRight(world);			
-			float actualMovement = movementValue % 6;
+			float possibleMovement = canMoveRight(world);
 			
-			if(actualMovement > possibleMovement)
-			{
-				actualMovement = possibleMovement;
-			}
+			float actualMovement = movementValue % 6;
 			
 			if(x + possibleMovement < (world.getWidth() * 6) && possibleMovement >= movementValue) //full movement
 				x += actualMovement;
@@ -781,11 +772,6 @@ public class EntityLiving extends Entity
 		{
 			float possibleMovement = canMoveLeft(world);
 			float actualMovement = movementValue % 6;
-			
-			if(actualMovement > possibleMovement)
-			{
-				actualMovement = possibleMovement;
-			}
 			
 			if((x - possibleMovement) >= 0 && possibleMovement >= movementValue) //full movement
 				x -= actualMovement;

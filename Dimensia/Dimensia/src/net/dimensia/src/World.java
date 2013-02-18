@@ -8,6 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,7 +30,7 @@ import org.lwjgl.opengl.Display;
  * interfere with it. 
  * <br><br>
  * Other methods of interest, aside from onWorldTick(), relate to block breaking or Block requests.
- * {@link #getBlockGenerate(int, int)} and {@link #setBlockGenerate(Block, int, int)} implement most of the features 
+ * {@link #getBlock(int, int)} and {@link #setBlock(Block, int, int)} implement most of the features 
  * required to "grandfather in" the old world.worldMap[][] style which has since been rendered obsolete 
  * by chunks. These methods are generally considered safe to use, with the same co-ordinates as the
  * previous world.worldMap[][] style. They should perform the division and modular division required 
@@ -38,8 +39,8 @@ import org.lwjgl.opengl.Display;
  * division/modular division every single request. 
  * <br><br>
  * The main methods relating to Block breaking and placement are {@link #breakBlock(int, int)} for breaking,
- * and {@link #placeBlock(int, int, Block)} for placing a Block. These methods differ from getBlockGenerate(int, int)
- * and setBlockGenerate(Block, int, int) significantly. These methods are for block placement and destruction while
+ * and {@link #placeBlock(int, int, Block)} for placing a Block. These methods differ from getBlock(int, int)
+ * and setBlock(Block, int, int) significantly. These methods are for block placement and destruction while
  * the game is running (generally the player would do this). As a result, they must obey the rules of 
  * the game. These methods are relatively simple in what they do, instantly breaking and dropping or placing
  * a block upon call, but with regard to the rules of the game. They do not actually decrease inventory 
@@ -55,8 +56,7 @@ import org.lwjgl.opengl.Display;
 public class World implements Serializable
 {
 	private static final long serialVersionUID = 1L;	
-	/**TEMP FIX TO KNOWING WHAT CHUNKS ARE LOADED. THIS IS INADVISABLE**/
-	public boolean[][] loadedChunks_B = new boolean[40][40];
+	public Hashtable<String, Boolean> chunksLoaded;
 	
 	public Weather weather;
 	public List<EntityLivingItemStack> itemsList;
@@ -69,7 +69,6 @@ public class World implements Serializable
 	private int[] generatedHeightMap;
 	private int averageSkyHeight;
 	private int totalBiomes;
-	private List<Position> loadedChunks;
 	private int chunkWidth;
 	private int chunkHeight;
 	private ChunkManager chunkManager;
@@ -85,21 +84,22 @@ public class World implements Serializable
 	private int height; //Height in blocks, not pixels
 	private float previousLightLevel;
 	private EntityLivingNPCEnemy[] spawnList;
-	
+	private LightUtils utils;
+
 	/**
 	 * Reconstructs a world from a save file. This is the first step.
 	 */
 	public World()
 	{
-		chunks = new ConcurrentHashMap<String, Chunk>(10);
+		setChunks(new ConcurrentHashMap<String, Chunk>(10));
 		entityList = new ArrayList<EntityLivingNPCEnemy>(255);
 		projectileList = new ArrayList<EntityProjectile>(255);
 		npcList = new ArrayList<EntityLivingNPC>(255);
 		temporaryText = new ArrayList<TemporaryTextStore>(100);
 		itemsList = new ArrayList<EntityLivingItemStack>(250);
-		loadedChunks = new ArrayList<Position>(25);
-		loadedChunks_B = new boolean[40][40];	
+		chunksLoaded= new Hashtable<String, Boolean>(25);
 		manager = new SpawnManager();
+		utils = new LightUtils();
 		checkChunks();
 	}
 	
@@ -114,7 +114,7 @@ public class World implements Serializable
 	 */
 	public World(String name, int width, int height, EnumDifficulty difficulty)
 	{
-		chunks = new ConcurrentHashMap<String, Chunk>(10);
+		setChunks(new ConcurrentHashMap<String, Chunk>(10));
 		this.width = width;
 		this.height = height; 
 		entityList = new ArrayList<EntityLivingNPCEnemy>(255);
@@ -122,7 +122,7 @@ public class World implements Serializable
 		npcList = new ArrayList<EntityLivingNPC>(255);
 		temporaryText = new ArrayList<TemporaryTextStore>(100);
 		itemsList = new ArrayList<EntityLivingItemStack>(250);
-		loadedChunks = new ArrayList<Position>(25);
+		chunksLoaded= new Hashtable<String, Boolean>(25);
 		worldTime = (long) (6.5 * GAMETICKSPERHOUR);
 		worldName = name;
 		totalBiomes = 0;
@@ -131,7 +131,8 @@ public class World implements Serializable
 		chunkManager = new ChunkManager(worldName);
 		manager = new SpawnManager();
 		chunkWidth = width / Chunk.getChunkWidth();
-		chunkHeight = height / Chunk.getChunkHeight();
+		chunkHeight = height / height;
+		utils = new LightUtils();
 		checkChunks();
 	}
 		
@@ -231,7 +232,7 @@ public class World implements Serializable
 	public void addPlayerToWorld(EntityLivingPlayer player)
 	{
 		requestRequiredChunks(getWorldCenterBlock(), averageSkyHeight);
-		chunkManager.addAllLoadedChunks_Wait(this, chunks);
+		chunkManager.addAllLoadedChunks_Wait(this, getChunks());
 		player = spawnPlayer(player);
 	}
 	
@@ -243,19 +244,19 @@ public class World implements Serializable
 	private void requestRequiredChunks(int x, int y)
 	{
 		final int loadDistanceHorizontally = (((int)(Display.getWidth() / 2.2) + 3) > Chunk.getChunkWidth()) ? ((int)(Display.getWidth() / 2.2) + 3) : Chunk.getChunkWidth();
-		final int loadDistanceVertically = (((int)(Display.getHeight() / 2.2) + 3) > Chunk.getChunkHeight()) ? ((int)(Display.getHeight() / 2.2) + 3) : Chunk.getChunkHeight();
+		final int loadDistanceVertically = (((int)(Display.getHeight() / 2.2) + 3) > height) ? ((int)(Display.getHeight() / 2.2) + 3) : height;
 		
 		//Where to check, in the chunk map (based off loadDistance variables)
 		int leftOff = (x - loadDistanceHorizontally) / Chunk.getChunkWidth();
 		int rightOff = (x + loadDistanceHorizontally) / Chunk.getChunkWidth();
-		int upOff = (y - loadDistanceVertically) / Chunk.getChunkHeight();
-		int downOff = ( y + loadDistanceVertically) / Chunk.getChunkHeight();
+		int upOff = (y - loadDistanceVertically) / height;
+		int downOff = ( y + loadDistanceVertically) / height;
 	
 		for(int i = leftOff; i <= rightOff; i++) //Check for chunks that need loaded
 		{
 			for(int k = upOff; k <= downOff; k++) 
 			{
-				chunkManager.requestChunk("Earth", this, chunks, i, k);
+				chunkManager.requestChunk("Earth", this, getChunks(), i);
 			}
 		}
 	}
@@ -287,7 +288,7 @@ public class World implements Serializable
 	/**
 	 * Keeps track of the worldtime and updates the light if needed
 	 */
-	public void updateWorldTime()
+	public void updateWorldTime(EntityLivingPlayer player)
 	{
 		//worldTime / GAMETICKSPERHOUR = the hour (from 00:00 to 24:00)
 		worldTime++;
@@ -299,7 +300,8 @@ public class World implements Serializable
 		if(getLightLevel() != previousLightLevel) //if the sunlight has changed, update it
 		{
 			previousLightLevel = getLightLevel();
-		//	LightingEngine.applySunlight(this);
+
+			applyAmbientLightingUpdates(player);
 		}		
 	}
 	
@@ -310,8 +312,10 @@ public class World implements Serializable
 	{
 		//LightLevel of 1.0f is full darkness (it's reverse due to blending mechanics)
 		//Light Levels By Time: 20:00-4:00->20%; 4:00-8:00->20% to 100%; 8:00-16:00->100%; 16:00-20:00->20% to 100%;  
+		
 		float time = (float)(worldTime) / GAMETICKSPERHOUR; 
-		return (time < 4 || time > 20) ? 0.8f : (time >= 4 && time <= 8) ? ((8 - time) / 5) : (time >= 16 && time <= 20) ? (Math.abs(time - 16) / 5) : 0.0f;
+		
+		return (time < 4 || time > 20) ? 1.0f : (time >= 4 && time <= 8) ? ((((time - 4) / 4.0F) * 0.8F) + 0.2F) : (time >= 16 && time <= 20) ? ((((time - 16) / 4.0F) * 0.8F) + 0.2F) : 0.2f;
 	}
 		
 	/**
@@ -403,13 +407,14 @@ public class World implements Serializable
 		performPlayerItemHittests(player);
 		performEnemyToolHittests(player);
 		//Update the time
-		updateWorldTime();
+		updateWorldTime(player);
 		//checkChunks();
 		updateChunks(player);
 		updateMonsterStatusEffects();
+		applyLightingUpdates();
 		if(chunkManager.isAnyLoadOperationDone())
 		{
-			chunkManager.addAllLoadedChunks(this, chunks);
+			chunkManager.addAllLoadedChunks(this, getChunks());
 		}
 		if (Mouse.isButtonDown(0) && player.inventory.getMainInventoryStack(player.selectedSlot) != null) 
 		{ //player mining, if applicable
@@ -438,7 +443,7 @@ public class World implements Serializable
 	}
 	
 	/**
-	 * Gets how many vertical chunks the world has. This is equal to (height / Chunk.getChunkHeight())
+	 * Gets how many vertical chunks the world has. This is equal to (height / height)
 	 * @return the number of vertical chunks the world has
 	 */
 	public int getChunkHeight()
@@ -812,7 +817,6 @@ public class World implements Serializable
 				//Ground Entity:
 				if((!getBlock(xoff, (yoff + 3)).isPassable() || !getBlock(xoff + 1, (yoff + 3)).isPassable())) //make sure there's actually ground to spawn on
 				{
-					//System.out.println("Entity spawn @" + "(" + xoff + "," + yoff + ")" + ". With player position of (" + player.x / 6 + "," + player.y / 6 + ")");
 					EntityLivingNPCEnemy enemy = new EntityLivingNPCEnemy(spawnList[entitych]);
 					enemy.setPosition(xoff * 6, yoff * 6);
 					entityList.add(enemy);
@@ -852,7 +856,7 @@ public class World implements Serializable
 		}
 		*/
 		
-		for(ConcurrentHashMap.Entry<String, Chunk> entry: chunks.entrySet())
+		for(ConcurrentHashMap.Entry<String, Chunk> entry: getChunks().entrySet())
 		{
 			Biome biome = entry.getValue().getBiome();			
 			if(biome != null && biome.biomeID == Biome.arctic.biomeID) //if the biome is arctic
@@ -982,7 +986,16 @@ public class World implements Serializable
 				addItemStackToItemList(new EntityLivingItemStack((mx * 6) - 1, (my * 6) - 2, stack));
 			}
 			
-			setBlock(Block.air, mx, my); //replace it with air
+			if(getBlock(mx, my) instanceof BlockLight)
+			{
+				//removeLightSource(player, mx, my, ((BlockLight)(getBlock(mx, my))).lightRadius, ((BlockLight)(getBlock(mx, my))).lightStrength);
+				setBlock(Block.air, mx, my, EnumEventType.EVENT_BLOCK_BREAK_LIGHT); //replace it with air
+			}
+			else
+			{
+				setBlock(Block.air, mx, my, EnumEventType.EVENT_BLOCK_BREAK); //replace it with air
+			}
+			
 		}
 		else
 		{
@@ -1065,7 +1078,7 @@ public class World implements Serializable
 				{
 					for(int j = 0; j < metaHeight; j++)
 					{
-						setBlock(Block.air, mx + i + xOffset, my + j + yOffset);
+						setBlock(Block.air, mx + i + xOffset, my + j + yOffset, EnumEventType.EVENT_BLOCK_BREAK);
 					}					
 				}
 				
@@ -1168,11 +1181,13 @@ public class World implements Serializable
 								}
 							}
 						}
-						setBlock(chest, mx + i, my + j);
+						setBlock(chest, mx + i, my + j, EnumEventType.EVENT_BLOCK_PLACE);
+
 					}
 					else
 					{
-						setBlock(block.clone(), mx + i, my + j);
+						setBlock(block.clone(), mx + i, my + j, EnumEventType.EVENT_BLOCK_PLACE);
+						
 					}
 					getBlock(mx + i, my + j).metaData = metadata[i][j];
 				}
@@ -1185,8 +1200,21 @@ public class World implements Serializable
 			if ((getBlock(mx, my).getIsOveridable() == true || getBlock(mx, my) == Block.air) && 
 				(getBlock(mx-1, my).getIsSolid() || getBlock(mx, my-1).getIsSolid() || getBlock(mx, my+1).getIsSolid() || getBlock(mx+1, my).getIsSolid())) //can the block be placed
 			{
-				setBlock(block, mx, my); //place it
 				player.inventory.removeItemsFromInventory(this, player, new ItemStack(block, 1)); //remove the items from inventory	
+			
+				
+				if(block instanceof BlockLight)
+				{
+					setBlock(block, mx, my, EnumEventType.EVENT_BLOCK_PLACE_LIGHT); //place it
+			//		applyLightSource(player, block, mx, my, ((BlockLight)(block)).lightRadius,  ((BlockLight)(block)).lightStrength);
+				}
+				else
+				{
+					setBlock(block, mx, my, EnumEventType.EVENT_BLOCK_PLACE); //place it
+					//	setBlock(block, mx, my, EnumEventType.EVENT_BLOCK_PLACE); //place it
+				}
+				
+				
 			}
 		}
 		getBlockGenerate(mx-1,my).setBitMap(updateBlockBitMap(mx-1, my));
@@ -1194,6 +1222,9 @@ public class World implements Serializable
 		getBlockGenerate(mx,my).setBitMap(updateBlockBitMap(mx, my));
 		getBlockGenerate(mx+1,my).setBitMap(updateBlockBitMap(mx+1, my));
 		getBlockGenerate(mx,my+1).setBitMap(updateBlockBitMap(mx, my+1));
+	
+		
+		
 	}
 	
 	/**
@@ -1350,7 +1381,16 @@ public class World implements Serializable
 	 */
 	public Block getBlock(int x, int y)
 	{
-		return chunks.get((x / Chunk.getChunkWidth()) + "," + (y / Chunk.getChunkHeight())).getBlock(x % Chunk.getChunkWidth(), (y % Chunk.getChunkHeight()));
+		try
+		{
+			return getChunks().get(""+(x / Chunk.getChunkWidth())).getBlock(x % Chunk.getChunkWidth(), (y));
+
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			return null;
+		}
 	}
 		
 	/**
@@ -1365,7 +1405,7 @@ public class World implements Serializable
 	{
 		try
 		{
-			chunks.get(x / Chunk.getChunkWidth() + "," + y / Chunk.getChunkHeight()).setBlock(block, x % Chunk.getChunkWidth(), y % Chunk.getChunkHeight());
+			getChunks().get(""+x / Chunk.getChunkWidth()).setBlock(block, x % Chunk.getChunkWidth(), y);
 		}
 		catch(Exception e)
 		{
@@ -1382,7 +1422,7 @@ public class World implements Serializable
 	 */
 	public Block getBlock(float x, float y)
 	{
-		return chunks.get((int)(x / Chunk.getChunkWidth()) + "," + (int)(y / Chunk.getChunkHeight())).getBlock((int)x % Chunk.getChunkWidth(), (int)y % Chunk.getChunkHeight());
+		return getChunks().get(""+(int)(x / Chunk.getChunkWidth())).getBlock((int)x % Chunk.getChunkWidth(), (int)y);
 	}
 	
 	/**
@@ -1394,20 +1434,19 @@ public class World implements Serializable
 	public void growTree(int space, int x, int y){
 		boolean isOpen = true;
 		int height = (int)(Math.random() * 5 + 4); //Determine the height of the tree
-		if (y-height-space <= 0 || x <= 2 || x >= getWidth() - 2 || y >= getHeight()){ //If the tree would go off the map
-			isOpen = false;
+		if (y-height-space <= 0 || x <= 2 || x >= getWidth() - 2){ //If the tree would go off the map
+			height = 0; //don't place a tree
+			space = 0; //Don't place a tree
 		}
 		//If there is room for the tree up and to the left/right	
-		if (isOpen){
-			for (int j = y; j >= y - height - space; j--){
-				for (int i = x - space; i <= x + space; i++){
-					if (!getBlockGenerate(i, j).getIsOveridable()){
-						isOpen = false;
-						break;
-					}
+		for (int j = y; j >= y - height - space; j--){
+			for (int i = x - space; i <= x + space; i++){
+				if (!getBlockGenerate(i, j).getIsOveridable()){
+					isOpen = false;
+					break;
 				}
-				if (!isOpen) break;			
 			}
+			if (!isOpen) break;			
 		}
 		if (isOpen){
 			setBlockGenerate(Block.dirt, x, y + 1);
@@ -1469,12 +1508,12 @@ public class World implements Serializable
 			for(int k = 1; k < x + w; k++){ //x-axis	
 				//Search above, left and right of dirt block for air
 				if (getBlockGenerate(k, j).getBlockID() == Block.dirt.getBlockID()){
-					if (k > 0){
+					if (k > 0 && k < getWidth() && j > 0){
 						if (getBlockGenerate(k - 1, j).getBlockID() == Block.air.getBlockID()){
 							setBlockGenerate(Block.grass, k, j);
 						}
 					}
-					if (k < getWidth() - 1){
+					if (k < getWidth()){
 						if (getBlockGenerate(k + 1, j).getBlockID() == Block.air.getBlockID()){
 							setBlockGenerate(Block.grass, k, j);
 						}
@@ -1501,7 +1540,7 @@ public class World implements Serializable
 	{
 		try
 		{
-			chunks.get(x + "," + y).setBlock(block, (int)x, (int)y);
+			getChunks().get(""+x).setBlock(block, (int)x, (int)y);
 		}
 		catch(Exception e)
 		{
@@ -1515,9 +1554,9 @@ public class World implements Serializable
 	 * @param y the y position of the chunk (in Blocks)
 	 * @return the chunk at the specified position in the world's chunk map, or null if it doesn't exist or isn't loaded
 	 */
-	public Chunk getChunk_Division(int x, int y)
+	public Chunk getChunk_Division(int x)
 	{
-		return chunks.get((int)(x / Chunk.getChunkWidth()) + "," + (int)(y / Chunk.getChunkHeight()));
+		return getChunks().get(""+(int)(x / Chunk.getChunkWidth()));
 	}
 	
 	/**
@@ -1526,9 +1565,9 @@ public class World implements Serializable
 	 * @param y the y position of the chunk 
 	 * @return the chunk at the specified position in the world's chunk map, or null if it doesn't exist or isn't loaded
 	 */
-	public Chunk getChunk(int x, int y)
+	public Chunk getChunk(int x)
 	{
-		return (chunks.get(x + "," + y) != null) ? chunks.get(x + "," + y) : new Chunk(Biome.forest, x, y);
+		return (getChunks().get(""+x) != null) ? getChunks().get(""+x) : new Chunk(Biome.forest, x, height);
 	}
 	
 	/**
@@ -1538,11 +1577,10 @@ public class World implements Serializable
 	 * @param x the x position of the chunk
 	 * @param y the y position of the chunk
 	 */
-	public void registerChunk(Chunk chunk, int x, int y)
+	public void registerChunk(Chunk chunk, int x)
 	{
-		loadedChunks_B[x][y] = true;
-		loadedChunks.add(new Position(x, y));
-		chunks.put(x + "," + y, chunk);
+		chunksLoaded.put(""+x, true);
+		chunks.put(""+x, chunk);
 	}
 	
 	/**
@@ -1557,7 +1595,7 @@ public class World implements Serializable
 	{
 		try
 		{
-			return chunks.get(x / Chunk.getChunkWidth() + "," + y / Chunk.getChunkHeight()).getBlock(x % Chunk.getChunkWidth(), y % Chunk.getChunkHeight());
+			return getChunks().get(""+x / Chunk.getChunkWidth()).getBlock(x % Chunk.getChunkWidth(), y);
 		}
 		catch (Exception e)
 		{
@@ -1579,9 +1617,9 @@ public class World implements Serializable
 	{
 		try
 		{ //Ensure the chunk exists
-			if(chunks.get((x / Chunk.getChunkWidth()) + "," + (y / Chunk.getChunkHeight())) == null)
+			if(getChunks().get(""+(x / Chunk.getChunkWidth())) == null)
 			{
-				registerChunk(new Chunk(Biome.forest, (int)(x / Chunk.getChunkWidth()), (int)(y / Chunk.getChunkHeight())), (x / Chunk.getChunkWidth()), (y / Chunk.getChunkHeight()));
+				registerChunk(new Chunk(Biome.forest, (int)(x / Chunk.getChunkWidth()), height), (int)(x / Chunk.getChunkWidth()));
 			}
 		}
 		catch(Exception e) 
@@ -1591,7 +1629,7 @@ public class World implements Serializable
 		
 		try 
 		{ //Set the block
-			chunks.get((x / Chunk.getChunkWidth()) + "," + (y / Chunk.getChunkHeight())).setBlock(block, x % Chunk.getChunkWidth(), y % Chunk.getChunkHeight());
+			chunks.get(""+(x / Chunk.getChunkWidth())).setBlock(block, x % Chunk.getChunkWidth(), y);
 		}
 		catch(Exception e) 
 		{
@@ -1610,7 +1648,7 @@ public class World implements Serializable
 	{
 		try
 		{
-			chunks.get((int)(x / Chunk.getChunkWidth()) + "," + (int)(y / Chunk.getChunkHeight())).setLight(value, (int)x % Chunk.getChunkWidth(), (int)y % Chunk.getChunkHeight());
+			getChunks().get(""+(int)(x / Chunk.getChunkWidth())).setLight(value, (int)x % Chunk.getChunkWidth(), (int)y);
 		}
 		catch (Exception e)
 		{
@@ -1629,7 +1667,7 @@ public class World implements Serializable
 	{
 		try
 		{
-			return chunks.get((int)(x / Chunk.getChunkWidth()) + "," + (int)(y / Chunk.getChunkHeight())).getLight((int)x % Chunk.getChunkWidth(), (int)y % Chunk.getChunkHeight());
+			return getChunks().get(""+(int)(x / Chunk.getChunkWidth())).getLight((int)x % Chunk.getChunkWidth(), (int)y);
 		}
 		catch (Exception e)
 		{
@@ -1646,41 +1684,39 @@ public class World implements Serializable
 	{
 		//How far to check for chunks (in blocks)
 		final int loadDistanceHorizontally = (((int)(Display.getWidth() / 2.2) + 3) > Chunk.getChunkWidth()) ? ((int)(Display.getWidth() / 2.2) + 3) : Chunk.getChunkWidth();
-		final int loadDistanceVertically = (((int)(Display.getHeight() / 2.2) + 3) > Chunk.getChunkHeight()) ? ((int)(Display.getHeight() / 2.2) + 3) : Chunk.getChunkHeight();
 		//Position to check from
 		final int x = (int) (player.x / 6);
-		final int y = (int) (player.y / 6);
 		//Where to check, in the chunk map (based off loadDistance variables)
 		int leftOff = (x - loadDistanceHorizontally) / Chunk.getChunkWidth();
 		int rightOff = (x + loadDistanceHorizontally) / Chunk.getChunkWidth();
-		int upOff = (y - loadDistanceVertically) / Chunk.getChunkHeight();
-		int downOff = ( y + loadDistanceVertically) / Chunk.getChunkHeight();
 		//Bounds checking
 		if(leftOff < 0) leftOff = 0;
-		if(upOff < 0) upOff = 0;
 		if(rightOff > (width / Chunk.getChunkWidth())) rightOff = width / Chunk.getChunkWidth();
-		if(downOff > (height / Chunk.getChunkHeight())) downOff = height / Chunk.getChunkHeight();
 		
-		for(int i = 0; i < loadedChunks.size(); i++) //Check for chunks that need unloaded
-		{
-			if((loadedChunks.get(i).x < leftOff || loadedChunks.get(i).x > rightOff || loadedChunks.get(i).y < upOff || loadedChunks.get(i).y > downOff) && 
-					x != leftOff && x != rightOff && y != upOff && y != downOff)
+		Enumeration<String> keys = chunksLoaded.keys();
+        while (keys.hasMoreElements()) 
+        {
+            Object key = keys.nextElement();
+            String strKey = (String) key;
+            boolean loaded = chunksLoaded.get(strKey);
+           
+            int cx = Integer.parseInt(strKey);
+            
+            if(loaded && (cx < leftOff || cx > rightOff) && x != leftOff && x != rightOff)
 			{
 				//If a chunk isnt needed, request a save.
-				chunkManager.saveChunk("Earth", chunks, loadedChunks.get(i).x, loadedChunks.get(i).y);
-				loadedChunks_B[loadedChunks.get(i).x][loadedChunks.get(i).y] = false;
-				loadedChunks.remove(i);
+				chunkManager.saveChunk("Earth", chunks, cx);
+				chunksLoaded.put(""+cx, false);
 			}
+            
 		}
 		for(int i = leftOff; i <= rightOff; i++) //Check for chunks that need loaded
 		{
-			for(int k = upOff; k <= downOff; k++) 
+			if(!chunksLoaded.get(""+i)) //If a needed chunk isnt loaded, request it.
 			{
-				if(!loadedChunks_B[i][k]) //If a needed chunk isnt loaded, request it.
-				{
-					chunkManager.requestChunk("Earth", this, chunks, i, k);
-				}
+				chunkManager.requestChunk("Earth", this, chunks, i);
 			}
+			
 		}
 	}
 	
@@ -1708,11 +1744,11 @@ public class World implements Serializable
 	 */
 	private void saveAllRemainingChunks(String dir)
 	{
-		Enumeration<String> keys = chunks.keys();
+		Enumeration<String> keys = getChunks().keys();
         while (keys.hasMoreElements()) 
         {
-            Chunk chunk = chunks.get((String)(keys.nextElement()));
-            chunkManager.saveChunk(dir, chunks, chunk.getX(), chunk.getY());		
+            Chunk chunk = getChunks().get((String)(keys.nextElement()));
+            chunkManager.saveChunk(dir, getChunks(), chunk.getX());		
         }
 	}
 	
@@ -1757,22 +1793,30 @@ public class World implements Serializable
 		return difficulty;
 	}
 	
+	public ConcurrentHashMap<String, Chunk> getChunks() 
+	{
+		return chunks;
+	}
+
+	public void setChunks(ConcurrentHashMap<String, Chunk> chunks) 
+	{
+		this.chunks = chunks;
+	}
+	
 	public void setChunk(Chunk chunk, int x, int y)
 	{
-		chunks.put(x + "," + y, chunk);
+		getChunks().put(""+x, chunk);
 	}
 	
 	private void checkChunks()
 	{
 		for(int i = 0; i < width / Chunk.getChunkWidth(); i++)
 		{
-			for(int j = 0; j < height / Chunk.getChunkHeight(); j++)
+			if(getChunks().get(""+i) == null)
 			{
-				if(chunks.get(i + "," + j) == null)
-				{
-					registerChunk(new Chunk(Biome.forest, i, j), i, j);
-				}
+				registerChunk(new Chunk(Biome.forest, i, height), i);
 			}
+			
 		}
 	}
 	
@@ -1784,15 +1828,13 @@ public class World implements Serializable
 	public Biome getBiome(String pos)
 	{
 		int x = (Integer.parseInt(pos)) / Chunk.getChunkWidth();
-		for(int i = 0; i < height / Chunk.getChunkHeight(); i++)
+	
+		Chunk chunk = getChunks().get(""+x);
+		if(chunk != null)
 		{
-			Chunk chunk = chunks.get(x + "," + i);
-			if(chunk != null)
-			{
-				return chunk.getBiome();
-			}
+			return chunk.getBiome();
 		}
-		
+			
 		return null;
 	}
 	
@@ -1807,4 +1849,157 @@ public class World implements Serializable
 		
 		return null;
 	}
+		
+	/**
+	 * Gets the background block at the specified (x,y). Useful for easily getting a backgroundblock at the specified location; 
+	 * Terrible for mass usage, such as in rendering. This method accepts floats, and casts them to Integers.
+	 * @param x the block's x location in the new world map
+	 * @param y the block's y location in the new world map
+	 * @return the block at the location specified (this should never be null)
+	 */
+	public Block getBackBlock(float x, float y)
+	{
+		return getChunks().get(""+(int)(x / Chunk.getChunkWidth())).getBlock((int)x % Chunk.getChunkWidth(), (int)y);
+	}
+	
+	public void setAmbientLight(float x, float y, float strength)
+	{
+		try
+		{
+			getChunks().get(""+(int)(x / Chunk.getChunkWidth())).setAmbientLight(strength, (int)x % Chunk.getChunkWidth(), (int)y);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+		
+	public void setDiffuseLight(float x, float y, float strength)
+	{
+		try
+		{
+			getChunks().get(""+(int)(x / Chunk.getChunkWidth())).setDiffuseLight(strength, (int)x % Chunk.getChunkWidth(), (int)y);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	public float getAmbientLight(int x, int y)
+	{
+		try
+		{
+			return getChunks().get(""+(int)(x / Chunk.getChunkWidth())).getAmbientLight((int)x % Chunk.getChunkWidth(), (int)y);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return 1.0f;
+	}
+	
+	public float getDiffuseLight(int x, int y)
+	{
+		try
+		{
+			return getChunks().get(""+(int)(x / Chunk.getChunkWidth())).getDiffuseLight((int)x % Chunk.getChunkWidth(), (int)y);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return 1.0f;
+	}
+
+	
+	public void applyLightSource(EntityLivingPlayer player, Block block, final int x, final int y, final int radius, final float strength)
+	{
+		utils.applyLightSource(this, x, y, radius, strength);
+	}
+	
+	public void removeLightSource(EntityLivingPlayer player, final int x, final int y, final int radius, final float strength)
+	{
+		utils.removeLightSource(this, x, y, radius, strength);
+	}
+	
+	public void updateAmbientLighting(Chunk chunk)
+	{
+		utils.applyAmbientChunk(this, chunk);
+	}
+	
+	public void updateAmbientLightAll()
+	{
+		utils.applyAmbient(this);
+	}
+	
+	public void blockUpdateLighting(int x, int y, EnumEventType eventType)
+	{
+		utils.blockUpdateAmbient(this, x, y, eventType);		
+	}
+	
+	public void applyAmbientLightingUpdates(EntityLivingPlayer player)
+	{
+		if(worldTime % 20 == 0)
+		{
+			Chunk[] chunks = ChunkUtils.getRequiredChunks(this, player);
+			for(Chunk chunk : chunks)
+			{
+				utils.applyAmbientChunk(this, chunk);
+			}
+			//updateAmbientLighting();
+		}
+	}
+	
+	public void setBlock(Block block, int x, int y, EnumEventType eventType)
+	{
+		//if(worldTime % 20 == 0)
+		//{
+		if(eventType == EnumEventType.EVENT_BLOCK_PLACE_LIGHT)
+		{
+			utils.fixDiffuseLightRemove(this, x, y);
+			
+			//blockUpdateLighting(x, y, eventType);
+		//	if(eventType != EnumEventType.EVENT_BLOCK_PLACE )
+		//	{
+				setBlock(block, x, y);
+		//	}
+			blockUpdateLighting(x, y, eventType);
+			utils.fixDiffuseLightApply(this, x, y);
+		//}
+		}
+		else
+		{
+			utils.fixDiffuseLightRemove(this, x, y);
+			
+			//blockUpdateLighting(x, y, eventType);
+		//	if(eventType != EnumEventType.EVENT_BLOCK_PLACE )
+		//	{
+				setBlock(block, x, y);
+		//	}
+			blockUpdateLighting(x, y, eventType);
+			utils.fixDiffuseLightApply(this, x, y);
+		//}
+		}
+	}
+
+	public void applyLightingUpdates()
+	{
+		//if(worldTime % 20 == 0)
+		//{
+			Enumeration<String> keys = chunks.keys();
+	        while (keys.hasMoreElements()) 
+	        {
+	            Object key = keys.nextElement();
+	            String str = (String) key;
+	            Chunk chunk = chunks.get(str);
+	            if(!chunk.lightUpdated)
+	            {
+	            	chunk.updateChunkLight();
+	            	chunk.lightUpdated = true;
+	            }
+	        }
+		//}
+	}
+	
 }

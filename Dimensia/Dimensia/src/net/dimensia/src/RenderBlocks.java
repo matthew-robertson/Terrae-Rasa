@@ -16,7 +16,7 @@ public class RenderBlocks extends Render
 		if(x < 0) x = 0;
 		if(xsize + x > world.getWidth()) x = world.getWidth() - xsize;
 		if(ysize + y > world.getHeight()) y = world.getHeight() - ysize - 1;
-		Chunk[][] chunks = getRequiredChunks(world, player);
+		Chunk[] chunks = ChunkUtils.getRequiredChunks(world, player);
 		TERRAIN.bind();
 		
 		//Settings for lighting
@@ -25,7 +25,7 @@ public class RenderBlocks extends Render
 		GL11.glShadeModel(GL11.GL_SMOOTH);
 		//'base' render position (this is a constant offset that needs applied). It is the edge of a chunk, in Blocks, generally the nearest left or up.
 		final int baseX_F = (int) ((int)(x / Chunk.getChunkWidth()) * Chunk.getChunkWidth());
-		final int baseY_F = (int) ((int)(y / Chunk.getChunkHeight()) * Chunk.getChunkHeight());
+		final int baseY_F = (int) ((int)(y / world.getHeight()) * world.getHeight());
 		//set the amount of remaining blocks, initially (this is reset later)
 		int remainingWidth = xsize;
 		int remainingHeight = ysize;
@@ -63,47 +63,31 @@ public class RenderBlocks extends Render
 				remainingWidth -= loopX;
 			}
 			
-			for(int j = 0; j < chunks[0].length; j++) //Loop all Y chunks
-			{
-				int baseY = baseY_F + (j * Chunk.getChunkHeight()); 
+		
+				int baseY = 0;//baseY_F + (j * world.getHeight()); 
 				int yoff = 0;
 				int loopY = 0;
 				
 				//Determine the offset to start rendering, and how far to render
 				//Also ensure rendering stays in bounds. This is for the Y rendering calculations
-				if(j == 0) //First Chunk
-				{
-					yoff = (int) (y % Chunk.getChunkHeight());
-					loopY = (int) (Chunk.getChunkHeight() - (y % Chunk.getChunkHeight()));
+					yoff = (int) (y % world.getHeight());
+					loopY = (int) (world.getHeight() - (y % world.getHeight()));
 					remainingHeight -= loopY;
 					if(remainingHeight < 0) 
 					{
 						loopY += remainingHeight;
 					}
-				}					
-				else if(j == chunks[0].length - 1) //Last Chunk (may never get hit)
-				{
-					yoff = 0;
-					loopY = remainingHeight;
-					remainingHeight = 0;
-				}
-				else //Not tested. Should allow an entire 'middle' chunk to render (this requires something stupid like 1800x3600 resolution to hit)
-				{
-					yoff = 0;
-					loopY = Chunk.getChunkHeight();
-					remainingHeight -= loopY;
-				}
 				
 				//Fix random blocks not rendering. Generally occurs on the edge of chunks
 				if(xoff + loopX < Chunk.getChunkWidth())
 				{
 					loopX++;
 				}
-				if(yoff + loopY < Chunk.getChunkHeight()) 
+				if(yoff + loopY < world.getHeight()) 
 				{
 					loopY++;
 				}
-				if((int)(y) == Chunk.getChunkHeight()) 
+				if((int)(y) == world.getHeight()) 
 				{
 					y++;
 				}
@@ -112,7 +96,7 @@ public class RenderBlocks extends Render
 				{	
 					for(int l = yoff; l < yoff + loopY; l++) //y
 					{						
-						Block block = chunks[i][j].backWalls[k][l];
+						Block block = chunks[i].backWalls[k][l];
 						int x1 = k + baseX;
 						int y1 = l + baseY;
 						
@@ -123,7 +107,7 @@ public class RenderBlocks extends Render
 						{
 							k1--;
 						}
-						while(l1 >= Chunk.getChunkHeight() - 1) 
+						while(l1 >= world.getHeight() - 1) 
 						{
 							l1--;
 						}
@@ -154,15 +138,6 @@ public class RenderBlocks extends Render
 								t.addVertexWithUV(xm + blockWidth, ym, 0, tw, ty);
 								t.addVertexWithUV(xm, ym, 0, tx, ty);	
 								
-								//Lighting (for the time being)
-								t.setColorRGBA_F(0, 0, 0, chunks[i][j].light[k1][l1 + 1]);
-								t.addVertexWithUV(xm, blockHeight + ym, 0, 0, 0.03125);
-								t.setColorRGBA_F(0, 0, 0, chunks[i][j].light[k1 + 1][l1 + 1]);
-								t.addVertexWithUV(xm + blockWidth, blockHeight + ym, 0, 0.0625, 0.03125);
-								t.setColorRGBA_F(0, 0, 0, chunks[i][j].light[k1 + 1][l1]);
-								t.addVertexWithUV(xm + blockWidth, ym, 0, 0.0625, 0);
-								t.setColorRGBA_F(0, 0, 0, chunks[i][j].light[k1][l1]);
-								t.addVertexWithUV(xm, ym, 0, 0, 0);	
 							}
 						}
 						else //normal texture
@@ -183,18 +158,9 @@ public class RenderBlocks extends Render
 							t.addVertexWithUV(xm + blockWidth, ym, 0, tw, ty);
 							t.addVertexWithUV(xm, ym, 0, tx, ty);				
 							
-							//Lighting (for the time being)
-							t.setColorRGBA_F(0, 0, 0, chunks[i][j].light[k1][l1 + 1]);
-							t.addVertexWithUV(xm, blockHeight + ym, 0, 0, 0.03125);
-							t.setColorRGBA_F(0, 0, 0, chunks[i][j].light[k1 + 1][l1 + 1]);
-							t.addVertexWithUV(xm + blockWidth, blockHeight + ym, 0, 0.0625, 0.03125);
-							t.setColorRGBA_F(0, 0, 0, chunks[i][j].light[k1 + 1][l1]);
-							t.addVertexWithUV(xm + blockWidth, ym, 0, 0.0625, 0);
-							t.setColorRGBA_F(0, 0, 0, chunks[i][j].light[k1][l1]);
-							t.addVertexWithUV(xm, ym, 0, 0, 0);				
 						}
 					}
-				}
+				
 			}
 			
 			if((int)(x) == Chunk.getChunkWidth())
@@ -216,7 +182,7 @@ public class RenderBlocks extends Render
 		if(x < 0) x = 0;
 		if(xsize + x > world.getWidth()) x = world.getWidth() - xsize;
 		if(ysize + y > world.getHeight()) y = world.getHeight() - ysize - 1;
-		Chunk[][] chunks = getRequiredChunks(world, player);
+		Chunk[] chunks = ChunkUtils.getRequiredChunks(world, player);
 		TERRAIN_GROUND.bind();
 		
 		//Settings for lighting
@@ -225,7 +191,7 @@ public class RenderBlocks extends Render
 		GL11.glShadeModel(GL11.GL_SMOOTH);
 		//'base' render position (this is a constant offset that needs applied). It is the edge of a chunk, in Blocks, generally the nearest left or up.
 		final int baseX_F = (int) ((int)(x / Chunk.getChunkWidth()) * Chunk.getChunkWidth());
-		final int baseY_F = (int) ((int)(y / Chunk.getChunkHeight()) * Chunk.getChunkHeight());
+		final int baseY_F = (int) ((int)(y / world.getHeight()) * world.getHeight());
 		//set the amount of remaining blocks, initially (this is reset later)
 		int remainingWidth = xsize;
 		int remainingHeight = ysize;
@@ -263,47 +229,30 @@ public class RenderBlocks extends Render
 				remainingWidth -= loopX;
 			}
 			
-			for(int j = 0; j < chunks[0].length; j++) //Loop all Y chunks
-			{
-				int baseY = baseY_F + (j * Chunk.getChunkHeight()); 
+				int baseY = 0;//baseY_F + (j * world.getHeight()); 
 				int yoff = 0;
 				int loopY = 0;
 				
 				//Determine the offset to start rendering, and how far to render
 				//Also ensure rendering stays in bounds. This is for the Y rendering calculations
-				if(j == 0) //First Chunk
-				{
-					yoff = (int) (y % Chunk.getChunkHeight());
-					loopY = (int) (Chunk.getChunkHeight() - (y % Chunk.getChunkHeight()));
+					yoff = (int) (y % world.getHeight());
+					loopY = (int) (world.getHeight() - (y % world.getHeight()));
 					remainingHeight -= loopY;
 					if(remainingHeight < 0) 
 					{
 						loopY += remainingHeight;
 					}
-				}					
-				else if(j == chunks[0].length - 1) //Last Chunk (may never get hit)
-				{
-					yoff = 0;
-					loopY = remainingHeight;
-					remainingHeight = 0;
-				}
-				else //Not tested. Should allow an entire 'middle' chunk to render (this requires something stupid like 1800x3600 resolution to hit)
-				{
-					yoff = 0;
-					loopY = Chunk.getChunkHeight();
-					remainingHeight -= loopY;
-				}
 				
 				//Fix random blocks not rendering. Generally occurs on the edge of chunks
 				if(xoff + loopX < Chunk.getChunkWidth())
 				{
 					loopX++;
 				}
-				if(yoff + loopY < Chunk.getChunkHeight()) 
+				if(yoff + loopY < world.getHeight()) 
 				{
 					loopY++;
 				}
-				if((int)(y) == Chunk.getChunkHeight()) 
+				if((int)(y) == world.getHeight()) 
 				{
 					y++;
 				}
@@ -312,7 +261,7 @@ public class RenderBlocks extends Render
 				{	
 					for(int l = yoff; l < yoff + loopY; l++) //y
 					{						
-						Block block = chunks[i][j].blocks[k][l];
+						Block block = chunks[i].blocks[k][l];
 						int x1 = k + baseX;
 						int y1 = l + baseY;
 						
@@ -323,7 +272,7 @@ public class RenderBlocks extends Render
 						{
 							k1--;
 						}
-						while(l1 >= Chunk.getChunkHeight() - 1) 
+						while(l1 >= world.getHeight() - 1) 
 						{
 							l1--;
 						}
@@ -353,15 +302,6 @@ public class RenderBlocks extends Render
 								t.addVertexWithUV(xm + blockWidth, ym, 0, tw, ty);
 								t.addVertexWithUV(xm, ym, 0, tx, ty);	
 								
-								//Lighting (for the time being)
-								/*t.setColorRGBA_F(0, 0, 0, chunks[i][j].light[k1][l1 + 1]);
-								t.addVertexWithUV(xm, blockHeight + ym, 0, 0, 0.03125);
-								t.setColorRGBA_F(0, 0, 0, chunks[i][j].light[k1 + 1][l1 + 1]);
-								t.addVertexWithUV(xm + blockWidth, blockHeight + ym, 0, 0.0625, 0.03125);
-								t.setColorRGBA_F(0, 0, 0, chunks[i][j].light[k1 + 1][l1]);
-								t.addVertexWithUV(xm + blockWidth, ym, 0, 0.0625, 0);
-								t.setColorRGBA_F(0, 0, 0, chunks[i][j].light[k1][l1]);
-								t.addVertexWithUV(xm, ym, 0, 0, 0);*/
 							}
 						}
 						else //normal texture
@@ -381,19 +321,10 @@ public class RenderBlocks extends Render
 							t.addVertexWithUV(xm + blockWidth, blockHeight + ym, 0, tw, th);
 							t.addVertexWithUV(xm + blockWidth, ym, 0, tw, ty);
 							t.addVertexWithUV(xm, ym, 0, tx, ty);				
-							
-							//Lighting (for the time being)
-							/*t.setColorRGBA_F(0, 0, 0, chunks[i][j].light[k1][l1 + 1]);
-							t.addVertexWithUV(xm, blockHeight + ym, 0, 0, 0.03125);
-							t.setColorRGBA_F(0, 0, 0, chunks[i][j].light[k1 + 1][l1 + 1]);
-							t.addVertexWithUV(xm + blockWidth, blockHeight + ym, 0, 0.0625, 0.03125);
-							t.setColorRGBA_F(0, 0, 0, chunks[i][j].light[k1 + 1][l1]);
-							t.addVertexWithUV(xm + blockWidth, ym, 0, 0.0625, 0);
-							t.setColorRGBA_F(0, 0, 0, chunks[i][j].light[k1][l1]);
-							t.addVertexWithUV(xm, ym, 0, 0, 0);*/				
+										
 						}
 					}
-				}
+				
 			}
 			
 			if((int)(x) == Chunk.getChunkWidth())
@@ -402,87 +333,5 @@ public class RenderBlocks extends Render
 			}
 		}
 		t.draw();
-	}
-
-	private Chunk[][] getRequiredChunks(World world, EntityLivingPlayer player)
-	{
-		Chunk[][] chunks;
-		final int width = (int)((float)(Display.getWidth() / 6) / 1.85);;
-		final int height = (int)((float)(Display.getHeight() / 6) / 1.85);;
-		float x = ((player.x - (0.25f * Display.getWidth())) / 6);
-		float y = ((player.y - (0.25f * Display.getHeight())) / 6);
-		if(y < 0) y = 0; 
-		if(x < 0) x = 0;
-		if(width + x > world.getWidth()) x = world.getWidth() - width - 1;
-		if(height + y > world.getHeight()) y = world.getHeight() - height - 1;
-			
-		int xBegin = (int) (x / Chunk.getChunkWidth());
-		int yBegin = (int) (y / Chunk.getChunkHeight()); 
-		int xEnd = (int) ((x + width) / Chunk.getChunkWidth());
-		int yEnd = (int) ((y + height) / Chunk.getChunkHeight());
-		chunks = new Chunk[(xEnd - xBegin > 0) ? xEnd - xBegin + 1 : 1][(yEnd - yBegin > 0) ? yEnd - yBegin + 1 : 1];
-		
-		xEnd++;
-		yEnd++;
-		
-		int k = 0;
-		int l = 0;
-				
-		for(int i = xBegin; i < xEnd; i++)
-		{
-			l = 0;
-			for(int j = yBegin; j < yEnd; j++)
-			{
-				chunks[k][l] = world.getChunk(i, j);
-				l++;
-			}
-			k++;
-		}
-		
-		return chunks;
-	}
-	
-	private void renderBlockEntity(int x, int y, Block block)
-	{			
-		if(block.blockID == 0) //nothing to render
-		{
-			return;
-		}
-		
-		if(block.hasMetaData) //large texture
-		{
-			if(block.metaData == 1) //if the block with metadata is in the top-left corner of the larger block, render it
-			{
-				int blockHeight = block.blockHeight;
-				int blockWidth = block.blockWidth;		
-			    float tx = (float)((block.iconIndex / 16) * 16) / 512;
-			    float ty = (float)((block.iconIndex % 16) * 16) / 256;
-				float tw = tx + (block.textureWidth / 512);
-				float th = ty + (block.textureHeight / 256);				
-				int xm = x * 6; 
-				int ym = y * 6; 
-				
-				t.addVertexWithUV(xm, blockHeight + ym, 0, tx, th);
-				t.addVertexWithUV(xm + blockWidth, blockHeight + ym, 0, tw, th);
-				t.addVertexWithUV(xm + blockWidth, ym, 0, tw, ty);
-				t.addVertexWithUV(xm, ym, 0, tx, ty);	
-			}
-		}
-		else //normal texture
-		{
-			int blockHeight = block.blockHeight;
-			int blockWidth = block.blockWidth;		
-		    float tx = (float)((block.iconIndex / 16) * 16) / 512;
-		    float ty = (float)((block.iconIndex % 16) * 16) / 256;
-			float tw = tx + (block.textureWidth / 512);
-			float th = ty + (block.textureHeight / 256);				
-			int xm = x * 6; 
-			int ym = y * 6; 
-			
-			t.addVertexWithUV(xm, blockHeight + ym, 0, tx, th);
-			t.addVertexWithUV(xm + blockWidth, blockHeight + ym, 0, tw, th);
-			t.addVertexWithUV(xm + blockWidth, ym, 0, tw, ty);
-			t.addVertexWithUV(xm, ym, 0, tx, ty);				
-		}
 	}
 }

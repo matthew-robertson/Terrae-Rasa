@@ -17,7 +17,6 @@ import java.util.Random;
  * <li>Dirt
  * <li>Caves
  * <li>Ores	 
- * <li>Grass
  * <li>Biome Specific Generation  
  * 
  * <br><br>
@@ -106,9 +105,9 @@ public class WorldGenEarth
 		{
 			for(int j = 0; j < world.getHeight(); j++)
 			{
-				if(world.getBlock(i, j) == null)
+				if(world.getBlockGenerate(i, j) == null)
 				{
-					world.setBlock(Block.air, i, j);
+					world.setBlockGenerate(Block.air, i, j);
 				}
 			}
 		}
@@ -521,9 +520,9 @@ public class WorldGenEarth
 	{
 		for(int i = 0; i < world.getWidth() / Chunk.getChunkWidth(); i++)
 		{
-			for(int j = 0; j < world.getHeight() / Chunk.getChunkHeight(); j++)
+			for(int j = 0; j < world.getHeight() / world.getHeight(); j++)
 			{
-				Chunk chunk = world.getChunk(i, j);
+				Chunk chunk = world.getChunk(i);
 				Biome biome = biomes[i];
 				chunk.setBiome(biome);
 				world.setChunk(chunk, i, j);
@@ -557,14 +556,12 @@ public class WorldGenEarth
 	private void forciblyGenerateChunks(World world)
 	{
 		int chunkWidth = world.getWidth() / Chunk.getChunkWidth();
-		int chunkHeight = world.getHeight() / Chunk.getChunkHeight();
-	
+		
 		for(int i = 0; i < chunkWidth; i++)
 		{
-			for(int j = 0; j < chunkHeight; j++)
-			{
-				world.registerChunk(new Chunk(Biome.forest, i, j), i, j);
-			}
+			
+			world.registerChunk(new Chunk(Biome.forest, i, world.getHeight()), i);
+			
 		}
 	}
 }
