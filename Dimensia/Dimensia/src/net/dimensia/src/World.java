@@ -85,7 +85,9 @@ public class World implements Serializable
 	private float previousLightLevel;
 	private EntityLivingNPCEnemy[] spawnList;
 	private LightUtils utils;
-
+	private boolean lightingUpdateRequired;
+	private Settings gameSettings;
+	
 	/**
 	 * Reconstructs a world from a save file. This is the first step.
 	 */
@@ -101,6 +103,7 @@ public class World implements Serializable
 		manager = new SpawnManager();
 		utils = new LightUtils();
 		checkChunks();
+		lightingUpdateRequired = true;
 	}
 	
 	/**
@@ -133,6 +136,8 @@ public class World implements Serializable
 		chunkWidth = width / Chunk.getChunkWidth();
 		chunkHeight = height / height;
 		utils = new LightUtils();
+		lightingUpdateRequired = true;
+		gameSettings = new Settings();
 		checkChunks();
 	}
 		
@@ -161,6 +166,14 @@ public class World implements Serializable
 		}
 		
 		player.respawnXPos = getWorldCenterOrtho();
+		
+		//requestRequiredChunks((int)(player.respawnXPos / 6), (int)(player.y / 6));
+		//chunkManager.addAllLoadedChunks_Wait(this, chunks);
+		
+		requestRequiredChunks(getWorldCenterBlock(), averageSkyHeight);
+		chunkManager.addAllLoadedChunks_Wait(this, getChunks());
+		
+		
 		for(int i = 0; i < height - 1; i++)
 		{
 			if(getBlock((int)(player.respawnXPos / 6), i).blockID == 0 && getBlock((int)(player.respawnXPos / 6) + 1, i).blockID == 0) 
@@ -176,7 +189,7 @@ public class World implements Serializable
 		}
 		return player;
 	}
-	
+		
 	/**
 	 * Opens the worlddata.dat file and applies all the data to the reconstructed world. Then final reconstruction is performed.
 	 * @param BASE_PATH the base path for the Dimensia folder, stored on disk
@@ -185,7 +198,8 @@ public class World implements Serializable
 	 * @throws IOException indicates the load operation has failed to perform the required I/O. This error is critical
 	 * @throws ClassNotFoundException indicates casting of an object has failed, due to incorrect class version or the class not existing
 	 */
-	public void loadAndApplyWorldData(final String BASE_PATH, String worldName, String dir) throws FileNotFoundException, IOException, ClassNotFoundException
+	public void loadAndApplyWorldData(final String BASE_PATH, String worldName, String dir)
+			throws FileNotFoundException, IOException, ClassNotFoundException
 	{
 		//Open an input stream for the file
 		ObjectInputStream ois = new ObjectInputStream(new DataInputStream(new GZIPInputStream(new FileInputStream(BASE_PATH + "/World Saves/" + worldName + "/" + dir + "/worlddata.dat")))); 
@@ -243,21 +257,16 @@ public class World implements Serializable
 	 */
 	private void requestRequiredChunks(int x, int y)
 	{
-		final int loadDistanceHorizontally = (((int)(Display.getWidth() / 2.2) + 3) > Chunk.getChunkWidth()) ? ((int)(Display.getWidth() / 2.2) + 3) : Chunk.getChunkWidth();
-		final int loadDistanceVertically = (((int)(Display.getHeight() / 2.2) + 3) > height) ? ((int)(Display.getHeight() / 2.2) + 3) : height;
+		final int loadDistanceHorizontally = (((int)(Display.getWidth() / 2.2) + 3) > Chunk.getChunkWidth()) ? 
+				((int)(Display.getWidth() / 2.2) + 3) : Chunk.getChunkWidth();
 		
 		//Where to check, in the chunk map (based off loadDistance variables)
 		int leftOff = (x - loadDistanceHorizontally) / Chunk.getChunkWidth();
 		int rightOff = (x + loadDistanceHorizontally) / Chunk.getChunkWidth();
-		int upOff = (y - loadDistanceVertically) / height;
-		int downOff = ( y + loadDistanceVertically) / height;
-	
+		
 		for(int i = leftOff; i <= rightOff; i++) //Check for chunks that need loaded
 		{
-			for(int k = upOff; k <= downOff; k++) 
-			{
-				chunkManager.requestChunk("Earth", this, getChunks(), i);
-			}
+			chunkManager.requestChunk("Earth", this, getChunks(), i);
 		}
 	}
 	
@@ -300,8 +309,7 @@ public class World implements Serializable
 		if(getLightLevel() != previousLightLevel) //if the sunlight has changed, update it
 		{
 			previousLightLevel = getLightLevel();
-
-			applyAmbientLightingUpdates(player);
+			lightingUpdateRequired = true;
 		}		
 	}
 	
@@ -315,7 +323,7 @@ public class World implements Serializable
 		
 		float time = (float)(worldTime) / GAMETICKSPERHOUR; 
 		
-		return (time < 4 || time > 20) ? 1.0f : (time >= 4 && time <= 8) ? ((((time - 4) / 4.0F) * 0.8F) + 0.2F) : (time >= 16 && time <= 20) ? ((((time - 16) / 4.0F) * 0.8F) + 0.2F) : 0.2f;
+		return (time > 8 && time < 16) ? 1.0f : (time >= 4 && time <= 8) ? MathHelper.roundDownFloat20th(((((time - 4) / 4.0F) * 0.8F) + 0.2F)) : (time >= 16 && time <= 20) ? MathHelper.roundDownFloat20th(1.0F - ((((time - 16) / 4.0F) * 0.8F) + 0.2F)) : 0.2f;
 	}
 		
 	/**
@@ -394,7 +402,9 @@ public class World implements Serializable
 		//spawnMonsters(player);				
 		causeWeather();		
 		//update the player
+		
 		player.onWorldTick(this); 
+		
 		//Update Entities
 		updateMonsters(player); 
 		updateNPCs(player);
@@ -411,7 +421,9 @@ public class World implements Serializable
 		//checkChunks();
 		updateChunks(player);
 		updateMonsterStatusEffects();
-		applyLightingUpdates();
+		applyLightingUpdates(player);
+		
+		
 		if(chunkManager.isAnyLoadOperationDone())
 		{
 			chunkManager.addAllLoadedChunks(this, getChunks());
@@ -1242,26 +1254,39 @@ public class World implements Serializable
 	 * @param my y position in the worldmap array, of the BlockWood
 	 */
 	public void breakTree(EntityLivingPlayer player, int mx, int my){
+		
 		do{
-			if (getBlock(mx, my-1).getBlockID() == Block.tree.getBlockID()){ //If there's a tree above, break it
-				handleBlockBreakEvent(player, mx, my-1);
+			if(my >= 1)
+			{
+				if (getBlock(mx, my-1).getBlockID() == Block.tree.getBlockID()){ //If there's a tree above, break it
+					handleBlockBreakEvent(player, mx, my-1);
+				}
 			}
-			if (getBlock(mx-1, my).getBlockID() == Block.treebranch.getBlockID() || getBlock(mx-1, my).getBlockID() == Block.treebase.getBlockID()){
-				handleBlockBreakEvent(player, mx - 1, my); //If there is a left branch/base on the same level, break it
+			if(mx >= 1)
+			{
+				if (getBlock(mx-1, my).getBlockID() == Block.treebranch.getBlockID() || getBlock(mx-1, my).getBlockID() == Block.treebase.getBlockID()){
+					handleBlockBreakEvent(player, mx - 1, my); //If there is a left branch/base on the same level, break it
+				}
 			}
-			if (getBlock(mx+1, my).getBlockID() == Block.treebranch.getBlockID() || getBlock(mx+1, my).getBlockID() == Block.treebase.getBlockID()){
-				handleBlockBreakEvent(player, mx + 1, my); //Same for right branches/bases
+			if(mx + 1 < width)
+			{
+				if (getBlock(mx+1, my).getBlockID() == Block.treebranch.getBlockID() || getBlock(mx+1, my).getBlockID() == Block.treebase.getBlockID()){
+					handleBlockBreakEvent(player, mx + 1, my); //Same for right branches/bases
+				}
 			}
-			if (getBlock(mx, my - 1).getBlockID() == Block.treetopc2.getBlockID()){
-				handleBlockBreakEvent(player, mx + 1, my - 1); //Break a canopy
-				handleBlockBreakEvent(player, mx + 1, my - 2);
-				handleBlockBreakEvent(player, mx, my - 1);
-				handleBlockBreakEvent(player, mx, my - 2);
-				handleBlockBreakEvent(player, mx - 1, my - 1);
-				handleBlockBreakEvent(player, mx - 1, my - 2);
+			if(mx + 1 < width && mx >= 1 && my >= 1)
+			{
+				if (getBlock(mx, my - 1).getBlockID() == Block.treetopc2.getBlockID()){
+					handleBlockBreakEvent(player, mx + 1, my - 1); //Break a canopy
+					handleBlockBreakEvent(player, mx + 1, my - 2);
+					handleBlockBreakEvent(player, mx, my - 1);
+					handleBlockBreakEvent(player, mx, my - 2);
+					handleBlockBreakEvent(player, mx - 1, my - 1);
+					handleBlockBreakEvent(player, mx - 1, my - 2);
+				}
 			}
 			my--; //Move the check upwards 1 block
-		}while (getBlock(mx, my-1).getBlockID() == Block.tree.getBlockID()  //Loop as long as part of the tree is above
+		}while (my >= 1 && getBlock(mx, my-1).getBlockID() == Block.tree.getBlockID()  //Loop as long as part of the tree is above
 			|| getBlock(mx, my-1).getBlockID() == Block.treetopc2.getBlockID());
 	}
 
@@ -1599,7 +1624,6 @@ public class World implements Serializable
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
 		}
 		return Block.air;
 	}
@@ -1712,7 +1736,7 @@ public class World implements Serializable
 		}
 		for(int i = leftOff; i <= rightOff; i++) //Check for chunks that need loaded
 		{
-			if(!chunksLoaded.get(""+i)) //If a needed chunk isnt loaded, request it.
+			if(chunksLoaded.get(""+i) != null && !chunksLoaded.get(""+i)) //If a needed chunk isnt loaded, request it.
 			{
 				chunkManager.requestChunk("Earth", this, chunks, i);
 			}
@@ -1911,95 +1935,72 @@ public class World implements Serializable
 		}
 		return 1.0f;
 	}
-
 	
-	public void applyLightSource(EntityLivingPlayer player, Block block, final int x, final int y, final int radius, final float strength)
+	/**
+	 * Updates the ambient lighting based on the world time and light level (from getLightLevel())
+	 */
+	public void updateAmbientLighting()
 	{
-		utils.applyLightSource(this, x, y, radius, strength);
+		Enumeration<String> keys = chunks.keys();
+		//Update the lighting in all the chunks (this is now efficient enough to work)
+		while (keys.hasMoreElements()) 
+        {
+            Chunk chunk = chunks.get((String)keys.nextElement());
+        	utils.applyAmbientChunk(this, chunk);
+    	}
 	}
 	
-	public void removeLightSource(EntityLivingPlayer player, final int x, final int y, final int radius, final float strength)
-	{
-		utils.removeLightSource(this, x, y, radius, strength);
-	}
-	
-	public void updateAmbientLighting(Chunk chunk)
-	{
-		utils.applyAmbientChunk(this, chunk);
-	}
-	
-	public void updateAmbientLightAll()
-	{
-		utils.applyAmbient(this);
-	}
-	
-	public void blockUpdateLighting(int x, int y, EnumEventType eventType)
-	{
-		utils.blockUpdateAmbient(this, x, y, eventType);		
-	}
-	
-	public void applyAmbientLightingUpdates(EntityLivingPlayer player)
-	{
-		if(worldTime % 20 == 0)
-		{
-			Chunk[] chunks = ChunkUtils.getRequiredChunks(this, player);
-			for(Chunk chunk : chunks)
-			{
-				utils.applyAmbientChunk(this, chunk);
-			}
-			//updateAmbientLighting();
-		}
-	}
-	
+	/**
+	 * Sets the block and applies relevant lighting to the area nearby. Includes an EnumEventType to describe the event, although
+	 * it is currently not used for anything.
+	 * @param block the new block to be placed at (x,y)
+	 * @param x the x position where the block will be placed
+	 * @param y the y position where the block will be placed
+	 * @param eventType
+	 */
 	public void setBlock(Block block, int x, int y, EnumEventType eventType)
 	{
-		//if(worldTime % 20 == 0)
-		//{
-		if(eventType == EnumEventType.EVENT_BLOCK_PLACE_LIGHT)
-		{
-			utils.fixDiffuseLightRemove(this, x, y);
-			
-			//blockUpdateLighting(x, y, eventType);
-		//	if(eventType != EnumEventType.EVENT_BLOCK_PLACE )
-		//	{
-				setBlock(block, x, y);
-		//	}
-			blockUpdateLighting(x, y, eventType);
-			utils.fixDiffuseLightApply(this, x, y);
-		//}
-		}
-		else
-		{
-			utils.fixDiffuseLightRemove(this, x, y);
-			
-			//blockUpdateLighting(x, y, eventType);
-		//	if(eventType != EnumEventType.EVENT_BLOCK_PLACE )
-		//	{
-				setBlock(block, x, y);
-		//	}
-			blockUpdateLighting(x, y, eventType);
-			utils.fixDiffuseLightApply(this, x, y);
-		//}
-		}
+		utils.fixDiffuseLightRemove(this, x, y);
+		setBlock(block, x, y);
+		utils.blockUpdateAmbient(this, x, y, eventType);		
+		utils.fixDiffuseLightApply(this, x, y);
 	}
-
-	public void applyLightingUpdates()
+	
+	/**
+	 * Called on world tick. Updates the lighting if it's appropriate to do so. It is considered appropriate if the light level of
+	 * the world has changed, or if the chunk (for whatever reason) has been flagged for a lighting update by a source.
+	 * @param player
+	 */
+	public void applyLightingUpdates(EntityLivingPlayer player)
 	{
-		//if(worldTime % 20 == 0)
-		//{
-			Enumeration<String> keys = chunks.keys();
-	        while (keys.hasMoreElements()) 
-	        {
-	            Object key = keys.nextElement();
-	            String str = (String) key;
-	            Chunk chunk = chunks.get(str);
-	            if(!chunk.lightUpdated)
-	            {
-	            	chunk.updateChunkLight();
-	            	chunk.lightUpdated = true;
-	            }
-	        }
-		//}
+		//If the light level has changed, update the ambient lighting.
+		if(lightingUpdateRequired)
+		{
+			updateAmbientLighting();
+			lightingUpdateRequired = false;
+		}
+		
+		Enumeration<String> keys = chunks.keys();
+        while (keys.hasMoreElements()) 
+        {
+            Object key = keys.nextElement();
+            String str = (String) key;
+            Chunk chunk = chunks.get(str);
+                        
+            //If the chunk has been flagged for an ambient lighting update, update the lighting
+            if(chunk.isFlaggedForLightingUpdate())
+            {
+            	utils.applyAmbientChunk(this, chunk);
+            	chunk.setFlaggedForLightingUpdate(false);
+            }
+                    
+            //If the light in the chunk has changed, update the light[][] used for rendering
+            if(!chunk.isLightUpdated())
+            {
+            	chunk.updateChunkLight();
+            	chunk.setLightUpdated(true);
+            }
+        }
 	}
 	
 }

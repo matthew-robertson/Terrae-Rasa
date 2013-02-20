@@ -5,8 +5,8 @@ import java.io.Serializable;
  * <code>Chunk implements Serializable</code>
  * <br>
  * <code>Chunk</code> implements something that is similar to a C(++) struct. It stores data relating to
- * back walls, Blocks, and lighting values. Upon initialization, all Blocks and backwalls are set to be air, 
- * not null, due to nullpointer issues that were previously occuring. Additionally, each chunk stores
+ * back walls, Blocks, and lighting values (including ambient, diffuse, and total). Upon initialization, all Blocks and backwalls 
+ * are set to be air,  not null, due to nullpointer issues that were previously occuring. Additionally, each chunk stores
  * its own position in the chunk array, should it be requested. 
  * <br><br>
  * Each method in <code>Chunk</code> is either synchronized or final to make <code>Chunk</code> 
@@ -23,7 +23,7 @@ import java.io.Serializable;
  * 
  * @author      Alec Sobeck
  * @author      Matthew Robertson
- * @version     1.0
+ * @version     1.1
  * @since       1.0
  */
 public class Chunk 
@@ -32,8 +32,11 @@ public class Chunk
 	/** V2 includes lighting */
 	private static final long serialVersionUID = 2L;
 	private Biome biome;
+	/** Light is the total of ambient and diffuse light. This value is inverted (0.0F becomes 1.0F, etc) to optimize rendering */
 	public final float[][] light;
+	/** Diffuse light is light from light sources*/
 	public final float[][] diffuseLight;
+	/** Ambient light is light from the sun */
 	public final float[][] ambientLight;
 	public final Block[][] backWalls;
 	public final Block[][] blocks;
@@ -41,7 +44,8 @@ public class Chunk
 	private boolean wasChanged;
 	private static final int CHUNK_WIDTH = 100;
 	private final int CHUNK_HEIGHT;
-	public boolean lightUpdated;
+	private boolean lightUpdated;
+	private boolean flaggedForLightingUpdate;
 	
 	/**
 	 * Constructs a new Chunk. Chunks are initialized with blocks[][] fully set to air, and backwalls[][]
@@ -54,8 +58,7 @@ public class Chunk
 	public Chunk(Biome biome, int x, final int height)
 	{
 		this.CHUNK_HEIGHT = height;
-		//this.biome = biome;
-		this.biome = Biome.forest;
+		this.biome = new Biome(biome);
 		blocks = new Block[CHUNK_WIDTH][CHUNK_HEIGHT];
 		backWalls = new Block[CHUNK_WIDTH][CHUNK_HEIGHT];
 		for(int i = 0; i < CHUNK_WIDTH; i++)
@@ -67,6 +70,7 @@ public class Chunk
 			}
 		}
 		
+		setFlaggedForLightingUpdate(false);
 		light = new float[CHUNK_WIDTH][CHUNK_HEIGHT];
 		diffuseLight = new float[CHUNK_WIDTH][CHUNK_HEIGHT];
 		ambientLight = new float[CHUNK_WIDTH][CHUNK_HEIGHT];
@@ -83,7 +87,8 @@ public class Chunk
 	}
 	
 	/**
-	 * Gets the height of this chunk, the height of a chunk can change based on the world size selected.
+	 * Gets the height of this chunk, the height of a chunk can change based on the world size selected. It should be the 
+	 * world's height.
 	 * @return the height of this chunk
 	 */
 	public final int getChunkHeight()
@@ -91,18 +96,22 @@ public class Chunk
 		return CHUNK_HEIGHT;
 	}
 	
+	/**
+	 * Gets the biome for this specific chunk.
+	 * @return the biome of this chunk
+	 */
 	public final Biome getBiome()
 	{
 		return biome;
 	}
 	
 	/**
-	 * Sets the biome of the chunk to the specified new biome type
+	 * Sets the biome of the chunk to the specified new biome type, creating a deep copy of the biome.
 	 * @param biome the new biome type assigned to this chunk
 	 */
 	public synchronized void setBiome(Biome biome)
 	{
-		this.biome = biome;
+		this.biome = new Biome(biome);
 	}
 	
 	/**
@@ -174,29 +183,20 @@ public class Chunk
 		return x;
 	}
 	
-	public void printLight()
-	{
-		for(int i = 0; i < CHUNK_WIDTH; i++)
-		{
-			for(int j = 0; j < CHUNK_HEIGHT; j++)
-			{
-				System.out.printf("%4.2f", light[i][j]);
-			}
-			System.out.println();
-		}
-	}
-	
-	public float getDiffuseLight(int x, int y)
+	public final float getDiffuseLight(int x, int y)
 	{
 		return diffuseLight[x][y];
 	}
 	
-	public float getAmbientLight(int x, int y)
+	public final float getAmbientLight(int x, int y)
 	{
 		return ambientLight[x][y];
 	}
 	
-	public void updateChunkLight()
+	/**
+	 * Updates the light[][] for rendering. A value of 0.0F is full light, 1.0F is full darkness. This is inverted for optimization reasons.
+	 */
+	public synchronized void updateChunkLight()
 	{
 		for(int i = 0; i < CHUNK_WIDTH; i++)
 		{
@@ -207,14 +207,37 @@ public class Chunk
 		}	
 	}
 	
-	public void clearAmbientLight()
+	/**
+	 * Sets all the ambientlight[][] to 0.0F (no light)
+	 */
+	public synchronized void clearAmbientLight()
 	{
 		for(int i = 0; i < CHUNK_WIDTH; i++)
 		{
 			for(int k = 0; k < CHUNK_HEIGHT; k++)
 			{
-				ambientLight[i][k] = 0.0F;//MathHelper.sat(1.0F - ambientLight[i][k] - diffuseLight[i][k]);
+				ambientLight[i][k] = 0.0F;
 			}
 		}	
+	}
+
+	public final boolean isFlaggedForLightingUpdate() 
+	{
+		return flaggedForLightingUpdate;
+	}
+
+	public synchronized void setFlaggedForLightingUpdate(boolean flaggedForLightingUpdate) 
+	{
+		this.flaggedForLightingUpdate = flaggedForLightingUpdate;
+	}
+
+	public final boolean isLightUpdated() 
+	{
+		return lightUpdated;
+	}
+
+	public synchronized void setLightUpdated(boolean lightUpdated) 
+	{
+		this.lightUpdated = lightUpdated;
 	}	
 }

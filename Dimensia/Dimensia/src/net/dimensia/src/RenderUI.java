@@ -561,36 +561,38 @@ public class RenderUI extends Render
 		t.draw();			
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		GL11.glColor4f(0, 0, 0, 1);
-		x1 = getCameraX() + 10;
-		y1 = getCameraY() + 25;		
-		newX = (int) (100);
-		newY = 11;		
-		t.startDrawingQuads();
-		t.addVertexWithUV(x1, y1 + newY, 0, 0, 1);
-		t.addVertexWithUV(x1 + newX, y1 + newY, 0, 1, 1);
-		t.addVertexWithUV(x1 + newX, y1, 0, 1, 0);
-		t.addVertexWithUV(x1, y1, 0, 0, 0);
-		t.draw();			
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		if(player.maxMana > 0)
+		{
+			GL11.glDisable(GL11.GL_TEXTURE_2D);
+			GL11.glColor4f(0, 0, 0, 1);
+			x1 = getCameraX() + 10;
+			y1 = getCameraY() + 25;		
+			newX = (int) (100);
+			newY = 11;		
+			t.startDrawingQuads();
+			t.addVertexWithUV(x1, y1 + newY, 0, 0, 1);
+			t.addVertexWithUV(x1 + newX, y1 + newY, 0, 1, 1);
+			t.addVertexWithUV(x1 + newX, y1, 0, 1, 0);
+			t.addVertexWithUV(x1, y1, 0, 0, 0);
+			t.draw();			
+			GL11.glEnable(GL11.GL_TEXTURE_2D);
+			
+			GL11.glDisable(GL11.GL_TEXTURE_2D);
+			GL11.glColor4f(0, 0, 1, 1);
+			x1 = getCameraX() + 10;
+			y1 = getCameraY() + 25;		
+			newX = (int) (player.mana / player.maxMana * 100);
+			newY = 11;		
+			t.startDrawingQuads();
+			t.addVertexWithUV(x1, y1 + newY, 0, 0, 1);
+			t.addVertexWithUV(x1 + newX, y1 + newY, 0, 1, 1);
+			t.addVertexWithUV(x1 + newX, y1, 0, 1, 0);
+			t.addVertexWithUV(x1, y1, 0, 0, 0);
+			t.draw();			
+			GL11.glEnable(GL11.GL_TEXTURE_2D);
+		}
 		
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		GL11.glColor4f(0, 0, 1, 1);
-		x1 = getCameraX() + 10;
-		y1 = getCameraY() + 25;		
-		newX = (int) (player.mana / player.maxMana * 100);
-		newY = 11;		
-		t.startDrawingQuads();
-		t.addVertexWithUV(x1, y1 + newY, 0, 0, 1);
-		t.addVertexWithUV(x1 + newX, y1 + newY, 0, 1, 1);
-		t.addVertexWithUV(x1 + newX, y1, 0, 1, 0);
-		t.addVertexWithUV(x1, y1, 0, 0, 0);
-		t.draw();			
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		
-		if(true) return;
-		
+		/*
 		float heartsFull = (float)player.health / 20;	//How many hearts are full? (partial hearts are important too!)	
 		float partialHeartValue = heartsFull - ((int)(player.health / 20));
 		player_heart.bind();
@@ -740,6 +742,7 @@ public class RenderUI extends Render
 			t.draw();	
 		}
 		GL11.glColor4f(1, 1, 1, 1); //Safety Colour Clear 	
+		*/
 	}
 
 	/**
@@ -1189,8 +1192,10 @@ public class RenderUI extends Render
 			String health = new StringBuilder().append((int)player.health).append(" / ").append(player.maxHealth).toString();
 			trueTypeFont.drawString((getCameraX() + 35), (getCameraY() + 22), health, 0.3f, -0.3f);
 			
+			int offset = (player.maxMana < 100) ? 5 : 0;
+			
 			String mana = new StringBuilder().append((int)player.mana).append(" / ").append(player.maxMana).toString();
-			trueTypeFont.drawString((getCameraX() + 40), (getCameraY() + 37), mana, 0.3f, -0.3f);
+			trueTypeFont.drawString((getCameraX() + 35 + offset), (getCameraY() + 37), mana, 0.3f, -0.3f);
 		}
 		
 		if(player.isInventoryOpen)

@@ -360,7 +360,7 @@ public class LightUtils
 			//System.out.println("x="+ x);
 		}
 		
-	    chunk.lightUpdated = false;
+	    chunk.setLightUpdated(false);
        
     }	
 
@@ -707,7 +707,7 @@ public class LightUtils
 			}
 			
 			
-		    world.getChunks().get(""+(int)(x / Chunk.getChunkWidth())).lightUpdated = false;
+		    world.getChunks().get(""+(int)(x / Chunk.getChunkWidth())).setLightUpdated(false);
 		}
 		else if(world.getAmbientLight(x, y - 1) > 0)
 		{
@@ -789,7 +789,7 @@ public class LightUtils
 			}
 			
 			
-		    world.getChunks().get(""+(int)(x / Chunk.getChunkWidth())).lightUpdated = false;
+		    world.getChunks().get(""+(int)(x / Chunk.getChunkWidth())).setLightUpdated(false);
 			
 			
 		}	

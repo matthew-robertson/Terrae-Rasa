@@ -14,6 +14,26 @@ import org.lwjgl.opengl.Display;
 public class MathHelper 
 {	
 	/**
+	 * Rounds down a float value to the nearest 20th (0.05). For example, the value 6.7754f will be rounded down to 6.75f;
+	 * @param f the value to round down to the nearest 20th
+	 * @return the rounded down value (nearest 20th)
+	 */
+	public static float roundDownFloat20th(float f)
+	{
+		return (float)(Math.floor(f * 20 + 0.5) / 20);
+	}
+
+	/**
+	 * Rounds down a float value to the nearest 10th (0.1). For example, the value 6.7233f will be rounded down to 6.7f.
+	 * @param f the value to round down to the nearest 10th
+	 * @return the rounded down value (nearest 10th)
+	 */
+	public static float roundDownFloat10th(float f)
+	{
+		return (float)(Math.floor(f * 10 + 0.5) / 10);
+	}
+	
+	/**
 	 * Returns a value between 0.0F and 1.0F, preferring the original value given if possible
 	 * @param f the value to check
 	 * @return the original value, if between 0.0F and 1.0F; 0.0F if the value is below 0.0F; 1.0F if the value is above 1.0F

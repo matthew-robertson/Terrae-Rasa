@@ -287,6 +287,8 @@ public class ChunkManager implements Serializable
 				{
 					e.printStackTrace();
 				}
+				chunk.setFlaggedForLightingUpdate(true);
+				
 				String key = ""+chunk.getX();
 				chunks.put(key, chunk);
 				world.chunksLoaded.put(""+chunk.getX(), true);

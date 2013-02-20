@@ -41,6 +41,7 @@ public class EntityLivingPlayer extends EntityLiving
 {
 	private static final long serialVersionUID = 2L;
 	private final static int HEALTH_FROM_STAMINA = 10;
+	private final static int MANA_FROM_INTELLECT = 10;
 	public int viewedChestX;
 	public int viewedChestY;
 	public boolean isViewingChest;	
@@ -50,6 +51,7 @@ public class EntityLivingPlayer extends EntityLiving
 	public int intellect;
 	public int stamina;
 	public int baseMaxHealth;
+	public int baseMaxMana;
 	
 	public float respawnXPos;
 	public float respawnYPos;
@@ -121,11 +123,14 @@ public class EntityLivingPlayer extends EntityLiving
 		health = 100;
 		maxHealth = 100;
 		baseMaxHealth = 100;
+		baseMaxMana = 0;
+		maxMana = 0;
 		if(Dimensia.initInDebugMode)
 		{
 			health = 1;
 			//maxHealth = 400;
 			mana = 1000;
+			baseMaxMana = 20;
 			maxMana = 20;
 			isAffectedByWalls = true; //pretty much no-clip
 			isImmuneToFallDamage = false;
@@ -515,7 +520,7 @@ public class EntityLivingPlayer extends EntityLiving
 		meleeDamageModifier = 1.0f + 0.04f * strength;
 		magicDamageModifier = 1.0f + 0.04f * intellect;
 		maxHealth = baseMaxHealth + (stamina * HEALTH_FROM_STAMINA);
-		
+		maxMana = baseMaxMana + (intellect * MANA_FROM_INTELLECT);
 	}
 	
 	/**
@@ -1122,8 +1127,9 @@ public class EntityLivingPlayer extends EntityLiving
 	 */
 	public boolean boostMaxMana(int increase) 
 	{
-		if(maxMana + increase <= MAXIMUM_BASE_MANA) //if the player can have that much of a max mana increase
+		if(baseMaxMana + increase <= MAXIMUM_BASE_MANA) //if the player can have that much of a max mana increase
 		{
+			baseMaxMana += increase;
 			maxMana += increase; //increase max mana
 			return true;
 		}
