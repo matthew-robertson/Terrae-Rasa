@@ -86,7 +86,6 @@ public class World implements Serializable
 	private EntityLivingNPCEnemy[] spawnList;
 	private LightUtils utils;
 	private boolean lightingUpdateRequired;
-	private Settings gameSettings;
 	
 	/**
 	 * Reconstructs a world from a save file. This is the first step.
@@ -137,7 +136,6 @@ public class World implements Serializable
 		chunkHeight = height / height;
 		utils = new LightUtils();
 		lightingUpdateRequired = true;
-		gameSettings = new Settings();
 		checkChunks();
 	}
 		
@@ -399,7 +397,7 @@ public class World implements Serializable
 	 */
 	public void onWorldTick(EntityLivingPlayer player)
 	{		
-		//spawnMonsters(player);				
+		spawnMonsters(player);				
 		causeWeather();		
 		//update the player
 		

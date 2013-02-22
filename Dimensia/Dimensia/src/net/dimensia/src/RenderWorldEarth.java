@@ -1,17 +1,12 @@
 package net.dimensia.src;
 
-import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
 public class RenderWorldEarth extends RenderWorld
 {	
 	RenderLight renderLight = new RenderLight();
 	public void render(World world, EntityLivingPlayer player) 
-	{	
-		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
-		GL11.glClearColor(0,0,0,0);
-		GL11.glColor4f(1, 1, 1, 1);
-		GL11.glPushMatrix();
+	{		
 		GL11.glEnable(GL11.GL_BLEND);
 
 		renderSkyBackgroundScene(); //Renders the background image thing		
@@ -34,17 +29,6 @@ public class RenderWorldEarth extends RenderWorld
 		renderUI.render(world, player);		
 		
 		GL11.glDisable(GL11.GL_ALPHA_TEST);
-		GL11.glDisable(GL11.GL_BLEND);			
-		GL11.glPopMatrix();
-	
-		try 
-		{
-			Display.swapBuffers();
-		    Display.update(); //updates the display
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		} 
+		GL11.glDisable(GL11.GL_BLEND);	
 	}
 }

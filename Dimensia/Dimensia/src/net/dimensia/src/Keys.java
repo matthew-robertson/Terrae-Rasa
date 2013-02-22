@@ -7,28 +7,18 @@ import org.lwjgl.opengl.Display;
 
 public class Keys
 {	
-	private static int count = 0;
 	private static boolean printer;
 	private static boolean actionKeys[] = new boolean[12];
 	private static boolean ic;
+	public static boolean ec;
 	
-	public static void keyboard(World world, EntityLivingPlayer player)
+	public static void keyboard(World world, EntityLivingPlayer player, Settings settings)
 	{	
 		if(Dimensia.initInDebugMode)
 		{
-			if(Keyboard.isKeyDown(Keyboard.KEY_ESCAPE) || Display.isCloseRequested()) //Exit if Escape is pressed or the Window is Closed
+			if((Keyboard.isKeyDown(Keyboard.KEY_Q) && Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) || Display.isCloseRequested()) //Exit if Escape is pressed or the Window is Closed
 			{
 				Dimensia.done = true;
-			}
-			
-			if(Keyboard.isKeyDown(Keyboard.KEY_E) && !ic) //Tooggle inventory
-			{
-				ic = true;
-				player.isInventoryOpen = !player.isInventoryOpen;
-			}
-			if(!Keyboard.isKeyDown(Keyboard.KEY_E))
-			{
-				ic = false;
 			}
 		}
 		else
@@ -36,16 +26,29 @@ public class Keys
 			if(Display.isCloseRequested()) //Exit if Escape is pressed or the Window is Closed
 			{
 				Dimensia.done = true;
-			}
-			if(Keyboard.isKeyDown(Keyboard.KEY_ESCAPE) && !ic) //Tooggle inventory
-			{
-				ic = true;
-				player.isInventoryOpen = !player.isInventoryOpen;
-			}
-			if(!Keyboard.isKeyDown(Keyboard.KEY_ESCAPE))
-			{
-				ic = false;
-			}	
+			}			
+
+			
+		}
+		
+		if(Keyboard.isKeyDown(Keyboard.KEY_ESCAPE) && !ec && !Dimensia.isMainMenuOpen)
+		{
+			ec = true;
+			settings.menuOpen = !settings.menuOpen;
+		}
+		if(!Keyboard.isKeyDown(Keyboard.KEY_ESCAPE))
+		{
+			ec = false;
+		}
+		
+		if(Keyboard.isKeyDown(Keyboard.KEY_E) && !ic) //Toggle inventory
+		{
+			ic = true;
+			player.isInventoryOpen = !player.isInventoryOpen;
+		}
+		if(!Keyboard.isKeyDown(Keyboard.KEY_E))
+		{
+			ic = false;
 		}
 		
 		if(Keyboard.isKeyDown(Keyboard.KEY_A)) //Move Left

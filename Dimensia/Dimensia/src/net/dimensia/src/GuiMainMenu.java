@@ -75,13 +75,9 @@ public class GuiMainMenu extends Render
 	public void render()
 	{	
 		try
-		{
-			GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
-			GL11.glClearColor(0,0,0,0);
-			GL11.glColor4f(1, 1, 1, 1);
+		{			
 			GL11.glLoadIdentity();
 			GL11.glTranslatef(0, 0, -2000f);
-			GL11.glPushMatrix();
 			GL11.glDisable(GL11.GL_BLEND);
 			GL11.glAlphaFunc(GL11.GL_GREATER, 0.1f);
 			GL11.glEnable(GL11.GL_ALPHA_TEST);	
@@ -95,9 +91,6 @@ public class GuiMainMenu extends Render
 			mouseEvents();
 			
 			GL11.glDisable(GL11.GL_ALPHA_TEST);
-			GL11.glPopMatrix();
-			Display.swapBuffers(); //allows the display to update when using VBO's, probably
-	        Display.update(); //updates the display
 		}
 		catch (Exception e)
 		{
