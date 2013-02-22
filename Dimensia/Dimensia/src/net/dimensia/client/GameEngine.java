@@ -15,12 +15,15 @@ import net.dimensia.src.Keys;
 import net.dimensia.src.LightUtils;
 import net.dimensia.src.MouseInput;
 import net.dimensia.src.RenderGlobal;
+import net.dimensia.src.RenderMenu;
+import net.dimensia.src.Settings;
 import net.dimensia.src.SoundManager;
 import net.dimensia.src.World;
 import net.dimensia.src.WorldHell;
 import net.dimensia.src.WorldSky;
 
 import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GL11;
 
 public class GameEngine 
 {
@@ -34,10 +37,13 @@ public class GameEngine
 	public WorldHell worldHell;
 	public WorldSky worldSky;
 	public EntityLivingPlayer player;
+	public Settings settings;
+	public RenderMenu renderMenu;
 	
 	public GameEngine()
 	{
 		renderMode = RENDER_MODE_WORLD_EARTH;
+		settings = new Settings();
 	}
 	
 	public void setWorld(World world)
@@ -64,10 +70,13 @@ public class GameEngine
 		        loops = 0;
 		        while(System.currentTimeMillis() > next_game_tick && loops < MAX_FRAMESKIP) //Update the game 20 times/second 
 		        {
-		        	if(!Dimensia.isMainMenuOpen) //Handle game inputs if the main menu isnt open (aka the game is being played)
+		        	if(settings.menuOpen /*&& Dimensia.isMainMenuOpen*/)
+		        	{ 
+		        	}
+		        	else if(!Dimensia.isMainMenuOpen) //Handle game inputs if the main menu isnt open (aka the game is being played)
 		        	{
 		        		MouseInput.mouse(world, player);
-		        		Keys.keyboard(world, player);	            
+		        		Keys.keyboard(world, player, settings);	            
 		        		
 		        		if(renderMode == RENDER_MODE_WORLD_EARTH) //Player is in the overworld ('earth')
 		        		{
@@ -91,17 +100,22 @@ public class GameEngine
 		        	 
 		        	next_game_tick += SKIP_TICKS;
 		            loops++;
-		            
-		            /*
-		            if(System.currentTimeMillis() - next_game_tick  > 1000)
-		            {
-		            	next_game_tick = System.currentTimeMillis();
-		            	break;
-		            }
-		            */
 		        }
+		        
+		        //Make sure the game loop doesn't fall very far behind and have to accelerate the 
+		        //game for an extended period of time
+		        if(System.currentTimeMillis() - next_game_tick > 1000)
+		        {
+		        	next_game_tick = System.currentTimeMillis();
+		        }
+		        
 		        Display.update();
-	            
+		    	GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+				GL11.glClearColor(0,0,0,0);
+				GL11.glColor4f(1, 1, 1, 1);
+				GL11.glPushMatrix();
+		        
+		        
 		        if(Dimensia.isMainMenuOpen) //if the main menu is open, render that, otherwise render the game
 		        {
 		        	mainMenu.render();
@@ -120,7 +134,19 @@ public class GameEngine
 		    		{
 		    		 	RenderGlobal.render(worldSky, player, renderMode); //Renders Everything on the screen for the game
 		    		}
-		    	}
+		        }
+		        
+		        if(settings.menuOpen)
+		        {
+		        	renderMenu.render(world, settings);
+		        }
+		        
+		        GL11.glPopMatrix();
+		        
+		        Display.swapBuffers(); //allows the display to update when using VBO's, probably
+		        Display.update(); //updates the display
+
+				
 		        
 	        	end = System.currentTimeMillis();        	
 	       //     System.out.println(end - start);
@@ -154,6 +180,7 @@ public class GameEngine
 	public void init()
 	{
 		mainMenu = new GuiMainMenu();
+		renderMenu = new RenderMenu();
 		
 		if(Dimensia.initInDebugMode)
 		{
