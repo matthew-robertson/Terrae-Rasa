@@ -79,6 +79,8 @@ public class Block implements Serializable, Cloneable
 	protected String blockName;
 	protected boolean passable;
 	protected boolean isSolid;
+	protected int hRange;
+	protected int lRange;
 
 	/**
 	 * Constructs a special Block- air. This constructor should only ever be used for the initial declaration
@@ -269,6 +271,16 @@ public class Block implements Serializable, Cloneable
 		return this;
 	}
 	
+	protected Block setHRange(int i){
+		hRange = i;
+		return this;
+	}
+	
+	protected Block setLRange(int i){
+		lRange = i;
+		return this;
+	}	
+	
 	protected Block setDroppedItem(ItemStack stack, int min, int max)
 	{
 		droppedItem = stack;
@@ -405,6 +417,14 @@ public class Block implements Serializable, Cloneable
 		return isOveridable;
 	}
 	
+	public int getHRange(){
+		return hRange;
+	}
+	
+	public int getLRange(){
+		return lRange;
+	}
+	
 	public boolean isPassable() //Is it possible to walk through this block? 
 	{
 		return (blockID == 0 || passable || this == null);
@@ -445,13 +465,13 @@ public class Block implements Serializable, Cloneable
 	public static Block treetopc2 = new BlockLeaves(23).setBlockName("tree top center bottom").setTileMap('T').setBlockHardness(5.0f).setIconIndex(5, 25).setPassable(true).setIsSolid(false);
 	public static Block treetopr1 = new BlockLeaves(24).setBlockName("tree top right top").setTileMap('T').setBlockHardness(5.0f).setIconIndex(6, 24).setPassable(true).setIsSolid(false);
 	public static Block treetopr2 = new BlockLeaves(25).setBlockName("tree top right bottom").setTileMap('T').setBlockHardness(5.0f).setIconIndex(6, 25).setPassable(true).setIsSolid(false);
-	public static Block gold = new Block(26).setBlockName("gold ore block").setBlockHardness(10.0f).setIconIndex(15, 12).setBlockType(1).setDroppedItem(new ItemStack(Item.goldOre), 1,1);
-	public static Block iron = new Block(27).setBlockName("iron ore block").setBlockHardness(10.0f).setIconIndex(15, 8).setBlockType(1).setDroppedItem(new ItemStack(Item.ironOre), 1,1);
-	public static Block coal = new Block(28).setBlockName("coal ore block").setTileMap('g').setBlockHardness(10.0f).setIconIndex(15,7).setBlockType(1).setDroppedItem(new ItemStack(Item.coal), 1,1);
-	public static Block diamond = new Block(29).setBlockName("diamond ore block").setBlockHardness(10.0f).setIconIndex(15, 15).setBlockType(1).setDroppedItem(new ItemStack(Item.diamond), 1,1);
-	public static Block copper = new Block(30).setBlockName("copper ore block").setBlockHardness(55.0f).setIconIndex(15,10).setBlockType(1).setDroppedItem(new ItemStack(Item.copperOre), 1,1);
-	public static Block silver = new Block(31).setBlockName("silver ore block").setBlockHardness(80.0f).setIconIndex(15, 11).setBlockType(1).setDroppedItem(new ItemStack(Item.silverOre), 1,1);
-	public static Block tin = new Block(32).setBlockName("tin ore block").setBlockHardness(55.0f).setIconIndex(15, 9).setBlockType(1).setDroppedItem(new ItemStack(Item.tinOre), 1,1);
+	public static Block gold = new BlockOre(26).setBlockName("gold ore block").setBlockHardness(10.0f).setHRange(0).setLRange(3).setIconIndex(15, 12).setBlockType(1).setDroppedItem(new ItemStack(Item.goldOre), 1,1);
+	public static Block iron = new BlockOre(27).setBlockName("iron ore block").setBlockHardness(10.0f).setHRange(5).setLRange(10).setIconIndex(15, 8).setBlockType(1).setDroppedItem(new ItemStack(Item.ironOre), 1,1);
+	public static Block coal = new BlockOre(28).setBlockName("coal ore block").setTileMap('g').setHRange(20).setLRange(10).setBlockHardness(10.0f).setIconIndex(15,7).setBlockType(1).setDroppedItem(new ItemStack(Item.coal), 1,1);
+	public static Block diamond = new BlockOre(29).setBlockName("diamond ore block").setBlockHardness(10.0f).setHRange(0).setLRange(1).setIconIndex(15, 15).setBlockType(1).setDroppedItem(new ItemStack(Item.diamond), 1,1);
+	public static Block copper = new BlockOre(30).setBlockName("copper ore block").setBlockHardness(55.0f).setHRange(20).setLRange(0).setIconIndex(15,10).setBlockType(1).setDroppedItem(new ItemStack(Item.copperOre), 1,1);
+	public static Block silver = new BlockOre(31).setBlockName("silver ore block").setBlockHardness(80.0f).setHRange(0).setLRange(5).setIconIndex(15, 11).setBlockType(1).setDroppedItem(new ItemStack(Item.silverOre), 1,1);
+	public static Block tin = new BlockOre(32).setBlockName("tin ore block").setBlockHardness(55.0f).setHRange(10).setLRange(0).setIconIndex(15, 9).setBlockType(1).setDroppedItem(new ItemStack(Item.tinOre), 1,1);
 	public static Block redflower = new Block(33).setBlockName("red flower").setBlockHardness(10.0f).setIconIndex(0, 1).setPassable(true).setIsOveridable(true).setIsSolid(false);
 	public static Block yellowflower = new Block(34).setBlockName("yellow flower").setBlockHardness(10.0f).setIconIndex(0, 1).setPassable(true).setIsOveridable(true).setIsSolid(false);
 	public static Block tallgrass = new Block(35).setBlockName("tall grass").setBlockHardness(10.0f).setIconIndex(0, 1).setPassable(true).setIsOveridable(true).setIsSolid(false);
