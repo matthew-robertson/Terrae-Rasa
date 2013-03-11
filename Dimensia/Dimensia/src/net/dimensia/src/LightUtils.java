@@ -5,7 +5,6 @@ import java.util.Enumeration;
 public class LightUtils 
 {
 	private final float LIGHT_BLOCK_DISSIPATES = 0.25F;
-	private final int AMBIENT_LIGHT_CLEAR_RADIUS = 10;
 	private final int DIFFUSE_LIGHT_CHECK_RADIUS = 20;
 
 	public void applyLightSource(World world, int xSource, int ySource, final int radius, final float strength)
@@ -87,6 +86,89 @@ public class LightUtils
         }
     
 	}
+	
+	public float[][] getLightMap(World world, int xSource, int ySource, final int radius, final float strength)
+	{
+		//not bounds safe
+		float[][] lightMap = new float[radius * 2][radius * 2];
+		
+		for(int x = xSource - radius; x < xSource + radius; x++)
+		{
+			for(int y = ySource - radius; y < ySource + radius; y++)
+			{
+				Vector2 vect = subtractVector(x, y, xSource, ySource);				
+				double len = vect.length();			
+				
+				if (x + 1 > world.getWidth() - 1 || x - 1 < 0 || y + 1 > world.getHeight() - 1 || y - 1 < 0)  
+                    continue;  
+                
+				if(len <= radius)
+				{
+					int x1 = xSource;
+					int y1 = ySource;
+					int x2 = x;
+					int y2 = y;
+					
+					int dx = Math.abs(x2 - x1);
+					int dy = Math.abs(y2 - y1);
+
+					int sx = (x1 < x2) ? 1 : -1;
+					int sy = (y1 < y2) ? 1 : -1;
+
+					int err = dx - dy;
+					int blockCount = 0;
+
+					while (true) 
+					{
+						//Count blocks in the way
+					   	//if(solid[x1][y1] == 1)
+					   	//	blockCount++;
+					   	
+						//THIS IS LIKELY AN ERROR!
+						if(!world.getBlock(x1, y1).isPassable())
+							blockCount++;
+							
+					    if (x1 == x2 && y1 == y2) {
+					        break;
+					    }
+
+					    int e2 = 2 * err;
+
+					    if (e2 > -dy) {
+					        err = err - dy;
+					        x1 = x1 + sx;
+					    }
+
+					    if (e2 < dx) {
+					        err = err + dx;
+					        y1 = y1 + sy;
+					    }		   
+					}
+					
+					float maxStrength = strength - (float) (len / radius * strength);
+					float light = sat((maxStrength - (LIGHT_BLOCK_DISSIPATES * blockCount)));
+			
+					lightMap[x - (xSource - radius)][y - (ySource - radius)] = light;
+					//if(light > world.getDiffuseLight(x,y))
+					//{
+					//	world.setDiffuseLight(x,y,world.getDiffuseLight(x, y) + light);
+					//}
+				}				
+			}		
+		}		
+	/*
+		System.out.println();
+		for(int i = 0; i < 20; i++)
+		{
+			for(int j = 0; j < 20; j++)
+			{
+				System.out.printf("%.2f ",lightMap[i][j]);
+			}
+			System.out.println();
+		}
+		*/
+		return lightMap;
+    }
 	
 	public void removeLightSource(World world, int xSource, int ySource, final int radius, final float strength)
 	{

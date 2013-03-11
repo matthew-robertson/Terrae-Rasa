@@ -11,6 +11,7 @@ import static org.lwjgl.opengl.GL11.glTexImage2D;
 import static org.lwjgl.opengl.GL11.glTexParameteri;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.color.ColorSpace;
@@ -30,6 +31,7 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -86,6 +88,17 @@ public class TextureLoader
 
         BufferedImage bufferedImage = loadImage(resourceName);
 
+       
+//        if(resourceName.equals("Resources/terrain_ground.png"))
+//        {
+//        	JFrame app = new JFrame("Move Man");
+//    		//app.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//    		app.add(new DebugFrame(bufferedImage));
+//    		app.setSize(new Dimension(700,700));
+//    		app.setVisible(true);
+//        }
+        
+        
         if (bufferedImage.getColorModel().hasAlpha()) 
         {
             srcPixelFormat = GL_RGBA;
@@ -97,14 +110,25 @@ public class TextureLoader
 
         // convert that image into a byte buffer of texture data
         ByteBuffer textureBuffer = convertImageData(bufferedImage,texture);
-
+        GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);
        
-        glTexParameteri(GL11.GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,  GL11.GL_LINEAR);
-        glTexParameteri(GL11.GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-        
+        glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
+        glTexParameteri (GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
+        glTexParameteri (GL11.GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+        glTexParameteri (GL11.GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
 
+        GL11.glTexEnvf(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_MODULATE);
+        
         // produce a texture from the byte buffer
-        glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, get2Fold(bufferedImage.getWidth()), get2Fold(bufferedImage.getHeight()), 0, srcPixelFormat, GL_UNSIGNED_BYTE, textureBuffer);
+        glTexImage2D(GL11.GL_TEXTURE_2D, 
+        		0, 
+        		srcPixelFormat, 
+        		get2Fold(bufferedImage.getWidth()), 
+        		get2Fold(bufferedImage.getHeight()), 
+        		0, 
+        		srcPixelFormat, 
+        		GL_UNSIGNED_BYTE, 
+        		textureBuffer);
 
         return texture;
     }

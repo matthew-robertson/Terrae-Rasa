@@ -1,5 +1,8 @@
 package net.dimensia.src;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ItemArmor extends Item
 {
 	protected boolean isSavingRelic;
@@ -125,5 +128,53 @@ public class ItemArmor extends Item
 	public int getStamina()
 	{
 		return stamina;
+	}
+	
+	public String[] getStringBonuses()
+	{
+		String[] strBonuses = new String[bonuses.length];
+		for(int i = 0; i < strBonuses.length; i++)
+		{
+			strBonuses[i] = bonuses[i].toString();
+		}
+		return strBonuses;
+	}
+	
+	/**
+	 * Gets the stats of the given item. Basic Items shouldn't have stats, but other Items such as extensions of 
+	 * ItemTool or ItemArmor can override this method and return an actual array of values.
+	 * @return an array of this Item's stats, this should be of size 0
+	 */
+	public String[] getStats()
+	{
+		List<String> stats = new ArrayList<String>();
+		
+		if(defense > 0)
+		{
+			stats.add("Defense: " + defense);
+		}
+		if(dexterity > 0)
+		{
+			stats.add("Dexterity: " + dexterity);
+		}
+		if(strength > 0)
+		{
+			stats.add("Strength: " + strength);	
+		}
+		if(intellect > 0)
+		{
+			stats.add("Intellect: " + intellect);			
+		}
+		if(stamina > 0)
+		{
+			stats.add("Stamina: " + stamina);
+		}
+		
+		String[] strings = new String[stats.size()];
+		for(int i = 0; i < strings.length; i++)
+		{
+			strings[i] = stats.get(i);
+		}
+		return strings;
 	}
 }

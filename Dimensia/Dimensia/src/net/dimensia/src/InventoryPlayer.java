@@ -1,18 +1,22 @@
 package net.dimensia.src;
 
 import java.io.Serializable;
-import java.util.Enumeration;
 import java.util.Hashtable;
 
 /**
- * This class is responsable for holding all the ItemStacks and ItemArmor_ the player currently has. <br>
+ * <code>InventoryPlayer implements Serializable</code> <br> 
  * <br>
- * This class has only one constructor: <br>
+ * <code>InventoryPlayer</code> is responsible for tracking all the items the player is holding or has equipped.
+ * A new instance of <code>InventoryPlayer</code> creates a mainInventory of size 48, an armour inventory of size 
+ * 10 (which is not fully used), and a garbage can of size 1 (see {@link #InventoryPlayer()} for any other 
+ * uses of the Constructor).
+ * <br><br>
  * 
- * {@link #InventoryPlayer()}
- * 
- * 
- *
+ * /home/alec/Desktop/Dimensia/Dimensia/src/net/dimensia/client/
+ * @author      Alec Sobeck
+ * @author      Matthew Robertson
+ * @version     1.0
+ * @since       1.0
  */
 public class InventoryPlayer 
 		implements Serializable
@@ -40,7 +44,7 @@ public class InventoryPlayer
 	}
 	
 	/**
-	 * Populates the inventoryTotals hashtable with every possible item/block that exists (each with a value of 0)
+	 * Populates the inventoryTotals Hashtable with every possible item/block that exists (each with a value of 0)
 	 */
 	public void initializeInventoryTotals(boolean isReloaded)
 	{
@@ -113,7 +117,7 @@ public class InventoryPlayer
 	}
 	
 	/**
-	 * Checks for a partial itemstack in the inventory
+	 * Checks for a partial ItemStack in the inventory
 	 * @param stack the stack to check for
 	 * @return the mainInventory[] slot containing the item, or -1 if the check failed
 	 */
@@ -134,7 +138,7 @@ public class InventoryPlayer
 	}
 	
 	/**
-	 * Returns the size of the mainInventory
+	 * Gets the size of the mainInventory
 	 * @return the length of the mainInventory[] array
 	 */
 	public int getMainInventoryLength()
@@ -143,7 +147,7 @@ public class InventoryPlayer
 	}
 	
 	/**
-	 * Attempt to pick up an ItemStack
+	 * Attempts to pick up an ItemStack
 	 * @param stack Stack to pick up
 	 * @return whatever's left, or null for a successful operation
 	 */
@@ -214,7 +218,7 @@ public class InventoryPlayer
 	}
 	
 	/**
-	 * Attempt to remove items from the inventory, nothing is removed if there isnt enough.
+	 * Attempts to remove items from the inventory, nothing is removed if there isnt enough.
 	 * @param stack stack to try to remove (including # to remove)
 	 * @return success of the removal
 	 */
@@ -305,7 +309,7 @@ public class InventoryPlayer
 	}
 	
 	/**
-	 * Try to place an itemstack in the selected index of the mainInventory[]
+	 * Tries to place an ItemStack in the selected index of the mainInventory[]
 	 * @param stack stack to place in mainInventory[]
 	 * @param index where to place the stack in mainInventory[]
 	 * @return success of the operation
@@ -329,7 +333,7 @@ public class InventoryPlayer
 	}
 	
 	/**
-	 * Attempt to combine two itemstack in the mainInventory
+	 * Attempts to combine two ItemStack in the mainInventory
 	 * @param stack stack to combine with the current one
 	 * @param index where to combine stacks in mainInventory[]
 	 * @return success of operation
@@ -349,7 +353,7 @@ public class InventoryPlayer
 	}
 	
 	/**
-	 * Try to place an itemstack in the selected index of the armorInventory[]
+	 * Tries to place an ItemStack in the selected index of the armorInventory[]
 	 * @param stack stack to place in armorInventory[]
 	 * @param index where to place the stack in armorInventory[]
 	 * @return success of the operation
@@ -379,13 +383,12 @@ public class InventoryPlayer
 			{
 				return false;
 			}
-		}
-		
+		}		
 		return true;
 	}
 	
 	/**
-	 * Try to place an itemstack in the selected index of the trashInventory[]
+	 * Tries to place an ItemStack in the selected index of the trashInventory[]
 	 * @param stack stack to place in trashInventory[]
 	 * @param index where to place the stack in trashInventory[]
 	 * @return success of the operation
@@ -434,7 +437,7 @@ public class InventoryPlayer
 	}
 	
 	/**
-	 * Returns a pointer(reference) safe ItemStack from the mainInventory[] 
+	 * Gets a reference safe ItemStack from the mainInventory[] 
 	 * @param index the slot of mainInventory[] to return.
 	 * @return a pointer(reference) safe ItemStack at the specified index of mainInventory[] or null if nothing is there
 	 */
@@ -444,7 +447,7 @@ public class InventoryPlayer
 	}
 		
 	/**
-	 * Returns a pointer(reference) safe ItemStack from the armorInventory[] 
+	 * Gets a reference safe ItemStack from the armorInventory[] 
 	 * @param index the slot of armorInventory[] to return.
 	 * @return a pointer(reference) safe ItemStack at the specified index of armorInventory[] or null if nothing is there
 	 */
@@ -454,7 +457,7 @@ public class InventoryPlayer
 	}
 		
 	/**
-	 * Returns a pointer(reference) safe ItemStack from the trash[]
+	 * Gets a reference safe ItemStack from the trash[]
 	 * @param index the slot of trash[] to return.
 	 * @return a pointer(reference) safe ItemStack at the specified index trash[] or null if nothing is there
 	 */
@@ -464,7 +467,7 @@ public class InventoryPlayer
 	}
 	
 	/**
-	 * Get the quantity of an Item/Block in the mainInventory[] 
+	 * Gets the quantity of an Item/Block in the mainInventory[] 
 	 * @param name the Item/Block name to check. It should be given by using Item.getItemName() or Block.getBlockName()
 	 * @return the quantity of that item in the mainInventory[]
 	 */
@@ -472,27 +475,20 @@ public class InventoryPlayer
 	{
 		return inventoryTotals.get(name);
 	}
-	
+		
 	/**
-	 * Debug method to print out all the key/values in inventoryTotals
+	 * Gets the size of the armorInventory
+	 * @return the length of the armorInventory[] array
 	 */
-	public void printHashTable() 
-	{
-        Enumeration<String> keys = inventoryTotals.keys();
-        while (keys.hasMoreElements()) 
-        {
-            Object key = keys.nextElement();
-            String str = (String) key;
-            double d = inventoryTotals.get(str);
-            System.out.printf("%-25s %-20f \n", str, d);
-        }
-    }
-	
 	public int getArmorInventoryLength() 
 	{
 		return armorInventory.length;
 	}
 	
+	/**
+	 * Iterates through the armorInventory[], destroying the first item with a saving relic
+	 * attribute (to prevent death).
+	 */
 	public void removeSavingRelic()
 	{
 		for(int i = 0; i < armorInventory.length; i++)

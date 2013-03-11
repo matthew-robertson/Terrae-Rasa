@@ -9,7 +9,6 @@ import java.util.zip.GZIPOutputStream;
 public class CallableSaveChunk implements Callable<Boolean>
 {
 	private String basepath;
-	private String worldName;
 	private Chunk chunk;
 	private int x;
 	
@@ -18,7 +17,6 @@ public class CallableSaveChunk implements Callable<Boolean>
 		this.chunk = chunk;
 		this.x = x;
 		this.basepath = basepath;
-		this.worldName = worldName;
 	}
 	
 	public Boolean call() throws Exception 

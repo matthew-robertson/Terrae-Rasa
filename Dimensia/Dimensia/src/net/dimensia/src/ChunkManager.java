@@ -113,24 +113,7 @@ public class ChunkManager implements Serializable
 		this.worldName = worldName;
 		loadRequests = new ArrayList<Integer>(8);
 		
-		//Assign the BASE_PATH
-		String osName = System.getProperty("os.name").toLowerCase();
-		if(osName.contains("window"))
-		{
-			BASE_PATH = Dimensia.WINDOWS_BASE_PATH;
-		}
-		else if(osName.contains("mac"))
-		{
-			BASE_PATH = Dimensia.MAC_BASE_PATH;
-		}
-		else if(osName.contains("ubuntu") || osName.contains("linux"))
-		{
-			BASE_PATH = Dimensia.LINUX_BASE_PATH;
-		}
-		else
-		{
-			throw new RuntimeException("Invalid OS");
-		}
+		BASE_PATH = Dimensia.getBasePath();
 		
 		//Create missing folders
 		if(!new File(BASE_PATH + "/World Saves/" + worldName).exists()) //Folder for the world ('/worldName')
@@ -295,9 +278,9 @@ public class ChunkManager implements Serializable
 				
 				for(int j = 0; j < loadRequests.size(); j++)
 				{
-					if(loadRequests.get(i).toString().equals(key))
+					if(loadRequests.get(j).toString().equals(key))
 					{
-						loadRequests.remove(i);
+						loadRequests.remove(j);
 					}
 				}
 				

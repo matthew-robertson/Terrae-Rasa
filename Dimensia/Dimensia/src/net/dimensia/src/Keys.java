@@ -5,14 +5,34 @@ import net.dimensia.client.Dimensia;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 
+/**
+ * <code>Keys</code> is responsible for handling most keyboard input within the application. Keyboard input
+ * for the main menu is self-contained in <code>GuiMainMenu</code>, but all other keyboard input
+ * is handled here. Currently only implements one method {@link #keyboard(World, EntityLivingPlayer, Settings)}
+ * to handle ingame key binds. All methods in Keys are static, so it cannot be instantiated.
+ * @author      Alec Sobeck
+ * @author      Matthew Robertson
+ * @version     1.0
+ * @since       1.0
+ */
 public class Keys
 {	
-	private static boolean printer;
 	private static boolean actionKeys[] = new boolean[12];
 	private static boolean ic;
 	public static boolean ec;
 	
-	public static void keyboard(World world, EntityLivingPlayer player, Settings settings)
+	private Keys()
+	{
+	}
+	
+	/**
+	 * Handles all standard keyboard input in the game. This includes all key binds and movement, but excludes
+	 * any typing in text boxes.
+	 * @param world
+	 * @param player
+	 * @param settings
+	 */
+	public static void keyboard(World world, EntityLivingPlayer player, Settings settings, Keybinds keybinds)
 	{	
 		if(Dimensia.initInDebugMode)
 		{
@@ -21,15 +41,13 @@ public class Keys
 				Dimensia.done = true;
 			}
 		}
-		else
-		{
-			if(Display.isCloseRequested()) //Exit if Escape is pressed or the Window is Closed
-			{
-				Dimensia.done = true;
-			}			
-
-			
-		}
+//		else
+//		{
+//			if(Display.isCloseRequested()) //Exit if Escape is pressed or the Window is Closed
+//			{
+//				Dimensia.done = true;
+//			}		
+//		}
 		
 		if(Keyboard.isKeyDown(Keyboard.KEY_ESCAPE) && !ec && !Dimensia.isMainMenuOpen)
 		{
@@ -41,12 +59,12 @@ public class Keys
 			ec = false;
 		}
 		
-		if(Keyboard.isKeyDown(Keyboard.KEY_E) && !ic) //Toggle inventory
+		if(Keyboard.isKeyDown(keybinds.inventoryToggle) && !ic) //Toggle inventory
 		{
 			ic = true;
 			player.isInventoryOpen = !player.isInventoryOpen;
 		}
-		if(!Keyboard.isKeyDown(Keyboard.KEY_E))
+		if(!Keyboard.isKeyDown(keybinds.inventoryToggle))
 		{
 			ic = false;
 		}
@@ -206,23 +224,13 @@ public class Keys
 	        {
 	        	//for(int i = 0; i < 3;i++){
 	        	//player.registerStatusEffect(new StatusEffectStun(5, 1));
-	        	EntityLivingNPC enemy = new EntityLivingNPCEnemy(EntityLivingNPCEnemy.slime);//EntityLivingNPC.test.clone();
+	        	EntityLivingNPCEnemy enemy = new EntityLivingNPCEnemy(EntityLivingNPCEnemy.slime);//EntityLivingNPC.test.clone();
 				enemy.setPosition((int)player.x, (int)player.y);
-				world.npcList.add(enemy);	
+				world.addEntityToEnemyList(enemy);	
 	        	//}
 	        }   
-	        if(Keyboard.isKeyDown(Keyboard.KEY_L) && !printer)
-	        {
-	        	printer = true;
-	        	for(int i =0 ; i < 5; i++)
-	        	{
-	        		System.out.println();
-	        	}
-	        	player.inventory.printHashTable();
-	        }
 	        if(!Keyboard.isKeyDown(Keyboard.KEY_L))
 	        {
-	        	printer = false;
 	        }
 	        
 			//End debug inputs\             

@@ -8,14 +8,12 @@ import java.util.zip.GZIPInputStream;
 public class CallableLoadChunk implements Callable<Chunk>
 {
 	private String basepath;
-	private String worldName;
 	private int x;
 	
 	public CallableLoadChunk(int x, String basepath, String worldName)
 	{
 		this.x = x;
 		this.basepath = basepath;
-		this.worldName = worldName;
 	}
 	
 	public Chunk call() throws Exception

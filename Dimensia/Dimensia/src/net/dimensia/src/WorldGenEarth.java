@@ -358,21 +358,4 @@ public class WorldGenEarth extends WorldGen
 	{		
 		return random.nextInt(3);
 	}
-	
-	/**
-	 * Forces the world to generate all the chunks, based on its size. This also
-	 * completely clears the chunks, making them completely empty. Default biome is Biome.forest
-	 * @param world - current world
-	 */
-	private void forciblyGenerateChunks(World world)
-	{
-		int chunkWidth = world.getWidth() / Chunk.getChunkWidth();
-		
-		for(int i = 0; i < chunkWidth; i++)
-		{
-			
-			world.registerChunk(new Chunk(Biome.forest, i, world.getHeight()), i);
-			
-		}
-	}
 }

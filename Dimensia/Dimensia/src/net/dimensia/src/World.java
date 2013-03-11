@@ -18,7 +18,7 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 
 /**
- * <code>World implements Serializable</code>
+ * <code>World implements Serializable</code> <br>
  * <code>World</code> implements many of the key features for Dimensia to actually run properly and update. 
  * <br><br>
  * All players, chunks, Biomes, EntityEnemies, EntityLivingItemStacks, TemporaryText, Weather are stored in the 
@@ -273,7 +273,8 @@ public class World implements Serializable
 	 */
 	public void clearEntityList()
 	{
-		entityList.clear();
+//		entityList.clear();
+		entityList = new ArrayList<EntityLivingNPCEnemy>(255);
 	}
 	
 	/**
@@ -346,7 +347,7 @@ public class World implements Serializable
 	 * Adds an EntityLivingNPCEnemy to the entityList in this instance of World
 	 * @param enemy the enemy to add to entityList
 	 */
-	public void addEntityToEntityList(EntityLivingNPCEnemy enemy)
+	public void addEntityToEnemyList(EntityLivingNPCEnemy enemy)
 	{
 		entityList.add(enemy);
 	}
@@ -355,7 +356,7 @@ public class World implements Serializable
 	 * Adds an EntityLivingNPC to the npcList in this instance of World
 	 * @param npc the npc to add to entityList
 	 */
-	public void addEntityToEntityList(EntityLivingNPC npc)
+	public void addEntityToNPCList(EntityLivingNPC npc)
 	{
 		npcList.add(npc);
 	}
@@ -397,7 +398,7 @@ public class World implements Serializable
 	 */
 	public void onWorldTick(EntityLivingPlayer player)
 	{		
-		spawnMonsters(player);				
+	//	spawnMonsters(player);				
 		causeWeather();		
 		//update the player
 		
@@ -616,7 +617,7 @@ public class World implements Serializable
 		}
 		
 		if (!getBlockGenerate(x, y - 1).isOveridable && !(getBlockGenerate(x, y - 1) instanceof BlockPillar)){
-			System.out.println(getBlockGenerate(x, y-1).getBlockID());
+			//System.out.println(getBlockGenerate(x, y-1).getBlockID());
 			bit = 0;					
 		}
 		
@@ -640,7 +641,7 @@ public class World implements Serializable
 			}
 			else if (!projectileList.get(i).active){
 				projectileList.get(i).ticksNonActive++;
-				System.out.println(projectileList.get(i).ticksNonActive);
+				//System.out.println(projectileList.get(i).ticksNonActive);
 			}
 			
 			if(((MathHelper.distanceBetweenTwoPoints(player.x, player.y, projectileList.get(i).x, projectileList.get(i).y) > OUT_OF_RANGE) || projectileList.get(i).ticksNonActive > 80) && projectileList.get(i).getType() != 'm')
@@ -1658,26 +1659,7 @@ public class World implements Serializable
 			e.printStackTrace();
 		}
 	}
-	
-	/**
-	 * Sets the light value of a Block. This may fail if a Chunk isnt loaded into memory or doesnt exist. Chunks are not created
-	 * in the event they dont exist. All Exceptions are handled in this method.
-	 * @param value the lighting value to set the square to
-	 * @param x the x value of the Block to assign the lighting value to
-	 * @param y the y value of the Block to assign the lighting value to
-	 */
-	public void setLight(float value, int x, int y)
-	{
-		try
-		{
-			getChunks().get(""+(int)(x / Chunk.getChunkWidth())).setLight(value, (int)x % Chunk.getChunkWidth(), (int)y);
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
-	
+		
 	/**
 	 * Gets the lighting value of the indicated Block. This may fail if the chunk requested isn't loaded into memory or doesnt exist.
 	 * In this case, a lighting value of 1.0f will be returned. All Exceptions are handled in this method.

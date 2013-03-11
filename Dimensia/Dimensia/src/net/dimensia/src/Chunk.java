@@ -1,25 +1,24 @@
 package net.dimensia.src;
+
 import java.io.Serializable;
 
 /**
  * <code>Chunk implements Serializable</code>
  * <br>
- * <code>Chunk</code> implements something that is similar to a C(++) struct. It stores data relating to
- * back walls, Blocks, and lighting values (including ambient, diffuse, and total). Upon initialization, all Blocks and backwalls 
- * are set to be air,  not null, due to nullpointer issues that were previously occuring. Additionally, each chunk stores
- * its own position in the chunk array, should it be requested. 
+ * <code>Chunk</code> implements something that is similar to a C(++) struct. A Chunk stores data relating to
+ * Backwalls, Blocks, Biomes, and lighting data(including ambient, diffuse, and total). Upon initialization, 
+ * all Blocks and Backwalls are set to be air, a Biome must be assigned, and lighting values are set to 0. 
+ * Additionally, each chunk stores its own position in the chunk array. 
  * <br><br>
  * Each method in <code>Chunk</code> is either synchronized or final to make <code>Chunk</code> 
- * relatively Thread-Safe overall. All setters (<code>{@link #setBlock(Block, int, int)}, 
+ * relatively Thread-Safe overall. All setters (for example: <code>{@link #setBlock(Block, int, int)}, 
  * {@link #setChanged(boolean)}, {@link #setLight(float, int, int)}</code>) are synchronized, all getters are 
  * final. All fields in <code>Chunk</code> are final.
  * 
  * <br><br>
- * <b>Chunk sizes are subject to change. NEVER use "magic numbers" and always use 
+ * <b>Chunk sizes are subject to change. NEVER use magic numbers and always use 
  * {@link #getChunkWidth()} or {@link #getChunkHeight()} when performing chunk
  * size operations.</b>
- * 
- * <i> Update: </i> Chunks now store biome data, which can be set with 
  * 
  * @author      Alec Sobeck
  * @author      Matthew Robertson
@@ -40,7 +39,7 @@ public class Chunk
 	public final float[][] ambientLight;
 	public final Block[][] backWalls;
 	public final Block[][] blocks;
-	private final int x;
+	private final int X;
 	private boolean wasChanged;
 	private static final int CHUNK_WIDTH = 100;
 	private final int CHUNK_HEIGHT;
@@ -74,7 +73,7 @@ public class Chunk
 		light = new float[CHUNK_WIDTH][CHUNK_HEIGHT];
 		diffuseLight = new float[CHUNK_WIDTH][CHUNK_HEIGHT];
 		ambientLight = new float[CHUNK_WIDTH][CHUNK_HEIGHT];
-		this.x = x;
+		this.X = x;
 	}
 	
 	/**
@@ -134,6 +133,13 @@ public class Chunk
 		return blocks[x][y];
 	}
 	
+	/**
+	 * Gets the currently calculated light value for the block at position (x,y) in the chunk. A value of
+	 * 1.0F is full darkness, 0.0F is full light (this reversal is an optimization for rendering)
+	 * @param x a value from 0 to ChunkWidth, to retrieve from the light[][]
+	 * @param y a value from 0 to ChunkHeight, to retrieve from the light[][]
+	 * @return the currently calculated light value of light[x][y]
+	 */
 	public final float getLight(int x, int y)
 	{
 		return light[x][y];
@@ -149,26 +155,43 @@ public class Chunk
 		return wasChanged;
 	}
 	
+	/**
+	 * Replaces the current block at blocks[x][y] with the given Block parameter.
+	 * @param block the new Block for position (x,y)
+	 * @param x a value from 0 to ChunkWidth	
+	 * @param y a value from 0 to ChunkHeight
+	 */
 	public synchronized void setBlock(Block block, int x, int y)
 	{
 		blocks[x][y] = block.clone();
 	}
 	
-	public synchronized void setLight(float strength, int x, int y)
-	{
-		light[x][y] = strength;
-	}
-	
+	/**
+	 * Sets the diffuseLight[x][y] value to the given strength. 
+	 * @param strength a value from 0.0F to 1.0F, indicating the % of diffuse light strength
+	 * @param x a value from 0 to ChunkWidth	
+	 * @param y a value from 0 to ChunkHeight
+	 */
 	public synchronized void setDiffuseLight(float strength, int x, int y)
 	{
 		diffuseLight[x][y] = strength;
 	}
 	
+	/**
+	 * Sets the ambientLight[x][y] value to the given strength. 
+	 * @param strength a value from 0.0F to 1.0F, indicating the % of ambient light strength
+	 * @param x a value from 0 to ChunkWidth	 
+	 * @param y a value from 0 to ChunkHeight
+	 */
 	public synchronized void setAmbientLight(float strength, int x, int y)
 	{
 		ambientLight[x][y] = strength;
 	}
 	
+	/**
+	 * Sets the wasChanged variable of this chunk to the given boolean
+	 * @param flag the new value for this Chunk's wasChanged field
+	 */
 	public synchronized void setChanged(boolean flag)
 	{
 		wasChanged = flag;
@@ -180,21 +203,36 @@ public class Chunk
 	 */
 	public final int getX()
 	{
-		return x;
+		return X;
 	}
 	
+	/**
+	 * Gets the diffuse (artificial) light value from diffuseLight[x][y]. A value of 1.0F is full light, 
+	 * 0.0F is no light (This value may exceed 1.0F, in which case it is simply full light).
+	 * @param x a value from 0 to ChunkWidth
+	 * @param y a value from 0 to ChunkHeight
+	 * @return the diffuse light value from diffuseLight[x][y]
+	 */
 	public final float getDiffuseLight(int x, int y)
 	{
 		return diffuseLight[x][y];
 	}
-	
+
+	/**
+	 * Gets the ambient(sun) light value from ambientLight[x][y]. A value of 1.0F is full light, 
+	 * 0.0F is no light (This value may not 1.0F, unlike diffuse light values).
+	 * @param x a value from 0 to ChunkWidth
+	 * @param y a value from 0 to ChunkHeight
+	 * @return the diffuse light value from ambientLight[x][y]
+	 */
 	public final float getAmbientLight(int x, int y)
 	{
 		return ambientLight[x][y];
 	}
 	
 	/**
-	 * Updates the light[][] for rendering. A value of 0.0F is full light, 1.0F is full darkness. This is inverted for optimization reasons.
+	 * Updates the light[][] for rendering. A value of 0.0F is full light, 1.0F is full darkness. This is inverted 
+	 * for optimization reasons.
 	 */
 	public synchronized void updateChunkLight()
 	{
@@ -221,21 +259,37 @@ public class Chunk
 		}	
 	}
 
+	/**
+	 * Gets the Chunk's flaggedForLightUpdate field
+	 * @return this Chunk's flaggedForLightUpdate field
+	 */
 	public final boolean isFlaggedForLightingUpdate() 
 	{
 		return flaggedForLightingUpdate;
 	}
 
+	/**
+	 * Sets this Chunk's flaggedForLightingUpdate field to the given boolean
+	 * @param flaggedForLightingUpdate the new value for this Chunk's flaggedForLightingUpdate field
+	 */
 	public synchronized void setFlaggedForLightingUpdate(boolean flaggedForLightingUpdate) 
 	{
 		this.flaggedForLightingUpdate = flaggedForLightingUpdate;
 	}
 
+	/**
+	 * Gets whether or not the light was updated
+	 * @return a boolean describing whether or not the light has been updated
+	 */
 	public final boolean isLightUpdated() 
 	{
 		return lightUpdated;
 	}
 
+	/**
+	 * Sets this Chunk's lightUpdated field to the given boolean
+	 * @param lightUpdated the new value for this Chunk's lightUpdated field
+	 */
 	public synchronized void setLightUpdated(boolean lightUpdated) 
 	{
 		this.lightUpdated = lightUpdated;

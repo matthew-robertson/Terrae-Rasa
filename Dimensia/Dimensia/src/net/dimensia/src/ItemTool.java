@@ -22,4 +22,13 @@ public class ItemTool extends Item
 	{
 		return damageDone;
 	}
+	
+	/**
+	 * Gets the stats of the given item. ItemTools should have at least a damage value.
+	 * @return an array of this ItemTool's stats, which should be at least of size 1
+	 */
+	public String[] getStats()
+	{
+		return new String[] { "Damage: "+damageDone };
+	}
 }

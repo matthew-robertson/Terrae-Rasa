@@ -1,11 +1,10 @@
 package net.dimensia.src;
 
-import java.awt.Font;
-
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
 /**
+ * <code>GuiButton extends GuiComponent</code> <br>
  * GuiButton implements a simple button, with a single background texture. Contains
  * methods to draw and check for mouse clicks as well as
  * a method to get the current String value of the button (for external use)
@@ -15,79 +14,47 @@ import org.lwjgl.opengl.GL11;
  * @version     1.0
  * @since       1.0
  */
-public class GuiButtonImproved 
+public class GuiButtonImproved extends GuiComponent
 {	
-	private static TrueTypeFont trueTypeFont;
-	private Texture renderTexture;
+	/** The possible values for the button. An array of size 1 keeps a constant value. */
 	private String[] values;
-	private int screenX;
-	private int screenY;
-	/** Determines whether the component will be centered on the X axis, which automatically updates the x position to be centered on screen size change*/
-	//private boolean centerComponent;
+	/** Which of the values in values[] is being displayed*/
 	private int buttonIndex;
-	/** The height of the button as a % of the screen, between 0.0F and 1.0F*/
-	private float width;
-	/** The height of the button as a % of the screen, between 0.0F and 1.0F*/
-	private float height;
-	/** The x position as a % of the screen, between 0.0F and 1.0F */
-	private float x;
-	/** The y position as a % of the screen, between 0.0F and 1.0F */
-	private float y;
 	
 	/**
-	 * Constructs a new instance of GuiButton. Initializes the button with the specified
-	 * values, and currently can only center the button.
+	 * Constructs a new instance of GuiButton and initializes the button with the specified
+	 * values.
 	 * @param values the possible text strings the button can display (and return)
-	 * @param x the x position of the button
-	 * @param y the y position of the button
-	 * @param center whether the button should be centered. currently this value is not used.
+	 * @param x the x position of the button, as a percent of the screen, from 0.0F to 1.0F 
+	 * @param y the y position of the button, as a percent of the screen, from 0.0F to 1.0F
 	 */
-	public GuiButtonImproved(String[] values, float x, float y, boolean center)
-	{
-		if(trueTypeFont == null)
-		{
-			trueTypeFont = new TrueTypeFont(new Font("Agent Orange", Font.BOLD, 20), false/*DO NOT use antialiasing*/);
-		}		
-
-		//centerComponent = center;
+	public GuiButtonImproved(String[] values, float x, float y)
+	{	
+		super();
+		this.x = x;
 		this.y = y;
-		width = 0.4F;
-		height = 0.1F;
 		buttonIndex = 0;
 		this.values = values;
-		screenX = Display.getWidth();
-		screenY = Display.getHeight();
-		renderTexture = GuiMainMenu.buttonTexture;
-		
-		/*
-		if(centerComponent)
-		{
-			this.x = (int) ((Display.getWidth() * 0.25f) - (width * 0.5f));
-		}
-		else
-		{
-			
-		}	
-		*/
+	}
+	
+	/**
+	 * Constructs a new instance of GuiButton and initializes the button with the specified
+	 * values.
+	 * @param values the possible text strings the button can display (and return)
+	 * @param x the x position of the button, as a percent of the screen, from 0.0F to 1.0F 
+	 * @param y the y position of the button, as a percent of the screen, from 0.0F to 1.0F
+	 * @param width the width of the button, as a percent of the screen, from 0.0F to 1.0F
+	 * @param height the height of the button, as a percent of the screen, from 0.0F to 1.0F
+	 */
+	public GuiButtonImproved(String[] values, float x, float y, float width, float height)
+	{
+		super();
 		this.x = x;
-	}
-	
-	/**
-	 * Sets the width of the button as a percent of the screen width
-	 * @param width the new width of the width, in percent, between 0.0F and 1.0F
-	 */
-	public void setWidth(float width)
-	{
+		this.y = y;
 		this.width = width;
-	}
-	
-	/**
-	 * Sets the height of the button as a percent of the screen height
-	 * @param height the new height of the button, in percent, between 0.0F and 1.0F
-	 */
-	public void setHeight(float height)
-	{
 		this.height = height;
+		buttonIndex = 0;
+		this.values = values;
 	}
 	
 	/**
@@ -98,29 +65,12 @@ public class GuiButtonImproved
 	{
 		return values[buttonIndex];
 	}
-	
-	/**
-	 * Gets whether or not a point is inside the button
-	 * @param x the x value of the point to compare
-	 * @param y the y value of the point to compare
-	 * @return whether the point is in bounds or not
-	 */
-	public boolean inBounds(int x, int y) //Is the specified vertex inside the bounds of the text?
-	{
-		return (x > this.x && x < this.x + width && y > this.y && y < this.y + height);
-	}	
-	
+			
 	/**
 	 * Draws the button, and fixes the position if the screen has been resized
 	 */
 	public void draw()
-	{	
-		if(Display.getWidth() != screenX || Display.getHeight() != screenY) //Has the screen been resized?
-		{
-			screenX = Display.getWidth();
-			screenY = Display.getHeight();
-		}
-		
+	{			
 		//Texture:
 		GL11.glColor4f(1, 1, 1, 1);
 		Tessellator t = Tessellator.instance;
@@ -132,10 +82,10 @@ public class GuiButtonImproved
 		float x = Display.getWidth() * this.x * 0.5F;
 		float y = Display.getHeight() * this.y * 0.5F;
 		
-		if(width < (trueTypeFont.getWidth(values[buttonIndex]) / 2))
-		{
-			width = trueTypeFont.getWidth(values[buttonIndex]) / 2;
-		}
+		//if(width < (trueTypeFont.getWidth(values[buttonIndex]) / 2))
+		//{
+		//	width = trueTypeFont.getWidth(values[buttonIndex]) / 2;
+		//}
 		
 	    t.addVertexWithUV(x, y + height, 0, 0, 1);
 	    t.addVertexWithUV(x + width, y + height, 0, 1, 1);
@@ -148,7 +98,7 @@ public class GuiButtonImproved
 		float xOffset = x + width/2 * 0.95f;//trueTypeFont.getWidth(values[buttonIndex]) / 2;
 		float yOffset = y + height - (height - trueTypeFont.getHeight(values[buttonIndex])) / 2;
 			
-		trueTypeFont.drawString(xOffset, yOffset, values[buttonIndex], 1, -1, TrueTypeFont.ALIGN_CENTER); //Render the Text	
+		trueTypeFont.drawString(xOffset, yOffset, values[buttonIndex], 0.7f, -1, TrueTypeFont.ALIGN_CENTER); //Render the Text	
 	}
 	
 	/**
@@ -161,33 +111,16 @@ public class GuiButtonImproved
 	}
 	
 	/**
-	 * Increments the value of the button (increases by 1)
+	 * Overrides GuiComponent.onClick() to increment the index of the button by 1, and reset the index back to 0 when it 
+	 * exceeds the length of the values[]
 	 */
-	public void onClick()
+	public void onClick(int x, int y)
 	{
 		buttonIndex++;
 		if(buttonIndex >= values.length)
 		{
 			buttonIndex = 0;
 		}
-	}
-	
-	/**
-	 * Gets the texture the button is currently rendering
-	 * @return the texture currently used by this button
-	 */
-	public Texture getRenderTexture()
-	{
-		return renderTexture;
-	}
-	
-	/**
-	 * Assigns a new texture to the button
-	 * @param texture the texture to assign to the button
-	 */
-	public void setRenderTexture(Texture texture)
-	{
-		this.renderTexture = texture;
-	}
+	}	
 }
 

@@ -1228,5 +1228,20 @@ public class EntityLivingPlayer extends EntityLiving
 		
 	}
 	
-	
+	/**
+	 * Gets the Block the player is holding, if it's a Block and it's an instanceof BlockLight. Used for handheld lighting.
+	 * @return an instanceof BlockLight if the player is holding one, otherwise null
+	 */
+	public Block getHandheldLight()
+	{
+		ItemStack stack = inventory.getMainInventoryStack(selectedSlot);
+		if(stack != null)
+		{
+			if(stack.getItemID() < Item.shiftedIndex && (Block.blocksList[stack.getItemID()]) instanceof BlockLight)
+			{
+				return Block.blocksList[stack.getItemID()];
+			}
+		}
+		return null;
+	}
 }

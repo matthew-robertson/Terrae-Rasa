@@ -1,10 +1,11 @@
 package net.dimensia.src;
 
-import java.io.Serializable;
-import java.util.Random;
+public class BlockOre extends Block
+{
+	private static final long serialVersionUID = 1L;
 
-public class BlockOre extends Block{	
-	public BlockOre(int i){
+	public BlockOre(int i)
+	{
 		super(i);
 	}
 }

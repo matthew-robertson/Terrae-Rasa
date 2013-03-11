@@ -1,7 +1,5 @@
 package net.dimensia.src;
 
-import java.util.Random;
-
 /**
  * DungeonGenCave aims to create a simple dungeon, consisting of a reasonably open cave with the dimensions (x,y).
  * 

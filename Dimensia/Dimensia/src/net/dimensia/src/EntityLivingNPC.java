@@ -45,7 +45,8 @@ public class EntityLivingNPC extends EntityLiving
 	}
 		
 	/**
-	 * Basic method to control AI. If the NPC isn't stunned, will chase the player if alert. Will wander otherwise
+	 * Basic method to control AI. If the NPC isn't stunned, will chase the player if alert. Will wander otherwise. Gravity is applied 
+	 * after any actions are taken
 	 * @param world - current world
 	 * @param target - entity to chase/retreat from
 	 */
@@ -58,8 +59,9 @@ public class EntityLivingNPC extends EntityLiving
 				AIManager.AIWander(world, this);
 			}
 		}
-	}
-	
+		
+		applyGravity(world);	
+	}	
 	
 	/**
 	 * triggers when the actor approaches a player.

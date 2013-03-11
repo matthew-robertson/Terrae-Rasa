@@ -9,7 +9,7 @@ public class AIManager {
 	 */
 	public static void AISpeech(String s){
 		//Flesh this out once displaying text works properly
-		System.out.println(s);
+		//System.out.println(s);
 	}
 	
 	/**

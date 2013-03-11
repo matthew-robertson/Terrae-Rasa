@@ -5,8 +5,24 @@ import java.awt.Font;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
+/**
+ * Defines the base class for anything that draws something to screen in this application. Provides methods to appropriately 
+ * update and move the camera, set it to the last position, render the background. Additionally, all Textures are stored here 
+ * as public static fields.
+ * @author      Alec Sobeck
+ * @author      Matthew Robertson
+ * @version     1.0
+ * @since       1.0
+ */
 public class Render 
 {	
+	public final static int TEXTURE_SHEET_WIDTH = 256;
+	public final static int TEXTURE_SHEET_HEIGHT = 512;
+	public final static int ICONS_PER_ROW =  TEXTURE_SHEET_WIDTH / 16;
+	public final static int ICONS_PER_COLUMN = TEXTURE_SHEET_HEIGHT / 16;
+	public final static int BLOCK_SIZE = 6;
+	public final static int BLOCK_SIZE_PIXELS = 12;
+	
 	public static Texture zombie;
 	public static Texture goblin;
 	public static Texture slime;
@@ -34,6 +50,7 @@ public class Render
 	public static Texture playerTexture;
 	public static Texture actionbarSlot;
 	public static Texture actionbarOutline;
+	public static Texture tooltipBackground;
 	public static Texture logo;
 	public static Texture background2;
 	public static Texture[] textures;
@@ -44,10 +61,11 @@ public class Render
 	public static Texture sun; 
 	public static Texture background_1; //Background (sky)
 	/** 
-	 * cameraX is a relatively unique variable. It's where the camera is moved to on the X axis, based on player location. Therefore this value becomes
-	 * very important to rendering user interface components. Using this value in addition to another, allows something to always be seen
-	 * by the player, and for that object not to shake or move randomly. This value is always in 'ortho' units, for easy rendering and 
-	 * camera readjustment. <b>NOTE: cameraX is often negative or inversed, use getCameraX() to correct this. </b>
+	 * cameraX is a relatively unique variable. It's where the camera is moved to on the X axis, based on player location. 
+	 * Therefore this value becomes very important to rendering user interface components. Using this value in addition 
+	 * to another, allows something to always be seen by the player, and for that object not to shake or move randomly. 
+	 * This value is always in 'ortho' units, for easy rendering and camera re-adjustment. <b>NOTE: cameraX is often 
+	 * negative or inversed, use getCameraX() to correct this. </b>
 	 **/
 	private static int cameraX;
 	/** 
@@ -57,7 +75,11 @@ public class Render
 	 * camera readjustment. <b>NOTE: cameraY is often negative or inversed, use getCameraY() to correct this. </b>
 	 **/
 	private static int cameraY;
+	public static Texture mainLogo;
 	
+	/**
+	 * Renders a sky background image. This is a filler for now.
+	 */
 	protected void renderSkyBackgroundScene()
 	{		
 		background2.bind();        
@@ -105,12 +127,10 @@ public class Render
 	}
 	
 	/**
-	 * This cannot be threaded.
-	 * Loads all game textures in use by Render and all extensions. 
+	 * Loads all game textures in use by Render and all extensions. This cannot be threaded.
 	 */
 	public static void initializeTextures(World world)
 	{
-	
 		trueTypeFont = new TrueTypeFont(new Font("Comic Sans MS", Font.BOLD, 32), false);
 		loader = new TextureLoader();
 		backgroundImages = new Texture[12];
@@ -143,14 +163,13 @@ public class Render
 		actionbarSlot = loader.getTexture("Resources/player_actionbar_slot.png");
 		actionbarOutline = loader.getTexture("Resources/player_actionbar_outline.png");
 		player_garbage = loader.getTexture("Resources/player_garbage.png");
+		tooltipBackground = loader.getTexture("Resources/tooltip_background.png");
 		renderParticles = new RenderParticles();
 		renderUI = new RenderUI();
 		renderEntities = new RenderEntities();
 		renderBlocks = new RenderBlocks();
 	}	
 		
-	public static Texture mainLogo;
-	
 	/**
 	 * Gets the absolute value of cameraX, as it's generally negative. This value is useful for rendering the user interface and many
 	 * other things, because it allows things to be rendered to screen at a static location the player can always see. See description

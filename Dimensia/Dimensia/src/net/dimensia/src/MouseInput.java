@@ -4,8 +4,6 @@ import org.lwjgl.input.Mouse;
 
 public class MouseInput 
 {	
-	private static int correctedDirection;
-	
 	public static void mouse(World world, EntityLivingPlayer player)
 	{
 		if(player.isStunned)

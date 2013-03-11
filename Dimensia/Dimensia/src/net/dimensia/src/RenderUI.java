@@ -1,7 +1,7 @@
 package net.dimensia.src;
 import java.awt.Font;
-
-import net.dimensia.src.GuiResizableTextUncentered.ALIGN;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Mouse;
@@ -46,16 +46,16 @@ import org.lwjgl.opengl.GL11;
 
 public class RenderUI extends Render
 {
-	private Font font = FontUtils.getFont("andy-bold.ttf");
-	private final TrueTypeFont tooltipFont = new TrueTypeFont((font.deriveFont(24.0f)), false);
-	private GuiResizableTextUncentered saveAndQuit;
+	private TrueTypeFont boldTooltip = new TrueTypeFont(((new Font("times", Font.BOLD, 24)).deriveFont(16.0f)), true);
+	private TrueTypeFont plainTooltip = new TrueTypeFont(((new Font("times", Font.PLAIN, 24)).deriveFont(16.0f)), true);
+			
 	//Variables for the item picked up by the mouse:
 	private boolean shouldDropItem;
 	private int mouseItemSize; //How big it is
 	private ItemStack mouseItem; //What it is
 	private int mouseXOffset; //How far it should be adjusted to avoid looking bad
 	private int mouseYOffset;	
-	
+		
 	/**
 	 * Constructs a new instance of RenderUI. The constructor is only required to initialize the 'Save And Quit'
 	 * button, and mouseItem information currently
@@ -67,7 +67,7 @@ public class RenderUI extends Render
 		mouseItem = null; 
 		mouseXOffset = 0; 
 		mouseYOffset = 0;		
-		saveAndQuit = new GuiResizableTextUncentered("Save And Quit", 0.4f, 0.45f, 0, 0, ALIGN.H_ALIGN_RIGHT, ALIGN.V_ALIGN_TOP);
+		//saveAndQuit = new GuiResizableTextUncentered("Save And Quit", 0.4f, 0.45f, 0, 0, ALIGN.H_ALIGN_RIGHT, ALIGN.V_ALIGN_TOP);
 	}
 	
 	/**
@@ -124,24 +124,374 @@ public class RenderUI extends Render
 	}
 	
 	/**
-	 * Attempts to render a tooltip for the selected Item. This may later extend beyond the item's name, to include
-	 * comprehensive information like damage, or item effect.
+	 * Checks to see if the mouse is hovering over something that needs to have a tooltip rendered.
+	 * Will return null if nothing appropriate is found.
+	 * @return an appropriate ItemStack to render, or null if none is found
+	 */
+	private ItemStack getTooltipStack(World world, EntityLivingPlayer player)
+	{
+		int x = MathHelper.getCorrectMouseXPosition();
+		int y = MathHelper.getCorrectMouseYPosition();	
+		
+		//Inventory
+		for(int i = 0; i < player.inventory.getMainInventoryLength(); i++) 
+		{
+			int size = 20;
+			int x1 = (int) ((Display.getWidth() * 0.25f) + (((i % 12) - 6) * (size + 3)));
+			int y1 = (int) ((Display.getHeight() * 0.5f) - ((i / 12) * (size + 3)) - (size + 22f));
+			
+			if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
+			{
+				return player.inventory.getMainInventoryStack(i);
+			}		
+		}
+		
+		//Armour and Accessories
+		for(int i = 0; i < 8; i++) 
+		{
+			int size = 20;
+			int x1 = (int) ((Display.getWidth() * 0.5f) - (size * 2.5f));
+			int y1 = 80 + (i * (size + 1));
+		
+			if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
+			{
+				return player.inventory.getArmorInventoryStack(i);
+			}			
+		}
+		
+		int x1 = (int)(Display.getWidth() * 0.25f) - 138; 
+		int y1 = (int)(Display.getHeight() * 0.5f) - 134;
+		
+		//Garbage
+		if(x > x1 && x < x1 + 20 && y > y1 && y < y1 + 20) 
+		{
+			return player.inventory.getTrashStack(0);
+		}			
+		
+		//Middle Recipe Slot:
+		int size = 24;
+		x1 = (int) (Display.getWidth() * 0.25f) - 13;
+		y1 = 8; 
+	
+		if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Middle
+		{
+			return player.getAllPossibleRecipes()[player.selectedRecipe].getResult();
+		}
+				
+		if(player.isViewingChest)
+		{
+			//Get the initial block the player is viewing
+			BlockChest chest = (BlockChest)world.getBlock(player.viewedChestX, player.viewedChestY).clone();
+			
+			if(chest.metaData != 1) //Make sure its metadata is 1 (otherwise it doesnt technically exist)
+			{
+				//Get the metadata for the block's size
+				int[][] metadata = MetaDataHelper.getMetaDataArray(world.getBlock(player.viewedChestX, player.viewedChestY).blockWidth / 6, world.getBlock(player.viewedChestX, player.viewedChestY).blockHeight / 6); //metadata used by the block of size (x,y)
+				int metaWidth = metadata.length; 
+				int metaHeight = metadata[0].length;	
+				x1 = 0;
+				y1 = 0;				
+				
+				//Loop until a the current chest's metadata value is found
+				//This provides the offset to find the 'real' chest, with the actual items in it
+				for(int i = 0; i < metaWidth; i++) 
+				{
+					for(int j = 0; j < metaHeight; j++)
+					{
+						if(metadata[i][j] == world.getBlock(player.viewedChestX - x1, player.viewedChestY - y1).metaData)
+						{
+							x1 = i; 
+							y1 = j;
+							break;
+						}
+					}
+				}			
+				
+				//Update the chest
+				chest = (BlockChest)(world.getBlock(player.viewedChestX - x1, player.viewedChestY - y1));
+			}	
+			
+			if(!chest.isAttached()) //Single chest (unattached)
+			{
+				for(int i = 0; i < 20; i++) //for each ItemStack in the chest
+				{
+					size = 20;
+					x1 = (int) ((Display.getWidth() * 0.25f) + (((-2 + (i % 5)) * (size + 3))));
+					y1 = (int) ((Display.getHeight() * 0.5f) - ((4 + (i / 5)) * (size + 3)) - (size + 22f));
+					
+					if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
+					{
+						return chest.getItemStack(i);
+
+					}		
+				}
+			}		
+			else if(chest.isAttachedLeft()) //Chest with an attachment to the left
+			{
+				//Selected Chest:
+				for(int i = 0; i < 20; i++)
+				{			
+					size = 20;				
+					x1 = (int) ((Display.getWidth() * 0.25f) + ((((i % 5)) * (size + 3))));
+					y1 = (int) ((Display.getHeight() * 0.5f) - ((4 + (i / 5)) * (size + 3)) - (size + 22f));
+					
+					if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
+					{
+						return chest.getItemStack(i);
+
+					}	
+				}
+				
+				//Chest to the left:			
+				BlockChest chest2 = (BlockChest)(world.getBlock(player.viewedChestX - 2, player.viewedChestY));
+				
+				for(int i = 0; i < 20; i++)
+				{
+					size = 20;
+					x1 = (int) ((Display.getWidth() * 0.25f) + (((-5 + (i % 5)) * (size + 3))));
+					y1 = (int) ((Display.getHeight() * 0.5f) - ((4 + (i / 5)) * (size + 3)) - (size + 22f));
+					
+					if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
+					{
+						return chest2.getItemStack(i);
+
+					}	
+				}					
+			}
+			else if(chest.isAttachedRight()) //Chest with attachment to the right
+			{
+				//Selected Chest:
+				for(int i = 0; i < 20; i++)
+				{			
+					size = 20;
+					x1 = (int) ((Display.getWidth() * 0.25f) + (((-5 + (i % 5)) * (size + 3))));
+					y1 = (int) ((Display.getHeight() * 0.5f) - ((4 + (i / 5)) * (size + 3)) - (size + 22f));
+					
+					if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
+					{
+						
+						return chest.getItemStack(i);
+
+						
+					
+					}	
+				}
+				
+				//Chest to the right:			
+				BlockChest chest2 = (BlockChest)(world.getBlock(player.viewedChestX + 2, player.viewedChestY));
+				
+				for(int i = 0; i < 20; i++)
+				{
+					size = 20;
+					x1 = (int) ((Display.getWidth() * 0.25f) + (((i % 5) * (size + 3))));
+					y1 = (int) ((Display.getHeight() * 0.5f) - ((4 + (i / 5)) * (size + 3)) - (size + 22f));
+					
+					if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
+					{
+						return chest2.getItemStack(i);
+
+					}	
+				}				
+			}	
+	
+		}
+		
+		return null;
+	}	
+	
+	/**
+	 * Attempts to render a tooltip for the selected Item. Renders tooltips for the recipe at the center of 
+	 * the slider, armour, anything in the inventory, and anything in a chest. A tooltip includes 
+	 * name, stats, and extra information.
 	 */
 	private void attemptToRenderItemTooltip(World world, EntityLivingPlayer player)
 	{
-		if(player.inventory.getMainInventoryStack(player.selectedSlot) != null && 1 == 2)
+		if(player.isInventoryOpen && mouseItem == null)
 		{
-			//player.inventory.getMainInventoryStack(player.selectedSlot).getItemName()
-			tooltipFont.drawString(getCameraX() + 150, getCameraY() + 100, "Hello Test", 0.2f, -1.0f);
-			tooltipFont.drawString(getCameraX() + 150, getCameraY() + 150, "Hello Test", 0.4f, -1.0f);
-			tooltipFont.drawString(getCameraX() + 150, getCameraY() + 200, "Hello Test", 0.6f, -1.0f);
-			tooltipFont.drawString(getCameraX() + 150, getCameraY() + 250, "Hello Test", 0.8f, -1.0f);
-			tooltipFont.drawString(getCameraX() + 150, getCameraY() + 300, "Hello Test", 1.0f, -1.0f);
-			tooltipFont.drawString(getCameraX() + 10, getCameraY() + 100, "Hello Test", 0.1f, -1.0f);
-			tooltipFont.drawString(getCameraX() + 10, getCameraY() + 150, "Hello Test", 0.3f, -1.0f);
-			tooltipFont.drawString(getCameraX() + 10, getCameraY() + 200, "Hello Test", 0.5f, -1.0f);
-			tooltipFont.drawString(getCameraX() + 10, getCameraY() + 250, "Hello Test", 0.7f, -1.0f);
-			tooltipFont.drawString(getCameraX() + 10, getCameraY() + 300, "Hello Test", 0.9f, -1.0f);
+			ItemStack stack = getTooltipStack(world, player);
+			if(stack == null)
+			{
+				return;
+			}
+
+			EnumItemQuality quality;			
+			String itemName = stack.getItemName();
+
+			String[] stats = { };
+			String fulltooltip = ""; 
+			//"A weak copper pick, which provides the ability to mine basic low level blocks. This is a long tooltip.";
+	        String[] setBonuses = { };
+			
+			if(stack.getItemID() >= Item.shiftedIndex)
+			{
+				quality = (Item.itemsList[stack.getItemID()]).itemQuality;
+				fulltooltip = Item.itemsList[stack.getItemID()].extraTooltipInformation;
+				stats = Item.itemsList[stack.getItemID()].getStats();
+				if(Item.itemsList[stack.getItemID()] instanceof ItemArmor)
+				{
+					setBonuses = ((ItemArmor)(Item.itemsList[stack.getItemID()])).getStringBonuses();
+				}
+			}
+			else 
+			{
+				quality = EnumItemQuality.COMMON;
+				fulltooltip = Block.blocksList[stack.getItemID()].extraTooltipInformation;
+			}
+			
+			//Variables to help determine where and how wide the frame/text will be, as well as text colour.
+			int tooltipWidth = 160;
+			int frameX = MathHelper.getCorrectMouseXPosition() - 25; 
+			int frameY = MathHelper.getCorrectMouseYPosition() - 25;
+						
+			//% of total text size to render, in this case sacale to 1/2 size.
+			float xScale = 0.5F;
+			//Arbitrary padding to make things look nicer
+			final int PADDING = 5;
+			
+			//Break the tooltip extra information into strings that don't exceed the tooltip's total width
+			//And look terrible as a result. The only risk is the tooltip will be too long.			
+			String[] words = fulltooltip.split(" ");
+			List<String> renderLines = new ArrayList<String>(0);
+			String line = "";
+			int length = 0;			
+			int spaceLength = (int) (xScale * plainTooltip.getWidth(" ") * 0.5F);
+			
+			if(fulltooltip != "")
+			{
+				for(int i = 0; i < words.length; i++)
+				{
+					int width = (int) (0.5F * xScale * plainTooltip.getWidth(words[i]));
+					
+					if(length + width + spaceLength < tooltipWidth)
+					{
+						length += width + spaceLength;
+						line += words[i] + " ";					
+					}
+					else
+					{
+						renderLines.add(line);
+						line = words[i] + " ";
+						length = width + spaceLength;
+					}				
+				}
+				renderLines.add(line);
+			}
+			
+			//Break the set bonuses extra information into strings that don't exceed the tooltip's total width
+			//And look terrible as a result.			
+			List<String> setBonusesList = new ArrayList<String>(0);
+			if(setBonuses.length > 0)
+			{
+				line = "Set Bonuses: ";
+				length = 0;			
+				
+				for(int i = 0; i < setBonuses.length; i++)
+				{
+					int width = (int) (0.5F * xScale * plainTooltip.getWidth(words[i]));
+					
+					if(length + width + spaceLength < tooltipWidth)
+					{
+						length += width + spaceLength;
+						line += setBonuses[i] + " ";					
+					}
+					else
+					{
+						renderLines.add(line);
+						line = setBonuses[i] + " ";
+						length = width + spaceLength;
+					}				
+				}
+				setBonusesList.add(line);
+			}
+			
+			//If there's just a title, crop the tooltip
+			if(setBonusesList.size() == 0 && renderLines.size() == 0 && stats.length == 0)
+			{
+				tooltipWidth = 3 * PADDING + (int) (0.5F * xScale * boldTooltip.getWidth(itemName));
+			}
+			
+			//Ensure the tooltip won't go off the right side of the screen
+			if(frameX + tooltipWidth > Display.getWidth() * 0.5)
+			{
+				frameX = (int) (Display.getWidth() * 0.5 - tooltipWidth);
+			}
+			frameX += getCameraX();
+			
+			//Find out how long does the tooltip actually has to be
+			float requiredHeight = (boldTooltip.getHeight(itemName)) + 
+					PADDING * (setBonusesList.size() + stats.length) + 
+					((plainTooltip.getHeight(itemName)) * 0.5f * (stats.length)) + 
+					((boldTooltip.getHeight(itemName)) * 0.5f * (setBonusesList.size()));
+			int tooltipHeight = (int) requiredHeight;
+			if(frameY + tooltipHeight > Display.getHeight() * 0.5)
+			{
+				frameY = (int) (Display.getHeight() * 0.5 - tooltipHeight);
+			}
+			frameY += getCameraY();
+			
+			//Render everything, in the order of:
+			//Background, title, stats, and full description.			
+			tooltipBackground.bind();			
+			//Background
+			t.startDrawingQuads();
+	        t.setColorRGBA_F(1, 1, 1, 1);
+			t.addVertexWithUV(frameX, frameY + tooltipHeight, 0, 0, 1);
+			t.addVertexWithUV(frameX + tooltipWidth, frameY + tooltipHeight, 0, 1, 1);
+			t.addVertexWithUV(frameX + tooltipWidth, frameY, 0, 1, 0);
+			t.addVertexWithUV(frameX, frameY, 0, 0, 0);
+			t.draw();
+			
+			GL11.glColor4f(quality.r, quality.g, quality.b, 1.0F);
+			
+			//Title
+			//float xOffset = frameX + ((tooltipWidth) * 0.95f) * 0.5f;
+			float yOffset = frameY + boldTooltip.getHeight(itemName);
+			boldTooltip.drawString(frameX + PADDING, yOffset, itemName, xScale , -1, TrueTypeFont.ALIGN_LEFT); 
+			
+			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+			
+			//Stats
+			for(int i = 0; i < stats.length; i++)
+			{
+				boldTooltip.drawString(frameX + PADDING, 
+						yOffset + PADDING*(1 + i) + (((tooltipHeight) - (tooltipHeight - boldTooltip.getHeight(itemName))) * 0.5f * (1+i)), 
+						stats[i],
+						xScale,
+						-1, 
+						TrueTypeFont.ALIGN_LEFT); 
+			}			
+			
+			GL11.glColor4f(0.0F, 1.0F, 0.0F, 1.0F);
+			
+			//Render the set bonuses
+			yOffset = yOffset + PADDING * (stats.length) + 
+					(((tooltipHeight) - (tooltipHeight - boldTooltip.getHeight(itemName))) * 0.5f * (stats.length));
+			
+			for(int i = 0; i < setBonusesList.size(); i++)
+			{
+				boldTooltip.drawString(frameX + PADDING, 
+						yOffset + PADDING*(1 + i) + (((tooltipHeight) - (tooltipHeight - boldTooltip.getHeight(itemName))) * 0.5f * (1+i)), 
+						setBonusesList.get(i),
+						xScale,
+						-1, 
+						TrueTypeFont.ALIGN_LEFT); 
+			}
+			
+			GL11.glColor4f(0.0F, 0.0F, 0.0F, 1.0F);
+			//Render the text lines which are now broken up to fit in the tooltip
+			//and adjust the yoffset so the text won't overlap
+			yOffset = yOffset + PADDING * (setBonusesList.size()) + 
+					(((tooltipHeight) - (tooltipHeight - boldTooltip.getHeight(itemName))) * 0.5f * (setBonusesList.size()));
+			
+			for(int i = 0; i < renderLines.size(); i++)
+			{
+				plainTooltip.drawString(frameX + PADDING, 
+						yOffset + PADDING*(i+ 1) + (((tooltipHeight) - (tooltipHeight - plainTooltip.getHeight(itemName))) * 0.5f * (1+i)), 
+						renderLines.get(i),
+						0.5F,
+						-1,
+						TrueTypeFont.ALIGN_LEFT); 			
+			}
 		}
 	}
 	
@@ -303,6 +653,7 @@ public class RenderUI extends Render
 			
 			textures[mouseItem.getItemID()].bind();
 			t.startDrawingQuads();
+			t.setColorRGBA_F(1.0F, 1.0F, 1.0F, 1.0F);
 			t.addVertexWithUV(x, y + newsize, 0, 0, 1);
 			t.addVertexWithUV(x + newsize, y + newsize, 0, 1, 1);
 			t.addVertexWithUV(x + newsize, y, 0, 1, 0);
@@ -326,13 +677,9 @@ public class RenderUI extends Render
 		int x = MathHelper.getCorrectMouseXPosition();
 		int y = MathHelper.getCorrectMouseYPosition();		
 		shouldDropItem = true;
-		
-		if(saveAndQuit.inBounds(x, y) && Mouse.isButtonDown(0))
-		{
-			saveAndQuit.saveAndQuit(world, player);
-		}
-		
-		if(!Mouse.isButtonDown(0)) //If the mouse isnt down, there's really no reason to run the rest of this function
+				
+		//If the mouse isnt down, there's really no reason to run the rest of this function
+		if(!Mouse.isButtonDown(0)) 
 		{
 			return;
 		}
@@ -877,7 +1224,7 @@ public class RenderUI extends Render
 		populateInventorySlots(world, player); 
 		renderScrollableCraftingRecipeWheel(world, player);
 		
-		saveAndQuit.draw();
+		//saveAndQuit.draw();
 	}		
 
 	/**

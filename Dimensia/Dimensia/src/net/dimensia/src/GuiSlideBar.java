@@ -1,195 +1,146 @@
 package net.dimensia.src;
 
-import java.awt.Font;
-
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
+//TODO: The slide-bar part of GuiSlideBar needs a texture.
+
 /**
- * GuiButtonImproved implements a simple button, with a single background texture. Contains
- * methods to draw and check for mouse clicks as well as
- * a method to get the current String value of the button (for external use). This button scales 
- * based on screensize and the: x, y, width, and heights are measured in respect to this using a float value
+ * <code> GuiSlideBar extends GuiComponent </code> <br>
+ * GuiSlideBar implements a simple slider to measure a % value for a setting, etc. It contains methods to 
+ * draw and check for mouse clicks as well as a method to get the current value of the slider(a value
+ * from 0.0F to 1.0F, indicating the %). Instances of GuiSlideBar scale based on screensize and 
+ * the: x, y, width, and heights are measured in respect to the Display size using a float value
  * from 0.0F to 1.0F (where 1.0F is 100%).
- *
  * @author      Alec Sobeck
  * @author      Matthew Robertson
  * @version     1.0
  * @since       1.0
  */
-public class GuiSlideBar 
+public class GuiSlideBar extends GuiComponent
 {	
-	private static TrueTypeFont trueTypeFont;
-	private Texture renderTexture;
-	private String[] values;
-	private int screenX;
-	private int screenY;
-	/** Determines whether the component will be centered on the X axis, which automatically updates the x position to be centered on screen size change*/
-	//private boolean centerComponent;
-	private int buttonIndex;
-	/** The height of the button as a % of the screen, between 0.0F and 1.0F*/
-	private float width;
-	/** The height of the button as a % of the screen, between 0.0F and 1.0F*/
-	private float height;
-	/** The x position as a % of the screen, between 0.0F and 1.0F */
-	private float x;
-	/** The y position as a % of the screen, between 0.0F and 1.0F */
-	private float y;
+	/** The % value of the slide bar, 0.0F is fully left (0%) and 1.0F is fully right (1.0F)*/
+	private float value;	
+	/** The final % value indicating how large the slide bar's "inner bar" is, from 0.0F to 1.0F */
+	private final float BAR_WIDTH = 0.05F;
+	/** */
+	private String extraInformation;
 	
 	/**
-	 * Constructs a new instance of GuiButton. Initializes the button with the specified
-	 * values, and currently can only center the button.
-	 * @param values the possible text strings the button can display (and return)
-	 * @param x the x position of the button
-	 * @param y the y position of the button
-	 * @param center whether the button should be centered. currently this value is not used.
+	 * Constructs a new instance of GuiSlideBar. Initializes the slidebar at the given position and 
+	 * and sets the width to 40%, height to 10%, and default gui component texture.
+	 * @param x the x position of the button, as a percent of the screen, from 0.0F to 1.0F 
+	 * @param y the y position of the button, as a percent of the screen, from 0.0F to 1.0F
 	 */
-	public GuiSlideBar(String[] values, float x, float y, boolean center)
+	public GuiSlideBar(float x, float y)
 	{
-		if(trueTypeFont == null)
-		{
-			trueTypeFont = new TrueTypeFont(new Font("Agent Orange", Font.BOLD, 20), false/*DO NOT use antialiasing*/);
-		}		
-
-		//centerComponent = center;
-		this.y = y;
-		width = 0.4F;
-		height = 0.1F;
-		buttonIndex = 0;
-		this.values = values;
-		screenX = Display.getWidth();
-		screenY = Display.getHeight();
-		renderTexture = GuiMainMenu.buttonTexture;
-		
-		/*
-		if(centerComponent)
-		{
-			this.x = (int) ((Display.getWidth() * 0.25f) - (width * 0.5f));
-		}
-		else
-		{
-			
-		}	
-		*/
+		super();
 		this.x = x;
+		this.y = y;
+		value = 0.5F;
+		extraInformation = "";
 	}
 	
 	/**
-	 * Sets the width of the button as a percent of the screen width
-	 * @param width the new width of the width, in percent, between 0.0F and 1.0F
+	 * Constructs a new instance of GuiSlideBar. Initializes the button with the specified
+	 * values, and the default GuiComponent texture
+	 * @param x the x position of the button, as a percent of the screen, from 0.0F to 1.0F 
+	 * @param y the y position of the button, as a percent of the screen, from 0.0F to 1.0F
+	 * @param width the width of the button, as a percent of the screen, from 0.0F to 1.0F
+	 * @param height the height of the button, as a percent of the screen, from 0.0F to 1.0F
 	 */
-	public void setWidth(float width)
+	public GuiSlideBar(float x, float y, float width, float height)
 	{
+		super();
+		this.x = x;
+		this.y = y;
 		this.width = width;
-	}
-	
-	/**
-	 * Sets the height of the button as a percent of the screen height
-	 * @param height the new height of the button, in percent, between 0.0F and 1.0F
-	 */
-	public void setHeight(float height)
-	{
 		this.height = height;
+		this.value = 0.5F;
+		extraInformation = "";
+	}
+
+	/**
+	 * Constructs a new instance of GuiSlideBar. Initializes the button with the specified
+	 * values, and the default GuiComponent texture
+	 * @param extra a String of extra information to render over the background texture
+	 * @param value the value of the slide bar in %, from 0.0F to 1.0F
+	 * @param x the x position of the button, as a percent of the screen, from 0.0F to 1.0F 
+	 * @param y the y position of the button, as a percent of the screen, from 0.0F to 1.0F
+	 * @param width the width of the button, as a percent of the screen, from 0.0F to 1.0F
+	 * @param height the height of the button, as a percent of the screen, from 0.0F to 1.0F
+	 */
+	public GuiSlideBar(String extra, float value, float x, float y, float width, float height)
+	{
+		super();
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
+		this.value = value;
+		extraInformation = extra;
 	}
 	
 	/**
-	 * Returns the String value currently selected in values[]
-	 * @return the String value of the currently selected button value
+	 * Returns a float value representing how far over to the right the slide bar is. 0.0F represents fully left (0%)
+	 * while 1.0F represents fully right (100%)
+	 * @return a float value from 0.0F to 1.0F, indicating the % value of the slide bar
 	 */
-	public String getValue()
+	public float getValue()
 	{
-		return values[buttonIndex];
+		return value;
 	}
-	
-	/**
-	 * Gets whether or not a point is inside the button
-	 * @param x the x value of the point to compare
-	 * @param y the y value of the point to compare
-	 * @return whether the point is in bounds or not
-	 */
-	public boolean inBounds(int x, int y) //Is the specified vertex inside the bounds of the text?
-	{
-		return (x > this.x && x < this.x + width && y > this.y && y < this.y + height);
-	}	
-	
+		
 	/**
 	 * Draws the button, and fixes the position if the screen has been resized
 	 */
 	public void draw()
-	{	
-		if(Display.getWidth() != screenX || Display.getHeight() != screenY) //Has the screen been resized?
-		{
-			screenX = Display.getWidth();
-			screenY = Display.getHeight();
-		}
-		
-		//Texture:
+	{			
+		//Background
 		GL11.glColor4f(1, 1, 1, 1);
 		Tessellator t = Tessellator.instance;
 		renderTexture.bind();
-		t.startDrawingQuads();
 		
 		float width = Display.getWidth() * this.width * 0.5F;
 		float height = Display.getHeight() * this.height * 0.5F;
 		float x = Display.getWidth() * this.x * 0.5F;
 		float y = Display.getHeight() * this.y * 0.5F;
 		
-		if(width < (trueTypeFont.getWidth(values[buttonIndex]) / 2))
-		{
-			width = trueTypeFont.getWidth(values[buttonIndex]) / 2;
-		}
-		
-	    t.addVertexWithUV(x, y + height, 0, 0, 1);
+		t.startDrawingQuads();
+		t.addVertexWithUV(x, y + height, 0, 0, 1);
 	    t.addVertexWithUV(x + width, y + height, 0, 1, 1);
 	    t.addVertexWithUV(x + width, y, 0, 1, 0);
 	    t.addVertexWithUV(x, y, 0, 0, 0);		
 		t.draw();
 		
+		//The "slide bar"
+		float barPosition = ((this.value - (BAR_WIDTH * 0.5F)) < 0) ? 0 : ((this.value - (BAR_WIDTH * 0.5F)) > 0.95F) ? 0.95F : 
+			(this.value - (BAR_WIDTH * 0.5F));
+		float width1 = Display.getWidth() * this.width * 0.5F * BAR_WIDTH;
+		float x1 = (Display.getWidth() * this.x * 0.5F) + (barPosition * this.width * Display.getWidth() * 0.5F);
 		
-		//Text:
-		float xOffset = x + width/2 * 0.95f;//trueTypeFont.getWidth(values[buttonIndex]) / 2;
-		float yOffset = y + height - (height - trueTypeFont.getHeight(values[buttonIndex])) / 2;
+		t.startDrawingQuads();
+		t.setColorRGBA_F(0.0F, 0.0F, 0.0F, 1.0F);		
+	    t.addVertexWithUV(x1, y + height, 0, 0, 1);
+	    t.addVertexWithUV(x1 + width1, y + height, 0, 1, 1);
+	    t.addVertexWithUV(x1 + width1, y, 0, 1, 0);
+	    t.addVertexWithUV(x1, y, 0, 0, 0);		
+		t.draw();
+		
+		//Text indicating %
+		float xOffset = x + width/2 * 0.95f;
+		float yOffset = y + height - (height - trueTypeFont.getHeight("" + value)) / 2;
 			
-		trueTypeFont.drawString(xOffset, yOffset, values[buttonIndex], 1, -1, TrueTypeFont.ALIGN_CENTER); //Render the Text	
+		trueTypeFont.drawString(xOffset, yOffset, extraInformation + String.format("%2d", (int)(value*100)) + "%", 0.7F, -1, TrueTypeFont.ALIGN_CENTER);
 	}
 	
 	/**
-	 * Sets the button's value to the given value
-	 * @param i the number to set buttonIndex to
+	 * Overrides GuiComponent.onClick() to move the slider based on where the mouse is in the slider
 	 */
-	public void setButtonIndex(int i)
+	public void onClick(int x, int y)
 	{
-		buttonIndex = i;
-	}
-	
-	/**
-	 * Increments the value of the button (increases by 1)
-	 */
-	public void onClick()
-	{
-		buttonIndex++;
-		if(buttonIndex >= values.length)
-		{
-			buttonIndex = 0;
-		}
-	}
-	
-	/**
-	 * Gets the texture the button is currently rendering
-	 * @return the texture currently used by this button
-	 */
-	public Texture getRenderTexture()
-	{
-		return renderTexture;
-	}
-	
-	/**
-	 * Assigns a new texture to the button
-	 * @param texture the texture to assign to the button
-	 */
-	public void setRenderTexture(Texture texture)
-	{
-		this.renderTexture = texture;
+		float newValue = (x - (Display.getWidth() * 0.5F * this.x)) / (Display.getWidth() * 0.5F * (this.width));
+		this.value = newValue;
 	}
 }
 

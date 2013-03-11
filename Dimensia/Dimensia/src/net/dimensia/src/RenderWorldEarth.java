@@ -9,9 +9,10 @@ public class RenderWorldEarth extends RenderWorld
 	{		
 		GL11.glEnable(GL11.GL_BLEND);
 
-		renderSkyBackgroundScene(); //Renders the background image thing		
+	    renderSkyBackgroundScene(); //Renders the background image thing		
 		adjustCamera(world, player); //Adjusts the camera before rendering the world		
-		renderBlocks.renderBackwall(world, player);
+		//renderBlocks.renderBackwall(world, player);
+				
 		renderBlocks.render(world, player);	
 		renderEntities.renderWorldEntityList(world);
 		renderEntities.renderWorldProjectileList(world);

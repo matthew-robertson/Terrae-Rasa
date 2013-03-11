@@ -679,8 +679,12 @@ public class EntityLiving extends Entity
 		for(int i = 0; i < loops; i++)
 		{
 			float possibleMovement = canMoveRight(world);
-			
 			float actualMovement = movementValue % 6;
+			
+			if(actualMovement > possibleMovement)
+			{
+				actualMovement = possibleMovement;
+			}
 			
 			if(x + possibleMovement < (world.getWidth() * 6) && possibleMovement >= movementValue) //full movement
 				x += actualMovement;
@@ -712,6 +716,11 @@ public class EntityLiving extends Entity
 			float possibleMovement = canMoveLeft(world);
 			float actualMovement = movementValue % 6;
 			
+			if(actualMovement > possibleMovement)
+			{
+				actualMovement = possibleMovement;
+			}
+			
 			if((x - possibleMovement) >= 0 && possibleMovement >= movementValue) //full movement
 				x -= actualMovement;
 			else if(possibleMovement > 0) //partial movement
@@ -740,8 +749,12 @@ public class EntityLiving extends Entity
 		for(int i = 0; i < loops; i++)
 		{
 			float possibleMovement = canMoveRight(world);
-			
 			float actualMovement = movementValue % 6;
+			
+			if(actualMovement > possibleMovement)
+			{
+				actualMovement = possibleMovement;
+			}
 			
 			if(x + possibleMovement < (world.getWidth() * 6) && possibleMovement >= movementValue) //full movement
 				x += actualMovement;
@@ -772,6 +785,11 @@ public class EntityLiving extends Entity
 		{
 			float possibleMovement = canMoveLeft(world);
 			float actualMovement = movementValue % 6;
+			
+			if(actualMovement > possibleMovement)
+			{
+				actualMovement = possibleMovement;
+			}
 			
 			if((x - possibleMovement) >= 0 && possibleMovement >= movementValue) //full movement
 				x -= actualMovement;
@@ -923,7 +941,7 @@ public class EntityLiving extends Entity
 		{
 			if(!(this instanceof EntityLivingPlayer))
 			{
-				System.out.println(i + ">" + statusEffects.get(i) + " TIME_REMAINING = " + statusEffects.get(i).ticksLeft);
+				//System.out.println(i + ">" + statusEffects.get(i) + " TIME_REMAINING = " + statusEffects.get(i).ticksLeft);
 			}
 			statusEffects.get(i).applyPeriodicBonus(world, this);
 			if(statusEffects.get(i).isExpired())
@@ -940,7 +958,7 @@ public class EntityLiving extends Entity
 		{
 			if(statusEffects.get(i).toString().equals(effect.toString()))
 			{
-				System.out.println("StatusEffectMatch=" + effect.toString());
+				//System.out.println("StatusEffectMatch=" + effect.toString());
 				
 				if(statusEffects.get(i).tier <= effect.tier)
 				{
@@ -958,7 +976,7 @@ public class EntityLiving extends Entity
 						
 						effect.applyInitialEffect(this);
 						statusEffects.add(effect);
-						System.out.println("Effect registered>>" + effect);
+						//System.out.println("Effect registered>>" + effect);
 						return true;
 					}
 				}
@@ -971,7 +989,7 @@ public class EntityLiving extends Entity
 		
 		effect.applyInitialEffect(this);
 		statusEffects.add(effect);
-		System.out.println(this + "->Effect registered>>" + effect);
+		//System.out.println(this + "->Effect registered>>" + effect);
 		return true;
 	}
 	

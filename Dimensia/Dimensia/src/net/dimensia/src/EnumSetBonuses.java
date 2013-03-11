@@ -1,39 +1,54 @@
 package net.dimensia.src;
 
+/**
+ * EnumSetBonuses provides a list of possible set bonuses, and a name for each of them which can be retrieved by calling 
+ * an EnumSetBonues' {@link #toString()}  method.
+ * @author      Alec Sobeck
+ * @author      Matthew Robertson
+ * @version     1.0
+ * @since       1.0
+ */
 public enum EnumSetBonuses 
 {
-	DEFENSE1,
-	DEFENSE2,
-	DEFENSE3,
-	DEFENSE4,
-	DEFENSE_P_10, //+10% defense
-	DEFENSE_P_20, //+20% defense
-	DAMAGE_MAGIC_DONE_10, //+10% magic damage done
-	DAMAGE_MAGIC_DONE_20, //+20% magic damage done
-	DAMAGE_RANGE_DONE_10, //+10% range damage done
-	DAMAGE_RANGE_DONE_20, //+20% range damage done
-	DAMAGE_MELEE_DONE_10, //+10% melee damage done
-	DAMAGE_MELEE_DONE_20, //+20% melee damage done
-	DAMAGE_DONE_10, //+10% all damage done
-	DAMAGE_DONE_20, //+20% all damage done
-	DAMAGE_SOAK_5, //-5% damage taken
-	DAMAGE_SOAK_10, //-10% damage taken
-	DAMAGE_SOAK_15, //-15% damage taken
-	DAMAGE_SOAK_20, //-20% damage taken
-	MOVEMENT_SPEED_10, //+10% movement speed
-	MOVEMENT_SPEED_20, //+20% movement speed
-	MOVEMENT_SPEED_30, //+30% movement speed
-	FALL_IMMUNE, //Immunity to fall damage
-	FIRE_IMMUNE, //Immunity to fire and lava damage
-	JUMP3, //Jumps 3 blocks higher (gives increased fall distance too)
-	JUMP8, //Jumps 8 blocks higher (gives increased fall distance too)
-	CRITICAL10, //+10% chance to critically hit
-	CRITICAL20, //+20% chance to critically hit
-	CRITICAL_IMMUNE, //Immune to critical hits
-	KNOCKBACK_20, //Knockbacks 20% more powerful 
-	KNOCKBACK_40, //Knockbacks 40% more powerful
-	KNOCKBACK_60, //Knockbacks 60% more powerful
-	HEAVENS_REPRIEVE; //A hit that would kill instead grants 15% maximum health and 6 seconds immunity (should destroy the accessory)
+	DEFENSE1("+1 Defense"),
+	DEFENSE2("+2 Defense"),
+	DEFENSE3("+3 Defense"),
+	DEFENSE4("+4 Defense"),
+	DEFENSE_P_10(""), //+10% defense
+	DEFENSE_P_20(""), //+20% defense
+	DAMAGE_MAGIC_DONE_10(""), //+10% magic damage done
+	DAMAGE_MAGIC_DONE_20(""), //+20% magic damage done
+	DAMAGE_RANGE_DONE_10(""), //+10% range damage done
+	DAMAGE_RANGE_DONE_20(""), //+20% range damage done
+	DAMAGE_MELEE_DONE_10(""), //+10% melee damage done
+	DAMAGE_MELEE_DONE_20(""), //+20% melee damage done
+	DAMAGE_DONE_10("+10% Damage"), //+10% all damage done
+	DAMAGE_DONE_20(""), //+20% all damage done
+	DAMAGE_SOAK_5(""), //-5% damage taken
+	DAMAGE_SOAK_10(""), //-10% damage taken
+	DAMAGE_SOAK_15(""), //-15% damage taken
+	DAMAGE_SOAK_20(""), //-20% damage taken
+	MOVEMENT_SPEED_10("+10% Speed"), //+10% movement speed
+	MOVEMENT_SPEED_20(""), //+20% movement speed
+	MOVEMENT_SPEED_30(""), //+30% movement speed
+	FALL_IMMUNE(""), //Immunity to fall damage
+	FIRE_IMMUNE(""), //Immunity to fire and lava damage
+	JUMP3(""), //Jumps 3 blocks higher (gives increased fall distance too)
+	JUMP8(""), //Jumps 8 blocks higher (gives increased fall distance too)
+	CRITICAL10(""), //+10% chance to critically hit
+	CRITICAL20(""), //+20% chance to critically hit
+	CRITICAL_IMMUNE(""), //Immune to critical hits
+	KNOCKBACK_20(""), //Knockbacks 20% more powerful 
+	KNOCKBACK_40(""), //Knockbacks 40% more powerful
+	KNOCKBACK_60(""), //Knockbacks 60% more powerful
+	HEAVENS_REPRIEVE("Heaven's Reprieve"); //A hit that would kill instead grants 15% maximum health and 6 seconds immunity (should destroy the accessory)
+	
+	private String name;
+	
+	EnumSetBonuses(String name)
+	{
+		this.name = name;
+	}
 	
 	/**
 	 * Gives the list of set bonuses for the armour the player currently has equiped
@@ -83,5 +98,14 @@ public enum EnumSetBonuses
 		}
 		
 		return new EnumSetBonuses[] { }; //Nothing matched 
+	}
+	
+	/**
+	 * Overrides Enum.toString() to provide the name of the given EnumSetBonuses
+	 * @return the EnumSetBonuses' name
+	 */
+	public String toString()
+	{
+		return name;
 	}
 }

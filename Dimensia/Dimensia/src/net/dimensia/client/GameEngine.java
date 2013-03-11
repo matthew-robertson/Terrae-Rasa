@@ -76,7 +76,7 @@ public class GameEngine
 		        	else if(!Dimensia.isMainMenuOpen) //Handle game inputs if the main menu isnt open (aka the game is being played)
 		        	{
 		        		MouseInput.mouse(world, player);
-		        		Keys.keyboard(world, player, settings);	            
+		        		Keys.keyboard(world, player, settings, settings.keybinds);	            
 		        		
 		        		if(renderMode == RENDER_MODE_WORLD_EARTH) //Player is in the overworld ('earth')
 		        		{
@@ -180,7 +180,7 @@ public class GameEngine
 	public void init()
 	{
 		mainMenu = new GuiMainMenu();
-		renderMenu = new RenderMenu();
+		renderMenu = new RenderMenu(settings);
 		
 		if(Dimensia.initInDebugMode)
 		{

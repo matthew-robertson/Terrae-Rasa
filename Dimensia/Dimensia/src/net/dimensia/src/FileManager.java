@@ -21,23 +21,7 @@ public class FileManager
 	
 	public FileManager()
 	{
-		String osName = System.getProperty("os.name").toLowerCase();
-		if(osName.contains("window"))
-		{
-			BASE_PATH = Dimensia.WINDOWS_BASE_PATH;
-		}
-		else if(osName.contains("mac"))
-		{
-			BASE_PATH = Dimensia.MAC_BASE_PATH;
-		}
-		else if(osName.contains("ubuntu") || osName.contains("linux"))
-		{
-			BASE_PATH = Dimensia.LINUX_BASE_PATH;
-		}
-		else
-		{
-			throw new RuntimeException("Invalid OS");
-		}
+		BASE_PATH = Dimensia.getBasePath();
 	}
 	
 	/**
