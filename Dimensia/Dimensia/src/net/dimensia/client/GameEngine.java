@@ -25,12 +25,35 @@ import net.dimensia.src.WorldSky;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
+/**
+ * <code>GameEngine</code> is the class responsible for running the main game loop, and other core features of multiple worlds.
+ * <code>GameEngine</code> defines 4 important methods. 
+ * <br><br>
+ * The method {@link #startGame(World, EntityLivingPlayer)} defines the method to actually start the game with the specified World object
+ * and player. This will close the main menu and begin rendering based on the Chunk data. 
+ * <br><br>
+ * Most of the application's life cycle is spent in {@link #run()} method, which contains the main game loop. This handles
+ * everything from the main menu to the game, and save menu. Before exiting this method, {@link #saveSettings()} will be called
+ * to update any settings changed during runtime. 
+ * <br><br>
+ * Additional methods of interest: <br>
+ * {@link #changeWorld(int)}, {@link #closeGameToMenu()}
+ *   
+ * 
+ * @author      Alec Sobeck
+ * @author      Matthew Robertson
+ * @version     1.0
+ * @since       1.0
+ */
 public class GameEngine 
 {
+	/** In single player one render mode can be active. This decides what world is updated, loaded, and rendered. The names
+	 * correspond directly to that respective world. */
 	public final static int RENDER_MODE_WORLD_EARTH = 1,
 							   RENDER_MODE_WORLD_HELL = 2,
 							   RENDER_MODE_WORLD_SKY  = 3;
-	public int renderMode;
+	/** The currently selected RENDER_MODE_WORLD value, detailing what world to update, load, and render.*/
+	private int renderMode;
 	public SoundManager soundManager;
 	public GuiMainMenu mainMenu;
 	public World world;
@@ -40,10 +63,27 @@ public class GameEngine
 	public Settings settings;
 	public RenderMenu renderMenu;
 	
+	/**
+	 * Creates a new instance of GameEngine. This includes setting the renderMode to RENDER_MODE_WORLD_EARTH
+	 * and loading the settings object from disk. If a settings object cannot be found a new one is created. 
+	 */
 	public GameEngine()
 	{
 		renderMode = RENDER_MODE_WORLD_EARTH;
-		settings = new Settings();
+		try 
+		{
+			loadSettings();
+		}
+		catch (IOException e) 
+		{
+			//e.printStackTrace();
+			settings = new Settings();
+		}
+		catch (ClassNotFoundException e) 
+		{
+			//e.printStackTrace();
+			settings = new Settings();
+		}
 	}
 	
 	public void setWorld(World world)
@@ -61,12 +101,12 @@ public class GameEngine
 			final int MAX_FRAMESKIP = 5;
 			long next_game_tick = System.currentTimeMillis();
 			long start, end;
+			long fps = 0;
 			int loops;
+			start = System.currentTimeMillis();
 			
 		    while(!Dimensia.done) //Main Game Loop
 		    {
-		    	start = System.currentTimeMillis();
-		    			    	
 		        loops = 0;
 		        while(System.currentTimeMillis() > next_game_tick && loops < MAX_FRAMESKIP) //Update the game 20 times/second 
 		        {
@@ -134,6 +174,7 @@ public class GameEngine
 		    		{
 		    		 	RenderGlobal.render(worldSky, player, renderMode); //Renders Everything on the screen for the game
 		    		}
+		        	fps++;
 		        }
 		        
 		        if(settings.menuOpen)
@@ -147,9 +188,14 @@ public class GameEngine
 		        Display.update(); //updates the display
 
 				
-		        
-	        	end = System.currentTimeMillis();        	
-	       //     System.out.println(end - start);
+		        if(System.currentTimeMillis() - start >= 5000)
+		        {
+		       // 	System.out.println("FPS: " + ((double)(fps) / ((double)(System.currentTimeMillis() - start) / 1000.0D)));
+		        	start = System.currentTimeMillis();
+	        		end = System.currentTimeMillis();     
+	        		fps = 0;
+		    	}
+	        	//     System.out.println(end - start);
 		    }     
 		}
 		catch(Exception e) //Fatal error catching
@@ -157,6 +203,22 @@ public class GameEngine
 			e.printStackTrace();			
 			ErrorUtils errorUtils = new ErrorUtils();
 			errorUtils.writeErrorToFile(e, true);			
+		}
+		finally
+		{
+			//Save the settings
+		    try 
+		    {
+				saveSettings();
+			}
+		    catch (FileNotFoundException e) 
+		    {
+				e.printStackTrace();
+			}
+		    catch (IOException e) 
+			{
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -167,21 +229,56 @@ public class GameEngine
 	 */
 	public void startGame(World world, EntityLivingPlayer player)
 	{
+		if(this.world != null)
+		{
+			throw new RuntimeException("World already exists!");
+		}
 		this.world = world;
 		this.player = player;
 		world.addPlayerToWorld(player);
 		Dimensia.isMainMenuOpen = false;
 		mainMenu = null;
 	}
-	
+		
 	/**
-	 * Misc. things required to initalize the game
+	 * Initializes miscellaneous things within the game engine. This should be called after object creation so 
+	 * that the UI thread does not throw an exception while loading textures.
 	 */
 	public void init()
 	{
 		mainMenu = new GuiMainMenu();
 		renderMenu = new RenderMenu(settings);
-		
+		Display.setVSyncEnabled(settings.vsyncEnabled);
+		debugCheats();
+	}
+	/**
+	 * Loads the Settings for the entire game upon starting the game.
+	 * @throws IOException Indicates the saving operation has failed
+	 * @throws ClassNotFoundException Indicates the Settings class does not exist with the correct version
+	 */
+	public void loadSettings() 
+			throws IOException, ClassNotFoundException
+	{
+		FileManager fileManager = new FileManager();
+		this.settings = fileManager.loadSettings();
+	}
+	/**
+	 * Saves the Settings for the entire game to disk, this is called before exiting the run method.
+	 * @throws IOException Indicates the saving operation has failed
+	 * @throws FileNotFoundException Indicates the desired directory (file) is not found on the filepath
+	 */
+	public void saveSettings() 
+			throws FileNotFoundException, IOException
+	{
+		FileManager fileManager = new FileManager();
+		fileManager.saveSettings(settings);
+	}
+	
+	/**
+	 * Inits some cheats and inventory stuff for debugging
+	 */
+	private void debugCheats()
+	{
 		if(Dimensia.initInDebugMode)
 		{
 			Dimensia.isMainMenuOpen = false;
@@ -237,16 +334,27 @@ public class GameEngine
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.angelsSigil, 2));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ringOfVigor, 5));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.regenerationPotion2, 5));
-			//world.player.registerStatusEffect(new StatusEffectDazed(500000, 1));
-			
 		}		
 	}
-
+	
+	/**
+	 * Gets the world object currently in use by the game. This will be null if the main menu is open or something breaks.
+	 * @return the world object for the current game, which may be null if on the main menu
+	 */
 	public World getWorld()
 	{
 		return world;
 	}
 	
+	/**
+	 * Changes the loaded world to something else. For example, changing from Earth to Hell would use this. Calling
+	 * this method forces a save of the remaining World and then loads what's required for the new World. The value 
+	 * of the param newMode should correspond to the class variables in GameEngine such as RENDER_MODE_WORLD_EARTH or
+	 * RENDER_MODE_WORLD_HELL. Supplying an incorrect value will not load a new World.
+	 * @param newMode the final integer value for the new world (indicating what object to manipulate)
+	 * @throws IOException indicates a general failure to load the file, not relating to a version error
+	 * @throws ClassNotFoundException indicates the saved world version is incompatible
+	 */
 	public void changeWorld(int newMode)
 			throws IOException, ClassNotFoundException
 	{
@@ -287,6 +395,12 @@ public class GameEngine
 		}
 	}
 	
+	/**
+	 * Saves the remaining world that's loaded and the player to their respective save locations before
+	 * exiting to the main menu.
+	 * @throws FileNotFoundException indicates a failure to find the save location of the player or world
+	 * @throws IOException indicates a general failure to save, not relating to the file
+	 */
 	public void closeGameToMenu() 
 			throws FileNotFoundException, IOException
 	{

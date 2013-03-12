@@ -42,7 +42,7 @@ public class Dimensia
 	private Frame dimensiaFrame;
 	private Canvas dimensiaCanvas;
 	private static String osName;
-	private final static String VERSION = "Alpha 1.0.17";	
+	private final static String VERSION = "Alpha 1.0.23";	
 	private final static String WINDOW_TITLE = "Dimensia " + VERSION;
 	private final static String WINDOWS_BASE_PATH = new StringBuilder().append("C:/Users/").append(System.getProperty("user.name")).append("/AppData/Roaming/Dimensia").toString();
 	private final static String MAC_BASE_PATH = new StringBuilder().append("/Users/").append(System.getProperty("user.name")).append("/Library/Application").append(" Support/Dimensia").toString();
@@ -96,7 +96,7 @@ public class Dimensia
 			throw new RuntimeException("OS not supported");
 		}
 						
-		dimensia = new Dimensia(784, 578/*854,480(widescreen)*/); //Init the game object with the specified resolution
+		dimensia = new Dimensia(854, 480 /*784, 578/*854,480(widescreen)*/); //Init the game object with the specified resolution
         dimensia.run(); //Start the game
 	}	
 	
@@ -116,7 +116,6 @@ public class Dimensia
 			dimensiaFrame.setLayout(new BorderLayout());
 			dimensiaFrame.add(dimensiaCanvas, "Center");
 			dimensiaFrame.pack();
-			//dimensiaFrame.setSize(new Dimension(width, height));
 			dimensiaFrame.setLocationRelativeTo(null);
 			dimensiaFrame.setVisible(true);
 	
@@ -124,15 +123,12 @@ public class Dimensia
 			Display.setParent(dimensiaCanvas); //The display is inside an awtCanvas to allow for resizing
 	        Display.setTitle(WINDOW_TITLE); //sets the title of the window
 		    Display.setDisplayMode(new DisplayMode(width, height)); //creates the window with the correct size
-		    Display.sync(60); //Sync the display so it attempts to maintain 60 fps
 		    Display.setFullscreen(true);
 		    Display.setResizable(true); //The display is resizable
 			Display.create((new PixelFormat()).withDepthBits(24)); //finally creates the window
 		    
-			//dimensiaFrame.pack();
-	    	
 	        initGL(); //Initialize the generic 2D opengl settings
-	    	//resizeWindow(); //To remain consistent, resize the window to use slightly different calculations immediately
+	    	resizeWindow(); //To remain consistent, resize the window to use slightly different calculations immediately
 	    	
 			Component myComponent = dimensiaFrame;
 			myComponent.addComponentListener(new ComponentAdapter() //JFrame listener for a window resize event
@@ -143,7 +139,6 @@ public class Dimensia
 		    		needsResized = true; //Flags the window for recalculations on the next game update
 			    }
 			});
-			
 		}
 		catch (Exception e)
 		{
@@ -160,14 +155,18 @@ public class Dimensia
 		width = (dimensiaFrame.getWidth() > 740) ? dimensiaFrame.getWidth() : 740; //740 = arbitrary value for things not to look bad
 		height = (dimensiaFrame.getHeight() > 480) ? dimensiaFrame.getHeight() : 480; //same with 480
 		
-		int width_fix = (int)(width / Render.BLOCK_SIZE) * Render.BLOCK_SIZE + Render.BLOCK_SIZE;
-		int height_fix = (int)(height / Render.BLOCK_SIZE) * Render.BLOCK_SIZE + Render.BLOCK_SIZE;
+		int width_fix = (int)(width / Render.BLOCK_SIZE) * Render.BLOCK_SIZE + 3 * Render.BLOCK_SIZE;
+		int height_fix = (int)(height / Render.BLOCK_SIZE) * Render.BLOCK_SIZE + 3 * Render.BLOCK_SIZE;
 		
 		if(osName.contains("Window")) //Windows Resize
 		{
 			dimensiaFrame.setSize(new Dimension(width, height));
 			dimensiaCanvas.setSize(new Dimension(width, height));
-			//dimensiaCanvas.setLocation(0, 22);
+		}
+		else if(osName.toLowerCase().contains("linux"))
+		{
+			dimensiaCanvas.setSize(new Dimension(width_fix, height_fix));
+			dimensiaFrame.setSize(new Dimension(width, height));
 		}
 		else //Mac resize
 		{
@@ -180,7 +179,7 @@ public class Dimensia
 		GL11.glMatrixMode(GL11.GL_PROJECTION); 
         GL11.glLoadIdentity(); //Reset to the origin        
         GL11.glOrtho(0.0D, width_fix / 2, height_fix / 2, 0.0D, 1000D, 3000D);
-        GL11.glMatrixMode(5888 /*GL_MODELVIEW0_ARB*/); 
+        GL11.glMatrixMode(GL11.GL_MODELVIEW); 
         GL11.glViewport(0, 0, width_fix, height_fix); //Sets up the second required element for 2D projection					
         
         System.out.println("Resizing window to: (" + width + ", " + height + ")");		
@@ -191,14 +190,17 @@ public class Dimensia
 	 */	
 	public void initGL() 
 	{		
+		int width_fix = (int)(width / Render.BLOCK_SIZE) * Render.BLOCK_SIZE + Render.BLOCK_SIZE;
+		int height_fix = (int)(height / Render.BLOCK_SIZE) * Render.BLOCK_SIZE + Render.BLOCK_SIZE;
+		
 		GL11.glClear(16640); //Clear the screen
         GL11.glMatrixMode(GL11.GL_PROJECTION); 
         GL11.glLoadIdentity(); //Reset to the origin
-        GL11.glOrtho(0.0D, width / 2, height / 2, 0.0D, 1000D, 3000D); //initialize the 2D drawing area
+        GL11.glOrtho(0.0D, width_fix / 2, height_fix / 2, 0.0D, 1000D, 3000D); //initialize the 2D drawing area
         GL11.glMatrixMode(5888 /*GL_MODELVIEW0_ARB*/); 
         GL11.glLoadIdentity(); //Reset position to the origin
         GL11.glTranslatef(0.0F, 0.0F, -2000F); //Move out on the screen so stuff is actually visible
-        GL11.glViewport(0, 0, width, height); //Setup the second element for 2D projection
+        GL11.glViewport(0, 0, width_fix, height_fix); //Setup the second element for 2D projection
         GL11.glClearColor(0.0F, 0.0F, 0.0F, 0.0F); //Clear the colour
         GL11.glDisable(GL11.GL_LIGHTING); //Ensure lighting isnt enabled
         GL11.glEnable(GL11.GL_TEXTURE_2D); //Allow flat textures to be drawn
@@ -206,7 +208,7 @@ public class Dimensia
 	}	
 	
 	/**
-	 * Attempt to load all resources- images, sound...
+	 * Attempts to load all resources- images, sound...
 	 */
 	public void loadResources()
  	{
@@ -238,8 +240,8 @@ public class Dimensia
 		createWindow(); //Create the display and embed it in an awtcanvas	
 		loadResources(); //Load all graphical and sound resources
 		
-		isMainMenuOpen = true;
-		gameEngine.init();        
+		isMainMenuOpen = true;       
+		gameEngine.init();
 		gameEngine.run();
 	    
 	    Display.destroy(); //Cleans up  

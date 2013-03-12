@@ -11,12 +11,14 @@ public class CallableSaveChunk implements Callable<Boolean>
 	private String basepath;
 	private Chunk chunk;
 	private int x;
+	private ChunkManager manager;
 	
-	public CallableSaveChunk(Chunk chunk, int x, String basepath, String worldName)
+	public CallableSaveChunk(ChunkManager manager, Chunk chunk, int x, String basepath, String worldName)
 	{
 		this.chunk = chunk;
 		this.x = x;
 		this.basepath = basepath;
+		this.manager = manager;
 	}
 	
 	public Boolean call() throws Exception 
@@ -34,7 +36,7 @@ public class CallableSaveChunk implements Callable<Boolean>
 		s.close();
 		bos.close();
 		fileWriter.close();     
-		
+		manager.unlockChunk(chunk.getX());
 		return true;
 	}
 }

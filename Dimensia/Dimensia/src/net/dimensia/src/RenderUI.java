@@ -415,6 +415,11 @@ public class RenderUI extends Render
 			{
 				frameX = (int) (Display.getWidth() * 0.5 - tooltipWidth);
 			}
+			//Ensure the tooltip doesnt go off the left side of the screen
+			if(frameX < 0)
+			{
+				frameX = PADDING;
+			}
 			frameX += getCameraX();
 			
 			//Find out how long does the tooltip actually has to be
@@ -423,9 +428,15 @@ public class RenderUI extends Render
 					((plainTooltip.getHeight(itemName)) * 0.5f * (stats.length)) + 
 					((boldTooltip.getHeight(itemName)) * 0.5f * (setBonusesList.size()));
 			int tooltipHeight = (int) requiredHeight;
+			//Make sure the tooltip doesnt go off the bottom
 			if(frameY + tooltipHeight > Display.getHeight() * 0.5)
 			{
 				frameY = (int) (Display.getHeight() * 0.5 - tooltipHeight);
+			}
+			//Ensure the tooltip doesnt go off the top of the screen
+			if(frameY < 0)
+			{
+				frameY = PADDING;
 			}
 			frameY += getCameraY();
 			
@@ -1186,11 +1197,17 @@ public class RenderUI extends Render
 		
 		GL11.glColor4f(0.603f, 1.0f, 0.466f, 0.6f);
 		t.startDrawingQuads();		
+		int armorOffset = 80;
+		int size = 20;
+		
+		if(armorOffset + (9 * (size + 1)) > Display.getHeight() * 0.5F)
+		{
+			armorOffset = (int) ((Display.getHeight() * 0.5F) - ((9 * (size + 1))));
+		}
 		for(int i = 0; i < 8; i++) //Armour and Accessories Frames
 		{
-			int size = 20;
 			int x = (int) (getCameraX() + (Display.getWidth() * 0.5f) - (size * 2.5f));
-			int y = getCameraY() + 80 + (i * (size + 1));
+			int y = getCameraY() + armorOffset + (i * (size + 1));
 			t.addVertexWithUV(x, y + size, 0, 0, 1);
 			t.addVertexWithUV(x + size, y + size, 0, 1, 1);
 			t.addVertexWithUV(x + size, y, 0, 1, 0);
@@ -1200,7 +1217,7 @@ public class RenderUI extends Render
 		
 		t.startDrawingQuads(); //Garbage Slot Frame
 		GL11.glColor4f(0.5f, 0.5f, 0.5f, 0.6f);
-		int size = 20;
+		size = 20;
 		int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + ((-6 * (size + 3))));
 		int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - (4 * (size + 3)) - (size + 22f));
 		t.addVertexWithUV(x, y + size, 0, 0, 1);
@@ -1548,8 +1565,19 @@ public class RenderUI extends Render
 		if(player.isInventoryOpen)
 		{
 			//Defense:
+			int armorOffset = 80;
+			int size = 20;
+			if(armorOffset + (9 * (size + 1)) > Display.getHeight() * 0.5F)
+			{
+				armorOffset = (int) ((Display.getHeight() * 0.5F) - ((9 * (size + 1))));
+			}
 			String defense = new StringBuilder().append("Defense: " + (int)(player.defense)).toString();
-			trueTypeFont.drawString(getCameraX() + ((Display.getWidth() * 0.5f) - 15), getCameraY() + 75, defense, 0.3f, -0.3f, TrueTypeFont.ALIGN_RIGHT);
+			trueTypeFont.drawString(getCameraX() + ((Display.getWidth() * 0.5f) - 15), 
+					getCameraY() + armorOffset - 5, 
+					defense, 
+					0.3f, 
+					-0.3f, 
+					TrueTypeFont.ALIGN_RIGHT);
 		}
 	}
 	

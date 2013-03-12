@@ -65,6 +65,15 @@ public class GuiButtonImproved extends GuiComponent
 	{
 		return values[buttonIndex];
 	}
+	
+	/**
+	 * Sets the values[] to the new String[] provided
+	 * @param newvals the new String values for the button, this must be an array of at least of size 1
+	 */
+	public void setValues(String[] newvals)
+	{
+		values = newvals;
+	}
 			
 	/**
 	 * Draws the button, and fixes the position if the screen has been resized

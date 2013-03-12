@@ -8,17 +8,16 @@ public class RenderLight extends Render
 	public void render(World world, EntityLivingPlayer player)
 	{
 		adjustCameraToLastPosition();
-		final int xsize = (int)(Display.getWidth() / 11.1);
-		final int ysize = (int)(Display.getHeight() / 11.1) + 2;
+		final int width = (int)(Display.getWidth() / 11.1);
+		final int height = (int)(Display.getHeight() / 11.1) + 2;
 		int x = (int) ((player.x - (0.25f * Display.getWidth())) / 6);
 		int y = (int) ((player.y - (0.25f * Display.getHeight())) / 6);
 		if(y < 0) y = 0;
 		if(x < 0) x = 0;
-		if(xsize + x > world.getWidth()) x = world.getWidth() - xsize;
-		if(ysize + y > world.getHeight()) y = world.getHeight() - ysize - 1;
+		if(width + x > world.getWidth()) x = world.getWidth() - width;
+		if(height + y > world.getHeight()) y = world.getHeight() - height - 1;
 		Chunk[] chunks = ChunkUtils.getRequiredChunks(world, player);
-		TERRAIN.bind();
-		
+				
 		//Settings for lighting
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glEnable(GL11.GL_BLEND);
@@ -27,8 +26,8 @@ public class RenderLight extends Render
 		//'base' render position (this is a constant offset that needs applied). It is the edge of a chunk, in Blocks, generally the nearest left or up.
 		final int baseX_F = (int) ((int)(x / Chunk.getChunkWidth()) * Chunk.getChunkWidth());
 		//set the amount of remaining blocks, initially (this is reset later)
-		int remainingWidth = xsize;
-		int remainingHeight = ysize;
+		int remainingWidth = width;
+		int remainingHeight = height;
 		
 		if(player.getHandheldLight() != null)
 		{
@@ -47,7 +46,7 @@ public class RenderLight extends Render
 			t.startDrawingQuads();
 			for(int i = 0; i < chunks.length; i++) //Loop each X Chunk
 			{
-				remainingHeight = ysize;
+				remainingHeight = height;
 				int baseX = baseX_F + (i * Chunk.getChunkWidth());
 				int xoff = 0;
 				int loopX = 0;
@@ -77,7 +76,6 @@ public class RenderLight extends Render
 					remainingWidth -= loopX;
 				}
 				
-				int baseY = 0;//baseY_F + (j * world.getHeight()); 
 				int yoff = 0;
 				int loopY = 0;
 				
@@ -115,49 +113,31 @@ public class RenderLight extends Render
 								&& l > (playerY - radius) && l < (playerY + radius))
 						{
 							int x1 = k + baseX;
-							int y1 = l + baseY;
-							
-							int blockHeight = 6;
-							int blockWidth = 6;		
-							int xm = x1 * 6; 
-							int ym = y1 * 6; 
+							int y1 = l;							
+							int xm = x1 * BLOCK_SIZE; 
+							int ym = y1 * BLOCK_SIZE; 
 							
 							float torchLight = lightMap[chunkXOffset + k - (playerX - radius)][l - (playerY - radius)];
 							float chunkLight = chunks[i].light[k][l];
 							float newLight = (chunkLight - torchLight >= 0.0F) ? chunks[i].light[k][l] - torchLight : 0.0F;
 														
-							t.setColorRGBA_F(0, 0, 0, newLight);
-							t.addVertexWithUV(xm, blockHeight + ym, 0, 0, 0.03125);
-							t.addVertexWithUV(xm + blockWidth, blockHeight + ym, 0, 0.0625, 0.03125);
-							t.addVertexWithUV(xm + blockWidth, ym, 0, 0.0625, 0);
+							t.setColorRGBA(0, 0, 0, (int)(newLight * 255F));
+							t.addVertexWithUV(xm, BLOCK_SIZE + ym, 0, 0, 0.03125);
+							t.addVertexWithUV(xm + BLOCK_SIZE, BLOCK_SIZE + ym, 0, 0.0625, 0.03125);
+							t.addVertexWithUV(xm + BLOCK_SIZE, ym, 0, 0.0625, 0);
 							t.addVertexWithUV(xm, ym, 0, 0, 0);
 						}
 						else
 						{	
 							int x1 = k + baseX;
-							int y1 = l + baseY;
+							int y1 = l;							
+							int xm = x1 * BLOCK_SIZE; 
+							int ym = y1 * BLOCK_SIZE; 
 							
-							//Fix lighting bound issues
-							int k1 = k;
-							int l1 = l;
-							while(k1 >= Chunk.getChunkWidth() - 1) 
-							{
-								k1--;
-							}
-							while(l1 >= world.getHeight() - 1) 
-							{
-								l1--;
-							}
-						
-							int blockHeight = 6;
-							int blockWidth = 6;		
-							int xm = x1 * 6; 
-							int ym = y1 * 6; 
-							
-							t.setColorRGBA_F(0, 0, 0, chunks[i].light[k1][l1]);
-							t.addVertexWithUV(xm, blockHeight + ym, 0, 0, 0.03125);
-							t.addVertexWithUV(xm + blockWidth, blockHeight + ym, 0, 0.0625, 0.03125);
-							t.addVertexWithUV(xm + blockWidth, ym, 0, 0.0625, 0);
+							t.setColorRGBA(0, 0, 0, (int)(chunks[i].light[k][l] * 255F));
+							t.addVertexWithUV(xm, BLOCK_SIZE + ym, 0, 0, 0.03125);
+							t.addVertexWithUV(xm + BLOCK_SIZE, BLOCK_SIZE + ym, 0, 0.0625, 0.03125);
+							t.addVertexWithUV(xm + BLOCK_SIZE, ym, 0, 0.0625, 0);
 							t.addVertexWithUV(xm, ym, 0, 0, 0);
 						}
 					}
@@ -175,7 +155,7 @@ public class RenderLight extends Render
 			t.startDrawingQuads();
 			for(int i = 0; i < chunks.length; i++) //Loop each X Chunk
 			{
-				remainingHeight = ysize;
+				remainingHeight = height;
 				int baseX = baseX_F + (i * Chunk.getChunkWidth());
 				int xoff = 0;
 				int loopX = 0;
@@ -204,8 +184,7 @@ public class RenderLight extends Render
 					loopX = Chunk.getChunkWidth();
 					remainingWidth -= loopX;
 				}
-				
-				
+								
 				int yoff = 0;
 				int loopY = 0;
 				
@@ -236,32 +215,16 @@ public class RenderLight extends Render
 				for(int k = xoff; k < xoff + loopX; k++) //x
 				{	
 					for(int l = yoff; l < yoff + loopY; l++) //y
-					{						
-						
+					{		
 						int x1 = k + baseX;
 						int y1 = l;
+						int xm = x1 * BLOCK_SIZE; 
+						int ym = y1 * BLOCK_SIZE; 
 						
-						//Fix lighting bound issues
-						int k1 = k;
-						int l1 = l;
-						while(k1 >= Chunk.getChunkWidth() - 1) 
-						{
-							k1--;
-						}
-						while(l1 >= world.getHeight() - 1) 
-						{
-							l1--;
-						}
-					
-						int blockHeight = 6;
-						int blockWidth = 6;		
-						int xm = x1 * 6; 
-						int ym = y1 * 6; 
-						
-						t.setColorRGBA_F(0, 0, 0, chunks[i].light[k1][l1]);
-						t.addVertexWithUV(xm, blockHeight + ym, 0, 0, 0.03125);
-						t.addVertexWithUV(xm + blockWidth, blockHeight + ym, 0, 0.0625, 0.03125);
-						t.addVertexWithUV(xm + blockWidth, ym, 0, 0.0625, 0);
+						t.setColorRGBA(0, 0, 0, (int)(chunks[i].light[k][l] * 255F));
+						t.addVertexWithUV(xm, BLOCK_SIZE + ym, 0, 0, 0.03125);
+						t.addVertexWithUV(xm + BLOCK_SIZE, BLOCK_SIZE + ym, 0, 0.0625, 0.03125);
+						t.addVertexWithUV(xm + BLOCK_SIZE, ym, 0, 0.0625, 0);
 						t.addVertexWithUV(xm, ym, 0, 0, 0);
 					}
 				}
@@ -273,9 +236,7 @@ public class RenderLight extends Render
 			}
 			t.draw();
 		}
-			
-		
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		
+					
+		GL11.glEnable(GL11.GL_TEXTURE_2D);		
 	}
 }

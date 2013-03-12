@@ -21,6 +21,9 @@ public class Keys
 	private static boolean ic;
 	public static boolean ec;
 	
+	/**
+	 * Everything in keys is static, so no instances may be created.
+	 */
 	private Keys()
 	{
 	}

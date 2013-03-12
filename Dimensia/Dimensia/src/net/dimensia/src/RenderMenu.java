@@ -228,6 +228,7 @@ public class RenderMenu extends Render
 			{
 				settingInventoryKeybind = false;	
 				settings.keybinds.inventoryToggle = characterValue;
+				inventoryToggleButton.setValues(new String[] { "Inventory: " + character });
 				System.out.println("Inventory_Toggle=" + character + " @int_value=" + characterValue);
 			}			
 		}

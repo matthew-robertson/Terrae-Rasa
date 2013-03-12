@@ -171,19 +171,27 @@ public class World implements Serializable
 		requestRequiredChunks(getWorldCenterBlock(), averageSkyHeight);
 		chunkManager.addAllLoadedChunks_Wait(this, getChunks());
 		
-		
-		for(int i = 0; i < height - 1; i++)
+		try
 		{
-			if(getBlock((int)(player.respawnXPos / 6), i).blockID == 0 && getBlock((int)(player.respawnXPos / 6) + 1, i).blockID == 0) 
+			for(int i = 0; i < height - 1; i++)
 			{
-				continue;
+				if(getBlock((int)(player.respawnXPos / 6), i).blockID == 0 && getBlock((int)(player.respawnXPos / 6) + 1, i).blockID == 0) 
+				{
+					continue;
+				}
+				if(getBlock((int)player.respawnXPos / 6, i).blockID != 0 || getBlock((int) (player.respawnXPos / 6) + 1, i).blockID != 0)
+				{	
+					player.x = player.respawnXPos;
+					player.y = (i * 6) - 18;				
+					return player;
+				}			
 			}
-			if(getBlock((int)player.respawnXPos / 6, i).blockID != 0 || getBlock((int) (player.respawnXPos / 6) + 1, i).blockID != 0)
-			{	
-				player.x = player.respawnXPos;
-				player.y = (i * 6) - 18;				
-				return player;
-			}			
+		}
+		catch (Exception e) //This is probably a nullpointer 
+		{
+			e.printStackTrace();
+			throw new RuntimeException("This is likely caused by a chunk that's required being denied due to I/O conflicts");
+			//If this exception is thrown, inspect the addition to chunkmanager - chunkLock from A1.0.23
 		}
 		return player;
 	}

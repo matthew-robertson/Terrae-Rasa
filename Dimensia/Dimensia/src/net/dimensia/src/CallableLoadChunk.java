@@ -9,11 +9,13 @@ public class CallableLoadChunk implements Callable<Chunk>
 {
 	private String basepath;
 	private int x;
+	private ChunkManager manager;
 	
-	public CallableLoadChunk(int x, String basepath, String worldName)
+	public CallableLoadChunk(ChunkManager manager, int x, String basepath, String worldName)
 	{
 		this.x = x;
 		this.basepath = basepath;
+		this.manager = manager;
 	}
 	
 	public Chunk call() throws Exception
@@ -23,6 +25,7 @@ public class CallableLoadChunk implements Callable<Chunk>
 		Chunk chunk = (Chunk)ois.readObject(); //Load the object
 		System.out.println("Chunk Loaded From File Path : " + fileName);
 		ois.close();
+		manager.unlockChunk(chunk.getX());
 		return chunk;
 	}
 	

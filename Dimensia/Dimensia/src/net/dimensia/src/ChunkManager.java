@@ -31,6 +31,7 @@ public class ChunkManager implements Serializable
 	private final ArrayList<Future<Boolean>> scheduledSaveOperations;
 	private final String BASE_PATH;
 	private final String worldName;
+	private final List<Integer> chunkLock;
 	
 	/**
 	 * RequestedChunkData defines a private data structure to store data for a chunk load request. Currently contains:
@@ -112,7 +113,7 @@ public class ChunkManager implements Serializable
 		scheduledSaveOperations = new ArrayList<Future<Boolean>>(4);
 		this.worldName = worldName;
 		loadRequests = new ArrayList<Integer>(8);
-		
+		chunkLock = new ArrayList<Integer>(16);
 		BASE_PATH = Dimensia.getBasePath();
 		
 		//Create missing folders
@@ -147,6 +148,10 @@ public class ChunkManager implements Serializable
 		{
 			return false;
 		}
+		if(chunkLocked(x))
+		{
+			return false;
+		}
 		
 		String key = ""+x;
 		//Check if the chunk is already loaded
@@ -162,6 +167,7 @@ public class ChunkManager implements Serializable
 		//Load the chunk, if it doesnt exist (if this fails, there's a bug. This is a final safety.)
 		if(chunks.get(key) == null)
 		{
+			lockChunk(x);
 			//System.out.println("Load @" + key);
 			loadRequests.add(x);
 			processChunkRequest(directory, x);
@@ -185,6 +191,11 @@ public class ChunkManager implements Serializable
 	 */
 	public boolean saveChunk(String directory, ConcurrentHashMap<String, Chunk> chunks, int x)
 	{
+		if(chunkLocked(x))
+		{
+			return false;
+		}
+		
 		if(!new File(BASE_PATH + "/World Saves/" + worldName + "/" + directory).exists()) //Sub-Folder ('/worldName/Earth') for the chunks
 		{
 			new File(BASE_PATH + "/World Saves/" + worldName + "/" + directory).mkdir();
@@ -202,8 +213,53 @@ public class ChunkManager implements Serializable
 			//throw new RuntimeException("Tried to save chunk that doesnt exist @" + x + " " + y);
 		}
 		
+		lockChunk(x);
+		
 		processChunkSave(chunk, directory, x);
 		return true;
+	}
+	
+	/**
+	 * Gets whether I/O is being performed on that chunk, preventing its use.
+	 * @param x the x index of the chunk in the chunk grid
+	 * @return true if the chunk is locked, otherwise false
+	 */
+	private boolean chunkLocked(int x)
+	{
+		for(int i = 0; i < chunkLock.size(); i++)
+		{
+			if(chunkLock.get(i) == x)
+			{
+				return true;
+			}
+		}		
+		return false;
+	}
+	
+	/**
+	 * Locks the chunk, preventing further I/O
+	 * @param x the x index of the chunk in the chunk grid
+	 */
+	private void lockChunk(int x)
+	{
+		chunkLock.add(x);
+		System.out.println("Lock@" + x);
+	}
+	
+	/**
+	 * Unlocks the specified chunk, allowing further I/O
+	 * @param x the x index of the chunk in the chunk grid
+	 */
+	public void unlockChunk(int x)
+	{
+		for(int i = 0; i < chunkLock.size(); i++)
+		{
+			if(chunkLock.get(i) == x)
+			{
+				System.out.println("Unlock@" + x);
+				chunkLock.remove(i);
+			}
+		}
 	}
 	
 	private void processChunkSave(Chunk chunk, String dir, int x)
@@ -218,13 +274,13 @@ public class ChunkManager implements Serializable
 	
 	private void submitSaveOperation(SavingChunkData data)
 	{
-		Future<Boolean> event = threadPool.submit(new CallableSaveChunk(data.getChunk(), data.getX(), BASE_PATH + "/World Saves/" + worldName + "/" + data.getDir(), worldName));
+		Future<Boolean> event = threadPool.submit(new CallableSaveChunk(this, data.getChunk(), data.getX(), BASE_PATH + "/World Saves/" + worldName + "/" + data.getDir(), worldName));
 		scheduledSaveOperations.add(event);
 	}
 	
 	private void submitLoadOperation(RequestedChunkData data)	
 	{
-		Future<Chunk> event = threadPool.submit(new CallableLoadChunk(data.getX(), BASE_PATH + "/World Saves/" + worldName + "/" + data.getDir(), worldName));
+		Future<Chunk> event = threadPool.submit(new CallableLoadChunk(this, data.getX(), BASE_PATH + "/World Saves/" + worldName + "/" + data.getDir(), worldName));
 		scheduledLoadOperations.add(event);
 	}
 	
@@ -280,6 +336,7 @@ public class ChunkManager implements Serializable
 				{
 					if(loadRequests.get(j).toString().equals(key))
 					{
+					//	unlockChunk(chunk.getX());
 						loadRequests.remove(j);
 					}
 				}
@@ -382,6 +439,7 @@ public class ChunkManager implements Serializable
 			{
 				if(loadRequests.get(j).toString().equals(key))
 				{
+					//unlockChunk(chunk.getX());
 					loadRequests.remove(j);
 				}
 			}

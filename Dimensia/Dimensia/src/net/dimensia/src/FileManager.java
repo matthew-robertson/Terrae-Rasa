@@ -73,7 +73,8 @@ public class FileManager
 	 * @throws IOException Indicates the saving operation has failed
 	 * @throws ClassNotFoundException Indicates the World class does not exist with the correct version
 	 */	
-	public World loadWorld(String dir, String name) throws IOException, ClassNotFoundException
+	public World loadWorld(String dir, String name) 
+			throws IOException, ClassNotFoundException
 	{
 		World world = new World();
 		world.loadAndApplyWorldData(BASE_PATH, name, dir);
@@ -163,7 +164,8 @@ public class FileManager
 	 * @throws IOException Indicates the saving operation has failed
 	 * @throws FileNotFoundException Indicates the desired directory (file) is not found on the filepath
 	 */
-	public void savePlayer(EntityLivingPlayer player) throws FileNotFoundException, IOException
+	public void savePlayer(EntityLivingPlayer player) 
+			throws FileNotFoundException, IOException
 	{
 		verifyDirectoriesExist();
 		String fileName = (BASE_PATH + "/Player Saves/" + player.getName() + ".dat");		
@@ -379,7 +381,8 @@ public class FileManager
 	 * @throws IOException Indicates the saving operation has failed
 	 * @throws ClassNotFoundException Indicates the EntityLivingPlayer class does not exist with the correct version
 	 */
-	public EntityLivingPlayer loadPlayer(String name) throws IOException, ClassNotFoundException
+	public EntityLivingPlayer loadPlayer(String name) 
+			throws IOException, ClassNotFoundException
 	{
 		String fileName = BASE_PATH + "/Player Saves/" + name + ".dat";
 		ObjectInputStream ois = new ObjectInputStream(new DataInputStream(new GZIPInputStream(new FileInputStream(fileName)))); //Open an input stream
@@ -473,5 +476,49 @@ public class FileManager
 	public String getBasePath()
 	{
 		return BASE_PATH;
+	}
+	
+	/**
+	 * Saves the specified Settings object in compressed GZIP format to the ~/ Directory
+	 * @param settings the Settings object for the entire game
+	 * @throws IOException Indicates the saving operation has failed
+	 * @throws FileNotFoundException Indicates the desired directory (file) is not found on the filepath
+	 */
+	public void saveSettings(Settings settings) 
+			throws FileNotFoundException, IOException
+	{
+		verifyDirectoriesExist();
+		String fileName = (BASE_PATH + "/settings.dat");		
+		GZIPOutputStream fileWriter = new GZIPOutputStream(new FileOutputStream(new File(fileName)));//Open an output stream
+	    ByteArrayOutputStream bos = new ByteArrayOutputStream();//Convert world to byte[]
+		ObjectOutputStream s = new ObjectOutputStream(bos); //open the OOS, used to save serialized objects to file
+		
+		s.writeObject(settings); //write the byte[] to the OOS
+		byte data[] = bos.toByteArray();
+		fileWriter.write(data, 0, data.length);//Actually save it to file
+		System.out.println("Settings Saved to: " + fileName + " With Initial Size: " + data.length);
+		
+		//Cleanup: 
+		s.close();
+		bos.close();
+		fileWriter.close();   		
+	}	
+
+	/**
+	 * Loads the Settings object from the ~/ Directory
+	 * @param name the name of the player to load
+	 * @return the Settings for the entire game
+	 * @throws IOException Indicates the saving operation has failed
+	 * @throws ClassNotFoundException Indicates the Settings class does not exist with the correct version
+	 */
+	public Settings loadSettings() 
+			throws IOException, ClassNotFoundException
+	{
+		String fileName = BASE_PATH + "/settings.dat";
+		ObjectInputStream ois = new ObjectInputStream(new DataInputStream(new GZIPInputStream(new FileInputStream(fileName)))); //Open an input stream
+		Settings settings = (Settings)ois.readObject(); //Load the object
+	    System.out.println("Settings loaded from: " + fileName);
+		ois.close();
+		return settings;
 	}
 }
