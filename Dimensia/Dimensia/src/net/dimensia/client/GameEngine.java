@@ -190,7 +190,7 @@ public class GameEngine
 				
 		        if(System.currentTimeMillis() - start >= 5000)
 		        {
-		       // 	System.out.println("FPS: " + ((double)(fps) / ((double)(System.currentTimeMillis() - start) / 1000.0D)));
+		         	//System.out.println("FPS: " + ((double)(fps) / ((double)(System.currentTimeMillis() - start) / 1000.0D)));
 		        	start = System.currentTimeMillis();
 	        		end = System.currentTimeMillis();     
 	        		fps = 0;
@@ -293,6 +293,8 @@ public class GameEngine
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.stone, 100));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.torch, 100));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.chest, 100));
+
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.ironChest, 100));
 			//*
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.healthPotion1, 100));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.healthPotion2, 100));
@@ -333,7 +335,9 @@ public class GameEngine
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.manaCrystal, 2));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.angelsSigil, 2));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ringOfVigor, 5));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.regenerationPotion2, 5));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.regenerationPotion2, 200));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.attackSpeedPotion1, 200));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.manaRegenerationPotion2, 200));
 		}		
 	}
 	

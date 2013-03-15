@@ -96,7 +96,7 @@ public class Dimensia
 			throw new RuntimeException("OS not supported");
 		}
 						
-		dimensia = new Dimensia(854, 480 /*784, 578/*854,480(widescreen)*/); //Init the game object with the specified resolution
+		dimensia = new Dimensia(900, 500/*784, 578/*854,480(widescreen)*/); //Init the game object with the specified resolution
         dimensia.run(); //Start the game
 	}	
 	

@@ -16,12 +16,19 @@ import org.lwjgl.opengl.GL11;
  */
 public class Render 
 {	
+	//Variables describing the size of the terrain_ground.png texture
 	public final static int TEXTURE_SHEET_WIDTH = 256;
 	public final static int TEXTURE_SHEET_HEIGHT = 512;
-	public final static int ICONS_PER_ROW =  TEXTURE_SHEET_WIDTH / 16;
-	public final static int ICONS_PER_COLUMN = TEXTURE_SHEET_HEIGHT / 16;
+	public final static int TEXTURES_PER_ROW =  TEXTURE_SHEET_WIDTH / 16;
+	public final static int TEXTURES_PER_COLUMN = TEXTURE_SHEET_HEIGHT / 16;
 	public final static int BLOCK_SIZE = 6;
 	public final static int BLOCK_SIZE_PIXELS = 12;
+	
+	//Variables describing the size  of the icons.png texture
+	public final static int ICONS_SHEET_WIDTH = 256;
+	public final static int ICONS_SHEET_HEIGHT = 256;
+	public final static int ICONS_PER_ROW =  ICONS_SHEET_WIDTH / 16;
+	public final static int ICONS_PER_COLUMN = ICONS_SHEET_HEIGHT / 16;
 	
 	public static Texture zombie;
 	public static Texture goblin;
@@ -44,9 +51,6 @@ public class Render
 	public static TrueTypeFont trueTypeFont_AR;
 	public static Tessellator t = Tessellator.instance;
 	public static TextureLoader loader;
-	public static Texture player_garbage;
-	public static Texture player_heart;
-	public static Texture player_mana;
 	public static Texture playerTexture;
 	public static Texture actionbarSlot;
 	public static Texture actionbarOutline;
@@ -158,11 +162,8 @@ public class Render
 		logo = loader.getTexture("Resources/terraria_logo.png");
 		background2 = loader.getTexture("Resources/terraria_background_2.png");
 		playerTexture = loader.getTexture("Resources/player_1.png");
-		player_heart = loader.getTexture("Resources/player_heart.png");
-		player_mana = loader.getTexture("Resources/player_mana.png");
 		actionbarSlot = loader.getTexture("Resources/player_actionbar_slot.png");
 		actionbarOutline = loader.getTexture("Resources/player_actionbar_outline.png");
-		player_garbage = loader.getTexture("Resources/player_garbage.png");
 		tooltipBackground = loader.getTexture("Resources/tooltip_background.png");
 		renderParticles = new RenderParticles();
 		renderUI = new RenderUI();

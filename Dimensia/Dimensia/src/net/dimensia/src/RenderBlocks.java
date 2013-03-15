@@ -268,14 +268,14 @@ public class RenderBlocks extends Render
 					}
 					if(block.hasMetaData) //large texture
 					{
-						if(block.metaData == 1 && 1 == 2) //if the block with metadata is in the top-left corner of the larger block, render it
+						if(block.metaData == 1) //if the block with metadata is in the top-left corner of the larger block, render it
 						{
 							int blockHeight = block.blockHeight;
 							int blockWidth = block.blockWidth;		
-						    float tx = (float)((block.iconIndex % 16) * 16) / TEXTURE_SHEET_WIDTH;
-						    float ty = (float)((block.iconIndex / 32) * 16) / TEXTURE_SHEET_HEIGHT;
-							double tw = tx + (block.textureWidth / TEXTURE_SHEET_WIDTH);
-							double th = ty + (block.textureHeight / TEXTURE_SHEET_HEIGHT);				
+							double tx = ((double)(block.iconIndex % TEXTURES_PER_ROW) ) / (double)TEXTURES_PER_ROW;
+						    double ty = ((double)(int)(block.iconIndex / TEXTURES_PER_COLUMN)) / (double)TEXTURES_PER_COLUMN;
+						    double tw = tx + ((double)block.textureWidth / (double)TEXTURE_SHEET_WIDTH);
+						    double th = ty + ((double)block.textureHeight / (double)TEXTURE_SHEET_HEIGHT);			
 							int xm = x1 * 6; 
 							int ym = y1 * 6; 
 							
@@ -291,8 +291,8 @@ public class RenderBlocks extends Render
 					{
 						int blockHeight = 6;//block.blockHeight;
 						int blockWidth = 6;//block.blockWidth;		
-					    double tx = ((double)(block.iconIndex % ICONS_PER_ROW) ) / (double)ICONS_PER_ROW;
-					    double ty = ((double)(int)(block.iconIndex / ICONS_PER_COLUMN)) / (double)ICONS_PER_COLUMN;
+					    double tx = ((double)(block.iconIndex % TEXTURES_PER_ROW) ) / (double)TEXTURES_PER_ROW;
+					    double ty = ((double)(int)(block.iconIndex / TEXTURES_PER_COLUMN)) / (double)TEXTURES_PER_COLUMN;
 					    double tw = tx + ((double)block.textureWidth / (double)TEXTURE_SHEET_WIDTH);
 					    double th = ty + ((double)block.textureHeight / (double)TEXTURE_SHEET_HEIGHT);				
 						int xm = x1 * BLOCK_SIZE; 

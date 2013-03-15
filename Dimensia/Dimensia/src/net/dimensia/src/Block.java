@@ -500,8 +500,8 @@ public class Block
 	public static Block craftingTable = new Block(53).setBlockName("Crafting table").setBlockHardness(50.0f).setIconIndex(11, 3).setBlockType(2).setBothBlockWidthAndHeight(2, 2);
 	public static Block snow = new Block(54).setBlockName("Snow Block").setBlockHardness(10.0f).setIconIndex(4, 1).setBlockType(1).setIsOveridable(true);
 	public static Block heartCrystal = new Block(55).setBlockName("Heart Crystal Block").setBlockHardness(50.0f).setIconIndex(1,1).setBlockType(3).setBothBlockWidthAndHeight(2,2).setDroppedItem(new ItemStack(Item.heartCrystal), 1, 1);
-	public static Block chest = new BlockChest(56).setBlockName("Chest").setBothBlockWidthAndHeight(2, 2).setBlockHardness(40.0f).setIconIndex(11, 1).setBlockType(2);
-
+	public static Block chest = new BlockChest(56, 20).setBlockName("Chest").setBothBlockWidthAndHeight(2, 2).setBlockHardness(40.0f).setIconIndex(11, 1).setBlockType(2);
+	
 	//Needs recipe
 	public static Block bookshelf = new Block(57).setBlockName("Bookshelf").setIconIndex(4, 3).setBlockHardness(20.0f).setBlockType(2);
 	public static Block woodTable = new Block(58).setBlockName("Wooden Table").setPassable(true).setBlockHardness(50.0f).setIconIndex(11, 1).setBlockType(2).setBothBlockWidthAndHeight(2, 1);
@@ -520,6 +520,7 @@ public class Block
 	public static Block diamondPillar = new BlockPillar(77).setBlockName("Diamond Pillar Block").setTileMap('p').setPassable(true).setBlockHardness(75.0f).setIconIndex(0,23).setBlockType(1);
 	
 	public static Block glass = new Block(79).setBlockName("Glass Block").setBlockHardness(10.0f).setIconIndex(1, 3).setBlockType(1);
+	public static Block ironChest = new BlockChest(80, 40).setBlockName("Iron Chest").setBothBlockWidthAndHeight(2, 2).setBlockHardness(40.0f).setIconIndex(11, 1).setBlockType(2);
 	
 	//Backwalls
 	public static Block backAir = new BlockBackWall(128).setIconIndex(3, 0).setBlockName("backwall air");

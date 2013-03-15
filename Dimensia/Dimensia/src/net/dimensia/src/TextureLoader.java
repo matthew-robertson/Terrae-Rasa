@@ -11,7 +11,6 @@ import static org.lwjgl.opengl.GL11.glTexImage2D;
 import static org.lwjgl.opengl.GL11.glTexParameteri;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.color.ColorSpace;
@@ -31,7 +30,6 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 import javax.swing.ImageIcon;
-import javax.swing.JFrame;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -161,8 +159,8 @@ public class TextureLoader
 	        
 	        int w = (int)list[i].textureWidth;
 	        int h = (int)list[i].textureHeight;
-	        int x = ((int)((float)list[i].iconIndex / 32)) * 16;
-	        int y = ((int)(list[i].iconIndex % 32)) * 16;
+	        int x = ((int)((float)list[i].iconIndex / 16)) * 16;
+	        int y = ((int)(list[i].iconIndex % 16)) * 16;
 	        
 	        bufferStore[i] = bufferedImage.getSubimage(x, y, w, h);
 	        

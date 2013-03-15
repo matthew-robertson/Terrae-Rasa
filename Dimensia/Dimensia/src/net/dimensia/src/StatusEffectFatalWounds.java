@@ -6,6 +6,7 @@ public class StatusEffectFatalWounds extends StatusEffect
 	{
 		super(durationSeconds, tier);
 		reapplicationSkipsRemovalEffect = true;
+		this.isBeneficialEffect = false;
 	}
 	
 	public void removeInitialEffect(EntityLiving entity)

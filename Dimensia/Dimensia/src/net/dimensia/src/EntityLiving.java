@@ -323,13 +323,14 @@ public class EntityLiving extends Entity
 	 * Damages the entity for the specified amount
 	 * @param d the amount damage
 	 * @param isCrit was the hit critical? (2x damage)
+	 * @param isDodgeable whether or not the hit can be dodged
 	 */
-	public void damageEntity(World world, int d, boolean isCrit)
+	public void damageEntity(World world, int d, boolean isCrit, boolean isDodgeable)
 	{
 		if(invincibilityTicks <= 0) //can the entity actually be damaged?
 		{	
 			double dodgeRoll = Math.random();
-			if(dodgeRoll < dodgeChance || dodgeChance >= 1.0f) //Is it a dodge
+			if(isDodgeable && dodgeRoll < dodgeChance || dodgeChance >= 1.0f) //Is it a dodge
 			{
 				world.addTemporaryText("Dodge", (int)x - 2, (int)y - 3, 20, 'g'); //add temporary text to be rendered, for the damage done
 			}
@@ -480,7 +481,7 @@ public class EntityLiving extends Entity
 				float fallDamage = MathHelper.getFallDamage(distanceFallen, maxHeightFallenSafely); //calculate the fall damage
 				if(fallDamage > 0)
 				{
-					damageEntity(world, (int)fallDamage, ((Math.random() < 0.1f) ? true : false)); //damage the entity
+					damageEntity(world, (int)fallDamage, ((Math.random() < 0.1f) ? true : false), false); //damage the entity
 				}
 			}
 			

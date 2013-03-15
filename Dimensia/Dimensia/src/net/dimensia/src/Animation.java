@@ -3,63 +3,37 @@ package net.dimensia.src;
 
 public class Animation 
 {
-	public Animation(String fileLocation, int imageSubWidth, int imageSubHeight, int duration)
+	public Texture texture;
+	public AnimationTextureCoords animationBounds;
+	public AnimationTextureCoords[] frameCoords;
+	public int animationIndex;
+	private int ticksDuration; 
+	int duration;//ms
+	int frames;
+	//private int imageSubWidth; 
+	//private int imageSubHeight;
+	
+	public Animation(Texture texture, AnimationTextureCoords animationBounds, int ticksDuration, int frames)
 	{
-		this.imageSubWidth = imageSubWidth;
-		this.imageSubHeight = imageSubHeight;
-		this.fileLocation = fileLocation;
-		this.duration = duration;
+		this.frames = frames;
+		this.ticksDuration = ticksDuration;
+		duration = ticksDuration * 50;
 		animationIndex = 0;
-		loadAnimations();
-		lastFrameDisplayed = System.currentTimeMillis();
-		frameDelay = (int) ((float)(duration) / animationFrames.length);
-	}
-	
-	public void loadAnimations()
-	{
-		TextureLoader loader = new TextureLoader();
-		animationFrames = loader.getTextureArray(fileLocation, imageSubWidth, imageSubHeight);
-	}
-	
-	public void bindNextTexture()
-	{
-		animationFrames[animationIndex].bind();			
-		if((System.currentTimeMillis() - lastFrameDisplayed) > frameDelay)
-		{
-			animationIndex++;
-		}	
-		if(animationIndex >= animationFrames.length)
-		{
-			animationIndex = 0;
-		}
-	}
-	
-	public int getDuration() 
-	{
-		return duration;
-	}
-	
-	public int getSubWidth() 
-	{
-		return imageSubWidth;
-	}
-	
-	public int getSubHeight()
-	{
-		return imageSubHeight;
-	}
-	
-	public String getFileLocation()
-	{
-		return fileLocation;
+		
 	}
 
-	public int frameDelay;
-	public long lastFrameDisplayed;
-	public Texture[] animationFrames;
-	public int animationIndex;
-	private int duration;
-	private int imageSubWidth;
-	private int imageSubHeight;
-	private String fileLocation;
+	public void bind()
+	{
+		texture.bind();
+	}
+	
+	public AnimationTextureCoords getFrameBounds()
+	{
+		return frameCoords[animationIndex];
+	}
+	
+	public void update()
+	{
+		
+	}
 }

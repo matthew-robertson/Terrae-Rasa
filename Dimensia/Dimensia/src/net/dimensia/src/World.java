@@ -676,7 +676,7 @@ public class World implements Serializable
 		{
 			if(player.inBounds(entityList.get(i).x, entityList.get(i).y, entityList.get(i).width, entityList.get(i).height))
 			{ //If the player is in bounds of the monster, damage them
-				player.damageEntity(this, entityList.get(i).damageDone, ((Math.random() < entityList.get(i).criticalStrikeChance) ? true : false));
+				player.damageEntity(this, entityList.get(i).damageDone, ((Math.random() < entityList.get(i).criticalStrikeChance) ? true : false), true);
 			}
 		}
 	}
@@ -692,14 +692,14 @@ public class World implements Serializable
 				{
 					if(entityList.get(j).inBounds(projectileList.get(i).x, projectileList.get(i).y, projectileList.get(i).width, projectileList.get(i).height))
 					{ //If the projectile is in bounds of the monster, damage them
-						entityList.get(j).damageEntity(this, projectileList.get(i).damage, ((Math.random() < projectileList.get(i).criticalStrikeChance) ? true : false));
+						entityList.get(j).damageEntity(this, projectileList.get(i).damage, ((Math.random() < projectileList.get(i).criticalStrikeChance) ? true : false), true);
 					}
 				}
 			}
 			if (projectileList.get(i).isHostile){
 				if(player.inBounds(projectileList.get(i).x, projectileList.get(i).y, projectileList.get(i).width, projectileList.get(i).height))
 				{ //If the projectile is in bounds of the player, damage them
-					player.damageEntity(this, projectileList.get(i).damage, ((Math.random() < projectileList.get(i).criticalStrikeChance) ? true : false));
+					player.damageEntity(this, projectileList.get(i).damage, ((Math.random() < projectileList.get(i).criticalStrikeChance) ? true : false), true);
 				}
 			}
 		}
@@ -932,7 +932,7 @@ public class World implements Serializable
 					int damageDone =((ItemTool) Item.itemsList[player.inventory.getMainInventoryStack(player.selectedSlot).getItemID()]).getDamageDone();
 					damageDone = (int) (damageDone * player.allDamageModifier * player.meleeDamageModifier);
 					//CURRENTLY DAMAGE DONE IS ALWAYS MELEE
-					entityList.get(i).damageEntity(this, damageDone, flag);
+					entityList.get(i).damageEntity(this, damageDone, flag, true);
 					
 					//knockback
 					/****
@@ -1056,15 +1056,6 @@ public class World implements Serializable
 					}
 				}
 				
-				if(((BlockChest)(getBlock(mx, my))).isAttachedLeft())
-				{
-					((BlockChest)(getBlock(mx - 2, my))).removeAttachment();
-				}
-				else if(((BlockChest)(getBlock(mx, my))).isAttachedRight())
-				{
-					((BlockChest)(getBlock(mx + 2, my))).removeAttachment();
-				}
-				
 				player.clearViewedChest();
 			}
 			
@@ -1180,28 +1171,8 @@ public class World implements Serializable
 				{
 					if(block instanceof BlockChest)
 					{
-						BlockChest chest = (BlockChest) block.clone();
-						if(metadata[i][j] == 1)
-						{
-							if(getBlock(mx + i - 2, my + j) instanceof BlockChest)
-							{
-								if(!((BlockChest)(getBlock(mx + i - 2, my + j))).isAttached() && getBlock(mx + i - 2, my + j).metaData == 1)
-								{
-									chest.attachLeft();
-									((BlockChest)(getBlock(mx + i - 2, my + j))).attachRight();
-								}
-							}
-							else if(getBlock(mx + i + 2, my + j) instanceof BlockChest)
-							{
-								if(!((BlockChest)(getBlock(mx + i + 2, my + j))).isAttached() && getBlock(mx + i + 2, my + j).metaData == 1)
-								{
-									chest.attachRight();
-									((BlockChest)(getBlock(mx + i + 2, my + j))).attachLeft();
-								}
-							}
-						}
+						BlockChest chest = (BlockChest) block.clone();						
 						setBlock(chest, mx + i, my + j, EnumEventType.EVENT_BLOCK_PLACE);
-
 					}
 					else
 					{

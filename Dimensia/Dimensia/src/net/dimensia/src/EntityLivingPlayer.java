@@ -342,14 +342,15 @@ public class EntityLivingPlayer extends EntityLiving
 	 * Overrides the entity damage taken to account for different invincibility and death
 	 * @param d damage inflicted against the player
 	 * @param isCrit was the hit critical? (2x damage)
+	 * @param isDodgeable whether or not this damage can be dodged
 	 */
-	public void damageEntity(World world, int d, boolean isCrit)
+	public void damageEntity(World world, int d, boolean isCrit, boolean isDodgeable)
 	{
 		if(invincibilityTicks <= 0) //If it's possible to take damage
 		{
 			double dodgeRoll = Math.random();
 			d *= damageSoakModifier;
-			if(dodgeRoll < dodgeChance || dodgeChance >= 1.0f) //Is it a dodge
+			if(isDodgeable && dodgeRoll < dodgeChance || dodgeChance >= 1.0f) //Is it a dodge
 			{
 				world.addTemporaryText("Dodge", (int)x - 2, (int)y - 3, 20, 'g'); //add temperary text to be rendered, for the dodge
 			}

@@ -218,8 +218,11 @@ public class RecipeManager
 		new ItemStack(Block.stone, 15), new ItemStack(Item.coal, 5)
 	});	
 	Recipe chest = new Recipe(this, new ItemStack(Block.chest), 'c', new ItemStack[] {
-		new ItemStack(Block.plank, 20), new ItemStack(Item.bronzeIngot, 5), new ItemStack(Item.ironIngot, 3) 
+		new ItemStack(Block.plank, 20) 
 	});	
+	Recipe ironChest = new Recipe(this, new ItemStack(Block.ironChest), 'c', new ItemStack[] {
+		new ItemStack(Block.plank, 5), new ItemStack(Item.ironIngot, 10)
+	});
 	
 	Recipe fence = new Recipe(this, new ItemStack(Block.fence), 'c', new ItemStack[]{
 		new ItemStack(Block.plank, 1)

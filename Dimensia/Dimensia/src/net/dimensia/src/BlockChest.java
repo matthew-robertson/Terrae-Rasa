@@ -1,24 +1,45 @@
 package net.dimensia.src;
 
 /**
- * Currently assumes attachment left first, then if that fails attempts to attach right
- * @author Alec
- *
+ * <code>BlockChest extends Block implements Serializable</code> <br>
+ * BlockChest is an extension of Block that allows items to be stored in it. Items can be placed in 
+ * the chest with {@link #placeItemStack(ItemStack, int)} and removed using {@link #takeItemStack(int)}. 
+ * Most methods which request an ItemStack make a deep copy to prevent reference errors, but this is not the 
+ * case with {@link #getMainInventory()}, therefore caution should be used to prevent corrupting the chest's 
+ * contents. 
+ * <br><br>
+ * A new Chest can be created using the only constructor, {@link #BlockChest(int, int)}.
+ * @author      Alec Sobeck
+ * @author      Matthew Robertson
+ * @version     1.0
+ * @since       1.0
  */
-
 public class BlockChest extends Block
 {
 	private static final long serialVersionUID = 1L;
-	private boolean isAttachedRight;
-	private boolean isAttachedLeft;
+	/** The contents of the chest. */
 	private ItemStack[] mainInventory;
+	/** The size of the mainInventory[], preferably a multiple of 5. */
+	private int inventorySize;
 	
-	protected BlockChest(int i)
+	/**
+	 * Creates a chest of the specified size and ID. Block(int) is called, and handed the ID of the 
+	 * block to create it and add it to Block.blockList[]. An inventorySize that is not divisible by 5 will 
+	 * create unexpected results in the UI.
+	 * @param i the ID of the block (handed to the Block constructor)
+	 * @param inventorySize the size of the chest's storage (inventory)
+	 */
+	protected BlockChest(int i, int inventorySize)
 	{
 		super(i);
-		mainInventory = new ItemStack[20];
+		mainInventory = new ItemStack[inventorySize];
+		this.inventorySize = inventorySize;
 	}	
 	
+	/**
+	 * There's a bug with this --- super() cannot be called because block doesnt actually have a copy constructor.
+	 * @param block
+	 */
 	public BlockChest(BlockChest block)
 	{
 		//super();
@@ -43,60 +64,16 @@ public class BlockChest extends Block
 		this.passable = block.passable;
 		this.isOveridable = block.isOveridable;
 		this.isSolid = block.isSolid;
-		this.mainInventory = new ItemStack[20];
-		this.isAttachedLeft = false;
-		this.isAttachedRight = false;
+		this.mainInventory = new ItemStack[block.inventorySize];
+		this.inventorySize = block.inventorySize;
 	}
 	
 	/**
-	 * @deprecated
-	 * --restructure
+	 * Attempts to place the itemstack in the chest.
+	 * @param stack
+	 * @param index
+	 * @return
 	 */
-	public BlockChest clone()
-	{
-		BlockChest chest = (BlockChest) super.clone();
-		if(chest == Block.chest)
-		{
-			throw new RuntimeException("Cloning has failed. This is considered critical. If you aren't Alec (hopefully you are), tell him");
-		}		
-		chest = new BlockChest(chest);		
-		return chest;
-	}
-	
-	/*
-	public ItemStack addItemStack(ItemStack stack, int index)
-	{
-		if(mainInventory[index] == null)
-		{
-			mainInventory[index] = stack;
-			return null;
-		}
-		if(mainInventory[index].getItemID() == stack.getItemID())
-		{
-			/**
-			 * 
-			 * This is very broken after ItemStack conversion
-			 * 
-			 *
-			 //
-			if(mainInventory[index].getMaxStackSize() - mainInventory[index].getStackSize() > stack.getStackSize())
-			{
-			//	int i = mainInventory[index].getMaxStackSize() - mainInventory[index].getStackSize();
-			//	stack.stackSize -= i;
-			//	mainInventory[index].stackSize = mainInventory[index].getMaxStackSize();
-				return stack;
-			}
-			else
-			{	
-			//	mainInventory[index].stackSize += stack.stackSize;
-				return null;
-			}			
-		}
-		
-		return stack;
-	}	
-	*/
-	
 	public ItemStack placeItemStack(ItemStack stack, int index)
 	{
 		if(mainInventory[index] == null)
@@ -120,6 +97,12 @@ public class BlockChest extends Block
 		return stack;
 	}
 	
+	/**
+	 * Gets the ItemStack at the specified index and then removes that ItemStack from the chest. This will return null if 
+	 * there is no item at the given ItemStack. Additionally, the ItemStack returned will be a deep copy.
+	 * @param index the ItemStack to remove from the chest
+	 * @return the ItemStack at given index from the chest
+	 */
 	public ItemStack takeItemStack(int index)
 	{
 		ItemStack stack = (mainInventory[index] != null) ? new ItemStack(mainInventory[index]) : null;
@@ -127,59 +110,66 @@ public class BlockChest extends Block
 		return stack;
 	}
 	
-	public boolean isStackEmpty(int index)
+	/**
+	 * Gets whether or not the slot at the specified index in empty. An empty slot is one that is not filled by any 
+	 * item and is therefore null. Throws an out of bounds exception if the given index is not within the 
+	 * Chest's mainInventory[] size.
+	 * @param index the slot of the chest to check. This value should be in bounds.
+	 * @return true if the specified slot is empty, otherwise false
+	 */
+	public boolean isStackEmpty(int index) 
 	{
 		return mainInventory[index] == null;
 	}
 	
+	/**
+	 * Returns a deep copy of the ItemStack at the given index. This will instead be null if there is no 
+	 * ItemStack at the given index. An out of bounds exception is thrown if the given index is not within the 
+	 * Chest's mainInventory[] size.
+	 * @param index the slot of the chest to copy
+	 * @return a deep copy of the ItemStack at the given index, or null if it's empty
+	 */
 	public ItemStack getItemStack(int index)
 	{
 		return (mainInventory[index] != null) ? new ItemStack(mainInventory[index]) : null;
 	}
 	
-	public void attachRight()
-	{
-		isAttachedRight = true;
-	}
-	
-	public void attachLeft()
-	{
-		isAttachedLeft = true;
-	}
-	
-	public boolean isAttachedLeft()
-	{
-		return isAttachedLeft;
-	}
-	
+	/**
+	 * Removes the ItemStack at the given index from the chest's inventory.
+	 * @param index the slot of the chest to empty.
+	 */
 	public void removeItemStack(int index)
 	{
 		mainInventory[index] = null;
 	}
-	
-	public boolean isAttachedRight()
-	{
-		return isAttachedRight;
-	}
-	
-	public void removeAttachment()
-	{
-		isAttachedLeft = false;
-		isAttachedRight = false;
-	}
-	
+		
+	/**
+	 * Returns a reference to the chest's mainInventory[].
+	 * @return a reference to the chest's mainInventory[]
+	 */
 	public ItemStack[] getMainInventory()
 	{
 		return mainInventory;
 	}
 	
-	public boolean canAttach()
+	/**
+	 * Returns the size of the chest's inventory. This should be equal to the mainInventory's length, but is a separate value
+	 * stored within the chest.
+	 * @return
+	 */
+	public int getInventorySize()
 	{
-		return !(isAttachedLeft || isAttachedRight);
+		return inventorySize;
 	}
 	
-	public boolean isAttached()
+	/**
+	 * Destroys the current mainInventory[], and recreates it with the given inventory size. <b> All Chest contents
+	 * are destroyed so this should be used sparingly. </b>
+	 * @param i the size of the new mainInventory[]
+	 */
+	public void setInventorySize(int newsize)
 	{
-		return (isAttachedRight || isAttachedLeft);
+		this.inventorySize = newsize;
+		mainInventory = new ItemStack[inventorySize];
 	}
 }

@@ -5,6 +5,7 @@ public class StatusEffectStun extends StatusEffect
 	public StatusEffectStun(float durationSeconds, int tier) 
 	{
 		super(durationSeconds, tier);
+		this.isBeneficialEffect = false;
 	}
 
 	public void applyInitialEffect(EntityLiving entity)

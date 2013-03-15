@@ -243,7 +243,6 @@ public class ChunkManager implements Serializable
 	private void lockChunk(int x)
 	{
 		chunkLock.add(x);
-		System.out.println("Lock@" + x);
 	}
 	
 	/**
@@ -256,7 +255,6 @@ public class ChunkManager implements Serializable
 		{
 			if(chunkLock.get(i) == x)
 			{
-				System.out.println("Unlock@" + x);
 				chunkLock.remove(i);
 			}
 		}

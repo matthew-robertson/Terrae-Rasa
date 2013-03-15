@@ -318,7 +318,7 @@ public class Item
 	
 	public static Item woodenArrow = new ItemAmmo(300).setProjectile(EntityProjectile.woodenArrow).setIconIndex(0, 8).setItemName("Wooden Arrow");
 	//Change this!
-	public static Item snowball = new ItemRanged(301, 1).setAmmo(Item.woodenArrow).setItemName("Snow Ball").setIconIndex(14, 0);
+	public static Item snowball = new ItemRanged(301, 50).setAmmo(Item.woodenArrow).setItemName("Snow Ball").setIconIndex(14, 0);
 	public static Item magicMissileSpell = new ItemMagic(302, 1, 10, EntityProjectile.magicMissile).setItemName("Tome of Magic Missile").setIconIndex(6, 0);
 	public static Item heartCrystal = new ItemHeartCrystal(340).setIconIndex(6, 6).setItemName("Heart Crystal");
 	public static Item manaCrystal = new ItemManaCrystal(341).setIconIndex(5, 6).setItemName("Mana Crystal");

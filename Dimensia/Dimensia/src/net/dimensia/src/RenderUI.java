@@ -106,6 +106,8 @@ public class RenderUI extends Render
 			renderActionBar(world, player);	//The actionbar if the inventory is closed
 		}
 		
+		renderStatusEffects(player);
+		
 		renderMouseItem(); //The item held by the mouse, if there is one
 		renderText(world, player); //Health and the 'Save And Quit' button
 		
@@ -115,10 +117,104 @@ public class RenderUI extends Render
 	}
 	
 	/**
+	 * Renders the status effects afflicting or benefiting the player, including their remaining time in seconds.
+	 * @param player the player in use currently
+	 */
+	private void renderStatusEffects(EntityLivingPlayer player)
+	{
+		//Get the status effects
+		List<StatusEffect> statusEffects = player.statusEffects;
+		List<StatusEffect> goodEffects = new ArrayList<StatusEffect>();
+		List<StatusEffect> badEffects = new ArrayList<StatusEffect>();
+		
+		//Split into positive and negative
+		for(int i = 0; i < statusEffects.size(); i++)
+		{
+			if(statusEffects.get(i).isBeneficialEffect)
+			{
+				goodEffects.add(statusEffects.get(i));
+			}
+			else
+			{
+				badEffects.add(statusEffects.get(i));				
+			}
+		}
+		
+		//Ensure the icons render in the right place and on the screen (top-right)
+		final int MAX_STATUS_PER_ROW = 8;
+		int size = 16;
+		int goodEffectHeight = 2 + (size + 2) * (goodEffects.size() / MAX_STATUS_PER_ROW);
+		int badEffectHeight = 2 + (size + 2) * (1 + (goodEffects.size() / MAX_STATUS_PER_ROW));
+
+		ICONS.bind();
+		t.startDrawingQuads(); 
+		t.setColorRGBA(255, 255, 255, 255);
+		for(int i = 0; i < goodEffects.size(); i++) //Render good background icons
+		{
+			int x = (int) (getCameraX() + (Display.getWidth() * 0.5f) - (((i + 2) % MAX_STATUS_PER_ROW) * (size + 3)));
+			int y = goodEffectHeight + (int) (getCameraY() + ((i / MAX_STATUS_PER_ROW) * (size + 3)));
+			t.setColorRGBA(255, 255, 255, 255);
+			double tx = (double)goodEffects.get(i).iconX / ICONS_PER_ROW;
+			double ty = (double)goodEffects.get(i).iconY / ICONS_PER_COLUMN;
+			double tw = tx + (double)ICONS_PER_ROW / ICONS_SHEET_WIDTH;
+			double th = ty + (double)ICONS_PER_COLUMN / ICONS_SHEET_HEIGHT;			
+			t.addVertexWithUV(x, y + size, 0, tx, th);
+			t.addVertexWithUV(x + size, y + size, 0, tw, th);
+			t.addVertexWithUV(x + size, y, 0, tw, ty);
+			t.addVertexWithUV(x, y, 0, tx, ty);
+		}
+		
+		for(int i = 0; i < badEffects.size(); i++) //Render bad background icons
+		{
+			int x = (int) (getCameraX() + (Display.getWidth() * 0.5f) - (((i + 2) % MAX_STATUS_PER_ROW) * (size + 3)));
+			int y = badEffectHeight + (int) (getCameraY() + (i / MAX_STATUS_PER_ROW) * (size + 3));
+			t.setColorRGBA(255, 255, 255, 255);
+			double tx = (double)badEffects.get(i).iconX / ICONS_PER_ROW;
+			double ty = (double)badEffects.get(i).iconY / ICONS_PER_COLUMN;
+			double tw = tx + (double)ICONS_PER_ROW / ICONS_SHEET_WIDTH;
+			double th = ty + (double)ICONS_PER_COLUMN / ICONS_SHEET_HEIGHT;			
+			t.addVertexWithUV(x, y + size, 0, tx, th);
+			t.addVertexWithUV(x + size, y + size, 0, tw, th);
+			t.addVertexWithUV(x + size, y, 0, tw, ty);
+			t.addVertexWithUV(x, y, 0, tx, ty);
+		}
+		t.draw();
+		
+		for(int i = 0; i < goodEffects.size(); i++) //Render good time remaining
+		{
+			int x = (int) (getCameraX() + (Display.getWidth() * 0.5f) - (((i + 2) % MAX_STATUS_PER_ROW) * (size + 3)));
+			int y = goodEffectHeight + (int) (getCameraY() + ((i / MAX_STATUS_PER_ROW) * (size + 3)));
+			
+			GL11.glColor4f(0, 1, 0, 1);
+			trueTypeFont.drawString(x + 1, 
+					y + 17, 
+					"" + (goodEffects.get(i).ticksLeft / 20), 
+					0.25f, 
+					-0.25f);
+			GL11.glColor4f(1, 1, 1, 1);
+		}
+		
+		for(int i = 0; i < badEffects.size(); i++) //Render bad time remaining
+		{
+			int x = (int) (getCameraX() + (Display.getWidth() * 0.5f) - (((i + 2) % MAX_STATUS_PER_ROW) * (size + 3)));
+			int y = badEffectHeight + (int) (getCameraY() + (i / MAX_STATUS_PER_ROW) * (size + 3));
+		
+			GL11.glColor4f(0, 1, 0, 1);
+			trueTypeFont.drawString(x + 1, 
+					y + 17, 
+					"" + (badEffects.get(i).ticksLeft / 20), 
+					0.25f, 
+					-0.25f);
+			GL11.glColor4f(1, 1, 1, 1);
+		}
+		
+	}
+	
+	/**
 	 * Updates all mouse events on call. Including: chests, the mainInventory, the garbage, 
 	 * and the recipe scroller 
 	 */
-	public void updateMouse(World world, EntityLivingPlayer player)
+	private void updateMouse(World world, EntityLivingPlayer player)
 	{
 		mouseEventInventory(world, player);	
 	}
@@ -137,8 +233,8 @@ public class RenderUI extends Render
 		for(int i = 0; i < player.inventory.getMainInventoryLength(); i++) 
 		{
 			int size = 20;
-			int x1 = (int) ((Display.getWidth() * 0.25f) + (((i % 12) - 6) * (size + 3)));
-			int y1 = (int) ((Display.getHeight() * 0.5f) - ((i / 12) * (size + 3)) - (size + 22f));
+			int x1 = (int) ((Display.getWidth() * 0.25f) + (((i % 12) - 6) * (size)));
+			int y1 = (int) ((Display.getHeight() * 0.5f) - ((i / 12) * (size)) - (size + 22f));
 			
 			if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
 			{
@@ -159,17 +255,18 @@ public class RenderUI extends Render
 			}			
 		}
 		
-		int x1 = (int)(Display.getWidth() * 0.25f) - 138; 
-		int y1 = (int)(Display.getHeight() * 0.5f) - 134;
+		int size = 20;
+		int x1 = (int)(Display.getWidth() * 0.25f) - (6 * 20); 
+		int y1 = (int)(Display.getHeight() * 0.5f) - (6 * 20);
 		
 		//Garbage
-		if(x > x1 && x < x1 + 20 && y > y1 && y < y1 + 20) 
+		if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) 
 		{
 			return player.inventory.getTrashStack(0);
 		}			
 		
 		//Middle Recipe Slot:
-		int size = 24;
+		size = 24;
 		x1 = (int) (Display.getWidth() * 0.25f) - 13;
 		y1 = 8; 
 	
@@ -181,7 +278,7 @@ public class RenderUI extends Render
 		if(player.isViewingChest)
 		{
 			//Get the initial block the player is viewing
-			BlockChest chest = (BlockChest)world.getBlock(player.viewedChestX, player.viewedChestY).clone();
+			BlockChest chest = (BlockChest)world.getBlock(player.viewedChestX, player.viewedChestY);
 			
 			if(chest.metaData != 1) //Make sure its metadata is 1 (otherwise it doesnt technically exist)
 			{
@@ -211,89 +308,19 @@ public class RenderUI extends Render
 				chest = (BlockChest)(world.getBlock(player.viewedChestX - x1, player.viewedChestY - y1));
 			}	
 			
-			if(!chest.isAttached()) //Single chest (unattached)
+			int totalRows = chest.getInventorySize() / 5;
+			for(int i = 0; i < chest.getInventorySize(); i++) //for each ItemStack in the chest
 			{
-				for(int i = 0; i < 20; i++) //for each ItemStack in the chest
-				{
-					size = 20;
-					x1 = (int) ((Display.getWidth() * 0.25f) + (((-2 + (i % 5)) * (size + 3))));
-					y1 = (int) ((Display.getHeight() * 0.5f) - ((4 + (i / 5)) * (size + 3)) - (size + 22f));
-					
-					if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
-					{
-						return chest.getItemStack(i);
-
-					}		
-				}
-			}		
-			else if(chest.isAttachedLeft()) //Chest with an attachment to the left
-			{
-				//Selected Chest:
-				for(int i = 0; i < 20; i++)
-				{			
-					size = 20;				
-					x1 = (int) ((Display.getWidth() * 0.25f) + ((((i % 5)) * (size + 3))));
-					y1 = (int) ((Display.getHeight() * 0.5f) - ((4 + (i / 5)) * (size + 3)) - (size + 22f));
-					
-					if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
-					{
-						return chest.getItemStack(i);
-
-					}	
-				}
+				size = 20;
+				x1 = (int) ((Display.getWidth() * 0.25f) + ((((i % totalRows) - (totalRows / 2)) * (size))));
+				y1 = (int) ((Display.getHeight() * 0.5f) - ((4 + (i / totalRows)) * (size)) - (size + 22f));
 				
-				//Chest to the left:			
-				BlockChest chest2 = (BlockChest)(world.getBlock(player.viewedChestX - 2, player.viewedChestY));
-				
-				for(int i = 0; i < 20; i++)
+				if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
 				{
-					size = 20;
-					x1 = (int) ((Display.getWidth() * 0.25f) + (((-5 + (i % 5)) * (size + 3))));
-					y1 = (int) ((Display.getHeight() * 0.5f) - ((4 + (i / 5)) * (size + 3)) - (size + 22f));
-					
-					if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
-					{
-						return chest2.getItemStack(i);
+					return chest.getItemStack(i);
 
-					}	
-				}					
+				}		
 			}
-			else if(chest.isAttachedRight()) //Chest with attachment to the right
-			{
-				//Selected Chest:
-				for(int i = 0; i < 20; i++)
-				{			
-					size = 20;
-					x1 = (int) ((Display.getWidth() * 0.25f) + (((-5 + (i % 5)) * (size + 3))));
-					y1 = (int) ((Display.getHeight() * 0.5f) - ((4 + (i / 5)) * (size + 3)) - (size + 22f));
-					
-					if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
-					{
-						
-						return chest.getItemStack(i);
-
-						
-					
-					}	
-				}
-				
-				//Chest to the right:			
-				BlockChest chest2 = (BlockChest)(world.getBlock(player.viewedChestX + 2, player.viewedChestY));
-				
-				for(int i = 0; i < 20; i++)
-				{
-					size = 20;
-					x1 = (int) ((Display.getWidth() * 0.25f) + (((i % 5) * (size + 3))));
-					y1 = (int) ((Display.getHeight() * 0.5f) - ((4 + (i / 5)) * (size + 3)) - (size + 22f));
-					
-					if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
-					{
-						return chest2.getItemStack(i);
-
-					}	
-				}				
-			}	
-	
 		}
 		
 		return null;
@@ -708,8 +735,8 @@ public class RenderUI extends Render
 		for(int i = 0; i < player.inventory.getMainInventoryLength(); i++) //Inventory
 		{
 			int size = 20;
-			int x1 = (int) ((Display.getWidth() * 0.25f) + (((i % 12) - 6) * (size + 3)));
-			int y1 = (int) ((Display.getHeight() * 0.5f) - ((i / 12) * (size + 3)) - (size + 22f));
+			int x1 = (int) ((Display.getWidth() * 0.25f) + (((i % 12) - 6) * (size)));
+			int y1 = (int) ((Display.getHeight() * 0.5f) - ((i / 12) * (size)) - (size + 22f));
 			
 			if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
 			{
@@ -744,12 +771,12 @@ public class RenderUI extends Render
 			}			
 		}
 		
-		int x1 = (int)(Display.getWidth() * 0.25f) - 138; 
-		int y1 = (int)(Display.getHeight() * 0.5f) - 134;
+		int x1 = (int)(Display.getWidth() * 0.25f) - (6 * 20); 
+		int y1 = (int)(Display.getHeight() * 0.5f) - (6 * 20);
 		
 		if(x > x1 && x < x1 + 20 && y > y1 && y < y1 + 20) //Garbage
 		{
-			System.out.println("Garbage");
+			//System.out.println("Garbage");
 			if(player.inventory.getTrashStack(0) != null && mouseItem == null)  //The mouse doesn't have something picked up
 			{
 				pickUpMouseItem(world, player, 3, 0, x - x1, y - y1, 16);
@@ -1186,8 +1213,8 @@ public class RenderUI extends Render
 		for(int i = 0; i < player.inventory.getMainInventory().length; i++) //Inventory Frames
 		{
 			int size = 20;
-			int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + (((i % 12) - 6) * (size + 3)));
-			int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - ((i / 12) * (size + 3)) - (size + 22f));
+			int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + (((i % 12) - 6) * (size)));
+			int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - ((i / 12) * (size)) - (size + 22f));
 			t.addVertexWithUV(x, y + size, 0, 0, 1);
 			t.addVertexWithUV(x + size, y + size, 0, 1, 1);
 			t.addVertexWithUV(x + size, y, 0, 1, 0);
@@ -1218,8 +1245,8 @@ public class RenderUI extends Render
 		t.startDrawingQuads(); //Garbage Slot Frame
 		GL11.glColor4f(0.5f, 0.5f, 0.5f, 0.6f);
 		size = 20;
-		int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + ((-6 * (size + 3))));
-		int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - (4 * (size + 3)) - (size + 22f));
+		int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + ((-6 * (size))));
+		int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - (4 * (size)) - (size + 22f));
 		t.addVertexWithUV(x, y + size, 0, 0, 1);
 		t.addVertexWithUV(x + size, y + size, 0, 1, 1);
 		t.addVertexWithUV(x + size, y, 0, 1, 0);
@@ -1228,12 +1255,12 @@ public class RenderUI extends Render
 		
 		if(player.inventory.getTrashStack(0) == null) //Garbage Slot Image If nothing's there
 		{
-			player_garbage.bind(); 
+			ICONS.bind(); 
 			GL11.glColor4f(0.6f, 0.6f, 0.6f, 1);
 			t.startDrawingQuads();
-			t.addVertexWithUV(x, y + size, 0, 0, 1);
-			t.addVertexWithUV(x + size, y + size, 0, 1, 1);
-			t.addVertexWithUV(x + size, y, 0, 1, 0);
+			t.addVertexWithUV(x, y + size, 0, 0, 64.0F / ICONS_SHEET_HEIGHT);
+			t.addVertexWithUV(x + size, y + size, 0, 64.0F / ICONS_SHEET_WIDTH, 64.0F / ICONS_SHEET_HEIGHT);
+			t.addVertexWithUV(x + size, y, 0, 64.0F / ICONS_SHEET_WIDTH, 0);
 			t.addVertexWithUV(x, y, 0, 0, 0);
 			t.draw();
 		}
@@ -1260,8 +1287,8 @@ public class RenderUI extends Render
 			else
 			{
 				int size = 16;
-				int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + (((i % 12) - 6) * (size + 7)) + 2);
-				int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - ((i / 12) * (size + 7)) - (size + 24f));
+				int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + (((i % 12) - 6) * (size + 4)) + 2);
+				int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - ((i / 12) * (size + 4)) - (size + 24f));
 				if(player.inventory.getMainInventoryStack(i).getItemID() < 2048)
 				{
 					size = 14;
@@ -1303,8 +1330,8 @@ public class RenderUI extends Render
 			textures[player.inventory.getTrashStack(0).getItemID()].bind();
 			t.startDrawingQuads(); 
 			int size = 16;
-			int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + ((-6 * (size + 7)))) + 2;
-			int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - (4 * (size + 7)) - (size + 26)) + 2;
+			int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + ((-6 * (size + 4)))) + 2;
+			int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - (4 * (size + 4)) - (size + 26)) + 2;
 			t.addVertexWithUV(x, y + size, 0, 0, 1);
 			t.addVertexWithUV(x + size, y + size, 0, 1, 1);
 			t.addVertexWithUV(x + size, y, 0, 1, 0);
@@ -1322,9 +1349,13 @@ public class RenderUI extends Render
 			}
 			else
 			{
-				int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + (((i % 12) - 6) * 23) + 2);
-				int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - ((i / 12) * 23) - 40);
-				trueTypeFont.drawString(x - 2, y + 18, new StringBuilder().append(player.inventory.getMainInventoryStack(i).getStackSize()).toString(), 0.25f, -0.25f);
+				int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + (((i % 12) - 6) * 20) + 2);
+				int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - ((i / 12) * 20) - 40);
+				trueTypeFont.drawString(x - 2, 
+						y + 18, 
+						new StringBuilder().append(player.inventory.getMainInventoryStack(i).getStackSize()).toString(), 
+						0.25f, 
+						-0.25f);
 			}
 		}	
 		
@@ -1640,139 +1671,30 @@ public class RenderUI extends Render
 			chest = (BlockChest)(world.getBlock(player.viewedChestX - x1, player.viewedChestY - y1));
 		}	
 		
-		if(!chest.isAttached()) //Single chest (unattached)
+		int totalRows = chest.getInventorySize() / 5;
+		for(int i = 0; i < chest.getInventorySize(); i++) //for each ItemStack in the chest
 		{
-			for(int i = 0; i < 20; i++) //for each ItemStack in the chest
+			int size = 20;
+			int x1 = (int) ((Display.getWidth() * 0.25f) + ((((i % totalRows) - (totalRows / 2)) * (size))));
+			int y1 = (int) ((Display.getHeight() * 0.5f) - ((4 + (i / totalRows)) * (size)) - (size + 22f));
+			
+			if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
 			{
-				int size = 20;
-				int x1 = (int) ((Display.getWidth() * 0.25f) + (((-2 + (i % 5)) * (size + 3))));
-				int y1 = (int) ((Display.getHeight() * 0.5f) - ((4 + (i / 5)) * (size + 3)) - (size + 22f));
-				
-				if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
+				if(chest.getItemStack(i) != null && mouseItem == null) //The mouse doesn't have something picked up, so this is straightforward
 				{
-					if(chest.getItemStack(i) != null && mouseItem == null) //The mouse doesn't have something picked up, so this is straightforward
-					{
-						pickUpMouseItemChest(chest, i, x - x1 - 2, y - y1 - 2, 16);
-						shouldDropItem = false;
-					}
-					else if(mouseItem != null) //The mouse has something picked up, things need swapped
-					{
-						//Reference safe swap
-						ItemStack stack = new ItemStack(mouseItem);
-						mouseItem = chest.takeItemStack(i);
-						chest.placeItemStack(stack, i);
-						shouldDropItem = false;
-					}
-				}		
-			}
-		}		
-		else if(chest.isAttachedLeft()) //Chest with an attachment to the left
-		{
-			//Selected Chest:
-			for(int i = 0; i < 20; i++)
-			{			
-				int size = 20;				
-				int x1 = (int) ((Display.getWidth() * 0.25f) + ((((i % 5)) * (size + 3))));
-				int y1 = (int) ((Display.getHeight() * 0.5f) - ((4 + (i / 5)) * (size + 3)) - (size + 22f));
-				
-				if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
+					pickUpMouseItemChest(chest, i, x - x1 - 2, y - y1 - 2, 16);
+					shouldDropItem = false;
+				}
+				else if(mouseItem != null) //The mouse has something picked up, things need swapped
 				{
-					if(chest.getItemStack(i) != null && mouseItem == null) //The mouse doesn't have something picked up, so this is straightforward
-					{
-						pickUpMouseItemChest(chest, i, x - x1 - 2, y - y1 - 2, 16);
-						shouldDropItem = false;
-					}
-					else if(mouseItem != null) //The mouse has something picked up, things need swapped
-					{
-						//Reference safe swap
-						ItemStack stack = new ItemStack(mouseItem);
-						mouseItem = chest.takeItemStack(i);
-						chest.placeItemStack(stack, i);
-						shouldDropItem = false;
-					}
-				}	
-			}
-			
-			//Chest to the left:			
-			BlockChest chest2 = (BlockChest)(world.getBlock(player.viewedChestX - 2, player.viewedChestY));
-			
-			for(int i = 0; i < 20; i++)
-			{
-				int size = 20;
-				int x1 = (int) ((Display.getWidth() * 0.25f) + (((-5 + (i % 5)) * (size + 3))));
-				int y1 = (int) ((Display.getHeight() * 0.5f) - ((4 + (i / 5)) * (size + 3)) - (size + 22f));
+					//Reference safe swap
+					ItemStack stack = new ItemStack(mouseItem);
+					mouseItem = chest.takeItemStack(i);
+					chest.placeItemStack(stack, i);
+					shouldDropItem = false;
+				}
+			}		
 				
-				if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
-				{
-					if(chest2.getItemStack(i) != null && mouseItem == null) //The mouse doesn't have something picked up, so this is straightforward
-					{
-						pickUpMouseItemChest(chest2, i, x - x1 - 2, y - y1 - 2, 16);
-						shouldDropItem = false;
-					}
-					else if(mouseItem != null) //The mouse has something picked up, things need swapped
-					{
-						//Reference safe swap
-						ItemStack stack = new ItemStack(mouseItem);
-						mouseItem = chest2.takeItemStack(i);
-						chest2.placeItemStack(stack, i);
-						shouldDropItem = false;
-					}
-				}	
-			}					
-		}
-		else if(chest.isAttachedRight()) //Chest with attachment to the right
-		{
-			//Selected Chest:
-			for(int i = 0; i < 20; i++)
-			{			
-				int size = 20;
-				int x1 = (int) ((Display.getWidth() * 0.25f) + (((-5 + (i % 5)) * (size + 3))));
-				int y1 = (int) ((Display.getHeight() * 0.5f) - ((4 + (i / 5)) * (size + 3)) - (size + 22f));
-				
-				if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
-				{
-					if(chest.getItemStack(i) != null && mouseItem == null) //The mouse doesn't have something picked up, so this is straightforward
-					{
-						pickUpMouseItemChest(chest, i, x - x1 - 2, y - y1 - 2, 16);
-						shouldDropItem = false;
-					}
-					else if(mouseItem != null) //The mouse has something picked up, things need swapped
-					{
-						//Reference safe swap
-						ItemStack stack = new ItemStack(mouseItem);
-						mouseItem = chest.takeItemStack(i);
-						chest.placeItemStack(stack, i);
-						shouldDropItem = false;
-					}
-				}	
-			}
-			
-			//Chest to the right:			
-			BlockChest chest2 = (BlockChest)(world.getBlock(player.viewedChestX + 2, player.viewedChestY));
-			
-			for(int i = 0; i < 20; i++)
-			{
-				int size = 20;
-				int x1 = (int) ((Display.getWidth() * 0.25f) + (((i % 5) * (size + 3))));
-				int y1 = (int) ((Display.getHeight() * 0.5f) - ((4 + (i / 5)) * (size + 3)) - (size + 22f));
-				
-				if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
-				{
-					if(chest2.getItemStack(i) != null && mouseItem == null) //The mouse doesn't have something picked up, so this is straightforward
-					{
-						pickUpMouseItemChest(chest2, i, x - x1 - 2, y - y1 - 2, 16);
-						shouldDropItem = false;
-					}
-					else if(mouseItem != null) //The mouse has something picked up, things need swapped
-					{
-						//Reference safe swap
-						ItemStack stack = new ItemStack(mouseItem);
-						mouseItem = chest2.takeItemStack(i);
-						chest2.placeItemStack(stack, i);
-						shouldDropItem = false;
-					}
-				}	
-			}				
 		}		
 	}
 	
@@ -1783,7 +1705,7 @@ public class RenderUI extends Render
 	private void renderChest(World world, EntityLivingPlayer player)
 	{
 		//Get the initial block the player is viewing
-		BlockChest chest = (BlockChest)world.getBlock(player.viewedChestX, player.viewedChestY);
+		BlockChest chest = (BlockChest)world.getBlock(player.viewedChestX, player.viewedChestY).clone();
 		
 		if(chest.metaData != 1)
 		{
@@ -1815,228 +1737,49 @@ public class RenderUI extends Render
 			player.viewedChestY -= y;
 		}	
 		
-		if(!chest.isAttached()) //Single chest (unattached)
-		{
-			t.startDrawingQuads(); 
-			GL11.glColor4f(0.5f, 0.5f, 0.5f, 0.6f);
-			for(int i = 0; i < 20; i++) //Draw all the background slots
-			{			
-				int size = 20;
-				actionbarSlot.bind();
-				int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + (((-2 + (i % 5)) * (size + 3))));
-				int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - ((4 + (i / 5)) * (size + 3)) - (size + 22f));
-				t.addVertexWithUV(x, y + size, 0, 0, 1);
-				t.addVertexWithUV(x + size, y + size, 0, 1, 1);
-				t.addVertexWithUV(x + size, y, 0, 1, 0);
-				t.addVertexWithUV(x, y, 0, 0, 0);
-			}
-			t.draw();
-			
-			GL11.glColor4f(1, 1, 1, 1);
-			
-			for(int i = 0; i < 20; i++) //Draw all the items, in the slots (with text)
-			{
-				if(chest.getItemStack(i) != null)
-				{
-					textures[chest.getItemStack(i).getItemID()].bind();
-					int size = 16;
-					int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + (((-2 + (i % 5)) * (size + 7))) + 2);
-					int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - ((4 + (i / 5)) * (size + 7)) - (size + 22f) - 2);
-	
-					t.startDrawingQuads();
-					t.addVertexWithUV(x, y + size, 0, 0, 1);
-					t.addVertexWithUV(x + size, y + size, 0, 1, 1);
-					t.addVertexWithUV(x + size, y, 0, 1, 0);
-					t.addVertexWithUV(x, y, 0, 0, 0);
-					t.draw();
-					
-					if(chest.getItemStack(i).getMaxStackSize() > 1) //If maxStackSize > 1, draw the stackSize
-					{
-						GL11.glColor4f(0, 1, 0, 1);
-						trueTypeFont.drawString(x - 2, y + 18, new StringBuilder().append(chest.getItemStack(i).getStackSize()).toString(), 0.25f, -0.25f);
-						GL11.glColor4f(1, 1, 1, 1);
-					}	
-				}
-			}			
+		t.startDrawingQuads(); 
+		GL11.glColor4f(0.5f, 0.5f, 0.5f, 0.6f);
+		int totalRows = (chest.getInventorySize() / 5);
+		for(int i = 0; i < chest.getInventorySize(); i++) //Draw all the background slots
+		{			
+			int size = 20;
+			actionbarSlot.bind();
+			int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + ((((i % totalRows) - (totalRows / 2)) * (size))));
+			int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - ((4 + (i / totalRows)) * (size)) - (size + 22f));
+			t.addVertexWithUV(x, y + size, 0, 0, 1);
+			t.addVertexWithUV(x + size, y + size, 0, 1, 1);
+			t.addVertexWithUV(x + size, y, 0, 1, 0);
+			t.addVertexWithUV(x, y, 0, 0, 0);
 		}
-		else if(chest.isAttachedLeft())
+		t.draw();
+		
+		GL11.glColor4f(1, 1, 1, 1);
+		
+		for(int i = 0; i < chest.getInventorySize(); i++) //Draw all the items, in the slots (with text)
 		{
-			t.startDrawingQuads(); 
-			GL11.glColor4f(0.5f, 0.5f, 0.5f, 0.6f);
-			for(int i = 0; i < 20; i++) //Draw all the background slots
-			{			
-				int size = 20;
-				actionbarSlot.bind();
-				int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + ((((i % 5)) * (size + 3))));
-				int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - ((4 + (i / 5)) * (size + 3)) - (size + 22f));
-				t.addVertexWithUV(x, y + size, 0, 0, 1);
-				t.addVertexWithUV(x + size, y + size, 0, 1, 1);
-				t.addVertexWithUV(x + size, y, 0, 1, 0);
-				t.addVertexWithUV(x, y, 0, 0, 0);
-			}
-			t.draw();
-			
-			GL11.glColor4f(1, 1, 1, 1);
-			
-			for(int i = 0; i < 20; i++) //Draw all the items, in the slots (with text)
+			if(chest.getItemStack(i) != null)
 			{
-				if(chest.getItemStack(i) != null)
-				{
-					textures[chest.getItemStack(i).getItemID()].bind();
-					int size = 16;
-					int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + ((((i % 5)) * (size + 7))) + 2);
-					int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - ((4 + (i / 5)) * (size + 7)) - (size + 22f) - 2);
-	
-					t.startDrawingQuads();
-					t.addVertexWithUV(x, y + size, 0, 0, 1);
-					t.addVertexWithUV(x + size, y + size, 0, 1, 1);
-					t.addVertexWithUV(x + size, y, 0, 1, 0);
-					t.addVertexWithUV(x, y, 0, 0, 0);
-					t.draw();
-					
-					if(chest.getItemStack(i).getMaxStackSize() > 1) //If maxStackSize > 1, draw the stackSize
-					{
-						GL11.glColor4f(0, 1, 0, 1);
-						trueTypeFont.drawString(x - 2, y + 18, new StringBuilder().append(chest.getItemStack(i).getStackSize()).toString(), 0.25f, -0.25f);
-						GL11.glColor4f(1, 1, 1, 1);
-					}	
-				}
-			}
-			
-			//Chest to the left:
-			BlockChest chest2 = (BlockChest)(world.getBlock(player.viewedChestX - 2, player.viewedChestY));
-			
-			for(int i = 0; i < 20; i++) //Draw all the background slots
-			{
-				t.startDrawingQuads(); 
-				GL11.glColor4f(0.5f, 0.5f, 0.5f, 0.6f);
-				int size = 20;
-				actionbarSlot.bind();
-				int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + (((-5 + (i % 5)) * (size + 3))));
-				int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - ((4 + (i / 5)) * (size + 3)) - (size + 22f));
-				t.addVertexWithUV(x, y + size, 0, 0, 1);
-				t.addVertexWithUV(x + size, y + size, 0, 1, 1);
-				t.addVertexWithUV(x + size, y, 0, 1, 0);
-				t.addVertexWithUV(x, y, 0, 0, 0);
-				t.draw();
-			}		
-			
-			GL11.glColor4f(1, 1, 1, 1);
-			
-			for(int i = 0; i < 20; i++) //Draw all the items, in the slots (with text)
-			{
-				if(chest2.getItemStack(i) != null)
-				{
-					textures[chest2.getItemStack(i).getItemID()].bind();
-					int size = 16;
-					int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + ((-5 + (i % 5)) * (size + 7)) + 2);
-					int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - ((4 + (i / 5)) * (size + 7)) - (size + 22f) - 2);
-	
-					t.startDrawingQuads();
-					t.addVertexWithUV(x, y + size, 0, 0, 1);
-					t.addVertexWithUV(x + size, y + size, 0, 1, 1);
-					t.addVertexWithUV(x + size, y, 0, 1, 0);
-					t.addVertexWithUV(x, y, 0, 0, 0);
-					t.draw();
-					
-					if(chest2.getItemStack(i).getMaxStackSize() > 1) //If maxStackSize > 1, draw the stackSize
-					{
-						GL11.glColor4f(0, 1, 0, 1);
-						trueTypeFont.drawString(x - 2, y + 18, new StringBuilder().append(chest2.getItemStack(i).getStackSize()).toString(), 0.25f, -0.25f);
-						GL11.glColor4f(1, 1, 1, 1);
-					}	
-				}
-			}
-		}
-		else if(chest.isAttachedRight()) //Chest and the chest to the right
-		{
-			t.startDrawingQuads(); 
-			GL11.glColor4f(0.5f, 0.5f, 0.5f, 0.6f);
-			for(int i = 0; i < 20; i++) //Draw all the background slots
-			{			
-				int size = 20;
-				actionbarSlot.bind();
-				int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + (((-5 + (i % 5)) * (size + 3))));
-				int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - ((4 + (i / 5)) * (size + 3)) - (size + 22f));
-				t.addVertexWithUV(x, y + size, 0, 0, 1);
-				t.addVertexWithUV(x + size, y + size, 0, 1, 1);
-				t.addVertexWithUV(x + size, y, 0, 1, 0);
-				t.addVertexWithUV(x, y, 0, 0, 0);
-			}
-			t.draw();
+				textures[chest.getItemStack(i).getItemID()].bind();
+				int size = 16;
+				int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + ((((i % totalRows) - (totalRows / 2)) * (size + 4))) + 2);
+				int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - ((4 + (i / totalRows)) * (size + 4)) - (size + 22f) - 2);
 
-			GL11.glColor4f(1, 1, 1, 1);
-			
-			for(int i = 0; i < 20; i++) //Draw all the items, in the slots (with text)
-			{
-				if(chest.getItemStack(i) != null)
-				{				
-					textures[chest.getItemStack(i).getItemID()].bind();
-					int size = 16;
-					int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + (((-5 + (i % 5)) * (size + 7))) + 2);
-					int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - ((4 + (i / 5)) * (size + 7)) - (size + 22f) - 2);
-					
-					t.startDrawingQuads();
-					t.addVertexWithUV(x, y + size, 0, 0, 1);
-					t.addVertexWithUV(x + size, y + size, 0, 1, 1);
-					t.addVertexWithUV(x + size, y, 0, 1, 0);
-					t.addVertexWithUV(x, y, 0, 0, 0);
-					t.draw();
-					
-					if(chest.getItemStack(i).getMaxStackSize() > 1) //If maxStackSize > 1, draw the stackSize
-					{
-						GL11.glColor4f(0, 1, 0, 1);
-						trueTypeFont.drawString(x - 2, y + 18, new StringBuilder().append(chest.getItemStack(i).getStackSize()).toString(), 0.25f, -0.25f);
-						GL11.glColor4f(1, 1, 1, 1);
-					}	
-				}
-			}
-			
-			//Chest to the right:			
-			BlockChest chest2 = (BlockChest)(world.getBlock(player.viewedChestX + 2, player.viewedChestY));
-			
-			for(int i = 0; i < 20; i++) //Draw all the background slots
-			{
-				t.startDrawingQuads(); 
-				GL11.glColor4f(0.5f, 0.5f, 0.5f, 0.6f);
-				int size = 20;
-				actionbarSlot.bind();
-				int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + (((i % 5) * (size + 3))));
-				int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - ((4 + (i / 5)) * (size + 3)) - (size + 22f));
+				t.startDrawingQuads();
 				t.addVertexWithUV(x, y + size, 0, 0, 1);
 				t.addVertexWithUV(x + size, y + size, 0, 1, 1);
 				t.addVertexWithUV(x + size, y, 0, 1, 0);
 				t.addVertexWithUV(x, y, 0, 0, 0);
 				t.draw();
-			}		
-			
-			GL11.glColor4f(1, 1, 1, 1);
-			
-			for(int i = 0; i < 20; i++) //Draw all the items, in the slots (with text)
-			{
-				if(chest2.getItemStack(i) != null)
+				
+				if(chest.getItemStack(i).getMaxStackSize() > 1) //If maxStackSize > 1, draw the stackSize
 				{
-					textures[chest2.getItemStack(i).getItemID()].bind();
-					int size = 16;
-					int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + ((i % 5) * (size + 7)) + 2);
-					int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - ((4 + (i / 5)) * (size + 7)) - (size + 22f) - 2);
-	
-					t.startDrawingQuads();
-					t.addVertexWithUV(x, y + size, 0, 0, 1);
-					t.addVertexWithUV(x + size, y + size, 0, 1, 1);
-					t.addVertexWithUV(x + size, y, 0, 1, 0);
-					t.addVertexWithUV(x, y, 0, 0, 0);
-					t.draw();
-					
-					if(chest2.getItemStack(i).getMaxStackSize() > 1) //If maxStackSize > 1, draw the stackSize
-					{
-						GL11.glColor4f(0, 1, 0, 1);
-						trueTypeFont.drawString(x - 2, y + 18, new StringBuilder().append(chest2.getItemStack(i).getStackSize()).toString(), 0.25f, -0.25f);
-						GL11.glColor4f(1, 1, 1, 1);
-					}	
-				}
+					GL11.glColor4f(0, 1, 0, 1);
+					trueTypeFont.drawString(x - 2, y + 18, new StringBuilder().append(chest.getItemStack(i).getStackSize()).toString(), 0.25f, -0.25f);
+					GL11.glColor4f(1, 1, 1, 1);
+				}	
 			}
-		}
+		}			
+		
 		GL11.glColor4f(1, 1, 1, 1);
 	}
 }

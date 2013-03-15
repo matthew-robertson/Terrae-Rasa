@@ -5,6 +5,7 @@ public class StatusEffectDazed extends StatusEffect
 	public StatusEffectDazed(float durationSeconds, int tier) 
 	{
 		super(durationSeconds, tier);
+		this.isBeneficialEffect = false;
 	}
 
 	public void applyInitialEffect(EntityLiving entity)

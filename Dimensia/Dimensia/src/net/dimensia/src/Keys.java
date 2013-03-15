@@ -66,6 +66,10 @@ public class Keys
 		{
 			ic = true;
 			player.isInventoryOpen = !player.isInventoryOpen;
+			if(!player.isInventoryOpen)
+			{
+				player.clearViewedChest();
+			}
 		}
 		if(!Keyboard.isKeyDown(keybinds.inventoryToggle))
 		{
