@@ -24,6 +24,13 @@ public class RenderWorldEarth extends RenderWorld
 		renderParticles.render(world);
 		renderLight.render(world, player);
 
+		//
+		//
+		//adjustCameraToLastPosition();
+		//zombie_test_animation.render(getCameraX() + 50, getCameraY() + 50, 32/2, 48/2);
+		//
+		//
+		
 		GL11.glAlphaFunc(GL11.GL_GREATER, 0.1f);
 		GL11.glEnable(GL11.GL_ALPHA_TEST); //cuts out blank junk in the background of text, etc	
 	

@@ -85,17 +85,6 @@ public class TextureLoader
         glBindTexture(GL11.GL_TEXTURE_2D, textureID);
 
         BufferedImage bufferedImage = loadImage(resourceName);
-
-       
-//        if(resourceName.equals("Resources/terrain_ground.png"))
-//        {
-//        	JFrame app = new JFrame("Move Man");
-//    		//app.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//    		app.add(new DebugFrame(bufferedImage));
-//    		app.setSize(new Dimension(700,700));
-//    		app.setVisible(true);
-//        }
-        
         
         if (bufferedImage.getColorModel().hasAlpha()) 
         {

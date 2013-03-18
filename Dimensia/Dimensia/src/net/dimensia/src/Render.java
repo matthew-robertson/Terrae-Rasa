@@ -35,7 +35,6 @@ public class Render
 	public static Texture slime;
 	
 	//</menu textures>
-	public static Animation a_water;
 
 	public static Texture dino;
 	public static Texture ICONS;
@@ -56,7 +55,6 @@ public class Render
 	public static Texture actionbarOutline;
 	public static Texture tooltipBackground;
 	public static Texture logo;
-	public static Texture background2;
 	public static Texture[] textures;
 	public static Texture[] backgroundImages;
 	//menu textures
@@ -86,7 +84,7 @@ public class Render
 	 */
 	protected void renderSkyBackgroundScene()
 	{		
-		background2.bind();        
+		background_1.bind();        
 		t.startDrawingQuads();
         t.setColorRGBA_F(1, 1, 1, 1);
         t.addVertexWithUV(0, Display.getHeight() / 2, 0, 0, 1);
@@ -142,35 +140,45 @@ public class Render
 		
 		//<menu textures>
 		moons = loader.getMoonTextureArray();
-		sun = loader.getTexture("Resources/terraria_sun.png");
-		background_1 = loader.getTexture("Resources/terraria_background_2.png");		
-		buttonTexture = loader.getTexture("Resources/background_dark_dirt.png");		
+		sun = loader.getTexture("Resources/sun.png");
+		background_1 = loader.getTexture("Resources/background_1.png");		
+		buttonTexture = loader.getTexture("Resources/gui_texture.png");		
 		//</menu textures>
 		
-		a_water = new Animation("Resources/water_animation.png",16,16, 100);
-
 		goblin = loader.getTexture("Resources/goblin.png");
 		zombie = loader.getTexture("Resources/zombie.png");
 		slime = loader.getTexture("Resources/slime.png");
-		dino = loader.getTexture("Resources/Dino.png");
+		dino = loader.getTexture("Resources/dino.png");
 		
 		snow_tex = loader.getTexture("Resources/snow_particle.png");
 		ICONS = loader.getTexture("Resources/icons.png");
 		TERRAIN = loader.getTexture("Resources/terrain.png");
-		TERRAIN_GROUND = loader.getTexture("Resources/terrain_ground.png");
+		TERRAIN_GROUND = loader.getTexture("Resources/terrain_earth.png");
 		PROJECTILES = loader.getTexture("Resources/projectiles.png");
-		logo = loader.getTexture("Resources/terraria_logo.png");
-		background2 = loader.getTexture("Resources/terraria_background_2.png");
+		logo = loader.getTexture("Resources/logo.png");
 		playerTexture = loader.getTexture("Resources/player_1.png");
 		actionbarSlot = loader.getTexture("Resources/player_actionbar_slot.png");
 		actionbarOutline = loader.getTexture("Resources/player_actionbar_outline.png");
 		tooltipBackground = loader.getTexture("Resources/tooltip_background.png");
+		
+		//
+		zombie_test_animation = new Animation(loader.getTexture("Resources/test_animation.png"), 
+				new TextureCoords(0, 0, 128F / 256F, 48.0F / 256F), 
+				32, 
+				48,
+				160, 
+				4, 
+				Animation.ANIMATE_HORIZONTAL);
+		//
+		
 		renderParticles = new RenderParticles();
 		renderUI = new RenderUI();
 		renderEntities = new RenderEntities();
 		renderBlocks = new RenderBlocks();
 	}	
 		
+	static Animation zombie_test_animation;
+	
 	/**
 	 * Gets the absolute value of cameraX, as it's generally negative. This value is useful for rendering the user interface and many
 	 * other things, because it allows things to be rendered to screen at a static location the player can always see. See description
