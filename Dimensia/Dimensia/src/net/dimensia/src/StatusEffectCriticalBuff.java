@@ -5,6 +5,8 @@ public class StatusEffectCriticalBuff extends StatusEffect
 	public StatusEffectCriticalBuff(float durationSeconds, int tier) 
 	{
 		super(durationSeconds, tier);
+		iconX = 12; 
+		iconY = 1;
 	}
 	
 	public void applyInitialEffect(EntityLiving entity)

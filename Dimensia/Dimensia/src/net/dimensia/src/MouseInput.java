@@ -4,6 +4,8 @@ import org.lwjgl.input.Mouse;
 
 public class MouseInput 
 {	
+	private static boolean mouseLock = false;
+	
 	public static void mouse(World world, EntityLivingPlayer player)
 	{
 		if(player.isStunned)
@@ -78,10 +80,18 @@ public class MouseInput
 				}
 				else if(player.inventory.getMainInventoryStack(active) != null && !player.isInventoryOpen) //otherwise, if it's an item
 				{
-					Item.itemsList[player.inventory.getMainInventoryStack(active).getItemID()].onRightClick(world, player);
+					if(!mouseLock)
+					{
+						Item.itemsList[player.inventory.getMainInventoryStack(active).getItemID()].onRightClick(world, player);
+						mouseLock = true;
+					}
 				}
 			}
 		}		
+		else
+		{
+			mouseLock = false;
+		}
 		
 		//Check for mouse wheel movement if the inventory isnt open
 		if(!player.isInventoryOpen)

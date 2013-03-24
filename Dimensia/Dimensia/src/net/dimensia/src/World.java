@@ -16,6 +16,7 @@ import java.util.zip.GZIPInputStream;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GL11;
 
 /**
  * <code>World implements Serializable</code> <br>
@@ -53,14 +54,15 @@ import org.lwjgl.opengl.Display;
  * @version     1.0
  * @since       1.0
  */
-public class World implements Serializable
+public class World
+		implements Serializable
 {
 	private static final long serialVersionUID = 1L;	
 	public Hashtable<String, Boolean> chunksLoaded;
 	
 	public Weather weather;
 	public List<EntityLivingItemStack> itemsList;
-	public List<TemporaryTextStore> temporaryText; 
+	public List<WorldText> temporaryText; 
 	public List<EntityLivingNPCEnemy> entityList;
 	public List<EntityLivingNPC> npcList;
 	public List<EntityProjectile> projectileList;
@@ -96,7 +98,7 @@ public class World implements Serializable
 		entityList = new ArrayList<EntityLivingNPCEnemy>(255);
 		projectileList = new ArrayList<EntityProjectile>(255);
 		npcList = new ArrayList<EntityLivingNPC>(255);
-		temporaryText = new ArrayList<TemporaryTextStore>(100);
+		temporaryText = new ArrayList<WorldText>(100);
 		itemsList = new ArrayList<EntityLivingItemStack>(250);
 		chunksLoaded= new Hashtable<String, Boolean>(25);
 		manager = new SpawnManager();
@@ -122,7 +124,7 @@ public class World implements Serializable
 		entityList = new ArrayList<EntityLivingNPCEnemy>(255);
 		projectileList = new ArrayList<EntityProjectile>(255);
 		npcList = new ArrayList<EntityLivingNPC>(255);
-		temporaryText = new ArrayList<TemporaryTextStore>(100);
+		temporaryText = new ArrayList<WorldText>(100);
 		itemsList = new ArrayList<EntityLivingItemStack>(250);
 		chunksLoaded= new Hashtable<String, Boolean>(25);
 		worldTime = (long) (6.5 * GAMETICKSPERHOUR);
@@ -396,9 +398,9 @@ public class World implements Serializable
 	 * @param ticksLeft the time (in game ticks) before the text despawns
 	 * @param type the type of combat text (affects the colour). For example 'g' makes the text render green
 	 */
-	public void addTemporaryText(String message, int x, int y, int ticksLeft, char type)
+	public void addTemporaryText(String message, int x, int y, int ticksLeft, EnumColor color)
 	{
-		temporaryText.add(new TemporaryTextStore(message, x, y, ticksLeft, type));
+		temporaryText.add(new WorldText(message, x, y, ticksLeft, color, true));
 	}
 	
 	/**
@@ -556,6 +558,8 @@ public class World implements Serializable
 				//System.out.println("Entity Removed @" + i);
 				continue;
 			}
+			entityList.get(i).invincibilityTicks--;
+			//System.out.println(entityList.get(i).invincibilityTicks);
 			entityList.get(i).applyAI(this, player); //otherwise apply AI
 		}
 	}
@@ -891,6 +895,30 @@ public class World implements Serializable
 			}
 		}
 	}
+	/**
+	 * 
+    nvert: Number of vertices in the polygon. Whether to repeat the first vertex at the end.
+    vertx, verty: Arrays containing the x- and y-coordinates of the polygon's vertices.
+    testx, testy: X- and y-coordinate of the test point.
+
+	 * @param nvert
+	 * @param vertx
+	 * @param verty
+	 * @param testx
+	 * @param testy
+	 * @return
+	 */
+	boolean pnpoly(int nvert, double vertx[], double verty[], float testx, float testy)
+	{
+	  int i, j;
+	  boolean c = false;
+	  for (i = 0, j = nvert-1; i < nvert; j = i++) {
+	    if ( ((verty[i]>testy) != (verty[j]>testy)) &&
+	     (testx < (vertx[j]-vertx[i]) * (testy-verty[i]) / (verty[j]-verty[i]) + vertx[i]) )
+	       c = !c;
+	  }
+	  return c;
+	}
 	
 	private void performEnemyToolHittests(EntityLivingPlayer player) //Work in progress, not yet fully implemented
 	{
@@ -899,76 +927,90 @@ public class World implements Serializable
 			return;
 		}
 		
-		int size = 20;		
-		int x = 0;
-		int y = -size;
-		int h = size;
-		int w = size;        
-		float angle = player.rotateAngle / 57.5f;
+
+		ItemTool heldItem = ((ItemTool)(Item.itemsList[player.inventory.getMainInventoryStack(player.selectedSlot).getItemID()]));
 		
-		double[] x_points = 
-		{
-			player.x + 9 + (((x) * Math.cos(angle)) - ((y+h) * Math.sin(angle))),
-			player.x + 9 + (((x+w) * Math.cos(angle)) - ((y+h) * Math.sin(angle))),
-			player.x + 9 + (((x+w) * Math.cos(angle)) - ((y) * Math.sin(angle))),
-			player.x + 9 + (((x) * Math.cos(angle)) - (y * Math.sin(angle))) 
-		};
+		double size = heldItem.size;		     
+		double angle = player.rotateAngle / 57.5f;		
+		double const_ = 9;
+				
+		double[] x_bounds = heldItem.xBounds;
+		double[] y_bounds = heldItem.yBounds;
 		
-		double[] y_points = 
+		Vector2F[] scaled_points = new Vector2F[x_bounds.length];
+			
+		
+		for(int i = 0; i < scaled_points.length; i++)
 		{
-			player.y + 9 +(((x) * Math.sin(angle)) + ((y+h) * Math.cos(angle))),	
-			player.y + 9 +(((x+w) * Math.sin(angle)) + ((y+h) * Math.cos(angle))),
-			player.y + 9 +(((x+w) * Math.sin(angle)) + ((y) * Math.cos(angle))),
-			player.y + 9 +(((x) * Math.sin(angle)) + ((y) * Math.cos(angle)))
-		};
+			scaled_points[i] = new Vector2F((float)(size * x_bounds[i]), (float)(size * ((float)y_bounds[i])) - (float)size );
+		}
+		
+		double[] x_points = new double[scaled_points.length];
+		double[] y_points = new double[scaled_points.length];
+		
+		for(int i = 0; i < scaled_points.length; i++)
+		{
+			x_points[i] =  player.x + const_ + (scaled_points[i].x * Math.cos(angle)) - 
+					(scaled_points[i].y * Math.sin(angle));
+			y_points[i] = player.y + const_ + (scaled_points[i].x * Math.sin(angle)) + 
+					( scaled_points[i].y * Math.cos(angle));
+		}
+		
 		
 		for(int i = 0; i < entityList.size(); i++)
 		{
-			for(int j = 0; j < 4; j++)
-			{
-				if(entityList.get(i).inBounds((float)x_points[j], (float)y_points[j]))
-				{
-					boolean flag = ((Math.random() < player.criticalStrikeChance) ? true : false);
-					int damageDone =((ItemTool) Item.itemsList[player.inventory.getMainInventoryStack(player.selectedSlot).getItemID()]).getDamageDone();
-					damageDone = (int) (damageDone * player.allDamageModifier * player.meleeDamageModifier);
-					//CURRENTLY DAMAGE DONE IS ALWAYS MELEE
-					entityList.get(i).damageEntity(this, damageDone, flag, true);
-					
-					//knockback
-					/****
-					 * ENTITIES NEED STUNNED BRIEFLY AFTER KNOCKBACK
-					 * 
-					 * 
-					 * 
-					 * 
-					 * 
-					 * 
-					 * 
-					 * 
-					 */
-					int knockBack = (int) (player.knockbackModifier * 6);
-					String direction = player.getDirectionOfQuadRelativeToEntityPosition(entityList.get(i).x, entityList.get(i).y, entityList.get(i).width, entityList.get(i).height);
-					
-					//System.out.println("@index=" + i + "!knock_back@time= || " + knockBack + " " + direction + " " + ((knockBack % 6 == 0) ? (knockBack / 6) : (knockBack / 6) + 1));
-					if(direction.equals("right"))
-					{
-						for(int k = 0; k < ((knockBack % 6 == 0) ? (knockBack / 6) : (knockBack / 6) + 1); k++)
-						{
-							entityList.get(i).moveEntityRight(this, knockBack);
-						}	
-					}
-					else if(direction.equals("left"))
-					{
-						for(int k = 0; k < ((knockBack % 6 == 0) ? (knockBack / 6) : (knockBack / 6) + 1); k++)
-						{
-							entityList.get(i).moveEntityLeft(this, knockBack);
-						}
-					}
-					
+			float entity_x = entityList.get(i).x + entityList.get(i).width;
+			float  entity_y = entityList.get(i).y + entityList.get(i).height;
 
-					entityList.get(i).registerStatusEffect(new StatusEffectStun(0.4f, 1));
-					
+			if(pnpoly(scaled_points.length, x_points, y_points, entity_x, entity_y))
+			{
+				if(entityList.get(i).isImmuneToDamage())
+				{
+					//System.out.println("Immune>>Damage not done");
+					continue;
+				}				
+				
+				//entityList.get(i).inBounds((float)x_points[j], (float)y_points[j])
+				boolean flag = ((Math.random() < player.criticalStrikeChance) ? true : false);
+				int damageDone =((ItemTool) Item.itemsList[player.inventory.getMainInventoryStack(player.selectedSlot).getItemID()]).getDamageDone();
+				damageDone = (int) (damageDone * player.allDamageModifier * player.meleeDamageModifier);
+				//CURRENTLY DAMAGE DONE IS ALWAYS MELEE
+				entityList.get(i).damageEntity(this, damageDone, flag, true);
+				
+				//knockback
+				/****
+				 * ENTITIES NEED STUNNED BRIEFLY AFTER KNOCKBACK
+				 * 
+				 * 
+				 * 
+				 * 
+				 * 
+				 * 
+				 * 
+				 * 
+				 */
+				int knockBack = (int) (player.knockbackModifier * 6);
+				String direction = player.getDirectionOfQuadRelativeToEntityPosition(entityList.get(i).x, entityList.get(i).y, entityList.get(i).width, entityList.get(i).height);
+				
+				//System.out.println("@index=" + i + "!knock_back@time= || " + knockBack + " " + direction + " " + ((knockBack % 6 == 0) ? (knockBack / 6) : (knockBack / 6) + 1));
+				if(direction.equals("right"))
+				{
+					for(int k = 0; k < ((knockBack % 6 == 0) ? (knockBack / 6) : (knockBack / 6) + 1); k++)
+					{
+						entityList.get(i).moveEntityRight(this, knockBack);
+					}	
 				}
+				else if(direction.equals("left"))
+				{
+					for(int k = 0; k < ((knockBack % 6 == 0) ? (knockBack / 6) : (knockBack / 6) + 1); k++)
+					{
+						entityList.get(i).moveEntityLeft(this, knockBack);
+					}
+				}
+				
+
+				entityList.get(i).registerStatusEffect(new StatusEffectStun(0.4f, 1));
+				
 			}
 		}
 

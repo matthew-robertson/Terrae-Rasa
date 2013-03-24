@@ -42,7 +42,7 @@ public class Dimensia
 	private Frame dimensiaFrame;
 	private Canvas dimensiaCanvas;
 	private static String osName;
-	private final static String VERSION = "Alpha 1.0.23";	
+	private final static String VERSION = "Alpha 1.0.24";	
 	private final static String WINDOW_TITLE = "Dimensia " + VERSION;
 	private final static String WINDOWS_BASE_PATH = new StringBuilder().append("C:/Users/").append(System.getProperty("user.name")).append("/AppData/Roaming/Dimensia").toString();
 	private final static String MAC_BASE_PATH = new StringBuilder().append("/Users/").append(System.getProperty("user.name")).append("/Library/Application").append(" Support/Dimensia").toString();
@@ -155,12 +155,12 @@ public class Dimensia
 		width = (dimensiaFrame.getWidth() > 740) ? dimensiaFrame.getWidth() : 740; //740 = arbitrary value for things not to look bad
 		height = (dimensiaFrame.getHeight() > 480) ? dimensiaFrame.getHeight() : 480; //same with 480
 		
-		int width_fix = (int)(width / Render.BLOCK_SIZE) * Render.BLOCK_SIZE + 3 * Render.BLOCK_SIZE;
-		int height_fix = (int)(height / Render.BLOCK_SIZE) * Render.BLOCK_SIZE + 3 * Render.BLOCK_SIZE;
+		int width_fix = (int)(width / Render.BLOCK_SIZE) * Render.BLOCK_SIZE + 1 * Render.BLOCK_SIZE;
+		int height_fix = (int)(height / Render.BLOCK_SIZE) * Render.BLOCK_SIZE + 1 * Render.BLOCK_SIZE;
 		
 		if(osName.contains("Window")) //Windows Resize
 		{
-			dimensiaFrame.setSize(new Dimension(width, height));
+			dimensiaFrame.setSize(new Dimension(width_fix, height_fix));
 			dimensiaCanvas.setSize(new Dimension(width, height));
 		}
 		else if(osName.toLowerCase().contains("linux"))

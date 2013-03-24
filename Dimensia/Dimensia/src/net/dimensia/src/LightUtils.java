@@ -4,7 +4,7 @@ import java.util.Enumeration;
 
 public class LightUtils 
 {
-	private final float LIGHT_BLOCK_DISSIPATES = 0.25F;
+	private final float LIGHT_BLOCK_DISSIPATES = 0.15F;
 	private final int DIFFUSE_LIGHT_CHECK_RADIUS = 20;
 
 	public void applyLightSource(World world, int xSource, int ySource, final int radius, final float strength)

@@ -11,8 +11,8 @@ public class RenderEntities extends Render
 		GL11.glColor4f(1, 1, 1, 1);
 		if(player.isFacingRight) //facing right (default)
 		{
-			float x = player.x;
-	        float y = player.y;
+			float x = (int)player.x;
+	        float y = (int)player.y;
 			playerTexture.bind(); 
 	        t.startDrawingQuads();
 	        t.addVertexWithUV(x, y + 18, 0, 0, 1);
@@ -23,7 +23,7 @@ public class RenderEntities extends Render
 		}
 		else //flip player sprite and adjust it, so it appears the player turned left
 		{
-			GL11.glTranslatef(player.x, player.y, 0);
+			GL11.glTranslatef((int)player.x, (int)player.y, 0);
 			playerTexture.bind();
 			GL11.glScalef(-1, 1, 1);
 	        t.startDrawingQuads();
@@ -76,8 +76,8 @@ public class RenderEntities extends Render
 	public void renderEntityLivingNPCEnemy(Texture tex, EntityLivingNPCEnemy enemy)
 	{
 		GL11.glColor4f(1, 1, 1, 1);
-		float x = enemy.x;
-        float y = enemy.y;
+		float x = (int)enemy.x;
+        float y = (int)enemy.y;
         float eh = enemy.getHeight();
         float ew = enemy.getWidth();
 				
@@ -100,8 +100,8 @@ public class RenderEntities extends Render
 	public void renderEntityLivingNPC(Texture tex, EntityLivingNPC npc)
 	{
 		GL11.glColor4f(1, 1, 1, 1);
-		float x = npc.x;
-        float y = npc.y;
+		float x = (int)npc.x;
+        float y = (int)npc.y;
         float eh = npc.getHeight();
         float ew = npc.getWidth();
 				
@@ -122,8 +122,8 @@ public class RenderEntities extends Render
 	public void renderEntityProjectile(EntityProjectile projectile)
 	{
 		GL11.glColor4f(1, 1, 1, 1);
-		float x = projectile.getX();
-        float y = projectile.getY();
+		float x = (int)projectile.getX();
+        float y = (int)projectile.getY();
         float ph = projectile.height;
 		float pw = projectile.width;
 		float tx = (float)((projectile.iconIndex / 16) * 16) / 256;
@@ -168,70 +168,16 @@ public class RenderEntities extends Render
 	{
 		for(int i = 0; i < world.temporaryText.size(); i++)
 		{
-			TemporaryTextStore temp = (TemporaryTextStore)(world.temporaryText.get(i));
-			//char of h->healing; d->damage; w->white; g->grey; c->critical; b->mana(blue)
-			if(temp.type == 'h') //healing
-			{
-				renderGreenText(temp.message, temp.x, temp.y);		
-			}
-			else if(temp.type == 'd') //damage
-			{
-				renderRedText(temp.message, temp.x, temp.y);		
-			}
-			else if(temp.type == 'w')//white
-			{
-				renderWhiteText(temp.message, temp.x, temp.y);
-			}
-			else if(temp.type == 'c') //Crit
-			{
-				renderCriticalText(temp.message, temp.x, temp.y);
-			}
-			else if(temp.type == 'b') //Mana(Blue)
-			{
-				renderBlueText(temp.message, temp.x, temp.y);
-			}
-			else 			
-			{
-				renderGreyText(temp.message, temp.x, temp.y);
-			}
+			WorldText temp = (WorldText)(world.temporaryText.get(i));
+			renderText(temp.message, temp.x, temp.y, temp.color.COLOR);		
 		}
 		GL11.glColor4f(1, 1, 1, 1);
 	}
 	
-	public void renderGreenText(String message, int x, int y)
+	public void renderText(String message, int x, int y, float[] colours)
 	{
-		GL11.glColor4f(0, 1, 0, 1);
+		GL11.glColor4f(colours[0], colours[1], colours[2], colours[3]);
 		trueTypeFont.drawString(x, y, message, 0.4f, -0.4f, TrueTypeFont.ALIGN_LEFT);
 	}
-	
-	public void renderWhiteText(String message, int x, int y)
-	{
-		GL11.glColor4f(1, 1, 1, 1);
-		trueTypeFont.drawString(x, y, message, 0.4f, -0.4f, TrueTypeFont.ALIGN_LEFT);
-	}
-	
-	public void renderGreyText(String message, int x, int y)
-	{
-		GL11.glColor4f(0.66666666f, 0.66666666f, 0.66666666f, 1);
-		GL11.glColor4f(1, 1, 1, 1);
-		trueTypeFont.drawString(x, y, message, 0.4f, -0.4f, TrueTypeFont.ALIGN_LEFT);
-	}
-	
-	public void renderRedText(String message, int x, int y)
-	{
-		GL11.glColor4f(1, 0, 0, 1);		
-		trueTypeFont.drawString(x, y, message, 0.4f, -0.4f, TrueTypeFont.ALIGN_LEFT);
-	}
-	
-	public void renderBlueText(String message, int x, int y)
-	{
-		GL11.glColor4f(0, 0, 1, 1);		
-		trueTypeFont.drawString(x, y, message, 0.4f, -0.4f, TrueTypeFont.ALIGN_LEFT);
-	}
-	
-	public void renderCriticalText(String message, int x, int y)
-	{
-		GL11.glColor4f(1, 0.5f, 0, 1);		
-		trueTypeFont.drawString(x, y, message, 0.5f, -0.5f, TrueTypeFont.ALIGN_LEFT);
-	}
+		
 }

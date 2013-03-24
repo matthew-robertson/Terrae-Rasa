@@ -16,6 +16,9 @@ import org.lwjgl.opengl.GL11;
  */
 public class Render 
 {	
+	public final static int TEXTURE_SHEET_ITEMS = 1,
+			   TEXTURE_SHEET_TERRAIN_EARTH = 2;
+
 	//Variables describing the size of the terrain_ground.png texture
 	public final static int TEXTURE_SHEET_WIDTH = 256;
 	public final static int TEXTURE_SHEET_HEIGHT = 512;
@@ -102,16 +105,19 @@ public class Render
 	protected void adjustCamera(World world, EntityLivingPlayer player) 
 	{
 		GL11.glLoadIdentity();// + seems to be on ----> this side of the Y axis, it behaves quite wierdly when comparing along the X axis however
-		final int width = (int) (Display.getWidth() / 2) + 1;
-		final int height = (int) (Display.getHeight() / 2) + 1;
+		final int width = (int) (Display.getWidth() / 2) + 2;
+		final int height = (int) (Display.getHeight() / 2) + 2;
 		final int xAdjust = (int) (Display.getWidth() * 0.239);
 		final int yAdjust = (int) (Display.getHeight() * 0.188);
 		float sx = MathHelper.inverseValue((int)player.x) + xAdjust;
 		float sy = MathHelper.inverseValue((int)player.y) + yAdjust;
 		if(sx > 0) sx = 0; //Bounds checking
 		if(sy > 0) sy = 0;				
-		if(sx < MathHelper.inverseValue(world.getWidth()) * 6 + width) sx = MathHelper.inverseValue(world.getWidth()) * 6 + width;
-		if(sy < MathHelper.inverseValue(world.getHeight()) * 6 + height) sy = MathHelper.inverseValue(world.getHeight()) * 6 + height;		
+		if(sx < MathHelper.inverseValue(world.getWidth()) * 6 + width) 
+			sx = MathHelper.inverseValue(world.getWidth()) * 6 + width;
+		if(sy < MathHelper.inverseValue(world.getHeight()) * 6 + height) 
+			sy = MathHelper.inverseValue(world.getHeight()) * 6 + height;		
+		
 		cameraX = (int) sx;
 		cameraY = (int) sy;
 		GL11.glTranslatef(sx, sy, -2000F);	//Adjust the camera	

@@ -5,6 +5,8 @@ public class StatusEffectManaRegeneration extends StatusEffect
 	public StatusEffectManaRegeneration(float durationSeconds, int tier)
 	{
 		super(durationSeconds, tier);
+		iconX = 13;
+		iconY = 2;
 	}
 	
 	public void applyPeriodicBonus(World world, EntityLiving entity)

@@ -143,7 +143,7 @@ public class RenderUI extends Render
 		//Ensure the icons render in the right place and on the screen (top-right)
 		final int MAX_STATUS_PER_ROW = 8;
 		int size = 16;
-		int goodEffectHeight = 2 + (size + 2) * (goodEffects.size() / MAX_STATUS_PER_ROW);
+		int goodEffectHeight = 2;
 		int badEffectHeight = 2 + (size + 2) * (1 + (goodEffects.size() / MAX_STATUS_PER_ROW));
 
 		ICONS.bind();
@@ -151,13 +151,13 @@ public class RenderUI extends Render
 		t.setColorRGBA(255, 255, 255, 255);
 		for(int i = 0; i < goodEffects.size(); i++) //Render good background icons
 		{
-			int x = (int) (getCameraX() + (Display.getWidth() * 0.5f) - (((i + 2) % MAX_STATUS_PER_ROW) * (size + 3)));
+			int x = (int) (getCameraX() + (Display.getWidth() * 0.5f) - ((1 + (i % MAX_STATUS_PER_ROW)) * (size + 3)));
 			int y = goodEffectHeight + (int) (getCameraY() + ((i / MAX_STATUS_PER_ROW) * (size + 3)));
 			t.setColorRGBA(255, 255, 255, 255);
-			double tx = (double)goodEffects.get(i).iconX / ICONS_PER_ROW;
-			double ty = (double)goodEffects.get(i).iconY / ICONS_PER_COLUMN;
-			double tw = tx + (double)ICONS_PER_ROW / ICONS_SHEET_WIDTH;
-			double th = ty + (double)ICONS_PER_COLUMN / ICONS_SHEET_HEIGHT;			
+			double tx = (double)goodEffects.get(i).iconX / (double)ICONS_PER_ROW;
+			double ty = (double)goodEffects.get(i).iconY / (double)ICONS_PER_COLUMN;
+			double tw = tx + (double)ICONS_PER_ROW / (double)ICONS_SHEET_WIDTH;
+			double th = ty + (double)ICONS_PER_COLUMN / (double)ICONS_SHEET_HEIGHT;			
 			t.addVertexWithUV(x, y + size, 0, tx, th);
 			t.addVertexWithUV(x + size, y + size, 0, tw, th);
 			t.addVertexWithUV(x + size, y, 0, tw, ty);
@@ -166,7 +166,7 @@ public class RenderUI extends Render
 		
 		for(int i = 0; i < badEffects.size(); i++) //Render bad background icons
 		{
-			int x = (int) (getCameraX() + (Display.getWidth() * 0.5f) - (((i + 2) % MAX_STATUS_PER_ROW) * (size + 3)));
+			int x = (int) (getCameraX() + (Display.getWidth() * 0.5f) - ((1 + (i % MAX_STATUS_PER_ROW)) * (size + 3)));
 			int y = badEffectHeight + (int) (getCameraY() + (i / MAX_STATUS_PER_ROW) * (size + 3));
 			t.setColorRGBA(255, 255, 255, 255);
 			double tx = (double)badEffects.get(i).iconX / ICONS_PER_ROW;
@@ -182,11 +182,11 @@ public class RenderUI extends Render
 		
 		for(int i = 0; i < goodEffects.size(); i++) //Render good time remaining
 		{
-			int x = (int) (getCameraX() + (Display.getWidth() * 0.5f) - (((i + 2) % MAX_STATUS_PER_ROW) * (size + 3)));
+			int x = (int) (getCameraX() + (Display.getWidth() * 0.5f) - ((1 + (i % MAX_STATUS_PER_ROW)) * (size + 3)));
 			int y = goodEffectHeight + (int) (getCameraY() + ((i / MAX_STATUS_PER_ROW) * (size + 3)));
 			
 			GL11.glColor4f(0, 1, 0, 1);
-			trueTypeFont.drawString(x + 1, 
+			trueTypeFont.drawString(x - 1, 
 					y + 17, 
 					"" + (goodEffects.get(i).ticksLeft / 20), 
 					0.25f, 
@@ -196,11 +196,11 @@ public class RenderUI extends Render
 		
 		for(int i = 0; i < badEffects.size(); i++) //Render bad time remaining
 		{
-			int x = (int) (getCameraX() + (Display.getWidth() * 0.5f) - (((i + 2) % MAX_STATUS_PER_ROW) * (size + 3)));
+			int x = (int) (getCameraX() + (Display.getWidth() * 0.5f) - ((1 + (i % MAX_STATUS_PER_ROW)) * (size + 3)));
 			int y = badEffectHeight + (int) (getCameraY() + (i / MAX_STATUS_PER_ROW) * (size + 3));
 		
 			GL11.glColor4f(0, 1, 0, 1);
-			trueTypeFont.drawString(x + 1, 
+			trueTypeFont.drawString(x - 1, 
 					y + 17, 
 					"" + (badEffects.get(i).ticksLeft / 20), 
 					0.25f, 
@@ -348,7 +348,8 @@ public class RenderUI extends Render
 			String fulltooltip = ""; 
 			//"A weak copper pick, which provides the ability to mine basic low level blocks. This is a long tooltip.";
 	        String[] setBonuses = { };
-			
+			String cooldown = "";
+	        
 			if(stack.getItemID() >= Item.shiftedIndex)
 			{
 				quality = (Item.itemsList[stack.getItemID()]).itemQuality;
@@ -363,6 +364,11 @@ public class RenderUI extends Render
 			{
 				quality = EnumItemQuality.COMMON;
 				fulltooltip = Block.blocksList[stack.getItemID()].extraTooltipInformation;
+			}
+			
+			if(player.isOnCooldown(stack.getItemID()))
+			{
+				cooldown = "Remaining Cooldown: " + (player.getTicksLeftOnCooldown(stack.getItemID()) / 20);
 			}
 			
 			//Variables to help determine where and how wide the frame/text will be, as well as text colour.
@@ -432,7 +438,7 @@ public class RenderUI extends Render
 			}
 			
 			//If there's just a title, crop the tooltip
-			if(setBonusesList.size() == 0 && renderLines.size() == 0 && stats.length == 0)
+			if(setBonusesList.size() == 0 && renderLines.size() == 0 && stats.length == 0 && cooldown.equals(""))
 			{
 				tooltipWidth = 3 * PADDING + (int) (0.5F * xScale * boldTooltip.getWidth(itemName));
 			}
@@ -453,7 +459,8 @@ public class RenderUI extends Render
 			float requiredHeight = (boldTooltip.getHeight(itemName)) + 
 					PADDING * (setBonusesList.size() + stats.length) + 
 					((plainTooltip.getHeight(itemName)) * 0.5f * (stats.length)) + 
-					((boldTooltip.getHeight(itemName)) * 0.5f * (setBonusesList.size()));
+					((boldTooltip.getHeight(itemName)) * 0.5f * (setBonusesList.size())) + 
+					((!cooldown.equals("")) ? plainTooltip.getHeight(cooldown) * 0.5f + 5: 0);
 			int tooltipHeight = (int) requiredHeight;
 			//Make sure the tooltip doesnt go off the bottom
 			if(frameY + tooltipHeight > Display.getHeight() * 0.5)
@@ -530,6 +537,21 @@ public class RenderUI extends Render
 						-1,
 						TrueTypeFont.ALIGN_LEFT); 			
 			}
+			
+			//Render the cooldown remaining if it happens to be applicable.
+			//(After adjusting to the proper position)
+			yOffset = yOffset + PADDING * (renderLines.size()) + 
+					(((tooltipHeight) - (tooltipHeight - boldTooltip.getHeight(itemName))) * 0.5f * (renderLines.size()));
+			
+			GL11.glColor4f(1.0F, 0.0F, 0.0F, 1.0F);
+			plainTooltip.drawString(frameX + PADDING, 
+					yOffset + PADDING + (((tooltipHeight) - (tooltipHeight - plainTooltip.getHeight(cooldown))) * 0.5f), 
+					cooldown,
+					0.5F,
+					-1,
+					TrueTypeFont.ALIGN_LEFT); 			
+		
+			
 		}
 	}
 	
@@ -1159,6 +1181,17 @@ public class RenderUI extends Render
 			t.addVertexWithUV(x + xsize, y, 0, 1, 0);
 			t.addVertexWithUV(x, y, 0, 0, 0);
 			t.draw();	
+			
+			if(player.isOnCooldown(player.inventory.getMainInventoryStack(i).getItemID()))
+			{
+				ICONS.bind();
+				t.startDrawingQuads();
+				t.addVertexWithUV(x, y + ysize, 0, 1F/16F, 4F/16F);
+				t.addVertexWithUV(x + xsize, y + ysize, 0, 1F/16F, 5F/16F);
+				t.addVertexWithUV(x + xsize, y, 0, 0, 5F/16F);
+				t.addVertexWithUV(x, y, 0, 0, 4F/16F);
+				t.draw();
+			}
 		}		
 
 		GL11.glColor4f(1, 1, 1, 1);
@@ -1289,6 +1322,7 @@ public class RenderUI extends Render
 				int size = 16;
 				int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + (((i % 12) - 6) * (size + 4)) + 2);
 				int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - ((i / 12) * (size + 4)) - (size + 24f));
+				
 				if(player.inventory.getMainInventoryStack(i).getItemID() < 2048)
 				{
 					size = 14;
@@ -1302,8 +1336,29 @@ public class RenderUI extends Render
 				t.addVertexWithUV(x + size, y, 0, 1, 0);
 				t.addVertexWithUV(x, y, 0, 0, 0);
 				t.draw();
+			
+				if(player.isOnCooldown(player.inventory.getMainInventoryStack(i).getItemID()))
+				{
+					ICONS.bind();
+					t.startDrawingQuads();
+					t.addVertexWithUV(x, y + size, 0, 1F/16F, 4F/16F);
+					t.addVertexWithUV(x + size, y + size, 0, 1F/16F, 5F/16F);
+					t.addVertexWithUV(x + size, y, 0, 0, 5F/16F);
+					t.addVertexWithUV(x, y, 0, 0, 4F/16F);
+					t.draw();
+				}
 			}
 		}	
+		
+		int armorOffset = 80;
+		int size = 16;
+		
+		if(armorOffset + (9 * (size + 5)) > Display.getHeight() * 0.5F)
+		{
+			armorOffset = (int) ((Display.getHeight() * 0.5F) - ((9 * (size + 5))));
+		}
+		armorOffset += 2;
+		
 		for(int i = 0; i < 8; i++) //Armor Inventory
 		{
 			if(player.inventory.getArmorInventoryStack(i) == null) 
@@ -1311,12 +1366,12 @@ public class RenderUI extends Render
 				continue;			
 			}
 			else
-			{
+			{					
 				textures[player.inventory.getArmorInventoryStack(i).getItemID()].bind();
 				t.startDrawingQuads();
-				int size = 16;
+				size = 16;
 				int x = (int) (getCameraX() + (Display.getWidth() * 0.5f) - ((size + 4) * 2.5f) + 2);
-				int y = getCameraY() + 82 + (i * (size + 5));
+				int y = getCameraY() + armorOffset + (i * (size + 5));
 				t.addVertexWithUV(x, y + size, 0, 0, 1);
 				t.addVertexWithUV(x + size, y + size, 0, 1, 1);
 				t.addVertexWithUV(x + size, y, 0, 1, 0);
@@ -1329,7 +1384,7 @@ public class RenderUI extends Render
 		{
 			textures[player.inventory.getTrashStack(0).getItemID()].bind();
 			t.startDrawingQuads(); 
-			int size = 16;
+			size = 16;
 			int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + ((-6 * (size + 4)))) + 2;
 			int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - (4 * (size + 4)) - (size + 26)) + 2;
 			t.addVertexWithUV(x, y + size, 0, 0, 1);
@@ -1340,7 +1395,7 @@ public class RenderUI extends Render
 		}
 		
 		//Stack Sizes:
-		GL11.glColor4f(0, 1, 0, 1);
+		
 		for(int i = 0; i < 48; i++) //Main Inventory
 		{
 			if(player.inventory.getMainInventoryStack(i) == null || player.inventory.getMainInventoryStack(i).getMaxStackSize() == 1) 
@@ -1349,6 +1404,7 @@ public class RenderUI extends Render
 			}
 			else
 			{
+				GL11.glColor4f(0, 1, 0, 1);
 				int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + (((i % 12) - 6) * 20) + 2);
 				int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - ((i / 12) * 20) - 40);
 				trueTypeFont.drawString(x - 2, 

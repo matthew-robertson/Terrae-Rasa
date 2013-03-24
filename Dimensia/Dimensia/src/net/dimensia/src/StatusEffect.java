@@ -9,6 +9,7 @@ public class StatusEffect
 	public boolean isBeneficialEffect;
 	public int iconX;
 	public int iconY;
+	public boolean stacksIndependantly;
 	
 	public StatusEffect(float durationSeconds, int tier)
 	{
@@ -18,6 +19,7 @@ public class StatusEffect
 		this.isBeneficialEffect = true;
 		iconX = 15;
 		iconY = 0;
+		stacksIndependantly = true;
 	}
 	
 	public StatusEffect(StatusEffect effect)

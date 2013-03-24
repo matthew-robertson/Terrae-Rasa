@@ -1,4 +1,6 @@
 package net.dimensia.src;
+import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.Vector;
 
 import net.dimensia.client.Dimensia;
@@ -89,6 +91,7 @@ public class EntityLivingPlayer extends EntityLiving
 	private final int MAXIMUM_BASE_MANA;
 	private final int MAXIMUM_BASE_HEALTH;
 	private final int MAX_BLOCK_PLACE_DISTANCE;
+	private Hashtable<String, Cooldown> cooldowns;
 	
 	/**
 	 * Constructs a new instance of EntityLivingPlayer with default settings, inventory (includes 3 basic tools),
@@ -159,6 +162,7 @@ public class EntityLivingPlayer extends EntityLiving
 		allDamageModifier = 1;
 		heavensReprieve = false;
 		isReloaded = false;
+		cooldowns = new Hashtable<String, Cooldown>();
 	}
 	
 	public EntityLivingPlayer(EntityLivingPlayer entity)
@@ -209,6 +213,7 @@ public class EntityLivingPlayer extends EntityLiving
 		applyManaRegen();
 		checkForNearbyBlocks(world);	
 		verifyChestRange();
+		updateCooldowns();
 	}
 	
 	/**
@@ -275,27 +280,34 @@ public class EntityLivingPlayer extends EntityLiving
 	}
 	
 	/**
-	 * Inflicts damage that does not trigger combat. This damage will not interrupt things like health regeneration which is dependent on whether 
-	 * or not combat is active. This damage cannot be critical, or dodged, can be affected by the players armor, but is affected by invincibility (including
-	 * triggering it).
+	 * Inflicts damage that does not trigger combat. This damage will not interrupt things like health regeneration 
+	 * which is dependent on whether or not combat is active. This damage cannot be critical, or dodged, can be 
+	 * affected by the players armor, but is unaffected by invincibility (including triggering it).
 	 * @param damage the damage inflicted
 	 * @param penetratesArmor whether or not the damage penetrates the player's armor points (defense)
 	 */
-	public void inflictNonCombatDamage(World world, int damage, boolean penetratesArmor)
+	public void inflictNonCombatDamage(World world, int damage, boolean penetratesArmor, boolean renderDamage)
 	{
 		if(invincibilityTicks <= 0)
 		{
 			if(penetratesArmor)
 			{
 				float damageAfterArmor = ((damage - (defense / 2)) > 0) ? (damage - (defense / 2)) : 1;
+				damageAfterArmor = damageAfterAbsorbs(damageAfterArmor);
 				health -= damageAfterArmor;
-				world.addTemporaryText(""+(int)damageAfterArmor, (int)x - 2, (int)y - 3, 20, 'd');
-				invincibilityTicks = 15; //750ms
+				if(renderDamage)
+				{
+					String message = (damageAfterArmor == 0) ? "Absorb" : ""+(int)damageAfterArmor;
+					world.addTemporaryText(message, (int)x - 2, (int)y - 3, 20, (damageAfterArmor == 0) ? EnumColor.WHITE : EnumColor.RED);
+				}
 			}
 			else
 			{
 				health -= damage;
-				world.addTemporaryText(""+(int)damage, (int)x - 2, (int)y - 3, 20, 'd');
+				if(renderDamage)
+				{
+					world.addTemporaryText(""+(int)damage, (int)x - 2, (int)y - 3, 20, EnumColor.RED);
+				}
 			}
 			
 			if(isDead()) //if the player has died
@@ -328,7 +340,7 @@ public class EntityLivingPlayer extends EntityLiving
 				float fallDamage = MathHelper.getFallDamage(distanceFallen, maxHeightFallenSafely); //calculate the fall damage
 				if(fallDamage > 0)
 				{
-					inflictNonCombatDamage(world, (int)fallDamage, true); //damage the player with non-combat defense affected damage
+					inflictNonCombatDamage(world, (int)fallDamage, true, true); //damage the player with non-combat defense affected damage
 				}
 			}
 			
@@ -352,13 +364,15 @@ public class EntityLivingPlayer extends EntityLiving
 			d *= damageSoakModifier;
 			if(isDodgeable && dodgeRoll < dodgeChance || dodgeChance >= 1.0f) //Is it a dodge
 			{
-				world.addTemporaryText("Dodge", (int)x - 2, (int)y - 3, 20, 'g'); //add temperary text to be rendered, for the dodge
+				world.addTemporaryText("Dodge", (int)x - 2, (int)y - 3, 20, EnumColor.GREEN); //add temperary text to be rendered, for the dodge
 			}
 			else if(!isCrit || isImmuneToCrits) //Is it Normal Damage
 			{
 				float damageAfterArmor = ((d - (defense / 2)) > 0) ? (d - (defense / 2)) : 1;
+				damageAfterArmor = damageAfterAbsorbs(damageAfterArmor);
 				health -= damageAfterArmor;
-				world.addTemporaryText(""+(int)damageAfterArmor, (int)x - 2, (int)y - 3, 20, 'd');
+				String message = (damageAfterArmor == 0) ? "Absorb" : ""+(int)damageAfterArmor;
+				world.addTemporaryText(message, (int)x - 2, (int)y - 3, 20, (damageAfterArmor == 0) ? EnumColor.WHITE : EnumColor.RED);
 				invincibilityTicks = 15; //750ms
 			}
 			else //It was a critical hit
@@ -366,8 +380,10 @@ public class EntityLivingPlayer extends EntityLiving
 				d *= 2;
 				invincibilityTicks = 16; //set the player invincible for 800ms
 				float damageAfterArmor = ((d - (defense / 2)) > 0) ? (d - (defense / 2)) : 1; //determine damage after armour
+				damageAfterArmor = damageAfterAbsorbs(damageAfterArmor);
 				health -= damageAfterArmor; //do the damage
-				world.addTemporaryText(""+(int)damageAfterArmor, (int)x - 2, (int)y - 3, 20, 'c'); //add temperary text to be rendered, for the damage done
+				String message = (damageAfterArmor == 0) ? "Absorb" : ""+(int)damageAfterArmor;
+				world.addTemporaryText(message, (int)x - 2, (int)y - 3, 20, (damageAfterArmor == 0) ? EnumColor.WHITE : EnumColor.CRITICAL); //add temperary text to be rendered, for the damage done
 			}	
 			
 			isInCombat = true;
@@ -381,39 +397,23 @@ public class EntityLivingPlayer extends EntityLiving
 	}
 	
 	/**
-	 * Heals the player, without a cooldown
+	 * Heals the player, and displays green WorldText if applicable.
 	 * @param h the amount healed
+	 * @param rendersText whether or not to render WorldText on the screen
 	 */
-	public boolean healPlayer_NoCooldown(World world, int h)
+	public boolean healPlayer(World world, int h, boolean rendersText)
 	{
 		if(health < maxHealth)
 		{
 			health += h; 
-			world.addTemporaryText(""+(int)h, (int)x - 2, (int)y - 3, 20, 'h'); //add temperary text to be rendered, for the healing done
+			if(rendersText)
+			{
+				world.addTemporaryText(""+(int)h, (int)x - 2, (int)y - 3, 20, EnumColor.GREEN); //add temperary text to be rendered, for the healing done
+			}
 			if(health > maxHealth) //if health exceeds the maximum, set it to the maximum
 			{
 				health = maxHealth;
 			}
-			return true;
-		}
-		return false;
-	}
-	
-	/**
-	 * Heals the player, upto 1 heal / second
-	 * @param h the amount healed
-	 */
-	public boolean healPlayer(World world, int h)
-	{
-		if(ticksBeforeNextHeal <= 0 && health < maxHealth)
-		{
-			health += h; 
-			world.addTemporaryText(""+(int)h, (int)x - 2, (int)y - 3, 20, 'h'); //add temperary text to be rendered, for the healing done
-			if(health > maxHealth) //if health exceeds the maximum, set it to the maximum
-			{
-				health = maxHealth;
-			}
-			ticksBeforeNextHeal = 20;
 			return true;
 		}
 		return false;
@@ -428,7 +428,7 @@ public class EntityLivingPlayer extends EntityLiving
 		if(ticksBeforeNextManaRestore <= 0 && mana < maxMana)
 		{
 			mana += m; 
-			world.addTemporaryText(""+(int)m, (int)x - 2, (int)y - 3, 20, 'b');
+			world.addTemporaryText(""+(int)m, (int)x - 2, (int)y - 3, 20, EnumColor.BLUE);
 			if(mana > maxMana) //if mana exceeds the maximum, set it to the maximum
 			{
 				mana = maxMana;
@@ -1244,5 +1244,63 @@ public class EntityLivingPlayer extends EntityLiving
 			}
 		}
 		return null;
+	}
+	
+	/**
+	 * Decreases the ticksLeft on each cooldown by 1, and removes that cooldown if it's expired.
+	 */
+	private void updateCooldowns()
+	{
+		Enumeration<String> keys = cooldowns.keys();
+		while (keys.hasMoreElements()) 
+		{
+			String str = (String) keys.nextElement();
+			Cooldown cooldown = cooldowns.get(str);
+			cooldown.ticksLeft--;
+			if(cooldown.ticksLeft <= 0)
+			{
+				cooldowns.remove(str);
+			}
+		}
+	}
+	
+	/**
+	 * Puts an ID on cooldown, which generally relates to an item or something else. If that ID is already on cooldown and
+	 * with a longer time, this will fail and the current cooldown will continue, otherwise the new cooldown will be implemented.
+	 * @param id the id to put on cooldown
+	 * @param duration the duration of the cooldown in game ticks
+	 */
+	public void putOnCooldown(int id, int duration)
+	{
+		if(cooldowns.get("" + id) != null)
+		{
+			Cooldown current = cooldowns.get("" + id);
+			if(current.ticksLeft < duration)
+			{
+				cooldowns.put("" + id, new Cooldown(id, duration));
+			}		
+			return;	
+		}
+		cooldowns.put("" + id, new Cooldown(id, duration));
+	}
+	
+	/**
+	 * Gets whether or not an ID is on cooldown. This does not verify that ID actually exists.
+	 * @param id the id that should be checked for a cooldown
+	 * @return if the ID is on cooldown (true if it is, false otherwise)
+	 */
+	public boolean isOnCooldown(int id)
+	{
+		return cooldowns.get("" + id) != null;
+	}
+	
+	/**
+	 * Gets the time remaining on an ID's cooldown. This does not verify that ID actually exists.
+	 * @param id the id that should be queried for a cooldown remaining
+	 * @return the time left on the specified ID's cooldown, in ticks
+	 */
+	public int getTicksLeftOnCooldown(int id)
+	{
+		return cooldowns.get("" + id).ticksLeft;
 	}
 }

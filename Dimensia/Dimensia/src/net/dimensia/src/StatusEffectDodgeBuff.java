@@ -5,6 +5,8 @@ public class StatusEffectDodgeBuff extends StatusEffect
 	public StatusEffectDodgeBuff(float durationSeconds, int tier)
 	{
 		super(durationSeconds, tier);
+		iconX = 11;
+		iconY = 1;
 	}
 	
 	public void applyInitialEffect(EntityLiving entity)

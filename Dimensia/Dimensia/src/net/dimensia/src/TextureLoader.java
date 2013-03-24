@@ -130,10 +130,10 @@ public class TextureLoader
         
     	int srcPixelFormat;
     	int textureID;
-    	String resourceName = "Resources/terrain.png";
-    	BufferedImage bufferedImage = loadImage(resourceName);
+    	BufferedImage blockSheet = loadImage("Resources/terrain_earth.png");
         Block[] list = Block.blocksList;
         Item[] list1 = Item.itemsList;
+        BufferedImage itemSheet = loadImage("Resources/items.png");
         
         for(int i = 0; i < list.length; i++) //Terrain Textures
         {
@@ -146,12 +146,43 @@ public class TextureLoader
 	        textureStore[i] = new Texture(textureID);
 	        glBindTexture(GL11.GL_TEXTURE_2D, textureID);
 	        
-	        int w = (int)list[i].textureWidth;
-	        int h = (int)list[i].textureHeight;
-	        int x = ((int)((float)list[i].iconIndex / 16)) * 16;
-	        int y = ((int)(list[i].iconIndex % 16)) * 16;
+	        int w = 0;
+	        int h = 0;
+	        int x = 1;
+	        int y = 1;
 	        
-	        bufferStore[i] = bufferedImage.getSubimage(x, y, w, h);
+	        //TODO: Associate specific blocks w/ specific sheets
+	        	
+	        if(list[i].iconOverriden)
+	        {
+		        if(list[i].associatedTextureSheet == Render.TEXTURE_SHEET_ITEMS)
+		        {
+		        	w = (int)list[i].textureWidth;
+			        h = (int)list[i].textureHeight;
+			        x = list[i].iconOverrideX * 16;
+			        y = list[i].iconOverrideY * 16;
+			        bufferStore[i] = itemSheet.getSubimage(x, y, w, h);
+		        	
+		        }
+		        else //This should be an else if.
+		        {
+			        w = (int)list[i].textureWidth;
+			        h = (int)list[i].textureHeight;
+			        x = list[i].iconOverrideX * 16;
+			        y = list[i].iconOverrideY * 16;
+			        bufferStore[i] = blockSheet.getSubimage(x, y, w, h);
+		        }
+	        }
+	        else
+	        {
+		        w = (int)list[i].textureWidth;
+		        h = (int)list[i].textureHeight;
+		        x = list[i].iconX * 16;
+		        y = list[i].iconY * 16;
+		        bufferStore[i] = blockSheet.getSubimage(x, y, w, h);
+	        }
+	        
+	        
 	        
 	        if (bufferStore[i].getColorModel().hasAlpha()) 
 	        {
@@ -170,8 +201,7 @@ public class TextureLoader
 	        		srcPixelFormat, GL_UNSIGNED_BYTE, textureBuffer);		        
         } 	
 	
-        resourceName = "Resources/items.png";
-        bufferedImage = loadImage(resourceName);
+        
 	        
         for(int i = 0; i < list1.length; i++) //Item Textures
         {
@@ -189,7 +219,7 @@ public class TextureLoader
 	        int x = ((int)((float)list1[i].iconIndex / 16)) * 16;
 	        int y = ((int)(list1[i].iconIndex % 16)) * 16;
 	        
-	        bufferStore[i] = bufferedImage.getSubimage(x, y, w, h);
+	        bufferStore[i] = itemSheet.getSubimage(x, y, w, h);
 	        
 	        if (bufferStore[i].getColorModel().hasAlpha()) 
 	        {

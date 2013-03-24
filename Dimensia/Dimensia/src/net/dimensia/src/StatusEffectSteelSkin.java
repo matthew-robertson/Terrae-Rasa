@@ -5,6 +5,8 @@ public class StatusEffectSteelSkin extends StatusEffect
 	public StatusEffectSteelSkin(float durationSeconds, int tier)
 	{
 		super(durationSeconds, tier);
+		iconX = 15;
+		iconY = 1;
 	}
 
 	public void applyInitialEffect(EntityLiving entity)

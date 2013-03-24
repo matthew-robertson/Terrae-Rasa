@@ -310,12 +310,25 @@ public class GameEngine
 		
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.copperIngot, 100));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ironIngot, 6));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.copperCoin, 5));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.woodenArrow, 5));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.woodenArrow, 5));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.woodenArrow, 5));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.woodenArrow, 5));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.woodenArrow, 5));
+
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.absorbPotion1, 20));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.criticalChancePotion1, 5));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.criticalChancePotion2, 5));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.attackSpeedPotion1, 5));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.attackSpeedPotion2, 5));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.damageBuffPotion1, 5));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.damageBuffPotion2, 5));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.damageSoakPotion1, 5));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.damageSoakPotion2, 5));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.dodgePotion1, 5));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.dodgePotion2, 5));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.manaRegenerationPotion1, 5));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.manaRegenerationPotion2, 5));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.steelSkinPotion1, 5));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.steelSkinPotion2, 5));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.swiftnessPotion1, 5));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.swiftnessPotion2, 5));
+			
 			
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.copperOre, 100));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.tinOre, 100));

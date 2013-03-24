@@ -6,6 +6,8 @@ public class StatusEffectDazed extends StatusEffect
 	{
 		super(durationSeconds, tier);
 		this.isBeneficialEffect = false;
+		iconX = 13;
+		iconY = 0;
 	}
 
 	public void applyInitialEffect(EntityLiving entity)

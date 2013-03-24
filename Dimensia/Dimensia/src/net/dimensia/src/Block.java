@@ -69,7 +69,6 @@ public class Block
 	protected int maxStackSize;
 	protected double textureWidth; //Pixel Width of texture
 	protected double textureHeight; //Pixel Height of texture
-	protected int iconIndex;
 	protected int gradeOfToolRequired;
 	protected int blockType;
 	protected int blockTier;
@@ -83,6 +82,11 @@ public class Block
 	protected int hRange;
 	protected int lRange;
 	protected String extraTooltipInformation;
+	protected int iconOverrideX;
+	protected int iconOverrideY;
+	protected boolean iconOverriden;
+	/**Corresponds to values from Render like TEXTURE_SHEET_TERRAIN_EARTH, to determine the inventory icon for a specific block.*/
+	protected int associatedTextureSheet;
 	
 	/**
 	 * Constructs a special Block- air. This constructor should only ever be used for the initial declaration
@@ -127,6 +131,12 @@ public class Block
 		isOveridable = false;
 		isSolid = true;
 		extraTooltipInformation = "";
+		iconOverriden = false;
+		iconOverrideX = 0;
+		iconOverrideY = 0;
+		iconX = 0;
+		iconY = 0;
+		associatedTextureSheet = Render.TEXTURE_SHEET_TERRAIN_EARTH;
 		
 		if(blocksList[i] != null)
 		{
@@ -172,7 +182,6 @@ public class Block
 		this.maxStackSize = block.maxStackSize;
 		this.textureWidth = block.textureWidth; 
 		this.textureHeight = block.textureHeight; 
-		this.iconIndex = block.iconIndex;
 		this.gradeOfToolRequired = block.gradeOfToolRequired;
 		this.blockType = block.blockType;
 		this.blockTier = block.blockTier;
@@ -207,7 +216,6 @@ public class Block
 	{
 		iconY = y;
 		iconX = x;
-		iconIndex = x + y * Render.ICONS_PER_COLUMN;
 		return this;
 	}
 	
@@ -367,12 +375,7 @@ public class Block
 	{
 		return breakable;
 	}
-	
-	public int getIconIndex()
-	{
-		return iconIndex;
-	}
-	
+		
 	public String getExtraTooltipInformation()
 	{
 		return extraTooltipInformation;
@@ -461,6 +464,22 @@ public class Block
 	public boolean getIsSolid(){
 		return isSolid;
 	}
+	
+	/**
+	 * Overrides the icon used when rendering this item in the inventory to one on any terrain or item.png sprite sheet.
+	 * @param x the x position of the sprite on the item.png sheet to render
+	 * @param y the y position of the sprite on the item.png sheet to render
+	 * @param associatedSheet the texture sheet to pull the inventory icon from, based on the Render fields like TEXTURE_SHEET_TERRAIN_EARTH
+	 * @return this block, but updated to include this new data
+	 */
+	public Block overrideItemIcon(int x, int y, int associatedSheet)
+	{
+		iconOverrideX = x;
+		iconOverrideY = y;
+		this.associatedTextureSheet = associatedSheet;
+		iconOverriden = true;
+		return this;
+	}
 		
 	public static final Block[] blocksList = new Block[2048];
 	/** Block Declarations **/
@@ -492,12 +511,12 @@ public class Block
 	public static Block yellowflower = new Block(34).setBlockName("Yellow Flower").setBlockHardness(10.0f).setIconIndex(0, 1).setPassable(true).setIsOveridable(true).setIsSolid(false);
 	public static Block tallgrass = new Block(35).setBlockName("Tall Grass").setBlockHardness(10.0f).setIconIndex(0, 1).setPassable(true).setIsOveridable(true).setIsSolid(false);
 	public static Block snowCover = new Block(44).setBlockName("Snow Cover").setBlockHardness(10.0f).setIconIndex(9, 10).setPassable(true).setIsOveridable(true).setDroppedItem(new ItemStack(Item.snowball), 1, 1).setIsSolid(false);
-	public static Block torch = new BlockLight(48).setLightStrengthAndRadius(1.0F, 10).setBlockName("Torch").setBlockHardness(0.0f).setIconIndex(0, 0).setPassable(true).setIsSolid(false);	
+	public static Block torch = new BlockLight(48).setLightStrengthAndRadius(1.0F, 10).setBlockName("Torch").setBlockHardness(0.0f).overrideItemIcon(5, 0, Render.TEXTURE_SHEET_ITEMS).setIconIndex(0, 0).setPassable(true).setIsSolid(false);	
 	public static Block adminium = new Block(49).setBlockName("Adminium").setBlockHardness(8000.0f).setIconIndex(0,1);
 	public static Block plank = new Block(50).setBlockName("Plank").setTileMap('g').setBlockHardness(30.0f).setIconIndex(0, 17).setBlockType(2);
 	public static Block sapling = new Block(51).setBlockName("Sapling").setBlockHardness(5.0f).setIconIndex(10, 4).setBlockType(2).setIsOveridable(true).setIsSolid(false); 
 	public static Block furnace = new Block(52).setBlockName("Furnace").setBlockHardness(50.0f).setIconIndex(12, 2).setBlockType(1).setBothBlockWidthAndHeight(2, 2);
-	public static Block craftingTable = new Block(53).setBlockName("Crafting table").setBlockHardness(50.0f).setIconIndex(11, 3).setBlockType(2).setBothBlockWidthAndHeight(2, 2);
+	public static Block craftingTable = new Block(53).setBlockName("Crafting table").setBlockHardness(50.0f).setIconIndex(14, 20).setBlockType(2).setBothBlockWidthAndHeight(2, 2);
 	public static Block snow = new Block(54).setBlockName("Snow Block").setBlockHardness(10.0f).setIconIndex(4, 1).setBlockType(1).setIsOveridable(true);
 	public static Block heartCrystal = new Block(55).setBlockName("Heart Crystal Block").setBlockHardness(50.0f).setIconIndex(1,1).setBlockType(3).setBothBlockWidthAndHeight(2,2).setDroppedItem(new ItemStack(Item.heartCrystal), 1, 1);
 	public static Block chest = new BlockChest(56, 20).setBlockName("Chest").setBothBlockWidthAndHeight(2, 2).setBlockHardness(40.0f).setIconIndex(11, 1).setBlockType(2);

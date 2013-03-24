@@ -7,11 +7,13 @@ public class StatusEffectFatalWounds extends StatusEffect
 		super(durationSeconds, tier);
 		reapplicationSkipsRemovalEffect = true;
 		this.isBeneficialEffect = false;
+		iconX = 6;
+		iconY = 2;
 	}
 	
 	public void removeInitialEffect(EntityLiving entity)
 	{
-		entity.health = -2000;
+		entity.health -= entity.maxHealth - 1;
 	}
 	
 	public String toString()

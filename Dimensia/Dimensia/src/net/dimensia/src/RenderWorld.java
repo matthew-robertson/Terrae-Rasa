@@ -1,5 +1,7 @@
 package net.dimensia.src;
 
+import net.dimensia.client.Dimensia;
+
 import org.lwjgl.opengl.GL11;
 
 public class RenderWorld extends Render
@@ -10,35 +12,51 @@ public class RenderWorld extends Render
 		{
 			return;
 		}
+		double const_ = 9;
 		
-		GL11.glTranslatef(player.x + 9, player.y + 9, 0);
-
-		int size = 20;		
-		int x = 0;
-		int y = -size;
-		int h = size;
-		int w = size;        
-		float angle = player.rotateAngle / 57.5f;
+		GL11.glTranslatef(player.x + (float)const_, player.y + (float)const_, 0);
 		
-		double x1 = ((x) * Math.cos(angle)) - ((y+h) * Math.sin(angle));
-		double y1 = ((x) * Math.sin(angle)) + ((y+h) * Math.cos(angle));	
-		double x2 = ((x+w) * Math.cos(angle)) - ((y+h) * Math.sin(angle));
-		double y2 = ((x+w) * Math.sin(angle)) + ((y+h) * Math.cos(angle));
-		double x3 = ((x+w) * Math.cos(angle)) - ((y) * Math.sin(angle));
-		double y3 = ((x+w) * Math.sin(angle)) + ((y) * Math.cos(angle));
-		double x4 = ((x) * Math.cos(angle)) - ((y) * Math.sin(angle));
-		double y4 = ((x) * Math.sin(angle)) + ((y) * Math.cos(angle));
+		ItemTool heldItem = ((ItemTool)(Item.itemsList[player.inventory.getMainInventoryStack(player.selectedSlot).getItemID()]));
 		
-		GL11.glColor4f(0, 0, 0, 1);
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
-        GL11.glBegin(GL11.GL_LINE_LOOP);
-        	GL11.glVertex3d(x1, y1, 0);
-        	GL11.glVertex3d(x2, y2, 0);
-        	GL11.glVertex3d(x3, y3, 0);
-        	GL11.glVertex3d(x4, y4, 0);
-        GL11.glEnd();
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
-        GL11.glColor4f(1, 1, 1, 1);
+		double size = heldItem.size;		
+		double angle = player.rotateAngle / (180 / Math.PI);
+		
+		double[] x_bounds = heldItem.xBounds;
+		double[] y_bounds = heldItem.yBounds;
+		
+		Vector2F[] scaled_points = new Vector2F[x_bounds.length];
+		Point[] points = { new Point(0, 0), new Point((int)size, 0), new Point((int)size, (int)-size), new Point(0, (int)-size) };
+			
+		
+		for(int i = 0; i < scaled_points.length; i++)
+		{
+			scaled_points[i] = new Vector2F((float)(size * x_bounds[i]), (float)(size * ((float)y_bounds[i])) - (float)size );
+		}
+		
+		double[] x_points = new double[scaled_points.length];
+		double[] y_points = new double[scaled_points.length];
+		
+		for(int i = 0; i < scaled_points.length; i++)
+		{
+			x_points[i] =  (scaled_points[i].x * Math.cos(angle)) - 
+					(scaled_points[i].y * Math.sin(angle));
+			y_points[i] = (scaled_points[i].x * Math.sin(angle)) + 
+					( scaled_points[i].y * Math.cos(angle));
+		}
+	
+		if(Dimensia.initInDebugMode)
+		{
+			GL11.glColor4f(0, 0, 0, 1);
+			GL11.glDisable(GL11.GL_TEXTURE_2D);
+			GL11.glBegin(GL11.GL_LINE_LOOP);
+			for(int i = 0; i < x_points.length; i++)
+			{
+				GL11.glVertex3d(x_points[i], y_points[i], 0);
+			}        
+			GL11.glEnd();
+			GL11.glEnable(GL11.GL_TEXTURE_2D);
+			GL11.glColor4f(1, 1, 1, 1);
+		}
 		
         textures[player.inventory.getMainInventoryStack(player.selectedSlot).getItemID()].bind();        
         
@@ -46,25 +64,26 @@ public class RenderWorld extends Render
         {
         	GL11.glRotatef(player.rotateAngle, 0, 0, 1);
             t.startDrawingQuads();
-	        t.addVertexWithUV(x, y+h, 0, 0, 1);
-	        t.addVertexWithUV(x+w, y+h, 0, 1, 1);
-	        t.addVertexWithUV(x+w, y, 0, 1, 0);
-	        t.addVertexWithUV(x, y, 0, 0, 0);
+	        t.addVertexWithUV(points[0].x, points[0].y, 0, 0, 1);
+	        t.addVertexWithUV(points[1].x, points[1].y, 0, 1, 1);
+	        t.addVertexWithUV(points[2].x, points[2].y, 0, 1, 0);
+	        t.addVertexWithUV(points[3].x, points[3].y, 0, 0, 0);
 	        t.draw();
         }
         else
         {
         	GL11.glRotatef(player.rotateAngle + 90.0f, 0, 0, 1);
-            //GL11.glTranslatef(20, 0, 0);
         	GL11.glScalef(-1, 1, 1);
         	t.startDrawingQuads();
-	        t.addVertexWithUV(x, y+h, 0, 0, 1);
-	        t.addVertexWithUV(x+w, y+h, 0, 1, 1);
-	        t.addVertexWithUV(x+w, y, 0, 1, 0);
-	        t.addVertexWithUV(x, y, 0, 0, 0);
+        	t.addVertexWithUV(points[0].x, points[0].y, 0, 0, 1);
+ 	        t.addVertexWithUV(points[1].x, points[1].y, 0, 1, 1);
+ 	        t.addVertexWithUV(points[2].x, points[2].y, 0, 1, 0);
+ 	        t.addVertexWithUV(points[3].x, points[3].y, 0, 0, 0);
 	        t.draw();
-        }
+        }        
+       
+        adjustCameraToLastPosition();
         
-        adjustCamera(world, player);
+       
 	}
 }

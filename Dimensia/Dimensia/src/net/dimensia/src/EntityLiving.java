@@ -71,6 +71,7 @@ public class EntityLiving extends Entity
 	public boolean alert;
 	public int ticksSinceLastWander;
 	public int ticksSinceLastProjectile;
+	public List<StatusEffectAbsorb> absorbs;
 	
 	/**
 	 * Overrides Entity's constructor, and constructs a new EntityLiving. 
@@ -125,6 +126,7 @@ public class EntityLiving extends Entity
 		isImmuneToCrits = false;
 		criticalStrikeChance = 0.05f;
 		statusEffects = new ArrayList<StatusEffect>();
+		absorbs = new ArrayList<StatusEffectAbsorb>();
 		
 		x = 0;
 		y = 0;	
@@ -151,6 +153,8 @@ public class EntityLiving extends Entity
 		{
 			this.statusEffects.add(new StatusEffect(entity.statusEffects.get(i)));
 		}
+		
+		this.absorbs = new ArrayList<StatusEffectAbsorb>();
 		this.ticksFallen = entity.ticksFallen;
 		this.criticalStrikeChance = entity.criticalStrikeChance; 
 		this.dodgeChance = entity.dodgeChance;
@@ -320,6 +324,26 @@ public class EntityLiving extends Entity
 	}
 	
 	/**
+	 * -- this actually uses absorbs, not just checking. nyi doc-comment
+	 * @param damageAfterArmor
+	 * @return
+	 */
+	protected float damageAfterAbsorbs(float damageAfterArmor)
+	{		
+		float newValue = damageAfterArmor;
+		for(int i = 0; i < absorbs.size(); i++)
+		{
+			if(damageAfterArmor == 0)
+			{
+				break;
+			}
+			newValue = absorbs.get(i).absorbDamage(newValue);
+		}
+		
+		return newValue;
+	}
+	
+	/**
 	 * Damages the entity for the specified amount
 	 * @param d the amount damage
 	 * @param isCrit was the hit critical? (2x damage)
@@ -332,22 +356,26 @@ public class EntityLiving extends Entity
 			double dodgeRoll = Math.random();
 			if(isDodgeable && dodgeRoll < dodgeChance || dodgeChance >= 1.0f) //Is it a dodge
 			{
-				world.addTemporaryText("Dodge", (int)x - 2, (int)y - 3, 20, 'g'); //add temporary text to be rendered, for the damage done
+				world.addTemporaryText("Dodge", (int)x - 2, (int)y - 3, 20, EnumColor.GREEN); //add temporary text to be rendered, for the damage done
 			}
 			else if(!isCrit) //Is it Normal Damage
 			{
 				invincibilityTicks = 5; //set them invincible for 250ms
 				float damageAfterArmor = ((d - (defense / 2)) > 0) ? (d - (defense / 2)) : 1; //determine damage after armour
+				damageAfterArmor = damageAfterAbsorbs(damageAfterArmor);
 				health -= damageAfterArmor; //do the damage
-				world.addTemporaryText(""+(int)damageAfterArmor, (int)x - 2, (int)y - 3, 20, 'w'); //add temporary text to be rendered, for the damage done
+				String message = (damageAfterArmor == 0) ? "Absorb" : ""+(int)damageAfterArmor;
+				world.addTemporaryText(message, (int)x - 2, (int)y - 3, 20, (damageAfterArmor == 0) ? EnumColor.WHITE : EnumColor.RED); //add temporary text to be rendered, for the damage done
 			}
 			else //It was a critical hit
 			{
 				d *= 2;
 				invincibilityTicks = 5; //set them invincible for 250ms
 				float damageAfterArmor = ((d - (defense / 2)) > 0) ? (d - (defense / 2)) : 1; //determine damage after armour
+				damageAfterArmor = damageAfterAbsorbs(damageAfterArmor);
 				health -= damageAfterArmor; //do the damage
-				world.addTemporaryText(""+(int)damageAfterArmor, (int)x - 2, (int)y - 3, 20, 'c'); //add temporary text to be rendered, for the damage done
+				String message = (damageAfterArmor == 0) ? "Absorb" : ""+(int)damageAfterArmor;
+				world.addTemporaryText(message, (int)x - 2, (int)y - 3, 20, (damageAfterArmor == 0) ? EnumColor.WHITE : EnumColor.CRITICAL); //add temporary text to be rendered, for the damage done
 			}		
 		}
 		else //the entity can't be damaged, so reduce their invincibility
@@ -368,7 +396,7 @@ public class EntityLiving extends Entity
 	public void healEntity(World world, int h)
 	{
 		health += h; 
-		world.addTemporaryText(""+(int)h, (int)x - 2, (int)y - 3, 20, 'h'); //add temperary text to be rendered, for the healing done
+		world.addTemporaryText(""+(int)h, (int)x - 2, (int)y - 3, 20, EnumColor.GREEN); //add temperary text to be rendered, for the healing done
 		if(health > maxHealth) //if health exceeds the maximum, set it to the maximum
 		{
 			health = maxHealth;
@@ -669,7 +697,7 @@ public class EntityLiving extends Entity
 	 */
 	public void moveEntityRight(World world)
 	{
-		float movementValue = baseSpeed * movementSpeedModifier;
+		float movementValue = MathHelper.roundDownFloat20th(baseSpeed * movementSpeedModifier);
 		int loops = (int) (movementValue / 6) + 1;
 		
 		if(isStunned)
@@ -680,7 +708,7 @@ public class EntityLiving extends Entity
 		for(int i = 0; i < loops; i++)
 		{
 			float possibleMovement = canMoveRight(world);
-			float actualMovement = movementValue % 6;
+			float actualMovement = (movementValue > 6) ? 6 : movementValue;
 			
 			if(actualMovement > possibleMovement)
 			{
@@ -704,7 +732,7 @@ public class EntityLiving extends Entity
 	 */
 	public void moveEntityLeft(World world) 
 	{
-		float movementValue = baseSpeed * movementSpeedModifier;
+		float movementValue = (int)(baseSpeed * movementSpeedModifier);
 		int loops = (int) (movementValue / 6) + 1;
 		
 		if(isStunned)
@@ -715,17 +743,15 @@ public class EntityLiving extends Entity
 		for(int i = 0; i < loops; i++)
 		{
 			float possibleMovement = canMoveLeft(world);
-			float actualMovement = movementValue % 6;
-			
+			float actualMovement = (movementValue > 6) ? 6 : movementValue;
+						
 			if(actualMovement > possibleMovement)
 			{
 				actualMovement = possibleMovement;
 			}
 			
-			if((x - possibleMovement) >= 0 && possibleMovement >= movementValue) //full movement
-				x -= actualMovement;
-			else if(possibleMovement > 0) //partial movement
-				x -= actualMovement;
+			x -= actualMovement;
+			
 			
 			if(x < 0)//out of bounds check
 				x = 0;
@@ -750,17 +776,14 @@ public class EntityLiving extends Entity
 		for(int i = 0; i < loops; i++)
 		{
 			float possibleMovement = canMoveRight(world);
-			float actualMovement = movementValue % 6;
-			
+			float actualMovement = (movementValue > 6) ? 6 : movementValue;
+
 			if(actualMovement > possibleMovement)
 			{
 				actualMovement = possibleMovement;
 			}
 			
-			if(x + possibleMovement < (world.getWidth() * 6) && possibleMovement >= movementValue) //full movement
-				x += actualMovement;
-			else if(possibleMovement > 0) //partial movement
-				x += actualMovement;
+			x += actualMovement;
 			
 			if(x > world.getWidth() * 6 - width - 6) //bounds check
 				x = (world.getWidth() * 6) - width - 6;
@@ -785,17 +808,14 @@ public class EntityLiving extends Entity
 		for(int i = 0; i < loops; i++)
 		{
 			float possibleMovement = canMoveLeft(world);
-			float actualMovement = movementValue % 6;
-			
+			float actualMovement = (movementValue > 6) ? 6 : movementValue;
+
 			if(actualMovement > possibleMovement)
 			{
 				actualMovement = possibleMovement;
 			}
 			
-			if((x - possibleMovement) >= 0 && possibleMovement >= movementValue) //full movement
-				x -= actualMovement;
-			else if(possibleMovement > 0) //partial movement
-				x -= actualMovement;
+			x -= actualMovement;
 			
 			if(x < 0)//out of bounds check
 				x = 0;
@@ -835,7 +855,8 @@ public class EntityLiving extends Entity
 			}
 		}
 		
-		return (flag) ? 6 : (offset == blockWidth) ? (x % 6) : (6 - (x % 6));//6-complete success; offset==2-0; otherwise, remaining value to move over
+		return (flag) ? 6 : (offset == blockWidth) ? (x % 6) : (6 - (x % 6));
+		//6-complete success; offset==2-0; otherwise, remaining value to move over
 	}
 	
 	/**
@@ -933,34 +954,48 @@ public class EntityLiving extends Entity
 	
 	public void checkAndUpdateStatusEffects(World world)
 	{
-		if(isStunned)
-		{
-		//	System.out.println("Stunned Entity@" + this);
-			System.out.print("");
-		}
 		for(int i = 0; i < statusEffects.size(); i++)
 		{
-			if(!(this instanceof EntityLivingPlayer))
-			{
-				//System.out.println(i + ">" + statusEffects.get(i) + " TIME_REMAINING = " + statusEffects.get(i).ticksLeft);
-			}
 			statusEffects.get(i).applyPeriodicBonus(world, this);
 			if(statusEffects.get(i).isExpired())
 			{
 				statusEffects.get(i).removeInitialEffect(this);
+				if(statusEffects.get(i) instanceof StatusEffectAbsorb)
+				{
+					removeAbsorb((StatusEffectAbsorb)statusEffects.get(i));
+				}
 				statusEffects.remove(i);
 			}
 		}
 	}
 	
+	private void removeAbsorb(StatusEffectAbsorb absorb)
+	{
+		for(int i = 0; i < absorbs.size(); i++)
+		{
+			if(absorb == absorbs.get(i))
+			{
+				absorbs.remove(i);
+			}
+		}
+	}
+	
+	private void registerAbsorb(StatusEffectAbsorb absorb)
+	{
+		absorbs.add(absorb);
+	}
+	
 	public boolean registerStatusEffect(StatusEffect effect)
 	{
+		if(effect instanceof StatusEffectAbsorb)
+		{
+			registerAbsorb((StatusEffectAbsorb)effect);
+		}
+		
 		for(int i = 0; i < statusEffects.size(); i++)
 		{
-			if(statusEffects.get(i).toString().equals(effect.toString()))
+			if(statusEffects.get(i).toString().equals(effect.toString()) && !effect.stacksIndependantly)
 			{
-				//System.out.println("StatusEffectMatch=" + effect.toString());
-				
 				if(statusEffects.get(i).tier <= effect.tier)
 				{
 					if(statusEffects.get(i).tier == effect.tier && statusEffects.get(i).ticksLeft > effect.ticksLeft)
@@ -992,6 +1027,11 @@ public class EntityLiving extends Entity
 		statusEffects.add(effect);
 		//System.out.println(this + "->Effect registered>>" + effect);
 		return true;
+	}
+	
+	public boolean isImmuneToDamage()
+	{
+		return invincibilityTicks > 0;
 	}
 	
 	public EntityLiving setUpwardJumpHeight(int i){

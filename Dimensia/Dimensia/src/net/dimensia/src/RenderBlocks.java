@@ -124,8 +124,8 @@ public class RenderBlocks extends Render
 							{
 								int blockHeight = block.blockHeight;
 								int blockWidth = block.blockWidth;		
-							    float tx = (float)((block.iconIndex / 16) * 16) / 512;
-							    float ty = (float)((block.iconIndex % 16) * 16) / 256;
+							    float tx = (block.iconX * 16F) / 512F;
+							    float ty = (block.iconY * 16F) / 256F;
 								double tw = tx + (block.textureWidth / 512);
 								double th = ty + (block.textureHeight / 256);				
 								int xm = x1 * 6; 
@@ -144,8 +144,8 @@ public class RenderBlocks extends Render
 						{
 							int blockHeight = block.blockHeight;
 							int blockWidth = block.blockWidth;		
-						    float tx = (float)((block.iconIndex / 16) * 16) / 512;
-						    float ty = (float)((block.iconIndex % 16) * 16) / 256;
+						    float tx = (block.iconX * 16F) / 512;
+						    float ty = (block.iconY * 16F) / 256;
 						    double tw = tx + (block.textureWidth / 512);
 						    double th = ty + (block.textureHeight / 256);				
 							int xm = x1 * 6; 
@@ -272,8 +272,8 @@ public class RenderBlocks extends Render
 						{
 							int blockHeight = block.blockHeight;
 							int blockWidth = block.blockWidth;		
-							double tx = ((double)(block.iconIndex % TEXTURES_PER_ROW) ) / (double)TEXTURES_PER_ROW;
-						    double ty = ((double)(int)(block.iconIndex / TEXTURES_PER_COLUMN)) / (double)TEXTURES_PER_COLUMN;
+							double tx = (double)(block.iconX) / (double)TEXTURES_PER_ROW;
+						    double ty = (double)(block.iconY) / (double)TEXTURES_PER_COLUMN;
 						    double tw = tx + ((double)block.textureWidth / (double)TEXTURE_SHEET_WIDTH);
 						    double th = ty + ((double)block.textureHeight / (double)TEXTURE_SHEET_HEIGHT);			
 							int xm = x1 * 6; 
@@ -291,8 +291,8 @@ public class RenderBlocks extends Render
 					{
 						int blockHeight = 6;//block.blockHeight;
 						int blockWidth = 6;//block.blockWidth;		
-					    double tx = ((double)(block.iconIndex % TEXTURES_PER_ROW) ) / (double)TEXTURES_PER_ROW;
-					    double ty = ((double)(int)(block.iconIndex / TEXTURES_PER_COLUMN)) / (double)TEXTURES_PER_COLUMN;
+					    double tx = (double)(block.iconX) / (double)TEXTURES_PER_ROW;
+					    double ty = (double)(block.iconY) / (double)TEXTURES_PER_COLUMN;
 					    double tw = tx + ((double)block.textureWidth / (double)TEXTURE_SHEET_WIDTH);
 					    double th = ty + ((double)block.textureHeight / (double)TEXTURE_SHEET_HEIGHT);				
 						int xm = x1 * BLOCK_SIZE; 

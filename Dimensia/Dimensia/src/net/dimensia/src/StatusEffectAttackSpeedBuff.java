@@ -5,6 +5,8 @@ public class StatusEffectAttackSpeedBuff extends StatusEffect
 	public StatusEffectAttackSpeedBuff(float durationSeconds, int tier) 
 	{
 		super(durationSeconds, tier);
+		iconX = 14;
+		iconY = 1;
 	}
 	
 	public void applyInitialEffect(EntityLiving entity)

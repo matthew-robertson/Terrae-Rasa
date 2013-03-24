@@ -5,6 +5,8 @@ public class StatusEffectDamageSoak extends StatusEffect
 	public StatusEffectDamageSoak(float durationSeconds, int tier) 
 	{
 		super(durationSeconds, tier);
+		iconX = 13;
+		iconY = 1;
 	}
 	
 	public void applyInitialEffect(EntityLiving entity)

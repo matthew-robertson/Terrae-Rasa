@@ -6,6 +6,8 @@ public class StatusEffectBleed extends StatusEffect
 	{
 		super(durationSeconds, tier);
 		this.isBeneficialEffect = false;
+		iconX = 14;
+		iconY = 0;
 	}
 
 	public void applyPeriodicBonus(World world, EntityLiving entity)

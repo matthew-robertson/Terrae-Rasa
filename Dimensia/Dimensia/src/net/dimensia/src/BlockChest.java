@@ -52,7 +52,8 @@ public class BlockChest extends Block
 		this.maxStackSize = block.maxStackSize;
 		this.textureWidth = block.textureWidth; 
 		this.textureHeight = block.textureHeight; 
-		this.iconIndex = block.iconIndex;
+		this.iconX = block.iconX;
+		this.iconY = block.iconY;
 		this.gradeOfToolRequired = block.gradeOfToolRequired;
 		this.blockType = block.blockType;
 		this.blockTier = block.blockTier;
@@ -66,6 +67,7 @@ public class BlockChest extends Block
 		this.isSolid = block.isSolid;
 		this.mainInventory = new ItemStack[block.inventorySize];
 		this.inventorySize = block.inventorySize;
+		//This is not complete
 	}
 	
 	/**
