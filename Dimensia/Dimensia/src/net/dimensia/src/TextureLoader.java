@@ -216,8 +216,8 @@ public class TextureLoader
 	        
 	        int w = 16;
 	        int h = 16;
-	        int x = ((int)((float)list1[i].iconIndex / 16)) * 16;
-	        int y = ((int)(list1[i].iconIndex % 16)) * 16;
+	        int x = list1[i].iconX * 16;
+	        int y = list1[i].iconY * 16;
 	        
 	        bufferStore[i] = itemSheet.getSubimage(x, y, w, h);
 	        

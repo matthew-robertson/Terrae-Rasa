@@ -12,13 +12,13 @@ public class ItemPotionHealth extends Item
 	
 	public void onRightClick(World world, EntityLivingPlayer player)
 	{
-		if(!player.isOnCooldown(itemID))
+		if(!player.isOnCooldown(id))
 		{
 			boolean success = player.healPlayer(world, healthRestored, true);
 			if(success)
 			{
 				player.inventory.removeItemsFromInventoryStack(1, player.selectedSlot);
-				player.putOnCooldown(itemID, 60);
+				player.putOnCooldown(id, 60);
 			}
 		}
 	}

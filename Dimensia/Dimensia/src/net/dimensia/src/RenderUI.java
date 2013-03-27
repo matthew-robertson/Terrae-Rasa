@@ -350,7 +350,7 @@ public class RenderUI extends Render
 	        String[] setBonuses = { };
 			String cooldown = "";
 	        
-			if(stack.getItemID() >= Item.shiftedIndex)
+			if(stack.getItemID() >= Item.itemIndex && stack.getItemID() < ActionbarItem.spellIndex)
 			{
 				quality = (Item.itemsList[stack.getItemID()]).itemQuality;
 				fulltooltip = Item.itemsList[stack.getItemID()].extraTooltipInformation;
@@ -626,7 +626,7 @@ public class RenderUI extends Render
 		}
 		else if(whichInventory == 2) //Armor && Accessories
 		{
-			Item item = Item.getItemByID(mouseItem.getItemID());			
+			Item item = Item.itemsList[mouseItem.getItemID()];			
 			//Check if the item is actually valid for the selected slot:
 			if(index == 0) //Helmet
 			{

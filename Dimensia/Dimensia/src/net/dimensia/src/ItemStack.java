@@ -30,38 +30,26 @@ public class ItemStack
 	private int maxStackSize;
 	private int itemID;
 	
-	public ItemStack(Item item)
+	public ItemStack(ActionbarItem item)
 	{
-		itemID = item.itemID;
+		itemID = item.id;
 		maxStackSize = item.maxStackSize;
 		stackSize = 1;
-		itemName = item.itemName;
+		itemName = item.name;
 	}
 	
-	public ItemStack(Item item, int stackSize)
+	public ItemStack(ActionbarItem item, int stackSize)
 	{
-		itemID = item.itemID;
+		itemID = item.id;
 		maxStackSize = item.maxStackSize;
-		this.stackSize = stackSize; if(stackSize > maxStackSize) stackSize = maxStackSize;
-		itemName = item.itemName;
+		this.stackSize = stackSize; 
+		if(stackSize > maxStackSize) 
+		{
+			stackSize = maxStackSize;
+		}
+		itemName = item.name;
 	}
-	
-	public ItemStack(Block block)
-	{
-		itemID = block.blockID;
-		maxStackSize = block.maxStackSize; 
-		stackSize = 1;
-		itemName = block.blockName;
-	}
-	
-	public ItemStack(Block block, int stackSize)
-	{
-		itemID = block.blockID;
-		maxStackSize = block.maxStackSize; 
-		this.stackSize = stackSize; if(stackSize > maxStackSize) stackSize = maxStackSize;
-		itemName = block.blockName;
-	}
-	
+		
 	public ItemStack(int id, int stackSize)
 	{
 		itemID = id;
@@ -69,12 +57,12 @@ public class ItemStack
 		
 		if(itemID < 2048)
 		{
-			itemName = Block.blocksList[id].blockName;
+			itemName = Block.blocksList[id].name;
 			maxStackSize = Block.blocksList[id].maxStackSize;
 		}
 		else
 		{
-			itemName = Item.itemsList[id].itemName;
+			itemName = Item.itemsList[id].name;
 			maxStackSize = Item.itemsList[id].maxStackSize;			
 		}		
 	}
@@ -86,12 +74,12 @@ public class ItemStack
 		
 		if(itemID < 2048)
 		{
-			itemName = Block.blocksList[id].blockName;
+			itemName = Block.blocksList[id].name;
 			maxStackSize = Block.blocksList[id].maxStackSize;
 		}
 		else
 		{
-			itemName = Item.itemsList[id].itemName;
+			itemName = Item.itemsList[id].name;
 			maxStackSize = Item.itemsList[id].maxStackSize;			
 		}		
 	}

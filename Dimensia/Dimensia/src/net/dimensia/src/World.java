@@ -177,11 +177,11 @@ public class World
 		{
 			for(int i = 0; i < height - 1; i++)
 			{
-				if(getBlock((int)(player.respawnXPos / 6), i).blockID == 0 && getBlock((int)(player.respawnXPos / 6) + 1, i).blockID == 0) 
+				if(getBlock((int)(player.respawnXPos / 6), i).id == 0 && getBlock((int)(player.respawnXPos / 6) + 1, i).id == 0) 
 				{
 					continue;
 				}
-				if(getBlock((int)player.respawnXPos / 6, i).blockID != 0 || getBlock((int) (player.respawnXPos / 6) + 1, i).blockID != 0)
+				if(getBlock((int)player.respawnXPos / 6, i).id != 0 || getBlock((int) (player.respawnXPos / 6) + 1, i).id != 0)
 				{	
 					player.x = player.respawnXPos;
 					player.y = (i * 6) - 18;				
@@ -629,7 +629,7 @@ public class World
 		}
 		
 		if (!getBlockGenerate(x, y - 1).isOveridable && !(getBlockGenerate(x, y - 1) instanceof BlockPillar)){
-			//System.out.println(getBlockGenerate(x, y-1).getBlockID());
+			//System.out.println(getBlockGenerate(x, y-1).getID());
 			bit = 0;					
 		}
 		
@@ -1278,25 +1278,25 @@ public class World
 		do{
 			if(my >= 1)
 			{
-				if (getBlock(mx, my-1).getBlockID() == Block.tree.getBlockID()){ //If there's a tree above, break it
+				if (getBlock(mx, my-1).getID() == Block.tree.getID()){ //If there's a tree above, break it
 					handleBlockBreakEvent(player, mx, my-1);
 				}
 			}
 			if(mx >= 1)
 			{
-				if (getBlock(mx-1, my).getBlockID() == Block.treebranch.getBlockID() || getBlock(mx-1, my).getBlockID() == Block.treebase.getBlockID()){
+				if (getBlock(mx-1, my).getID() == Block.treebranch.getID() || getBlock(mx-1, my).getID() == Block.treebase.getID()){
 					handleBlockBreakEvent(player, mx - 1, my); //If there is a left branch/base on the same level, break it
 				}
 			}
 			if(mx + 1 < width)
 			{
-				if (getBlock(mx+1, my).getBlockID() == Block.treebranch.getBlockID() || getBlock(mx+1, my).getBlockID() == Block.treebase.getBlockID()){
+				if (getBlock(mx+1, my).getID() == Block.treebranch.getID() || getBlock(mx+1, my).getID() == Block.treebase.getID()){
 					handleBlockBreakEvent(player, mx + 1, my); //Same for right branches/bases
 				}
 			}
 			if(mx + 1 < width && mx >= 1 && my >= 1)
 			{
-				if (getBlock(mx, my - 1).getBlockID() == Block.treetopc2.getBlockID()){
+				if (getBlock(mx, my - 1).getID() == Block.treetopc2.getID()){
 					handleBlockBreakEvent(player, mx + 1, my - 1); //Break a canopy
 					handleBlockBreakEvent(player, mx + 1, my - 2);
 					handleBlockBreakEvent(player, mx, my - 1);
@@ -1306,8 +1306,8 @@ public class World
 				}
 			}
 			my--; //Move the check upwards 1 block
-		}while (my >= 1 && getBlock(mx, my-1).getBlockID() == Block.tree.getBlockID()  //Loop as long as part of the tree is above
-			|| getBlock(mx, my-1).getBlockID() == Block.treetopc2.getBlockID());
+		}while (my >= 1 && getBlock(mx, my-1).getID() == Block.tree.getID()  //Loop as long as part of the tree is above
+			|| getBlock(mx, my-1).getID() == Block.treetopc2.getID());
 	}
 
 	/**
@@ -1497,18 +1497,18 @@ public class World
 			setBlockGenerate(Block.dirt, x, y + 1);
 			int count = 1;
 			
-			if ((getBlockGenerate(x-1, y+1).getBlockID() == Block.grass.getBlockID()|| getBlockGenerate(x-1, y+1).getBlockID() == Block.dirt.getBlockID())){
+			if ((getBlockGenerate(x-1, y+1).getID() == Block.grass.getID()|| getBlockGenerate(x-1, y+1).getID() == Block.dirt.getID())){
 				setBlockGenerate(Block.treebase.setBitMap(0), x-1, y);
 				setBlockGenerate(Block.dirt, x-1, y+1);
 			}
 			
-			if ((getBlockGenerate(x+1, y+1).getBlockID() == Block.grass.getBlockID()|| getBlockGenerate(x+1, y+1).getBlockID() == Block.dirt.getBlockID())){
+			if ((getBlockGenerate(x+1, y+1).getID() == Block.grass.getID()|| getBlockGenerate(x+1, y+1).getID() == Block.dirt.getID())){
 				setBlockGenerate(Block.treebase.setBitMap(3), x+1, y);
 				setBlockGenerate(Block.dirt, x+1, y+1);
 			}
 			
 			for (int k = y; k >= y - height; k--){ //Place the tree
-				if (getBlockGenerate(x, k).getBlockID() == Block.air.getBlockID()){ //If the cell is empty
+				if (getBlockGenerate(x, k).getID() == Block.air.getID()){ //If the cell is empty
 					if (k == y-height){ //If at the top of the tree
 						setBlockGenerate(Block.treetopr2, x+1, k); //Place the tree top
 						setBlockGenerate(Block.treetopr1, x+1, k-1);
@@ -1552,19 +1552,19 @@ public class World
 		for(int j = maxHeight; j > minHeight; j--){ //go through the the y-axis of the world
 			for(int k = 1; k < x + w; k++){ //x-axis	
 				//Search above, left and right of dirt block for air
-				if (getBlockGenerate(k, j).getBlockID() == Block.dirt.getBlockID()){
+				if (getBlockGenerate(k, j).getID() == Block.dirt.getID()){
 					if (k > 0 && k < getWidth() && j > 0){
-						if (getBlockGenerate(k - 1, j).getBlockID() == Block.air.getBlockID()){
+						if (getBlockGenerate(k - 1, j).getID() == Block.air.getID()){
 							setBlockGenerate(Block.grass, k, j);
 						}
 					}
 					if (k < getWidth()){
-						if (getBlockGenerate(k + 1, j).getBlockID() == Block.air.getBlockID()){
+						if (getBlockGenerate(k + 1, j).getID() == Block.air.getID()){
 							setBlockGenerate(Block.grass, k, j);
 						}
 					}
 					if (j > 0){
-						if (getBlockGenerate(k, j-1).getBlockID() == Block.air.getBlockID()){
+						if (getBlockGenerate(k, j-1).getID() == Block.air.getID()){
 							setBlockGenerate(Block.grass, k, j);
 						}
 					}

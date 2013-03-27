@@ -38,7 +38,7 @@ public class MouseInput
 				}	
 				
 				//Attempt to launch a projectile
-				player.launchProjectile(world, (float)(Render.getCameraX() + MathHelper.getCorrectMouseXPosition()), (float)(Render.getCameraY() + MathHelper.getCorrectMouseYPosition()), Item.itemsList[player.inventory.getMainInventoryStack(active).getItemID()]);
+				//player.launchProjectile(world, (float)(Render.getCameraX() + MathHelper.getCorrectMouseXPosition()), (float)(Render.getCameraY() + MathHelper.getCorrectMouseYPosition()), Item.itemsList[player.inventory.getMainInventoryStack(active).getItemID()]);
 				
 				//Try to mine a block
 				player.breakBlock(world, mouseBX, mouseBY, Item.itemsList[player.inventory.getMainInventoryStack(active).getItemID()]); 

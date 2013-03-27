@@ -52,16 +52,16 @@ public class InventoryPlayer
 		{
 			for(int i = 0; i < Item.itemsList.length; i++) //Items
 			{
-				if(Item.itemsList[i] != null && inventoryTotals.get(Item.itemsList[i].getItemName()) == null) //A new Item needs added 
+				if(Item.itemsList[i] != null && inventoryTotals.get(Item.itemsList[i].getName()) == null) //A new Item needs added 
 				{
-					inventoryTotals.put(Item.itemsList[i].itemName, 0);
+					inventoryTotals.put(Item.itemsList[i].name, 0);
 				}
 			}
 			for(int i = 0; i < Block.blocksList.length; i++) //Blocks
 			{	
-				if(Block.blocksList[i] != null  && inventoryTotals.get(Block.blocksList[i].getBlockName()) == null) //A new Block needs added
+				if(Block.blocksList[i] != null  && inventoryTotals.get(Block.blocksList[i].getName()) == null) //A new Block needs added
 				{
-					inventoryTotals.put(Block.blocksList[i].blockName, 0);					
+					inventoryTotals.put(Block.blocksList[i].name, 0);					
 				}
 			}
 		}
@@ -71,30 +71,30 @@ public class InventoryPlayer
 			
 			for(int i = 0; i < Item.itemsList.length; i++) //Items
 			{
-				if(Item.itemsList[i] != null && inventoryTotals.get(Item.itemsList[i].getItemName()) != null) //If the Item exists and is already in inventoryTotals
+				if(Item.itemsList[i] != null && inventoryTotals.get(Item.itemsList[i].getName()) != null) //If the Item exists and is already in inventoryTotals
 				{
-					if(Item.itemsList[i].getItemName().toLowerCase() != "unnamed") //And it isnt unnamed
+					if(Item.itemsList[i].getName().toLowerCase() != "unnamed") //And it isnt unnamed
 					{
-						throw new RuntimeException("Item name already exists : " + Item.itemsList[i].getItemName()); //There is a name conflict, throw an exception
+						throw new RuntimeException("Item name already exists : " + Item.itemsList[i].getName()); //There is a name conflict, throw an exception
 					}
 				}
 				else if(Item.itemsList[i] != null) //Otherwise if the item exists, add it with a starting value of 0
 				{
-					inventoryTotals.put(Item.itemsList[i].itemName, 0);
+					inventoryTotals.put(Item.itemsList[i].name, 0);
 				}
 			}
 			for(int i = 0; i < Block.blocksList.length; i++) //Blocks
 			{	
-				if(Block.blocksList[i] != null  && inventoryTotals.get(Block.blocksList[i].getBlockName()) != null) //If the block exists
+				if(Block.blocksList[i] != null && inventoryTotals.get(Block.blocksList[i].getName()) != null) //If the block exists
 				{
-					if(Block.blocksList[i].getBlockName().toLowerCase() != "unnamed") //And it isnt unnamed
+					if(Block.blocksList[i].getName().toLowerCase() != "unnamed") //And it isnt unnamed
 					{
-						throw new RuntimeException("Block name already exists : " + Block.blocksList[i].getBlockName()); //There is a name conflict, throw an exception
+						throw new RuntimeException("Block name already exists : " + Block.blocksList[i].getName()); //There is a name conflict, throw an exception
 					}
 				}
 				else if(Block.blocksList[i] != null) //Otherwise if the block exists, add it with a starting value of 0
 				{
-					inventoryTotals.put(Block.blocksList[i].blockName, 0);				
+					inventoryTotals.put(Block.blocksList[i].name, 0);				
 				}
 			}
 		}

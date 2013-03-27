@@ -215,14 +215,14 @@ public class Keys
 	        } 
 	        if (Keyboard.isKeyDown(Keyboard.KEY_F))
 			{
-				player.launchProjectile( world, player.x, player.y, Item.snowball);
+				//player.launchProjectile(world, player.x, player.y, Item.snowball);
 				/*EntityProjectile.woodenArrow.clone().setXLocAndYLoc(world.player.x, world.player.y).setDirection(count));
 				count++;
 				if (count == 360) count = 0;*/
 			}	
 	        if (Keyboard.isKeyDown(Keyboard.KEY_G))
 			{
-	        	player.launchProjectile( world, player.x, player.y, Item.magicMissileSpell);
+	        	//player.launchProjectile( world, player.x, player.y, Item.magicMissileSpell);
 	        	/*world.addEntityToProjectileList(EntityProjectile.magicMissile.clone().setXLocAndYLoc(world.player.x, world.player.y).setDirection(count));
 				count++;
 				if (count == 360) count = 0;*/

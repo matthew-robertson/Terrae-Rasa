@@ -88,14 +88,21 @@ public class WeatherSnow extends Weather
 				if(getBlockAtPosition(world, snow[i].x, snow[i].y) instanceof BlockGrass && snow[i].x > 0 && snow[i].y > 0)
 				{
 					//Adding snow cover
-					if(world.getBlockGenerate(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)snow[i].x / 6), MathHelper.returnIntegerInWorldMapBounds_Y(world, (int)((snow[i].y - 6) / 6))).getBlockID() == Block.air.getBlockID())
+					if(world.getBlockGenerate(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)snow[i].x / 6), 
+							MathHelper.returnIntegerInWorldMapBounds_Y(world, (int)((snow[i].y - 6) / 6))).getID() == Block.air.getID())
 					{
-						world.setBlockGenerate(Block.snowCover, MathHelper.returnIntegerInWorldMapBounds_X(world, (int)snow[i].x / 6), MathHelper.returnIntegerInWorldMapBounds_Y(world, (int)((snow[i].y - 6) / 6)));						
+						world.setBlockGenerate(Block.snowCover, 
+								MathHelper.returnIntegerInWorldMapBounds_X(world, (int)snow[i].x / 6), 
+								MathHelper.returnIntegerInWorldMapBounds_Y(world, (int)((snow[i].y - 6) / 6)));						
 					}
 					//Converting grass to snowy-grass:
-					if (world.getBlockGenerate(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)snow[i].x / 6), MathHelper.returnIntegerInWorldMapBounds_Y(world, (int)((snow[i].y - 6) / 6) + 1)).getBlockID() == Block.grass.getBlockID())
+					if (world.getBlockGenerate(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)snow[i].x / 6),
+							MathHelper.returnIntegerInWorldMapBounds_Y(world, (int)((snow[i].y - 6) / 6) + 1)).getID() == Block.grass.getID())
 					{
-						world.getBlockGenerate(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)snow[i].x / 6), MathHelper.returnIntegerInWorldMapBounds_Y(world, (int)((snow[i].y - 6) / 6) + 1)).setBitMap(world.getBlockGenerate(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)snow[i].x / 6), MathHelper.returnIntegerInWorldMapBounds_Y(world, (int)((snow[i].y - 6) / 6) + 1)).getBitMap() + 16);					
+						world.getBlockGenerate(MathHelper.returnIntegerInWorldMapBounds_X(world,
+								(int)snow[i].x / 6), 
+								MathHelper.returnIntegerInWorldMapBounds_Y(world, (int)((snow[i].y - 6) / 6) + 1)).setBitMap(world.getBlockGenerate(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)snow[i].x / 6), 
+								MathHelper.returnIntegerInWorldMapBounds_Y(world, (int)((snow[i].y - 6) / 6) + 1)).getBitMap() + 16);					
 					}					
 					
 				}

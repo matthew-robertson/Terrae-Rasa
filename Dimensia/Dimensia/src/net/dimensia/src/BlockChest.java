@@ -42,7 +42,7 @@ public class BlockChest extends Block
 	 */
 	public BlockChest(BlockChest block)
 	{
-		//super();
+		super(block);
 		this.droppedItem = block.droppedItem;
 		this.maximumDropAmount = block.maximumDropAmount;
 		this.minimumDropAmount = block.minimumDropAmount;
@@ -60,8 +60,6 @@ public class BlockChest extends Block
 		this.material = block.material;
 		this.breakable = block.breakable;
 		this.hardness = block.hardness;
-		this.blockID = block.blockID;
-		this.blockName = block.blockName;
 		this.passable = block.passable;
 		this.isOveridable = block.isOveridable;
 		this.isSolid = block.isSolid;

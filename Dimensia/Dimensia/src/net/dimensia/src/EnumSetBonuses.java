@@ -61,37 +61,37 @@ public enum EnumSetBonuses
 			return new EnumSetBonuses[] { };
 		}
 		
-		if (inventory.getArmorInventoryStack(0).getItemID() == Item.copperHelmet.getItemID() && 
-			inventory.getArmorInventoryStack(1).getItemID() == Item.copperBody.getItemID() && 
-			inventory.getArmorInventoryStack(2).getItemID() == Item.copperGreaves.getItemID())
+		if (inventory.getArmorInventoryStack(0).getItemID() == Item.copperHelmet.getID() && 
+			inventory.getArmorInventoryStack(1).getItemID() == Item.copperBody.getID() && 
+			inventory.getArmorInventoryStack(2).getItemID() == Item.copperGreaves.getID())
 		{ //Copper Set Bonus
 			//defense + 1... 
 			return new EnumSetBonuses[] { EnumSetBonuses.DEFENSE1 };
 		}
-		if (inventory.getArmorInventoryStack(0).getItemID() == Item.bronzeHelmet.getItemID() && 
-			inventory.getArmorInventoryStack(1).getItemID() == Item.bronzeBody.getItemID() && 
-			inventory.getArmorInventoryStack(2).getItemID() == Item.bronzeGreaves.getItemID())
+		if (inventory.getArmorInventoryStack(0).getItemID() == Item.bronzeHelmet.getID() && 
+			inventory.getArmorInventoryStack(1).getItemID() == Item.bronzeBody.getID() && 
+			inventory.getArmorInventoryStack(2).getItemID() == Item.bronzeGreaves.getID())
 		{ //Bronze Set Bonus
 			//defense + 2... 
 			return new EnumSetBonuses[] { EnumSetBonuses.DEFENSE2 };
 		}
-		if (inventory.getArmorInventoryStack(0).getItemID() == Item.ironHelmet.getItemID() && 
-			inventory.getArmorInventoryStack(1).getItemID() == Item.ironBody.getItemID() && 
-			inventory.getArmorInventoryStack(2).getItemID() == Item.ironGreaves.getItemID())
+		if (inventory.getArmorInventoryStack(0).getItemID() == Item.ironHelmet.getID() && 
+			inventory.getArmorInventoryStack(1).getItemID() == Item.ironBody.getID() && 
+			inventory.getArmorInventoryStack(2).getItemID() == Item.ironGreaves.getID())
 		{ //Iron Set Bonus
 			//defense + 3... 
 			return new EnumSetBonuses[] { EnumSetBonuses.DEFENSE3 };
 		}
-		if (inventory.getArmorInventoryStack(0).getItemID() == Item.silverHelmet.getItemID() && 
-			inventory.getArmorInventoryStack(1).getItemID() == Item.silverBody.getItemID() && 
-			inventory.getArmorInventoryStack(2).getItemID() == Item.silverGreaves.getItemID())
+		if (inventory.getArmorInventoryStack(0).getItemID() == Item.silverHelmet.getID() && 
+			inventory.getArmorInventoryStack(1).getItemID() == Item.silverBody.getID() && 
+			inventory.getArmorInventoryStack(2).getItemID() == Item.silverGreaves.getID())
 		{ //Silver Set Bonus
 			//defense + 4... 
 			return new EnumSetBonuses[] { EnumSetBonuses.DEFENSE4 };
 		}
-		if (inventory.getArmorInventoryStack(0).getItemID() == Item.goldHelmet.getItemID() && 
-			inventory.getArmorInventoryStack(1).getItemID() == Item.goldBody.getItemID() && 
-			inventory.getArmorInventoryStack(2).getItemID() == Item.goldGreaves.getItemID())
+		if (inventory.getArmorInventoryStack(0).getItemID() == Item.goldHelmet.getID() && 
+			inventory.getArmorInventoryStack(1).getItemID() == Item.goldBody.getID() && 
+			inventory.getArmorInventoryStack(2).getItemID() == Item.goldGreaves.getID())
 		{ //Gold Set Bonus
 			//defense + 4... 
 			return new EnumSetBonuses[] { EnumSetBonuses.DEFENSE4 };

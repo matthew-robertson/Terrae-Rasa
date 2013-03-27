@@ -466,7 +466,7 @@ public class EntityLiving extends Entity
 		{
 			for(int j = upOffset; j < downOffset + blockHeight; j++) //and each block vertically
 			{
-				if(world.getBlock(MathHelper.returnIntegerInWorldMapBounds_X(world, x + i), MathHelper.returnIntegerInWorldMapBounds_Y(world, y + j)).blockID == block.blockID)
+				if(world.getBlock(MathHelper.returnIntegerInWorldMapBounds_X(world, x + i), MathHelper.returnIntegerInWorldMapBounds_Y(world, y + j)).id == block.id)
 				{ //see if the block matches the specified block
 					return true;				
 				}

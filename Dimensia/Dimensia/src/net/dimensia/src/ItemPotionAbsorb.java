@@ -9,11 +9,11 @@ public class ItemPotionAbsorb extends ItemPotion
 	
 	public void onRightClick(World world, EntityLivingPlayer player)
 	{
-		if(!player.isOnCooldown(itemID))
+		if(!player.isOnCooldown(id))
 		{
 			player.registerStatusEffect(new StatusEffectAbsorb(durationSeconds, tier, 50));
 			player.inventory.removeItemsFromInventoryStack(1, player.selectedSlot);		
-			player.putOnCooldown(itemID, 600);
+			player.putOnCooldown(id, 600);
 		}		
 	}
 }

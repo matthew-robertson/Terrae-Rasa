@@ -109,18 +109,18 @@ public class WorldGenEarth extends WorldGen
 		for(int j = world.getHeight() - 200; j > 0; j--){ //go through the the y-axis of the world
 			for(int k =  x; k < x + w; k++){ //x-axis	
 				//Start replacing trees with snow-covered variant
-				if (world.getBlockGenerate(k, j+1).getBlockID() == Block.treebranch.getBlockID()) world.getBlockGenerate(k, j+1).setBitMap(world.getBlockGenerate(k, j+1).getBitMap() + 12);
+				if (world.getBlockGenerate(k, j+1).getID() == Block.treebranch.getID()) world.getBlockGenerate(k, j+1).setBitMap(world.getBlockGenerate(k, j+1).getBitMap() + 12);
 				
-				else if (world.getBlockGenerate(k, j+1).getBlockID() == Block.treetop.getBlockID() || world.getBlockGenerate(k, j+1).getBlockID() == Block.treetopl2.getBlockID() ||
-						world.getBlockGenerate(k, j+1).getBlockID() == Block.treetopc1.getBlockID() || world.getBlockGenerate(k, j+1).getBlockID() == Block.treetopc2.getBlockID() ||
-						world.getBlockGenerate(k, j+1).getBlockID() == Block.treetopr1.getBlockID() || world.getBlockGenerate(k, j+1).getBlockID() == Block.treetopr2.getBlockID()) world.getBlockGenerate(k, j+1).setBitMap(1);
+				else if (world.getBlockGenerate(k, j+1).getID() == Block.treetop.getID() || world.getBlockGenerate(k, j+1).getID() == Block.treetopl2.getID() ||
+						world.getBlockGenerate(k, j+1).getID() == Block.treetopc1.getID() || world.getBlockGenerate(k, j+1).getID() == Block.treetopc2.getID() ||
+						world.getBlockGenerate(k, j+1).getID() == Block.treetopr1.getID() || world.getBlockGenerate(k, j+1).getID() == Block.treetopr2.getID()) world.getBlockGenerate(k, j+1).setBitMap(1);
 				
 				else if (world.getBlockGenerate(k, j+1).isSolid){ //If there is a solid block with air above
 					if (world.getBlockGenerate(k, j).isOveridable){
 						world.setBlockGenerate(Block.snowCover, k, j); // If the current block is air or a unneeded plant, replace the block with snow
 					}
 				}
-				if (world.getBlockGenerate(k, j).getBlockID() == Block.grass.getBlockID()) world.getBlockGenerate(k, j).setBitMap(world.getBlockGenerate(k, j).getBitMap() + 16);								
+				if (world.getBlockGenerate(k, j).getID() == Block.grass.getID()) world.getBlockGenerate(k, j).setBitMap(world.getBlockGenerate(k, j).getBitMap() + 16);								
 			}
 		}
 	}
@@ -135,7 +135,7 @@ public class WorldGenEarth extends WorldGen
 		int plant = 0;		
 		for(int i = world.getHeight() - 20; i > 0 ; i--){ //for the depth
 			for(int j = x; j < x + w; j++){ //Throughout the width of the forest
-				if (world.getBlockGenerate(j, i+1).getBlockID() == Block.grass.getBlockID() && world.getBlockGenerate(j, i).getBlockID() == Block.air.getBlockID()){ //If the block beneath the current cell is grass
+				if (world.getBlockGenerate(j, i+1).getID() == Block.grass.getID() && world.getBlockGenerate(j, i).getID() == Block.air.getID()){ //If the block beneath the current cell is grass
 					plant = (int)(Math.random() * 100 + 1); //Decide what plant will be placed									
 					int space = 4;
 					if (plant <= 40 && i <= 450){ //If a tree is to be placed
@@ -167,7 +167,7 @@ public class WorldGenEarth extends WorldGen
 		int height = 0, space = 0, cacti = 0, sand = 0;
 		for(int i = world.getHeight() -200; i > 1 ; i--){ //for the depth
 			for(int j = x; j < x + w; j++){ //Throughout the width of the desert
-				if (world.getBlockGenerate(j, i).getBlockID() == Block.dirt.getBlockID()|| world.getBlockGenerate(j, i).getBlockID() == Block.grass.getBlockID()){ //If the current block is dirt
+				if (world.getBlockGenerate(j, i).getID() == Block.dirt.getID()|| world.getBlockGenerate(j, i).getID() == Block.grass.getID()){ //If the current block is dirt
 					if (i > world.getHeight() - 390){
 						if (j < x + 6 || j > x + w - 6 || i > world.getHeight() - 210){
 							sand = (int)(Math.random()*100+1);
@@ -176,7 +176,7 @@ public class WorldGenEarth extends WorldGen
 							sand = (int)(Math.random()*50+1);
 						}
 						if (sand <= 50){
-							if (world.getBlockGenerate(j, i+1).getBlockID() != Block.sandstone.getBlockID() && world.getBlockGenerate(j, i+1).getBlockID() != Block.sand.getBlockID()){
+							if (world.getBlockGenerate(j, i+1).getID() != Block.sandstone.getID() && world.getBlockGenerate(j, i+1).getID() != Block.sand.getID()){
 								world.setBlockGenerate(Block.sandstone, j, i);
 							}
 							else{
@@ -185,7 +185,7 @@ public class WorldGenEarth extends WorldGen
 						}
 					}
 					else{						
-						if (world.getBlockGenerate(j, i+1).getBlockID() != Block.sandstone.getBlockID() && world.getBlockGenerate(j, i+1).getBlockID() != Block.sand.getBlockID()){
+						if (world.getBlockGenerate(j, i+1).getID() != Block.sandstone.getID() && world.getBlockGenerate(j, i+1).getID() != Block.sand.getID()){
 							world.setBlockGenerate(Block.sandstone, j, i);							
 						}
 						else{
@@ -193,7 +193,7 @@ public class WorldGenEarth extends WorldGen
 						}
 					}
 				}
-				if (i <= 460 && (world.getBlockGenerate(j, i+1).getBlockID() == Block.sand.getBlockID() || world.getBlockGenerate(j, i+1).getBlockID() == Block.sandstone.getBlockID()) && world.getBlockGenerate(j, i).getBlockID() == Block.air.getBlockID()){ //If the block beneath the current cell is grass
+				if (i <= 460 && (world.getBlockGenerate(j, i+1).getID() == Block.sand.getID() || world.getBlockGenerate(j, i+1).getID() == Block.sandstone.getID()) && world.getBlockGenerate(j, i).getID() == Block.air.getID()){ //If the block beneath the current cell is grass
 					cacti = (int)(Math.random() * 100 + 1); //Decide what plant will be placed									
 					space = 1;
 					if (cacti <= 30){ //If a cactus is to be placed
@@ -203,7 +203,7 @@ public class WorldGenEarth extends WorldGen
 							space = 0;
 						}
 						if (height != 0){
-							if (world.getBlockGenerate(j, i-height-space).getBlockID() == Block.air.getBlockID() && world.getBlockGenerate(j-1, i).getBlockID() == Block.air.getBlockID() && world.getBlockGenerate(j+1, i).getBlockID() == Block.air.getBlockID()){ //If there is room for the cactus up and to the left/right	
+							if (world.getBlockGenerate(j, i-height-space).getID() == Block.air.getID() && world.getBlockGenerate(j-1, i).getID() == Block.air.getID() && world.getBlockGenerate(j+1, i).getID() == Block.air.getID()){ //If there is room for the cactus up and to the left/right	
 								for (int k = i; k >= i - height; k--){ //Place the cactus
 									world.setBlockGenerate(Block.cactus, j, k);
 								}
@@ -271,14 +271,14 @@ public class WorldGenEarth extends WorldGen
 			for(int k = 0; k < world.getWidth(); k++){ //x-axis			
 				dirt = (int)(Math.random() * 6 + 1); //select whether dirt is being placed
 				amount = (int)(Math.random() * 4 + 1); //Select how much dirt is being placed on either side
-				if (world.getBlockGenerate(k, i + 1).getBlockID() == Block.stone.getBlockID()){ //If the block beneath is stone
+				if (world.getBlockGenerate(k, i + 1).getID() == Block.stone.getID()){ //If the block beneath is stone
 					dirt = 1; //Place dirt
 				}
 				if (k - amount <= 0 || k + amount >= world.getWidth()){ //If the amount chosen would take it off the map
 					amount = 0; //Do not use an amount
 				}				
-				if (dirt == 1 && world.getBlockGenerate(k, i + 1).getBlockID() != Block.air.getBlockID()){ //If dirt is being placed and the one beneath is not empty
-					if (world.getBlockGenerate(k + amount, i + 1).getBlockID() != Block.air.getBlockID() || world.getBlockGenerate(k - amount, i + 1).getBlockID() != Block.air.getBlockID()){ //If the spot the amount chosen down to the left, or to the right is occupied						
+				if (dirt == 1 && world.getBlockGenerate(k, i + 1).getID() != Block.air.getID()){ //If dirt is being placed and the one beneath is not empty
+					if (world.getBlockGenerate(k + amount, i + 1).getID() != Block.air.getID() || world.getBlockGenerate(k - amount, i + 1).getID() != Block.air.getID()){ //If the spot the amount chosen down to the left, or to the right is occupied						
 						for (int j = -amount; j <= amount; j++){ //Loop given the amount							
 							world.setBlockGenerate(Block.dirt, k + j, i); //Make each space dirt							
 						}
@@ -297,12 +297,12 @@ public class WorldGenEarth extends WorldGen
 		int choice = 0;
 		for (int i = world.getHeight() - 10; i > 1; i--){ //Go through the height
 			for (int j = 1; j < world.getWidth() - 1; j++){ //go through the width
-				if (world.getBlockGenerate(j, i-1).getBlockID() != Block.air.getBlockID() && world.getBlockGenerate(j, i-2).getBlockID() != Block.air.getBlockID() && world.getBlockGenerate(j, i-3).getBlockID() != Block.air.getBlockID()){
+				if (world.getBlockGenerate(j, i-1).getID() != Block.air.getID() && world.getBlockGenerate(j, i-2).getID() != Block.air.getID() && world.getBlockGenerate(j, i-3).getID() != Block.air.getID()){
 					choice = (int)(Math.random()*100+1);
 					if (choice <= 80) 
 						world.setBlockGenerate(Block.stone, j, i);
 				}
-				if (world.getBlockGenerate(j-1, i).getBlockID() == Block.dirt.getBlockID()) 
+				if (world.getBlockGenerate(j-1, i).getID() == Block.dirt.getID()) 
 					oreplace(world, 3, j-1,i ,Block.dirt);
 			}
 		}

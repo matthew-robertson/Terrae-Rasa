@@ -113,7 +113,7 @@ public class RenderBlocks extends Render
 						}
 					
 						//Check if the block should be rendered
-						if(block.blockID == 0) 
+						if(block.id == 0) 
 						{
 							continue;
 						}
@@ -262,7 +262,7 @@ public class RenderBlocks extends Render
 					int y1 = l;
 										
 					//Check if the block should be rendered
-					if(block.blockID == 0) 
+					if(block.id == 0) 
 					{
 						continue;
 					}
