@@ -5,15 +5,22 @@ import java.util.Vector;
 public class ItemRanged extends Item
 {
 	protected Vector<ItemStack> ammo;
+	protected int cooldownTicks;
 	
 	protected ItemRanged(int i, int d) {
 		super(i);
 		maxStackSize = 1;
 		damage = d;
+		cooldownTicks = 5;
 		if (ammo == null){
 			ammo = new Vector<ItemStack>();
 		}
 	}	
+	
+	public ItemRanged setCooldownTicks(int i){
+		cooldownTicks = i;
+		return this;
+	}
 	
 	public ItemRanged setAmmo(Item item){
 		ammo.add(new ItemStack(item));
@@ -30,6 +37,10 @@ public class ItemRanged extends Item
 		ammo.copyInto(ammunition);
 		return ammunition;
 	}	
+	
+	public int getCooldownTicks(){
+		return cooldownTicks;
+	}
 	
 	public int getDamage(){
 		return damage;

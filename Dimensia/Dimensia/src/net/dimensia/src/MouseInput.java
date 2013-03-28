@@ -38,8 +38,15 @@ public class MouseInput
 				}	
 				
 				//Attempt to launch a projectile
-				//player.launchProjectile(world, (float)(Render.getCameraX() + MathHelper.getCorrectMouseXPosition()), (float)(Render.getCameraY() + MathHelper.getCorrectMouseYPosition()), Item.itemsList[player.inventory.getMainInventoryStack(active).getItemID()]);
-				
+				Item item = Item.itemsList[player.inventory.getMainInventoryStack(active).getItemID()];
+				if (item instanceof ItemMagic){
+					ItemMagic spell = (ItemMagic) item;
+					player.launchProjectileMagic(world, (float)(Render.getCameraX() + MathHelper.getCorrectMouseXPosition()), (float)(Render.getCameraY() + MathHelper.getCorrectMouseYPosition()), spell);
+				}
+				else if (item instanceof ItemRanged){
+					ItemRanged weapon = (ItemRanged) item;
+					player.launchProjectileWeapon(world, (float)(Render.getCameraX() + MathHelper.getCorrectMouseXPosition()), (float)(Render.getCameraY() + MathHelper.getCorrectMouseYPosition()), weapon);
+				}
 				//Try to mine a block
 				player.breakBlock(world, mouseBX, mouseBY, Item.itemsList[player.inventory.getMainInventoryStack(active).getItemID()]); 
 			}

@@ -343,8 +343,8 @@ public class GameEngine
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.bronzeBody));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.bronzeGreaves));
 
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.rocketBoots));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.heartCrystal, 2));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.snowball));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.woodenArrow, 100));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.manaCrystal, 2));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.angelsSigil, 2));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ringOfVigor, 5));

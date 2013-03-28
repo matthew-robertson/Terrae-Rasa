@@ -67,7 +67,7 @@ public class EntityLivingPlayer extends EntityLiving
 	public InventoryPlayer inventory;
 	public boolean heavensReprieve;
 	
-	private int ticksSinceLastCast = 0;
+	private int ticksSinceLastCast = 99999;
 	private int ticksInCombat;
 	private int ticksOfHealthRegen;
 	private boolean isInCombat;
@@ -1188,46 +1188,56 @@ public class EntityLivingPlayer extends EntityLiving
 	}
 	
 	/**
-	 * Launch a player projectile
+	 * Launch a player spell projectile
 	 * @param world = current world
 	 * @param mouseX = x position to create the projectile at
 	 * @param mouseY = y position to create the projectile at
 	 * @param item = Item to be used to launch projectile (what projectile is needed)
 	 */
-//	public void launchProjectile(World world, float mouseX, float mouseY, Item item){
-//		if (item instanceof ItemRanged){
-//			ItemStack[] ammo = item.getAmmoAsArray();
-//			for (int i = 0; i < ammo.length; i++){				
-//				if (inventory.doesPartialStackExist(ammo[i]) != -1){
-//					int angle = MathHelper.angleMousePlayer(mouseX, mouseY, x, y) - 90;
-//					if (angle < 0){
-//						angle += 360;
-//					}
-//					if (isFacingRight){
-//						world.addEntityToProjectileList(new EntityProjectile(Item.itemsList[ammo[i].getItemID()].getProjectile()).setDrop(Item.itemsList[ammo[i].getItemID()]).setXLocAndYLoc(x, y)
-//								.setDirection(angle).setDamage((Item.itemsList[ammo[i].getItemID()].getProjectile().getDamage() + item.getDamage())));
-//					}
-//					else{
-//						world.addEntityToProjectileList(new EntityProjectile(Item.itemsList[ammo[i].getItemID()].getProjectile()).setDrop(Item.itemsList[ammo[i].getItemID()]).setXLocAndYLoc(x, y)
-//								.setDirection(angle).setDamage((Item.itemsList[ammo[i].getItemID()].getProjectile().getDamage() + item.getDamage())));
-//					}
-//					inventory.removeItemsFromInventoryStack(1, inventory.doesPartialStackExist(ammo[i]));
-//				}
-//			}
-//		}
-//		if (item instanceof ItemMagic){
-//			if (mana >= item.getManaReq()){
-//				int angle = MathHelper.angleMousePlayer(mouseX, mouseY, x, y) - 90;
-//				if (angle < 0){
-//					angle += 360;
-//				}
-//				world.addEntityToProjectileList(new EntityProjectile(item.getProjectile()).setXLocAndYLoc(x, y)
-//						.setDirection(angle).setDamage(item.getProjectile().getDamage()));
-//				mana -= item.getManaReq();
-//			}
-//		}
-//		
-//	}
+	public void launchProjectileMagic(World world, float mouseX, float mouseY, ItemMagic item){		
+		if (mana >= item.getManaReq()){
+			int angle = MathHelper.angleMousePlayer(mouseX, mouseY, x, y) - 90;
+			if (angle < 0){
+				angle += 360;
+			}
+			world.addEntityToProjectileList(new EntityProjectile(item.getProjectile()).setXLocAndYLoc(x, y)
+					.setDirection(angle).setDamage(item.getProjectile().getDamage()));
+			mana -= item.getManaReq();			
+		}
+		
+	}
+
+	/**
+	 * Launch a player weapon projectile
+	 * @param world = current world
+	 * @param mouseX = x position to create the projectile at
+	 * @param mouseY = y position to create the projectile at
+	 * @param item = Item to be used to launch projectile (to determine what projectile is needed)
+	 */
+	public void launchProjectileWeapon(World world, float mouseX, float mouseY, ItemRanged item){
+		if (ticksSinceLastCast > item.getCooldownTicks()){
+			ItemStack[] ammo = item.getAmmoAsArray();
+			for (int i = 0; i < ammo.length; i++){			
+				if (inventory.doesPartialStackExist(ammo[i]) != -1){
+					ItemAmmo ammunition = (ItemAmmo) Item.itemsList[ammo[i].getItemID()];
+					int angle = MathHelper.angleMousePlayer(mouseX, mouseY, x, y) - 90;
+					if (angle < 0){
+						angle += 360;
+					}
+					if (isFacingRight){
+						world.addEntityToProjectileList(new EntityProjectile(ammunition.getProjectile()).setDrop(ammunition).setXLocAndYLoc(x, y)
+								.setDirection(angle).setDamage((ammunition.getProjectile().getDamage() + item.getDamage())));
+					}
+					else{
+						world.addEntityToProjectileList(new EntityProjectile(ammunition.getProjectile()).setDrop(ammunition).setXLocAndYLoc(x, y)
+								.setDirection(angle).setDamage((ammunition.getProjectile().getDamage() + item.getDamage())));
+					}
+					inventory.removeItemsFromInventoryStack(1, inventory.doesPartialStackExist(ammo[i]));
+					ticksSinceLastCast = 0;
+				}
+			}
+		}
+	}
 	
 	/**
 	 * Gets the Block the player is holding, if it's a Block and it's an instanceof BlockLight. Used for handheld lighting.
