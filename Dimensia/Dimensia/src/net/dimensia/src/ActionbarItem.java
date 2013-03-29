@@ -15,14 +15,12 @@ public class ActionbarItem
 	public final static int blockIndex = 0;
 	public final static int itemIndex = 2048;
 	public final static int spellIndex = 4096 + 2048;
-	
 	protected int iconX;
 	protected int iconY;
 	protected int id;
 	protected String name;
 	protected String extraTooltipInformation;
 	protected int maxStackSize;
-	
 	protected int iconOverrideX;
 	protected int iconOverrideY;
 	protected boolean iconOverriden;
@@ -80,6 +78,10 @@ public class ActionbarItem
 		this.name = item.name;
 		this.extraTooltipInformation = item.extraTooltipInformation;
 		this.maxStackSize = item.maxStackSize;
+		this.iconOverrideX = item.iconOverrideX;
+		this.iconOverrideY = item.iconOverrideY;
+		this.iconOverriden = item.iconOverriden;
+		this.associatedTextureSheet = item.associatedTextureSheet;
 	}	
 	
 	/**

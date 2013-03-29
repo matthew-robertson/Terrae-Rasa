@@ -33,13 +33,25 @@ public class ItemArmor extends Item
 		{
 			defense = armorType.getHelmetDefense();
 		}
-		if(this instanceof ItemArmorGreaves)
+		else if(this instanceof ItemArmorPants)
 		{
 			defense = armorType.getGreavesDefense();
 		}
-		if(this instanceof ItemArmorBody)
+		else if(this instanceof ItemArmorBody)
 		{
 			defense = armorType.getBodyDefense();
+		}
+		else if(this instanceof ItemArmorBoots)
+		{
+			defense = armorType.getBootsDefense();
+		}
+		else if(this instanceof ItemArmorGloves)
+		{
+			defense = armorType.getGlovesDefense();
+		}
+		else if(this instanceof ItemArmorBelt)
+		{
+			defense = armorType.getBeltDefense();
 		}
 		return this;
 	}

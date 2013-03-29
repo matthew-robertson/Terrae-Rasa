@@ -63,35 +63,35 @@ public enum EnumSetBonuses
 		
 		if (inventory.getArmorInventoryStack(0).getItemID() == Item.copperHelmet.getID() && 
 			inventory.getArmorInventoryStack(1).getItemID() == Item.copperBody.getID() && 
-			inventory.getArmorInventoryStack(2).getItemID() == Item.copperGreaves.getID())
+			inventory.getArmorInventoryStack(2).getItemID() == Item.copperPants.getID())
 		{ //Copper Set Bonus
 			//defense + 1... 
 			return new EnumSetBonuses[] { EnumSetBonuses.DEFENSE1 };
 		}
 		if (inventory.getArmorInventoryStack(0).getItemID() == Item.bronzeHelmet.getID() && 
 			inventory.getArmorInventoryStack(1).getItemID() == Item.bronzeBody.getID() && 
-			inventory.getArmorInventoryStack(2).getItemID() == Item.bronzeGreaves.getID())
+			inventory.getArmorInventoryStack(2).getItemID() == Item.bronzePants.getID())
 		{ //Bronze Set Bonus
 			//defense + 2... 
 			return new EnumSetBonuses[] { EnumSetBonuses.DEFENSE2 };
 		}
 		if (inventory.getArmorInventoryStack(0).getItemID() == Item.ironHelmet.getID() && 
 			inventory.getArmorInventoryStack(1).getItemID() == Item.ironBody.getID() && 
-			inventory.getArmorInventoryStack(2).getItemID() == Item.ironGreaves.getID())
+			inventory.getArmorInventoryStack(2).getItemID() == Item.ironPants.getID())
 		{ //Iron Set Bonus
 			//defense + 3... 
 			return new EnumSetBonuses[] { EnumSetBonuses.DEFENSE3 };
 		}
 		if (inventory.getArmorInventoryStack(0).getItemID() == Item.silverHelmet.getID() && 
 			inventory.getArmorInventoryStack(1).getItemID() == Item.silverBody.getID() && 
-			inventory.getArmorInventoryStack(2).getItemID() == Item.silverGreaves.getID())
+			inventory.getArmorInventoryStack(2).getItemID() == Item.silverPants.getID())
 		{ //Silver Set Bonus
 			//defense + 4... 
 			return new EnumSetBonuses[] { EnumSetBonuses.DEFENSE4 };
 		}
 		if (inventory.getArmorInventoryStack(0).getItemID() == Item.goldHelmet.getID() && 
 			inventory.getArmorInventoryStack(1).getItemID() == Item.goldBody.getID() && 
-			inventory.getArmorInventoryStack(2).getItemID() == Item.goldGreaves.getID())
+			inventory.getArmorInventoryStack(2).getItemID() == Item.goldPants.getID())
 		{ //Gold Set Bonus
 			//defense + 4... 
 			return new EnumSetBonuses[] { EnumSetBonuses.DEFENSE4 };

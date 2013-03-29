@@ -13,10 +13,10 @@ public class ChestLootGenerator
 	private final static ChestLootTable HIGH_LEVEL_RARE = new ChestLootTable(new ChestLootItem[] {
 			new ChestLootItem(new ItemStack(Item.ironBody), 1),
 			new ChestLootItem(new ItemStack(Item.ironHelmet), 1),
-			new ChestLootItem(new ItemStack(Item.ironGreaves), 1),
+			new ChestLootItem(new ItemStack(Item.ironPants), 1),
 			new ChestLootItem(new ItemStack(Item.silverBody), 1),
 			new ChestLootItem(new ItemStack(Item.silverHelmet), 1),
-			new ChestLootItem(new ItemStack(Item.silverGreaves), 1),
+			new ChestLootItem(new ItemStack(Item.silverPants), 1),
 			new ChestLootItem(new ItemStack(Item.ironIngot), 1),
 			new ChestLootItem(new ItemStack(Item.silverIngot), 1),
 			new ChestLootItem(new ItemStack(Item.silverSword), 1),
@@ -64,7 +64,7 @@ public class ChestLootGenerator
 	private final static ChestLootTable LOW_LEVEL_RARE = new ChestLootTable(new ChestLootItem[] { 
 			new ChestLootItem(new ItemStack(Item.bronzeBody), 1),  
 			new ChestLootItem(new ItemStack(Item.bronzeHelmet), 1),
-			new ChestLootItem(new ItemStack(Item.bronzeGreaves), 1),
+			new ChestLootItem(new ItemStack(Item.bronzePants), 1),
 			new ChestLootItem(new ItemStack(Item.ironIngot), 1),
 			new ChestLootItem(new ItemStack(Item.bronzeSword), 1),
 			new ChestLootItem(new ItemStack(Item.ironPickaxe), 1),

@@ -116,9 +116,19 @@ public class RecipeManager
 	Recipe copperHelmet = new Recipe(this, new ItemStack(Item.copperHelmet), 'c', new ItemStack[] {
 		new ItemStack(Item.copperIngot, 8) 
 	});	
-	Recipe copperGreaves = new Recipe(this, new ItemStack(Item.copperGreaves), 'c', new ItemStack[] {
+	Recipe copperGreaves = new Recipe(this, new ItemStack(Item.copperPants), 'c', new ItemStack[] {
 		new ItemStack(Item.copperIngot, 7)
 	});	
+	Recipe copperBelt = new Recipe(this, new ItemStack(Item.copperBelt), 'c', new ItemStack[] {
+		new ItemStack(Item.copperIngot, 5)
+	});	
+	Recipe copperBoots = new Recipe(this, new ItemStack(Item.copperBoots), 'c', new ItemStack[] {
+		new ItemStack(Item.copperIngot, 5)
+	});	
+	Recipe copperGloves = new Recipe(this, new ItemStack(Item.copperGloves), 'c', new ItemStack[] {
+		new ItemStack(Item.copperIngot, 5)
+	});	
+	
 	
 	Recipe bronzeAxe = new Recipe(this, new ItemStack(Item.bronzeAxe), 'c', new ItemStack[] {
 		new ItemStack(Item.bronzeIngot, 7), new ItemStack(Block.plank, 5)
@@ -138,9 +148,18 @@ public class RecipeManager
 	Recipe bronzeHelmet = new Recipe(this, new ItemStack(Item.bronzeHelmet), 'c', new ItemStack[] {
 		new ItemStack(Item.bronzeIngot, 10)
 	});	
-	Recipe bronzeGreaves = new Recipe(this, new ItemStack(Item.bronzeGreaves), 'c', new ItemStack[] {
+	Recipe bronzeGreaves = new Recipe(this, new ItemStack(Item.bronzePants), 'c', new ItemStack[] {
 		new ItemStack(Item.bronzeIngot, 8)
 	});		
+	Recipe bronzeBelt = new Recipe(this, new ItemStack(Item.bronzeBelt), 'c', new ItemStack[] {
+		new ItemStack(Item.bronzeIngot, 5)
+	});	
+	Recipe bronzeBoots = new Recipe(this, new ItemStack(Item.bronzeBoots), 'c', new ItemStack[] {
+		new ItemStack(Item.bronzeIngot, 5)
+	});	
+	Recipe bronzeGloves = new Recipe(this, new ItemStack(Item.bronzeGloves), 'c', new ItemStack[] {
+		new ItemStack(Item.bronzeIngot, 5)
+	});	
 	
 	Recipe ironAxe = new Recipe(this, new ItemStack(Item.ironAxe), 'c', new ItemStack[] {
 		new ItemStack(Item.ironIngot, 9), new ItemStack(Block.plank, 5)
@@ -160,8 +179,17 @@ public class RecipeManager
 	Recipe ironHelmet = new Recipe(this, new ItemStack(Item.ironHelmet), 'c', new ItemStack[] {
 		new ItemStack(Item.ironIngot, 11)
 	});	
-	Recipe ironGreaves = new Recipe(this, new ItemStack(Item.ironGreaves), 'c', new ItemStack[] {
+	Recipe ironGreaves = new Recipe(this, new ItemStack(Item.ironPants), 'c', new ItemStack[] {
 		new ItemStack(Item.ironIngot, 10)
+	});	
+	Recipe ironBelt = new Recipe(this, new ItemStack(Item.ironBelt), 'c', new ItemStack[] {
+		new ItemStack(Item.ironIngot, 7)
+	});	
+	Recipe ironBoots = new Recipe(this, new ItemStack(Item.ironBoots), 'c', new ItemStack[] {
+		new ItemStack(Item.ironIngot, 7)
+	});	
+	Recipe ironGloves = new Recipe(this, new ItemStack(Item.ironGloves), 'c', new ItemStack[] {
+		new ItemStack(Item.ironIngot, 7)
 	});	
 	
 	Recipe silverAxe = new Recipe(this, new ItemStack(Item.silverAxe), 'c', new ItemStack[] {
@@ -182,8 +210,17 @@ public class RecipeManager
 	Recipe silverHelmet = new Recipe(this, new ItemStack(Item.silverHelmet), 'c', new ItemStack[] {
 		new ItemStack(Item.silverIngot, 13)
 	});	
-	Recipe silverGreaves = new Recipe(this, new ItemStack(Item.silverGreaves), 'c', new ItemStack[] {
+	Recipe silverGreaves = new Recipe(this, new ItemStack(Item.silverPants), 'c', new ItemStack[] {
 		new ItemStack(Item.silverIngot, 12)
+	});	
+	Recipe silverBelt = new Recipe(this, new ItemStack(Item.silverBelt), 'c', new ItemStack[] {
+		new ItemStack(Item.silverIngot, 9)
+	});	
+	Recipe silverBoots = new Recipe(this, new ItemStack(Item.silverBoots), 'c', new ItemStack[] {
+		new ItemStack(Item.silverIngot, 9)
+	});	
+	Recipe silverGloves = new Recipe(this, new ItemStack(Item.silverGloves), 'c', new ItemStack[] {
+		new ItemStack(Item.silverIngot, 9)
 	});	
 	
 	Recipe goldAxe = new Recipe(this, new ItemStack(Item.goldAxe), 'c', new ItemStack[] {
@@ -204,8 +241,17 @@ public class RecipeManager
 	Recipe goldHelmet = new Recipe(this, new ItemStack(Item.goldHelmet), 'c', new ItemStack[] {
 		new ItemStack(Item.goldIngot, 16)
 	});	
-	Recipe goldGreaves = new Recipe(this, new ItemStack(Item.goldGreaves), 'c', new ItemStack[] {
+	Recipe goldGreaves = new Recipe(this, new ItemStack(Item.goldPants), 'c', new ItemStack[] {
 		new ItemStack(Item.goldIngot, 15)
+	});	
+	Recipe goldBelt = new Recipe(this, new ItemStack(Item.goldBelt), 'c', new ItemStack[] {
+		new ItemStack(Item.goldIngot, 12)
+	});	
+	Recipe goldBoots = new Recipe(this, new ItemStack(Item.goldBoots), 'c', new ItemStack[] {
+		new ItemStack(Item.goldIngot, 12)
+	});	
+	Recipe goldGloves = new Recipe(this, new ItemStack(Item.goldGloves), 'c', new ItemStack[] {
+		new ItemStack(Item.goldIngot, 12)
 	});	
 	
 	Recipe woodenArrow = new Recipe(this, new ItemStack(Item.woodenArrow, 4), 'c', new ItemStack[] {

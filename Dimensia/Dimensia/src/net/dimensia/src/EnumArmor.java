@@ -1,8 +1,9 @@
 package net.dimensia.src;
 
 /**
- * EnumArmor defines the armour values given by a specific grade of equipment. These values are available for any piece of the Armour
- * set (the helmet, chestpiece, and greaves). Defense values are generally: Chestpiece > helmet >= greaves.
+ * EnumArmor defines the armour values given by a specific grade of equipment. These values are 
+ * available for any piece of the Armour set (the helmet, chestpiece, and pants, boots, belts, and gloves). 
+ * Defense values are generally: Chestpiece > helmet >= pants > boots >= gloves >= belt.
  * @author      Alec Sobeck
  * @author      Matthew Robertson
  * @version     1.0
@@ -10,22 +11,28 @@ package net.dimensia.src;
  */
 public enum EnumArmor 
 {
-	NOTHING(0, 0, 0),
-	COPPER(1, 2, 1),
-	BRONZE(1, 3, 2),
-	IRON(2, 4, 2),
-	SILVER(3, 4, 2),
-	GOLD(4, 5, 3);
+	NOTHING(0, 0, 0, 0, 0, 0),
+	COPPER(2, 3, 2, 1, 1, 1),
+	BRONZE(2, 4, 3, 1, 1, 1),
+	IRON(3, 5, 4, 2, 2, 2),
+	SILVER(4, 6, 5, 3, 3, 3),
+	GOLD(5, 7, 5, 4, 4, 4);
 
-	public int helmDefense;
-	public int bodyDefense;
-	public int greavesDefense;
+	private final int helmDefense;
+	private final int bodyDefense;
+	private final int pantsDefense;
+	private final int bootsDefense;
+	private final int glovesDefense;
+	private final int beltDefense;
 	
-	EnumArmor(int helmDef, int bodyDef, int greavesDef)
+	EnumArmor(int helmDef, int bodyDef, int pantsDef, int bootsDefense, int glovesDefense, int beltDefense)
 	{
 		this.helmDefense = helmDef;
 		this.bodyDefense = bodyDef;
-		this.greavesDefense = greavesDef;
+		this.pantsDefense = pantsDef;
+		this.bootsDefense = bootsDefense;
+		this.glovesDefense = glovesDefense;
+		this.beltDefense = beltDefense;
 	}
 	
 	public int getHelmetDefense()
@@ -40,6 +47,21 @@ public enum EnumArmor
 	
 	public int getGreavesDefense()
 	{
-		return greavesDefense;
+		return pantsDefense;
+	}
+	
+	public int getBootsDefense()
+	{
+		return bootsDefense;
+	}
+	
+	public int getGlovesDefense()
+	{
+		return glovesDefense;
+	}
+	
+	public int getBeltDefense()
+	{
+		return beltDefense;
 	}
 }

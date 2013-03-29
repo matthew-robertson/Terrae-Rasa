@@ -242,20 +242,38 @@ public class RenderUI extends Render
 			}		
 		}
 		
-		//Armour and Accessories
-		for(int i = 0; i < 8; i++) 
+		//Quiver
+		for(int i = 0; i < player.inventory.getQuiverLength(); i++) 
 		{
 			int size = 20;
-			int x1 = (int) ((Display.getWidth() * 0.5f) - (size * 2.5f));
-			int y1 = 80 + (i * (size + 1));
+			int x1 = (int) ((Display.getWidth() * 0.25f) + (-7 * size));
+			int y1 = (int) ((Display.getHeight() * 0.5f) - (i * size) - (size + 22f));
+			
+			if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
+			{
+				return player.inventory.getQuiverStack(i);
+			}		
+		}
 		
+		//Armour and Accessories
+		int armorOffset = 80;
+		int size = 20;
+		if(armorOffset + (9 * (size + 1)) > Display.getHeight() * 0.5F)
+		{
+			armorOffset = (int) ((Display.getHeight() * 0.5F) - ((9 * (size + 1))));
+		}
+		for(int i = 0; i < player.inventory.getArmorInventoryLength(); i++) //Armour and Accessories
+		{
+			int x1 = (int) ((Display.getWidth() * 0.5f) - ((size + 2) * (1.5 + (i / 5))));
+			int y1 = armorOffset + ((i % 5) * (size + 2));	
+			
 			if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
 			{
 				return player.inventory.getArmorInventoryStack(i);
 			}			
 		}
 		
-		int size = 20;
+		size = 20;
 		int x1 = (int)(Display.getWidth() * 0.25f) - (6 * 20); 
 		int y1 = (int)(Display.getHeight() * 0.5f) - (6 * 20);
 		
@@ -586,6 +604,11 @@ public class RenderUI extends Render
 			mouseItem = player.inventory.getTrashStack(index);
 			player.inventory.setTrashStack(null, index);
 		}
+		else if(whichInventory == 4) //Quiver
+		{
+			mouseItem = player.inventory.getQuiverStack(index);
+			player.inventory.setQuiverStack(null, index);
+		}			
 	}
 	
 	/**
@@ -606,15 +629,17 @@ public class RenderUI extends Render
 			}
 			else if(player.inventory.getMainInventoryStack(index).getItemID() == mouseItem.getItemID())
 			{
-				if(player.inventory.getMainInventoryStack(index).getStackSize() + mouseItem.getStackSize() <= player.inventory.getMainInventoryStack(index).getMaxStackSize())
+				if(player.inventory.getMainInventoryStack(index).getStackSize() + mouseItem.getStackSize() 
+						<= player.inventory.getMainInventoryStack(index).getMaxStackSize())
 				{
 					player.inventory.combineItemStacksInSlot(world, player, mouseItem, index);
 					mouseItem = null;
 				}
 				else
 				{
-					mouseItem.removeFromStack((player.inventory.getMainInventoryStack(index).getMaxStackSize() - player.inventory.getMainInventoryStack(index).getStackSize()));
-					player.inventory.getMainInventoryStack(index).setStackSize(player.inventory.getMainInventoryStack(index).getMaxStackSize());
+					mouseItem.removeFromStack((player.inventory.getMainInventoryStack(index).getMaxStackSize() - 
+							player.inventory.getMainInventoryStack(index).getStackSize()));
+					player.inventory.adjustMainInventoryStackSize(index, player.inventory.getMainInventoryStack(index).getMaxStackSize());
 				}
 			}
 			else //If there is an item there, swap that slot's item and the mouse's item.
@@ -635,21 +660,42 @@ public class RenderUI extends Render
 					return;
 				}	
 			}
-			if(index == 1) //Body
+			else if(index == 1) //Body
 			{
 				if(!(item != null) || !(item instanceof ItemArmorBody))
 				{
 					return;
 				}	
 			}
-			if(index == 2) //Greaves
+			else if(index == 2) //Belt
 			{
-				if(!(item != null) || !(item instanceof ItemArmorGreaves))
+				if(!(item != null) || !(item instanceof ItemArmorBelt))
+				{
+					return;
+				}	
+			}			
+			else if(index == 3) //Pants
+			{
+				if(!(item != null) || !(item instanceof ItemArmorPants))
 				{
 					return;
 				}	
 			}
-			if(index > 2) //Accessory
+			else if(index == 4) //Boots
+			{
+				if(!(item != null) || !(item instanceof ItemArmorBoots))
+				{
+					return;
+				}	
+			}
+			else if(index == 5) //Gloves
+			{
+				if(!(item != null) || !(item instanceof ItemArmorGloves))
+				{
+					return;
+				}	
+			}
+			else //Accessory
 			{
 				if(!(item != null) || !(item instanceof ItemArmorAccessory))
 				{
@@ -674,6 +720,26 @@ public class RenderUI extends Render
 			//The mouse doesnt swap items in this instance, so just place the item there
 			player.inventory.setTrashStack(mouseItem, index);
 			mouseItem = null;
+		}
+		else if(whichInventory == 4) //Quiver
+		{
+			Item item = Item.itemsList[mouseItem.getItemID()];
+			if(!(item instanceof ItemAmmo))
+			{
+				return;
+			}
+			
+			if(player.inventory.getQuiverStack(index) == null) //There's nothing there, so the mouse doesnt have to pickup something
+			{
+				player.inventory.setQuiverStack(mouseItem, index);
+				mouseItem = null;
+			}
+			else //If there is an item there, swap that slot's item and the mouse's item.
+			{
+				ItemStack stack = player.inventory.getQuiverStack(index);
+				player.inventory.setQuiverStack(mouseItem, index);
+				mouseItem = stack;
+			}
 		}
 		else //If something's added to no inventory, then obviously something's wrong.
 		{
@@ -773,12 +839,36 @@ public class RenderUI extends Render
 			}		
 		}
 		
-		for(int i = 0; i < 8; i++) //Armour and Accessories
+		for(int i = 0; i < player.inventory.getMainInventoryLength(); i++) //Quiver
 		{
 			int size = 20;
-			int x1 = (int) ((Display.getWidth() * 0.5f) - (size * 2.5f));
-			int y1 = 80 + (i * (size + 1));
+			int x1 = (int) ((Display.getWidth() * 0.25f) + (-7 * size));
+			int y1 = (int) ((Display.getHeight() * 0.5f) - (i * (size)) - (size + 22f));
+			
+			if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
+			{
+				if(player.inventory.getMainInventoryStack(i) != null && mouseItem == null) //The mouse doesn't have something picked up
+				{
+					pickUpMouseItem(world, player, 4, i, x - x1 - 2, y - y1 - 2, 16);
+				}
+				else if(mouseItem != null) //The mouse has something picked up
+				{
+					placeItemIntoInventory(world, player, 4, i);
+				}
+			}		
+		}
 		
+		int armorOffset = 80;
+		int size = 20;
+		if(armorOffset + (9 * (size + 1)) > Display.getHeight() * 0.5F)
+		{
+			armorOffset = (int) ((Display.getHeight() * 0.5F) - ((9 * (size + 1))));
+		}
+		for(int i = 0; i < player.inventory.getArmorInventoryLength(); i++) //Armour and Accessories
+		{
+			int x1 = (int) ((Display.getWidth() * 0.5f) - ((size + 2) * (1.5 + (i / 5))));
+			int y1 = armorOffset + ((i % 5) * (size + 2));	
+			
 			if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
 			{
 				if(player.inventory.getArmorInventoryStack(i) != null && mouseItem == null) //The mouse doesn't have something picked up
@@ -812,7 +902,7 @@ public class RenderUI extends Render
 		//Recipe Slots:
 		int xoff = (int) (Display.getWidth() * 0.25f) - 62;
 		int yoff = 10;
-		int size = 20;
+		size = 20;
 			
 		x1 = xoff;
 		y1 = yoff; 
@@ -1241,9 +1331,10 @@ public class RenderUI extends Render
 	{
 		GL11.glColor4f(1, 1, 1, 0.6f);
 
+		//Inventory Frames
 		actionbarSlot.bind();
 		t.startDrawingQuads();
-		for(int i = 0; i < player.inventory.getMainInventory().length; i++) //Inventory Frames
+		for(int i = 0; i < player.inventory.getMainInventory().length; i++) 
 		{
 			int size = 20;
 			int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + (((i % 12) - 6) * (size)));
@@ -1255,19 +1346,34 @@ public class RenderUI extends Render
 		}
 		t.draw();
 		
+		//Quiver Frames
+		t.startDrawingQuads();
+		t.setColorRGBA_F(0.666f, 0.666f, 0.666f, 0.6f);
+		for(int i = 0; i < player.inventory.getQuiverLength(); i++) 
+		{
+			int size = 20;
+			int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + (-7 * size));
+			int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - (i * size) - (size + 22f));
+			t.addVertexWithUV(x, y + size, 0, 0, 1);
+			t.addVertexWithUV(x + size, y + size, 0, 1, 1);
+			t.addVertexWithUV(x + size, y, 0, 1, 0);
+			t.addVertexWithUV(x, y, 0, 0, 0);
+		}
+		t.draw();
+		
+		//Armour and Accessories Frames
 		GL11.glColor4f(0.603f, 1.0f, 0.466f, 0.6f);
 		t.startDrawingQuads();		
 		int armorOffset = 80;
 		int size = 20;
-		
 		if(armorOffset + (9 * (size + 1)) > Display.getHeight() * 0.5F)
 		{
 			armorOffset = (int) ((Display.getHeight() * 0.5F) - ((9 * (size + 1))));
 		}
-		for(int i = 0; i < 8; i++) //Armour and Accessories Frames
+		for(int i = 0; i < player.inventory.getArmorInventoryLength(); i++) 
 		{
-			int x = (int) (getCameraX() + (Display.getWidth() * 0.5f) - (size * 2.5f));
-			int y = getCameraY() + armorOffset + (i * (size + 1));
+			int x = (int) (getCameraX() + (Display.getWidth() * 0.5f) - ((size + 2) * (1.5 + (i / 5))));
+			int y = getCameraY() + armorOffset + ((i % 5) * (size + 2));
 			t.addVertexWithUV(x, y + size, 0, 0, 1);
 			t.addVertexWithUV(x + size, y + size, 0, 1, 1);
 			t.addVertexWithUV(x + size, y, 0, 1, 0);
@@ -1275,7 +1381,8 @@ public class RenderUI extends Render
 		}
 		t.draw();	
 		
-		t.startDrawingQuads(); //Garbage Slot Frame
+		//Garbage Slot Frame
+		t.startDrawingQuads(); 
 		GL11.glColor4f(0.5f, 0.5f, 0.5f, 0.6f);
 		size = 20;
 		int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + ((-6 * (size))));
@@ -1300,8 +1407,6 @@ public class RenderUI extends Render
 		
 		populateInventorySlots(world, player); 
 		renderScrollableCraftingRecipeWheel(world, player);
-		
-		//saveAndQuit.draw();
 	}		
 
 	/**
@@ -1311,7 +1416,7 @@ public class RenderUI extends Render
 	{
 		GL11.glColor4f(1, 1, 1, 1);
 		
-		for(int i = 0; i < 48; i++) //Main Inventory
+		for(int i = 0; i < player.inventory.getMainInventoryLength(); i++) //Main Inventory
 		{
 			if(player.inventory.getMainInventoryStack(i) == null) 
 			{
@@ -1350,6 +1455,30 @@ public class RenderUI extends Render
 			}
 		}	
 		
+		//Quiver Inventory
+		for(int i = 0; i < player.inventory.getQuiverLength(); i++) 
+		{
+			if(player.inventory.getQuiverStack(i) == null) 
+			{
+				continue;
+			}
+			else
+			{
+				int size = 16;
+				int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + (-7 * (size + 4)) + 2);
+				int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - (i * (size + 4)) - (size + 24f));
+				
+				textures[player.inventory.getQuiverStack(i).getItemID()].bind();
+				t.startDrawingQuads();
+				t.addVertexWithUV(x, y + size, 0, 0, 1);
+				t.addVertexWithUV(x + size, y + size, 0, 1, 1);
+				t.addVertexWithUV(x + size, y, 0, 1, 0);
+				t.addVertexWithUV(x, y, 0, 0, 0);
+				t.draw();
+			}
+		}	
+				
+		//
 		int armorOffset = 80;
 		int size = 16;
 		
@@ -1370,8 +1499,8 @@ public class RenderUI extends Render
 				textures[player.inventory.getArmorInventoryStack(i).getItemID()].bind();
 				t.startDrawingQuads();
 				size = 16;
-				int x = (int) (getCameraX() + (Display.getWidth() * 0.5f) - ((size + 4) * 2.5f) + 2);
-				int y = getCameraY() + armorOffset + (i * (size + 5));
+				int x = (int) (getCameraX() + (Display.getWidth() * 0.5f) - ((size + 6) * (1.5f + (i / 5))) + 2);
+				int y = getCameraY() + armorOffset + ((i % 5) * (size + 6));
 				t.addVertexWithUV(x, y + size, 0, 0, 1);
 				t.addVertexWithUV(x + size, y + size, 0, 1, 1);
 				t.addVertexWithUV(x + size, y, 0, 1, 0);
@@ -1379,6 +1508,8 @@ public class RenderUI extends Render
 				t.draw();
 			}
 		}	
+//		int x = (int) (getCameraX() + (Display.getWidth() * 0.5f) - ((size + 2) * (1.5 + (i / 5))));
+//		int y = getCameraY() + armorOffset + ((i % 5) * (size + 2));
 		
 		if(player.inventory.getTrashStack(0) != null) //Garbage Slot 
 		{
@@ -1396,7 +1527,7 @@ public class RenderUI extends Render
 		
 		//Stack Sizes:
 		
-		for(int i = 0; i < 48; i++) //Main Inventory
+		for(int i = 0; i < player.inventory.getMainInventoryLength(); i++) //Main Inventory
 		{
 			if(player.inventory.getMainInventoryStack(i) == null || player.inventory.getMainInventoryStack(i).getMaxStackSize() == 1) 
 			{
@@ -1414,7 +1545,27 @@ public class RenderUI extends Render
 						-0.25f);
 			}
 		}	
-		
+
+		//Quiver
+		for(int i = 0; i < player.inventory.getQuiverLength(); i++) 
+		{
+			if(player.inventory.getQuiverStack(i) == null || player.inventory.getQuiverStack(i).getMaxStackSize() == 1) 
+			{
+				continue;
+			}
+			else
+			{
+				GL11.glColor4f(0, 1, 0, 1);
+				int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + (-7 * 20) + 2);
+				int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - (i * 20) - 40);
+				trueTypeFont.drawString(x - 2, 
+						y + 18, 
+						new StringBuilder().append(player.inventory.getQuiverStack(i).getStackSize()).toString(), 
+						0.25f, 
+						-0.25f);
+			}
+		}	
+	
 		GL11.glColor4f(1, 1, 1, 1);
 	}
 	

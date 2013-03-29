@@ -1,42 +1,53 @@
 package net.dimensia.src;
 
-import java.util.Vector;
-
 /**
  * <code>Spell extends ActionbarItem</code>
  * <br><br>
  * 
- * This class is a WIP -- proper doc comment not yet done. Will be the baseclass for all spells
+ * Spell is the base class for all Spells. A new spell can be constructed using {@link #Spell(int)} and 
+ * should be created in this class similarly to Items or Blocks. 
  * 
- * 
+ * @author Alec Sobeck
+ * @author Matthew Robertson
+ * @version 1.0
+ * @since 1.0
  */
 public class Spell extends ActionbarItem
 {
 	private static final long serialVersionUID = 1L;
-
+	protected int manaCost;
+	
+	public Spell(int i)
+	{
+		super(i);
+		this.id = i + spellIndex;
+		
+		if(spellList[id] != null)
+		{
+			System.out.println(new StringBuilder().append("Conflict@ itemsList").append(id).toString());
+			throw new RuntimeException(new StringBuilder().append("Conflict@ itemsList").append(id).toString());
+		}
+		spellList[id] = this;		
+		
+	}
+	
 	public Spell(Spell spell)
 	{
 		super(spell);
-		throw new RuntimeException("CPY CSTR @ SPELL NYI");
+		this.manaCost = spell.manaCost;
 	}
 
-	protected int manaReq;
-
-	protected Spell setManaReq(int i){
-		manaReq = i;
+	protected Spell setManaCost(int cost)
+	{
+		manaCost = cost;
 		return this;
 	}
 	
-	public int getManaReq(){
-		return manaReq;
+	public int getManaCost()
+	{
+		return manaCost;
 	}
 	
-	/** -- do these belong here? -- pulled from Item*/
-	protected Vector<ItemStack> ammo;
+	public final static Spell[] spellList = new Spell[spellIndex + 2096];
 	
-	public ItemStack[] getAmmoAsArray(){
-		ItemStack[] ammunition = new ItemStack[ammo.size()];
-		ammo.copyInto(ammunition);
-		return ammunition;
-	}
 }

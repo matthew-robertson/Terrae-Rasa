@@ -25,7 +25,24 @@ public class InventoryPlayer
 	private Hashtable<String, Integer> inventoryTotals;
 	private ItemStack[] trash;
 	private ItemStack[] mainInventory;
+	/**
+	 * Slots are in order (the actual index can be found by subtracting 1 from the number next to that piece of
+	 * armor): <br>
+	 * <ol>
+	 * <li> Helmet </li>
+	 * <li> Body </li>
+	 * <li> Belt </li>
+	 * <li> Pants </li>
+	 * <li> Boots </li>
+	 * <li> Gloves </li>
+	 * <li> Accessories </li>
+	 * <li> Accessories </li>
+	 * <li> Accessories </li>
+	 * <li> Accessories </li>
+	 * </ol>
+	 */
 	private ItemStack[] armorInventory;		
+	private ItemStack[] quiver; 
 	
 	/**
 	 * Only constructor for InventoryPlayer. <br>
@@ -40,6 +57,9 @@ public class InventoryPlayer
 		mainInventory = new ItemStack[48];
 		armorInventory = new ItemStack[10];
 		trash = new ItemStack[1];
+		quiver = new ItemStack[4];
+		quiver[0] = new ItemStack(Item.woodenArrow, 200);
+		quiver[2] = new ItemStack(Item.woodenArrow, 200);
 		initializeInventoryTotals(false);	
 	}
 	
@@ -502,5 +522,72 @@ public class InventoryPlayer
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Volatile function to return the quiver[]. Very vulnerable to pointer issues if modification to quiver[]
+	 * is attempted using this method
+	 * @return the quiver[] array
+	 */
+	public final ItemStack[] getQuiver()
+	{
+		return quiver;
+	}
+	
+	/**
+	 * Gets the size of the quiver
+	 * @return the length of the quiver[] array
+	 */
+	public int getQuiverLength() 
+	{
+		return quiver.length;
+	}
+	
+	/**
+	 * Tries to place an ItemStack in the selected index of the quiver[]. Passing a null ItemStack will clear that slot
+	 * of the quiver[].
+	 * @param stack stack to place in quiver[]
+	 * @param index where to place the stack in quiver[]
+	 * @return success of the operation
+	 */
+	public boolean setQuiverStack(ItemStack stack, int index)
+	{
+		if(stack == null)
+		{
+			quiver[index] = null;
+		}
+		else
+		{
+			quiver[index] = new ItemStack(stack);
+		}
+		return true;
+	}
+	
+	/**
+	 * Adjusts the stacksize of an Itemstack in the mainInventory[]. This will do nothing if that stack is null.
+	 * @param index the index of the ItemStack in the mainInventory[]
+	 * @param newStackSize the new stacksize of the ItemStack
+	 */
+	public void adjustMainInventoryStackSize(int index, int newStackSize)
+	{
+		if(mainInventory[index] != null && mainInventory[index].getStackSize() != newStackSize)
+		{
+			//The change in stack size. A positive number is an increase, negative number a 
+			//decrease overall.
+			int differenceInStackSize = newStackSize - mainInventory[index].getStackSize();			
+			inventoryTotals.put(mainInventory[index].getItemName(), 
+					inventoryTotals.get(mainInventory[index].getItemName()) + differenceInStackSize);				
+			mainInventory[index].setStackSize(newStackSize);
+		}
+	}
+	
+	/**
+	 * Gets a reference safe ItemStack from the quiver[] 
+	 * @param index the slot of quiver[] to return.
+	 * @return a pointer(reference) safe ItemStack at the specified index of quiver[] or null if nothing is there
+	 */
+	public final ItemStack getQuiverStack(int index)
+	{
+		return  (quiver[index] != null) ? new ItemStack(quiver[index]) : null;
 	}
 }
