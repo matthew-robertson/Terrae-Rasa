@@ -437,7 +437,8 @@ public class World
 		{
 			chunkManager.addAllLoadedChunks(this, getChunks());
 		}
-		if (Mouse.isButtonDown(0) && player.inventory.getMainInventoryStack(player.selectedSlot) != null) 
+		if (player.inventory.getMainInventoryStack(player.selectedSlot).getItemID() < ActionbarItem.spellIndex && 
+				Mouse.isButtonDown(0) && player.inventory.getMainInventoryStack(player.selectedSlot) != null) 
 		{ //player mining, if applicable
 			player.breakBlock(this, ((Render.getCameraX() + MathHelper.getCorrectMouseXPosition()) / 6), ((Render.getCameraY() + MathHelper.getCorrectMouseYPosition()) / 6), (Item.itemsList[player.inventory.getMainInventoryStack(player.selectedSlot).getItemID()]));
 		}
@@ -922,7 +923,10 @@ public class World
 	
 	private void performEnemyToolHittests(EntityLivingPlayer player) //Work in progress, not yet fully implemented
 	{
-		if(!player.hasSwungTool || (player.inventory.getMainInventoryStack(player.selectedSlot) == null) || !(Item.itemsList[player.inventory.getMainInventoryStack(player.selectedSlot).getItemID()] instanceof ItemTool))
+		if(player.inventory.getMainInventoryStack(player.selectedSlot).getItemID() >= ActionbarItem.spellIndex ||
+				!player.hasSwungTool || 
+				(player.inventory.getMainInventoryStack(player.selectedSlot) == null) || 
+				!(Item.itemsList[player.inventory.getMainInventoryStack(player.selectedSlot).getItemID()] instanceof ItemTool))
 		{
 			return;
 		}

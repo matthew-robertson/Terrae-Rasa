@@ -19,17 +19,19 @@ public class EntityLivingItemStack extends EntityLiving
 	public EntityLivingItemStack(float x, float y, ItemStack stack)
 	{
 		super();
-		if(stack.getItemID() < 2048) //Blocks are 6x6 render size
+		if(stack.getItemID() < ActionbarItem.itemIndex) //Blocks are 6x6 render size
 		{
 			width = 6;
 			height = 6;
 		}
-		else if(Item.itemsList[stack.getItemID()] instanceof ItemTool) //Tools are 16x16 render size
+		else if(stack.getItemID() < ActionbarItem.spellIndex && 
+				Item.itemsList[stack.getItemID()] instanceof ItemTool) //Tools are 16x16 render size
 		{
 			width = 16;
 			height = 16;
 		}
-		else if(Item.itemsList[stack.getItemID()] instanceof ItemArmor) //Armor is 14x14 render size
+		else if(stack.getItemID() < ActionbarItem.spellIndex && 
+				Item.itemsList[stack.getItemID()] instanceof ItemArmor) //Armor is 14x14 render size
 		{
 			width = 14;
 			height = 14;

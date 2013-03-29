@@ -280,7 +280,7 @@ public class Item extends ActionbarItem
 	public static Item rocketBoots = new ItemArmorAccessory(130).setIconPosition(0, 3).setName("Rocket Boots");	
 	public static Item ringOfVigor = new ItemArmorAccessory(131).setBonuses(new EnumSetBonuses[]{ 
 			EnumSetBonuses.DAMAGE_DONE_10 
-	}).setIconPosition(0, 3).setName("Ring of Vigor");	
+	}).setIconPosition(0, 3).setName("Ring of Vigor").setExtraTooltipInformation("This ring instills a sense of courage in its wearer.");	
 	public static Item talismanOfWinds = new ItemArmorAccessory(132).setBonuses(new EnumSetBonuses[]{ 
 			EnumSetBonuses.MOVEMENT_SPEED_10 
 	}).setIconPosition(0, 3).setName("Talisman of Winds");	

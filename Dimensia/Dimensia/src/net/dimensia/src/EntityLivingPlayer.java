@@ -92,6 +92,8 @@ public class EntityLivingPlayer extends EntityLiving
 	private final int MAXIMUM_BASE_HEALTH;
 	private final int MAX_BLOCK_PLACE_DISTANCE;
 	private Hashtable<String, Cooldown> cooldowns;
+	public final static int MAX_SPECIAL_ENERGY = 100;
+	public float specialEnergy;
 	
 	/**
 	 * Constructs a new instance of EntityLivingPlayer with default settings, inventory (includes 3 basic tools),
@@ -104,6 +106,7 @@ public class EntityLivingPlayer extends EntityLiving
 	{
 		super();		
 		stamina = 0;
+		specialEnergy = 100;
 		isJumping = false;
 		movementSpeedModifier = 1.0f;		
 		baseSpeed = 5.0f;
@@ -211,6 +214,7 @@ public class EntityLivingPlayer extends EntityLiving
 		applyGravity(world); //Apply Gravity to the player (and jumping)
 		applyHealthRegen();
 		applyManaRegen();
+		applySpecialRegen();
 		checkForNearbyBlocks(world);	
 		verifyChestRange();
 		updateCooldowns();
@@ -1312,5 +1316,48 @@ public class EntityLivingPlayer extends EntityLiving
 	public int getTicksLeftOnCooldown(int id)
 	{
 		return cooldowns.get("" + id).ticksLeft;
+	}
+
+	/**
+	 * Regens a little bit of the special energy bar
+	 */
+	private void applySpecialRegen()
+	{
+		//25% per minute.
+		specialEnergy += 0.020833333F;
+		
+		if(specialEnergy > MAX_SPECIAL_ENERGY)
+		{
+			specialEnergy = MAX_SPECIAL_ENERGY;
+		}
+	}
+	
+	/**
+	 * Restores special energy, upto the cap
+	 * @param restore the amount restored
+	 * @return whether or not any special energy was restored
+	 */
+	public boolean restoreSpecialEnergy(int restore)
+	{
+		if(specialEnergy == MAX_SPECIAL_ENERGY)
+		{
+			return false;
+		}
+		
+		specialEnergy += restore;
+		if(specialEnergy > MAX_SPECIAL_ENERGY)
+		{
+			specialEnergy = MAX_SPECIAL_ENERGY;
+		}
+		return true;
+	}
+	
+	/**
+	 * Spends the given amount of special energy - even if the player doesnt have it.
+	 * @param amount the amount of energy to spend
+	 */
+	public void spendSpecialEnergy(int amount)
+	{
+		specialEnergy -= amount;
 	}
 }

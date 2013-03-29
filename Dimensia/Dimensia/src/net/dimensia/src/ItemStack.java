@@ -55,16 +55,21 @@ public class ItemStack
 		itemID = id;
 		this.stackSize = stackSize;
 		
-		if(itemID < 2048)
+		if(itemID < ActionbarItem.itemIndex)
 		{
 			itemName = Block.blocksList[id].name;
 			maxStackSize = Block.blocksList[id].maxStackSize;
 		}
-		else
+		else if(itemID >= ActionbarItem.itemIndex && itemID < ActionbarItem.spellIndex)
 		{
 			itemName = Item.itemsList[id].name;
 			maxStackSize = Item.itemsList[id].maxStackSize;			
 		}		
+		else
+		{
+			itemName = Spell.spellList[id].name;
+			maxStackSize = Spell.spellList[id].maxStackSize;
+		}
 	}
 	
 	public ItemStack(int id)
@@ -72,16 +77,21 @@ public class ItemStack
 		itemID = id;
 		stackSize = 1;
 		
-		if(itemID < 2048)
+		if(itemID < ActionbarItem.itemIndex)
 		{
 			itemName = Block.blocksList[id].name;
 			maxStackSize = Block.blocksList[id].maxStackSize;
 		}
-		else
+		else if(itemID >= ActionbarItem.itemIndex && itemID < ActionbarItem.spellIndex)
 		{
 			itemName = Item.itemsList[id].name;
 			maxStackSize = Item.itemsList[id].maxStackSize;			
 		}		
+		else
+		{
+			itemName = Spell.spellList[id].name;
+			maxStackSize = Spell.spellList[id].maxStackSize;
+		}
 	}
 	
 	public ItemStack(ItemStack stack)

@@ -38,17 +38,21 @@ public class MouseInput
 				}	
 				
 				//Attempt to launch a projectile
-				Item item = Item.itemsList[player.inventory.getMainInventoryStack(active).getItemID()];
-				if (item instanceof ItemMagic){
-					ItemMagic spell = (ItemMagic) item;
-					player.launchProjectileMagic(world, (float)(Render.getCameraX() + MathHelper.getCorrectMouseXPosition()), (float)(Render.getCameraY() + MathHelper.getCorrectMouseYPosition()), spell);
+				int selectedItemID = player.inventory.getMainInventoryStack(active).getItemID();
+				if(selectedItemID >= ActionbarItem.itemIndex && selectedItemID < ActionbarItem.spellIndex)
+				{
+					Item item = Item.itemsList[selectedItemID];
+					if (item instanceof ItemMagic){
+						ItemMagic spell = (ItemMagic) item;
+						player.launchProjectileMagic(world, (float)(Render.getCameraX() + MathHelper.getCorrectMouseXPosition()), (float)(Render.getCameraY() + MathHelper.getCorrectMouseYPosition()), spell);
+					}
+					else if (item instanceof ItemRanged){
+						ItemRanged weapon = (ItemRanged) item;
+						player.launchProjectileWeapon(world, (float)(Render.getCameraX() + MathHelper.getCorrectMouseXPosition()), (float)(Render.getCameraY() + MathHelper.getCorrectMouseYPosition()), weapon);
+					}
+					//Try to mine a block
+					player.breakBlock(world, mouseBX, mouseBY, Item.itemsList[player.inventory.getMainInventoryStack(active).getItemID()]); 
 				}
-				else if (item instanceof ItemRanged){
-					ItemRanged weapon = (ItemRanged) item;
-					player.launchProjectileWeapon(world, (float)(Render.getCameraX() + MathHelper.getCorrectMouseXPosition()), (float)(Render.getCameraY() + MathHelper.getCorrectMouseYPosition()), weapon);
-				}
-				//Try to mine a block
-				player.breakBlock(world, mouseBX, mouseBY, Item.itemsList[player.inventory.getMainInventoryStack(active).getItemID()]); 
 			}
 		}
 		else if (Mouse.isButtonDown(1)) //Right Mouse down
@@ -70,7 +74,7 @@ public class MouseInput
 			
 			if(player.inventory.getMainInventoryStack(active) != null)
 			{
-				if (!player.isInventoryOpen && player.inventory.getMainInventoryStack(active).getItemID() <= 2048) //If player is holding a block
+				if (!player.isInventoryOpen && player.inventory.getMainInventoryStack(active).getItemID() < ActionbarItem.itemIndex) //If player is holding a block
 				{
 					mouseBX = (int) ((float)(Render.getCameraX() + MathHelper.getCorrectMouseXPosition()) / 6);
 					mouseBY = (int) ((float)(Render.getCameraY() + MathHelper.getCorrectMouseYPosition()) / 6);				
@@ -85,11 +89,21 @@ public class MouseInput
 						world.placeBlock(player, mouseBX, mouseBY, Block.blocksList[player.inventory.getMainInventoryStack(active).getItemID()].clone());
 					}
 				}
-				else if(player.inventory.getMainInventoryStack(active) != null && !player.isInventoryOpen) //otherwise, if it's an item
+				else if(player.inventory.getMainInventoryStack(active) != null && !player.isInventoryOpen && 
+						player.inventory.getMainInventoryStack(active).getItemID() >= ActionbarItem.itemIndex && 
+						player.inventory.getMainInventoryStack(active).getItemID() < ActionbarItem.spellIndex) //otherwise, if it's an item
 				{
 					if(!mouseLock)
 					{
 						Item.itemsList[player.inventory.getMainInventoryStack(active).getItemID()].onRightClick(world, player);
+						mouseLock = true;
+					}
+				}
+				else if(player.inventory.getMainInventoryStack(active) != null && !player.isInventoryOpen) //Spell
+				{
+					if(!mouseLock)
+					{
+						Spell.spellList[player.inventory.getMainInventoryStack(active).getItemID()].onRightClick(world, player);
 						mouseLock = true;
 					}
 				}

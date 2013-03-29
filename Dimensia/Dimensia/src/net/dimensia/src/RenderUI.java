@@ -378,10 +378,15 @@ public class RenderUI extends Render
 					setBonuses = ((ItemArmor)(Item.itemsList[stack.getItemID()])).getStringBonuses();
 				}
 			}
-			else 
+			else if (stack.getItemID() < Item.itemIndex)
 			{
 				quality = EnumItemQuality.COMMON;
 				fulltooltip = Block.blocksList[stack.getItemID()].extraTooltipInformation;
+			}
+			else 
+			{
+				quality = EnumItemQuality.COMMON;
+				fulltooltip = Spell.spellList[stack.getItemID()].extraTooltipInformation;
 			}
 			
 			if(player.isOnCooldown(stack.getItemID()))
@@ -478,6 +483,7 @@ public class RenderUI extends Render
 					PADDING * (setBonusesList.size() + stats.length) + 
 					((plainTooltip.getHeight(itemName)) * 0.5f * (stats.length)) + 
 					((boldTooltip.getHeight(itemName)) * 0.5f * (setBonusesList.size())) + 
+					((plainTooltip.getHeight(itemName)) * 0.7f * (renderLines.size())) + 
 					((!cooldown.equals("")) ? plainTooltip.getHeight(cooldown) * 0.5f + 5: 0);
 			int tooltipHeight = (int) requiredHeight;
 			//Make sure the tooltip doesnt go off the bottom
@@ -839,7 +845,7 @@ public class RenderUI extends Render
 			}		
 		}
 		
-		for(int i = 0; i < player.inventory.getMainInventoryLength(); i++) //Quiver
+		for(int i = 0; i < player.inventory.getQuiverLength(); i++) //Quiver
 		{
 			int size = 20;
 			int x1 = (int) ((Display.getWidth() * 0.25f) + (-7 * size));
@@ -1088,6 +1094,35 @@ public class RenderUI extends Render
 			t.draw();			
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
 		}
+		
+		//Special Energy
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		GL11.glColor4f(0, 0, 0, 1);
+		x1 = getCameraX() + 10;
+		y1 = getCameraY() + 40;		
+		newX = (int) (100);
+		newY = 11;		
+		t.startDrawingQuads();
+		t.addVertexWithUV(x1, y1 + newY, 0, 0, 1);
+		t.addVertexWithUV(x1 + newX, y1 + newY, 0, 1, 1);
+		t.addVertexWithUV(x1 + newX, y1, 0, 1, 0);
+		t.addVertexWithUV(x1, y1, 0, 0, 0);
+		t.draw();			
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		GL11.glColor4f(141F/255, 230F/255, 99F/255, 1);
+		x1 = getCameraX() + 10;
+		y1 = getCameraY() + 40;		
+		newX = (int) (player.specialEnergy / EntityLivingPlayer.MAX_SPECIAL_ENERGY * 100);
+		newY = 11;		
+		t.startDrawingQuads();
+		t.addVertexWithUV(x1, y1 + newY, 0, 0, 1);
+		t.addVertexWithUV(x1 + newX, y1 + newY, 0, 1, 1);
+		t.addVertexWithUV(x1 + newX, y1, 0, 1, 0);
+		t.addVertexWithUV(x1, y1, 0, 0, 0);
+		t.draw();			
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		
 		/*
 		float heartsFull = (float)player.health / 20;	//How many hearts are full? (partial hearts are important too!)	
@@ -1507,11 +1542,7 @@ public class RenderUI extends Render
 				t.addVertexWithUV(x, y, 0, 0, 0);
 				t.draw();
 			}
-		}	
-//		int x = (int) (getCameraX() + (Display.getWidth() * 0.5f) - ((size + 2) * (1.5 + (i / 5))));
-//		int y = getCameraY() + armorOffset + ((i % 5) * (size + 2));
-		
-		if(player.inventory.getTrashStack(0) != null) //Garbage Slot 
+		}			if(player.inventory.getTrashStack(0) != null) //Garbage Slot 
 		{
 			textures[player.inventory.getTrashStack(0).getItemID()].bind();
 			t.startDrawingQuads(); 
@@ -1794,10 +1825,14 @@ public class RenderUI extends Render
 			String health = new StringBuilder().append((int)player.health).append(" / ").append(player.maxHealth).toString();
 			trueTypeFont.drawString((getCameraX() + 35), (getCameraY() + 22), health, 0.3f, -0.3f);
 			
+			//Mana
 			int offset = (player.maxMana < 100) ? 5 : 0;
-			
 			String mana = new StringBuilder().append((int)player.mana).append(" / ").append(player.maxMana).toString();
 			trueTypeFont.drawString((getCameraX() + 35 + offset), (getCameraY() + 37), mana, 0.3f, -0.3f);
+		
+			//Special
+			String special = new StringBuilder().append((int)(player.specialEnergy / EntityLivingPlayer.MAX_SPECIAL_ENERGY * 100)).append("%").toString();
+			trueTypeFont.drawString((getCameraX() + 35 + offset), (getCameraY() + 52), special, 0.3f, -0.3f);
 		}
 		
 		if(player.isInventoryOpen)

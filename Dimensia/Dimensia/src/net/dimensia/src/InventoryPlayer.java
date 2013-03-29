@@ -84,6 +84,13 @@ public class InventoryPlayer
 					inventoryTotals.put(Block.blocksList[i].name, 0);					
 				}
 			}
+			for(int i = 0; i < Spell.spellList.length; i++) //Spell
+			{	
+				if(Spell.spellList[i] != null  && inventoryTotals.get(Spell.spellList[i].getName()) == null) //A new Spell needs added
+				{
+					inventoryTotals.put(Spell.spellList[i].name, 0);					
+				}
+			}
 		}
 		else
 		{
@@ -115,6 +122,20 @@ public class InventoryPlayer
 				else if(Block.blocksList[i] != null) //Otherwise if the block exists, add it with a starting value of 0
 				{
 					inventoryTotals.put(Block.blocksList[i].name, 0);				
+				}
+			}
+			for(int i = 0; i < Spell.spellList.length; i++) //Spell
+			{
+				if(Spell.spellList[i] != null && inventoryTotals.get(Spell.spellList[i].getName()) != null) //If the Item exists and is already in inventoryTotals
+				{
+					if(Spell.spellList[i].getName().toLowerCase() != "unnamed") //And it isnt unnamed
+					{
+						throw new RuntimeException("Spell name already exists : " + Spell.spellList[i].getName()); //There is a name conflict, throw an exception
+					}
+				}
+				else if(Spell.spellList[i] != null) //Otherwise if the item exists, add it with a starting value of 0
+				{
+					inventoryTotals.put(Spell.spellList[i].name, 0);
 				}
 			}
 		}

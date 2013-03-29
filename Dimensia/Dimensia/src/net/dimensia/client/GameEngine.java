@@ -18,6 +18,7 @@ import net.dimensia.src.RenderGlobal;
 import net.dimensia.src.RenderMenu;
 import net.dimensia.src.Settings;
 import net.dimensia.src.SoundManager;
+import net.dimensia.src.Spell;
 import net.dimensia.src.World;
 import net.dimensia.src.WorldHell;
 import net.dimensia.src.WorldSky;
@@ -338,10 +339,10 @@ public class GameEngine
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldHelmet));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldHelmet));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldBody));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldGreaves));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.bronzeHelmet));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.bronzeBody));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.bronzeGreaves));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldPants));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldGloves));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldBoots));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldBelt));
 
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.snowball));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.woodenArrow, 100));
@@ -351,6 +352,8 @@ public class GameEngine
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.regenerationPotion2, 200));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.attackSpeedPotion1, 200));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.manaRegenerationPotion2, 200));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Spell.rejuvenate));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Spell.bulwark));
 		}		
 	}
 	

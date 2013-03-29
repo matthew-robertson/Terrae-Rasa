@@ -134,6 +134,7 @@ public class TextureLoader
         Block[] list = Block.blocksList;
         Item[] list1 = Item.itemsList;
         BufferedImage itemSheet = loadImage("Resources/items.png");
+        Spell[] list2 = Spell.spellList;
         
         for(int i = 0; i < list.length; i++) //Terrain Textures
         {
@@ -237,6 +238,44 @@ public class TextureLoader
 	        glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, get2Fold(bufferStore[i].getWidth()), get2Fold(bufferStore[i].getHeight()), 0, 
 	        		srcPixelFormat, GL_UNSIGNED_BYTE, textureBuffer);
         } 	
+        
+
+        
+        for(int i = 0; i < list2.length; i++) //Spell Textures
+        {
+        	if(list2[i] == null)
+        	{
+        		continue;
+        	}
+        	
+	        textureID = createTextureID();
+	        textureStore[i] = new Texture(textureID);
+	        glBindTexture(GL11.GL_TEXTURE_2D, textureID);
+	        
+	        int w = 16;
+	        int h = 16;
+	        int x = list2[i].iconX * 16;
+	        int y = list2[i].iconY * 16;
+	        
+	        bufferStore[i] = itemSheet.getSubimage(x, y, w, h);
+	        
+	        if (bufferStore[i].getColorModel().hasAlpha()) 
+	        {
+	            srcPixelFormat = GL_RGBA;
+	        } 
+	        else
+	        {
+	            srcPixelFormat = GL_RGB;
+	        }
+	
+	        ByteBuffer textureBuffer = convertImageData(bufferStore[i], textureStore[i]);
+	
+	        glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);//generates a texture that never changes based on view distance
+	    	glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+	        glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, get2Fold(bufferStore[i].getWidth()), get2Fold(bufferStore[i].getHeight()), 0, 
+	        		srcPixelFormat, GL_UNSIGNED_BYTE, textureBuffer);
+        } 	
+        
         
         return textureStore;
     }

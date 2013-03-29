@@ -8,7 +8,10 @@ public class RenderWorld extends Render
 {
 	public void renderToolSwing(World world, EntityLivingPlayer player)
 	{
-		if(!player.hasSwungTool || (player.inventory.getMainInventoryStack(player.selectedSlot) == null) || !(Item.itemsList[player.inventory.getMainInventoryStack(player.selectedSlot).getItemID()] instanceof ItemTool))
+		if(player.inventory.getMainInventoryStack(player.selectedSlot).getItemID() >= ActionbarItem.spellIndex || 
+				!player.hasSwungTool || 
+				(player.inventory.getMainInventoryStack(player.selectedSlot) == null) || 
+				!(Item.itemsList[player.inventory.getMainInventoryStack(player.selectedSlot).getItemID()] instanceof ItemTool))
 		{
 			return;
 		}
