@@ -37,35 +37,15 @@ public class BlockChest extends Block
 	}	
 	
 	/**
-	 * There's a bug with this --- super() cannot be called because block doesnt actually have a copy constructor.
-	 * @param block
+	 * Implements a further version of Block(Block). In addition to Block(Block) a deep copy of all variables
+	 * is performed and a new mainInventory[] is created.
+	 * @param block the block to create a deep copy of
 	 */
 	public BlockChest(BlockChest block)
 	{
 		super(block);
-		this.droppedItem = block.droppedItem;
-		this.maximumDropAmount = block.maximumDropAmount;
-		this.minimumDropAmount = block.minimumDropAmount;
-		this.hasMetaData = block.hasMetaData;
-		this.blockWidth = block.blockWidth; 
-		this.blockHeight = block.blockHeight; 
-		this.maxStackSize = block.maxStackSize;
-		this.textureWidth = block.textureWidth; 
-		this.textureHeight = block.textureHeight; 
-		this.iconX = block.iconX;
-		this.iconY = block.iconY;
-		this.gradeOfToolRequired = block.gradeOfToolRequired;
-		this.blockType = block.blockType;
-		this.blockTier = block.blockTier;
-		this.material = block.material;
-		this.breakable = block.breakable;
-		this.hardness = block.hardness;
-		this.passable = block.passable;
-		this.isOveridable = block.isOveridable;
-		this.isSolid = block.isSolid;
 		this.mainInventory = new ItemStack[block.inventorySize];
 		this.inventorySize = block.inventorySize;
-		//This is not complete
 	}
 	
 	/**

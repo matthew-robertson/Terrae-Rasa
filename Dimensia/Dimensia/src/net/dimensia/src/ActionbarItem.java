@@ -1,17 +1,12 @@
 package net.dimensia.src;
 
-import java.io.Serializable;
-
 /**
- * <code>ActionbarItem implements Serializable</code> <br><br>
  * ActionbarItem is a base class for something that can go in the actionbar. It contains variables regarding the unique id of 
  * that ActionbarItem, as well as its name, any extra tooltip information, and the maximum stack size. Item, Block, Spell and
  * anything else that can be put in the inventory or on the actionbar should extend this for compatability reasons.
  */
 public class ActionbarItem 
-		implements Serializable
 {
-	private static final long serialVersionUID = 1L;
 	public final static int blockIndex = 0;
 	public final static int itemIndex = 2048;
 	public final static int spellIndex = 4096 + 2048;

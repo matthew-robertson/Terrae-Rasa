@@ -9,11 +9,11 @@ public class Animation
 								ANIMATE_VERTICALLY = 2;
 	private Tessellator t = Tessellator.instance;
 	private Texture texture;
-	private TextureCoords animationBounds;
+	//private TextureCoords animationBounds;
 	private TextureCoords[] frameCoords;
 	private int animationIndex;
 	/** There are 20 ticks in a second. To get the actual time of this animation in ms, roughly multiply ticksDuration by 50. */
-	private int ticksDuration; 
+	//private int ticksDuration; 
 	private int frames;
 	private int width;
 	private int height;
@@ -34,12 +34,12 @@ public class Animation
 	public Animation(Texture texture, TextureCoords animationBounds, int renderWidth, int renderHeight, int ticksDuration, int frames, int animationDirection)
 	{
 		this.frames = frames;
-		this.ticksDuration = ticksDuration;
+		//this.ticksDuration = ticksDuration;
 		this.texture = texture;
-		this.animationBounds = animationBounds;
-		animationIndex = 0;
-		durationOfFrameTicks = (ticksDuration / frames > 0) ? (ticksDuration) / frames : 1;
-		frameCoords = new TextureCoords[frames];
+		//this.animationBounds = animationBounds;
+		this.animationIndex = 0;
+		this.durationOfFrameTicks = (ticksDuration / frames > 0) ? (ticksDuration) / frames : 1;
+		this.frameCoords = new TextureCoords[frames];
 		
 		for(int i = 0; i < frames; i++)
 		{

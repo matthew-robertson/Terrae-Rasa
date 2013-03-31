@@ -14,7 +14,6 @@ package net.dimensia.src;
  */
 public class Spell extends ActionbarItem
 {
-	private static final long serialVersionUID = 1L;
 	public static final int RESOURCE_MANA = 1, 
 							   RESOURCE_SPECIAL = 2;
 	protected int cost;

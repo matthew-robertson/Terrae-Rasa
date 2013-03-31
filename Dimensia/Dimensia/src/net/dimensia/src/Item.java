@@ -40,7 +40,6 @@ package net.dimensia.src;
  */
 public class Item extends ActionbarItem
 {
-	private static final long serialVersionUID = 1L;
 	protected EnumToolMaterial material;
 	protected EnumItemQuality itemQuality;	
 	protected int damage;
@@ -78,11 +77,12 @@ public class Item extends ActionbarItem
 	}
 
 	/**
-	 * Creates a shallow copy, copying any references to non-primative objects to the new Item. 
+	 * Creates a shallow copy, copying any references and primitive types to the new Item. 
 	 * @param item the item to create a shallow copy of
 	 */
 	public Item(Item item)
 	{
+		super(item);
 		this.material = item.material;
 		this.itemQuality = item.itemQuality;
 		this.damage = item.damage;

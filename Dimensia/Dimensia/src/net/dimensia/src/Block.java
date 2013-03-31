@@ -1,5 +1,6 @@
 package net.dimensia.src;
 
+import java.io.Serializable;
 import java.util.Random;
 
 /**
@@ -52,7 +53,7 @@ import java.util.Random;
  * @since 1.0
  */
 public class Block extends ActionbarItem 
-		implements Cloneable 
+		implements Cloneable, Serializable 
 {
 	private static final long serialVersionUID = 1L;
 	/** (constant) Block width in pixels, currently this value is 6. Corresponds to the value of Render.BLOCK_SIZE. */
@@ -137,7 +138,6 @@ public class Block extends ActionbarItem
 		isOveridable = false;
 		isSolid = true;
 		extraTooltipInformation = "";
-
 		iconX = 0;
 		iconY = 0;
 		associatedTextureSheet = Render.TEXTURE_SHEET_TERRAIN_EARTH;
@@ -167,32 +167,35 @@ public class Block extends ActionbarItem
 	}
 
 	/**
-	 * @deprecated replaced by clone(). This method is not maintained very well
-	 *             and likely is outdated. Generally it's recommended to use
-	 *             clone(), as there's a good chance this will fail and cause
-	 *             Block corruption.
+	 * Creates a deep copy of a Block. Objects are copied, but will not have the same reference, though, Enums references are directly
+	 * copied to the new Block.
 	 * @param block the Block to be copied
 	 * @return a new Block with the same properties as the cloned one
 	 */
-	public Block(Block block) {
-		super(block);
-		// this.droppedItem = block.droppedItem;
-		// this.maximumDropAmount = block.maximumDropAmount;
-		// this.minimumDropAmount = block.minimumDropAmount;
-		// this.hasMetaData = block.hasMetaData;
-		// this.blockWidth = block.blockWidth;
-		// this.blockHeight = block.blockHeight;
-		// this.maxStackSize = block.maxStackSize;
-		// this.textureWidth = block.textureWidth;
-		// this.textureHeight = block.textureHeight;
-		// this.gradeOfToolRequired = block.gradeOfToolRequired;
-		// this.blockType = block.blockType;
-		// this.blockTier = block.blockTier;
-		// this.material = block.material;
-		// this.breakable = block.breakable;
-		// this.hardness = block.hardness;
-		// this.passable = block.passable;
-		// this.extraTooltipInformation = block.extraTooltipInformation;
+	public Block(Block block) 
+	{
+		this.droppedItem = new ItemStack(block.droppedItem);
+		this.maximumDropAmount = block.maximumDropAmount;
+		this.minimumDropAmount = block.minimumDropAmount;
+		this.metaData = block.metaData;
+		this.isOveridable = block.isOveridable;
+		this.hasMetaData = block.hasMetaData;
+		this.tileMap = block.tileMap;
+		this.bitMap = block.bitMap;
+		this.blockWidth = block.blockWidth;
+		this.blockHeight = block.blockHeight;
+		this.textureWidth = block.textureWidth;
+		this.textureHeight = block.textureHeight;
+		this.gradeOfToolRequired = block.gradeOfToolRequired;
+		this.blockType = block.blockType;
+		this.blockTier = block.blockTier;
+		this.material = block.material;
+		this.breakable = block.breakable;
+		this.hardness = block.hardness;
+		this.passable = block.passable;
+		this.isSolid = block.isSolid;
+		this.hRange = block.hRange;
+		this.lRange = block.lRange;
 	}
 
 	/**

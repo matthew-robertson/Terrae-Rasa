@@ -9,12 +9,10 @@ public enum EnumColor
 	BLUE(5, new float[] { 0, 0, 1, 1 }), 
 	GRAY(6, new float[] { 0.66666666f, 0.66666666f, 0.66666666f, 1 });		
 
-	private final int COLOR_ID;
 	public final float[] COLOR;
 	
 	EnumColor(int i, float[] colour)
 	{
-		this.COLOR_ID = i;
 		this.COLOR = colour;
 	}
 }
