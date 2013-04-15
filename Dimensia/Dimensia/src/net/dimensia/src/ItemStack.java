@@ -29,6 +29,7 @@ public class ItemStack
 	private int stackSize;
 	private int maxStackSize;
 	private int itemID;
+	//private ItemGem[] sockets = { (ItemGem) Item.gemDefense1 };
 	
 	public ItemStack(ActionbarItem item)
 	{

@@ -34,7 +34,7 @@ public class FileManager
 	public World generateAndSaveWorld(String name, EnumWorldSize worldSize, EnumDifficulty difficulty)
 	{
 		World world = generateNewWorld(name, worldSize.getWidth(), worldSize.getHeight(), difficulty);
-		world.saveRemainingWorld("Earth");
+		world.saveRemainingWorld();
 		return world;
 	}
 	
@@ -48,7 +48,7 @@ public class FileManager
 	public WorldHell generateAndSaveWorldHell(String name, EnumWorldSize worldSize, EnumDifficulty difficulty)
 	{
 		WorldHell worldHell = generateNewWorldHell(name, worldSize.getWidth(), worldSize.getHeight(), difficulty);
-		worldHell.saveRemainingWorld("Hell");
+		worldHell.saveRemainingWorld();
 		return worldHell;
 	}
 	
@@ -62,7 +62,7 @@ public class FileManager
 	public WorldSky generateAndSaveWorldSky(String name, EnumWorldSize worldSize, EnumDifficulty difficulty)
 	{
 		WorldSky worldSky = generateNewWorldSky(name, worldSize.getWidth(), worldSize.getHeight(), difficulty);
-		worldSky.saveRemainingWorld("Sky");
+		worldSky.saveRemainingWorld();
 		return worldSky;
 	}
 	
@@ -73,11 +73,11 @@ public class FileManager
 	 * @throws IOException Indicates the saving operation has failed
 	 * @throws ClassNotFoundException Indicates the World class does not exist with the correct version
 	 */	
-	public World loadWorld(String dir, String name) 
+	public World loadWorld(String dir, String universeName) 
 			throws IOException, ClassNotFoundException
 	{
 		World world = new World();
-		world.loadAndApplyWorldData(BASE_PATH, name, dir);
+		world.loadAndApplyWorldData(BASE_PATH, universeName, dir);
 		return world;
 	}
 		

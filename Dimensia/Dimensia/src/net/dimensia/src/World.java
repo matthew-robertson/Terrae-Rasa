@@ -55,9 +55,8 @@ import org.lwjgl.opengl.GL11;
  * @since       1.0
  */
 public class World
-		implements Serializable
 {
-	private static final long serialVersionUID = 1L;	
+//	private static final long serialVersionUID = 1L;	
 	public Hashtable<String, Boolean> chunksLoaded;
 	
 	public Weather weather;
@@ -79,7 +78,7 @@ public class World
 	private final Random random = new Random();
 	private final int GAMETICKSPERDAY = 28800; 
 	private final int GAMETICKSPERHOUR = 1200;
-	private String worldName;
+	protected String worldName;
 	private long worldTime;
 	private ConcurrentHashMap<String, Chunk> chunks;
 	private int width; //Width in blocks, not pixels
@@ -111,12 +110,12 @@ public class World
 	 * Constructs a new instance of World. This involves creation of the EntityLists, and some miscellaneous
 	 * fields being initialized, but largely initialization doesnt happen here. Instead things like WorldGen_
 	 * initialize most of the important things, such as the 'world map', and ground-level map/averages, 
-	 * @param name the world's name, assigned on creation
+	 * @param universeName the world's name, assigned on creation
 	 * @param width the width of the world, in blocks
 	 * @param height the height of the world, in blocks
 	 * @param difficulty the difficulty (EnumDifficulty) of the world
 	 */
-	public World(String name, int width, int height, EnumDifficulty difficulty)
+	public World(String universeName, int width, int height, EnumDifficulty difficulty)
 	{
 		setChunks(new ConcurrentHashMap<String, Chunk>(10));
 		this.width = width;
@@ -128,11 +127,11 @@ public class World
 		itemsList = new ArrayList<EntityLivingItemStack>(250);
 		chunksLoaded= new Hashtable<String, Boolean>(25);
 		worldTime = (long) (6.5 * GAMETICKSPERHOUR);
-		worldName = name;
+		worldName = "Earth";
 		totalBiomes = 0;
 		previousLightLevel = getLightLevel();
 		this.difficulty = difficulty;
-		chunkManager = new ChunkManager(worldName);
+		chunkManager = new ChunkManager(universeName);
 		manager = new SpawnManager();
 		chunkWidth = width / Chunk.getChunkWidth();
 		chunkHeight = height / height;
@@ -145,9 +144,9 @@ public class World
 	 * Finishes reconstructing a world object from disk. This is the 3rd and final step where anything dependent on
 	 * variables saved to disk should be created/executed.
 	 */
-	public void finishWorldReconstruction()
+	public void finishWorldReconstruction(String universeName)
 	{
-		chunkManager = new ChunkManager(worldName);
+		chunkManager = new ChunkManager(universeName);
 	}
 	
 	/**
@@ -201,12 +200,12 @@ public class World
 	/**
 	 * Opens the worlddata.dat file and applies all the data to the reconstructed world. Then final reconstruction is performed.
 	 * @param BASE_PATH the base path for the Dimensia folder, stored on disk
-	 * @param worldName the name of the world to be loaded
+	 * @param universeName the name of the world to be loaded
 	 * @throws FileNotFoundException indicates the worlddata.dat file cannot be found
 	 * @throws IOException indicates the load operation has failed to perform the required I/O. This error is critical
 	 * @throws ClassNotFoundException indicates casting of an object has failed, due to incorrect class version or the class not existing
 	 */
-	public void loadAndApplyWorldData(final String BASE_PATH, String worldName, String dir)
+	public void loadAndApplyWorldData(final String BASE_PATH, String universeName, String dir)
 			throws FileNotFoundException, IOException, ClassNotFoundException
 	{
 		//Open an input stream for the file
@@ -228,7 +227,6 @@ public class World
 			biomesByColumn
 		**/
 		
-		this.worldName = (String)ois.readObject();
 		width = Integer.valueOf((ois.readObject()).toString()).intValue();
 		height = Integer.valueOf((ois.readObject()).toString()).intValue();
 		chunkWidth = Integer.valueOf((ois.readObject()).toString()).intValue();
@@ -244,7 +242,7 @@ public class World
 		ois.close();
 		//Finalize construction of the world. For example, chunkManager must be constructed here as it depends on variables 
 		//from the .dat file
-		finishWorldReconstruction();
+		finishWorldReconstruction(universeName);
 	}
 	
 	/**
@@ -274,7 +272,7 @@ public class World
 		
 		for(int i = leftOff; i <= rightOff; i++) //Check for chunks that need loaded
 		{
-			chunkManager.requestChunk("Earth", this, getChunks(), i);
+			chunkManager.requestChunk(worldName, this, getChunks(), i);
 		}
 	}
 	
@@ -894,8 +892,9 @@ public class World
 					}
 				}
 			}
-		}
+		}	
 	}
+	
 	/**
 	 * 
     nvert: Number of vertices in the polygon. Whether to repeat the first vertex at the end.
@@ -923,8 +922,9 @@ public class World
 	
 	private void performEnemyToolHittests(EntityLivingPlayer player) //Work in progress, not yet fully implemented
 	{
-		if(player.inventory.getMainInventoryStack(player.selectedSlot).getItemID() >= ActionbarItem.spellIndex ||
-				!player.hasSwungTool || 
+		if(player.inventory.getMainInventoryStack(player.selectedSlot) == null ||
+				player.inventory.getMainInventoryStack(player.selectedSlot).getItemID() >= ActionbarItem.spellIndex ||
+				!player.isSwingingTool() || 
 				(player.inventory.getMainInventoryStack(player.selectedSlot) == null) || 
 				!(Item.itemsList[player.inventory.getMainInventoryStack(player.selectedSlot).getItemID()] instanceof ItemTool))
 		{
@@ -935,7 +935,7 @@ public class World
 		ItemTool heldItem = ((ItemTool)(Item.itemsList[player.inventory.getMainInventoryStack(player.selectedSlot).getItemID()]));
 		
 		double size = heldItem.size;		     
-		double angle = player.rotateAngle / 57.5f;		
+		double angle = player.getToolRotationAngle();		
 		double const_ = 9;
 				
 		double[] x_bounds = heldItem.xBounds;
@@ -1018,22 +1018,7 @@ public class World
 			}
 		}
 
-		if(player.isSwingingRight)
-		{
-            player.rotateAngle = (player.rotateAngle < -120) ? 40 : (player.rotateAngle > 40) ? -120 : player.rotateAngle + 10;	
-	        if(player.rotateAngle <= -120 || player.rotateAngle >= 40)
-	        {
-	        	player.hasSwungTool = false;
-	        }
-		}
-		else
-		{
-		    player.rotateAngle = (player.rotateAngle < -120) ? 40 : (player.rotateAngle > 40) ? -120 : player.rotateAngle - 10;	
-	        if(player.rotateAngle <= -120 || player.rotateAngle >= 40)
-	        {
-	        	player.hasSwungTool = false;
-	        }
-		}
+		player.updateSwing();
 	}
 	
 	/**
@@ -1264,7 +1249,8 @@ public class World
 	}
 	
 	/**
-	 * Gets the world object's name. worldName is a final field of world and is always the same.
+	 * Gets the world object's name. worldName is a final field of world and is always the same. It 
+	 * describes whether the world is 'Earth', 'Sky', etc.
 	 * @return the world's name
 	 */
 	public final String getWorldName()
@@ -1734,7 +1720,7 @@ public class World
             if(loaded && (cx < leftOff || cx > rightOff) && x != leftOff && x != rightOff)
 			{
 				//If a chunk isnt needed, request a save.
-				chunkManager.saveChunk("Earth", chunks, cx);
+				chunkManager.saveChunk(worldName, chunks, cx);
 				chunksLoaded.put(""+cx, false);
 			}
             
@@ -1743,7 +1729,7 @@ public class World
 		{
 			if(chunksLoaded.get(""+i) != null && !chunksLoaded.get(""+i)) //If a needed chunk isnt loaded, request it.
 			{
-				chunkManager.requestChunk("Earth", this, chunks, i);
+				chunkManager.requestChunk(worldName, this, chunks, i);
 			}
 			
 		}
@@ -1771,13 +1757,13 @@ public class World
 	 * Saves all chunks loaded in chunks (ConcurrantHashMap) to disk.
 	 * @param dir the sub-directory to save the chunks in (ex. "Earth" for the overworld)
 	 */
-	private void saveAllRemainingChunks(String dir)
+	private void saveAllRemainingChunks()
 	{
 		Enumeration<String> keys = getChunks().keys();
         while (keys.hasMoreElements()) 
         {
             Chunk chunk = getChunks().get((String)(keys.nextElement()));
-            chunkManager.saveChunk(dir, getChunks(), chunk.getX());		
+            chunkManager.saveChunk(worldName, getChunks(), chunk.getX());		
         }
 	}
 	
@@ -1786,10 +1772,10 @@ public class World
 	 * main directory under the name "worlddata.dat" and the chunks are saved in the "Earth" directory (or the applicable dimension)
 	 * @param dir the sub-directory to save the world data in (Ex. "Earth" for the over-world)
 	 */
-	public void saveRemainingWorld(String dir)
+	public void saveRemainingWorld()
 	{
-		saveAllRemainingChunks(dir);
-		chunkManager.saveWorldData(this, dir);
+		saveAllRemainingChunks();
+		chunkManager.saveWorldData(this);
 	}
 	
 	/**

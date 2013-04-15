@@ -356,4 +356,5 @@ public class Item extends ActionbarItem
 	public static Item swiftnessPotion4 = new ItemPotionSwiftness(394, 360, 4).setIconPosition(0, 2).setName("swiftness potion 4");
 	public static Item absorbPotion1 = new ItemPotionAbsorb(395, 30, 1).setIconPosition(9, 1).setName("Minor Absorb Potion");
 	
+	//public static Item gemDefense1 = new ItemGem(500).setIconPosition(0, 0).setName("Gem of Stoneskin 1");
 }

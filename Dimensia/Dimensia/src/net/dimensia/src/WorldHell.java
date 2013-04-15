@@ -11,10 +11,12 @@ public class WorldHell extends World
 	public WorldHell()
 	{
 		super();
+		
 	}
 	
-	public WorldHell(String name, int width, int height, EnumDifficulty difficulty)
+	public WorldHell(String universeName, int width, int height, EnumDifficulty difficulty)
 	{
-		super(name, width, height, difficulty);
+		super(universeName, width, height, difficulty);
+		worldName = "Hell";
 	}
 }

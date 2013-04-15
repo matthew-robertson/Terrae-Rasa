@@ -24,17 +24,9 @@ public class MouseInput
 			}
 			else
 			{
-				if(!player.hasSwungTool) //If the player isn't swinging a tool, start swinging
+				if(!player.isSwingingTool()) //If the player isn't swinging a tool, start swinging
 				{
-					if(player.isFacingRight) 
-					{
-						player.isSwingingRight = true;
-					}
-					else
-					{
-						player.isSwingingRight = false;
-					}
-					player.hasSwungTool = true;
+					player.startSwingingTool(player.isFacingRight);
 				}	
 				
 				//Attempt to launch a projectile
@@ -44,11 +36,17 @@ public class MouseInput
 					Item item = Item.itemsList[selectedItemID];
 					if (item instanceof ItemMagic){
 						ItemMagic spell = (ItemMagic) item;
-						player.launchProjectileMagic(world, (float)(Render.getCameraX() + MathHelper.getCorrectMouseXPosition()), (float)(Render.getCameraY() + MathHelper.getCorrectMouseYPosition()), spell);
+						player.launchProjectileMagic(world, 
+								(float)(Render.getCameraX() + MathHelper.getCorrectMouseXPosition()), 
+								(float)(Render.getCameraY() + MathHelper.getCorrectMouseYPosition()), 
+								spell);
 					}
 					else if (item instanceof ItemRanged){
 						ItemRanged weapon = (ItemRanged) item;
-						player.launchProjectileWeapon(world, (float)(Render.getCameraX() + MathHelper.getCorrectMouseXPosition()), (float)(Render.getCameraY() + MathHelper.getCorrectMouseYPosition()), weapon);
+						player.launchProjectileWeapon(world, 
+								(float)(Render.getCameraX() + MathHelper.getCorrectMouseXPosition()), 
+								(float)(Render.getCameraY() + MathHelper.getCorrectMouseYPosition()), 
+								weapon);
 					}
 					//Try to mine a block
 					player.breakBlock(world, mouseBX, mouseBY, Item.itemsList[player.inventory.getMainInventoryStack(active).getItemID()]); 
@@ -63,7 +61,9 @@ public class MouseInput
 			}
 			else
 			{
-				if((player.viewedChestX != mouseBX || player.viewedChestY != mouseBY) && world.getBlock(mouseBX, mouseBY) instanceof BlockChest && player.isInventoryOpen)
+				if((player.viewedChestX != mouseBX || 
+						player.viewedChestY != mouseBY) && 
+						world.getBlock(mouseBX, mouseBY) instanceof BlockChest && player.isInventoryOpen)
 				{
 				}
 				else
@@ -74,7 +74,8 @@ public class MouseInput
 			
 			if(player.inventory.getMainInventoryStack(active) != null)
 			{
-				if (!player.isInventoryOpen && player.inventory.getMainInventoryStack(active).getItemID() < ActionbarItem.itemIndex) //If player is holding a block
+				//If player is holding a block
+				if (!player.isInventoryOpen && player.inventory.getMainInventoryStack(active).getItemID() < ActionbarItem.itemIndex) 
 				{
 					mouseBX = (int) ((float)(Render.getCameraX() + MathHelper.getCorrectMouseXPosition()) / 6);
 					mouseBY = (int) ((float)(Render.getCameraY() + MathHelper.getCorrectMouseYPosition()) / 6);				
@@ -122,10 +123,12 @@ public class MouseInput
 	        if (wheelMovement > 0) //If mouse scrolled up
 	        {
 	        	player.selectedSlot--; //Decrease selected slot (actionbar)
+	        	player.clearSwing();
 	        }
 	        else if(wheelMovement < 0) //If mouse scrolled down
 	        {
 	        	player.selectedSlot++; //Increase selected slot (actionbar)
+	        	player.clearSwing();
 	        }
 	        
 	        //Bounds checking

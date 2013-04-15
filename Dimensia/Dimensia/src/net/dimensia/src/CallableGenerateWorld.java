@@ -49,9 +49,9 @@ public class CallableGenerateWorld implements Callable<World>
 	 * @param difficulty the difficulty setting of the world (easy, medium, hardcore)
 	 * @return the newly created world
 	 */
-	public World generateNewWorld(String name, int w, int h, EnumDifficulty difficulty)
+	public World generateNewWorld(String universeName, int w, int h, EnumDifficulty difficulty)
 	{
-		return new WorldGenEarth().generate(new World(name, w, h, difficulty));
+		return new WorldGenEarth().generate(new World(universeName, w, h, difficulty));
 	}
 	
 	/**

@@ -43,7 +43,13 @@ public class InventoryPlayer
 	 */
 	private ItemStack[] armorInventory;		
 	private ItemStack[] quiver; 
-	
+	public static final int HELMET_INDEX = 0;
+	public static final int BODY_INDEX = 1;
+	public static final int BELT_INDEX = 2;
+	public static final int PANTS_INDEX = 3;
+	public static final int BOOTS_INDEX = 4;
+	public static final int GLOVES_INDEX = 5;
+
 	/**
 	 * Only constructor for InventoryPlayer. <br>
 	 * Initializes the inventory to contain: <br>
@@ -257,6 +263,174 @@ public class InventoryPlayer
 		stack.setStackSize(size);
 		return stack;
 	}
+
+	/**
+	 * Checks for a partial ItemStack in the quiver
+	 * @param stack the stack to check for
+	 * @return the quiver[] slot containing the item, or -1 if the check failed
+	 */
+	public int doesPartialQuiverStackExist(ItemStack stack)
+	{
+		for(int i = 0; i < quiver.length; i++)
+		{
+			if(quiver[i] == null) 
+			{
+				continue;
+			}
+			if(quiver[i].getItemID() == stack.getItemID() && quiver[i].getStackSize() < stack.getMaxStackSize()) 
+			{ //If the itemID matches and there's less than the max stacksize; success
+				return i;
+			}
+		}		
+		return -1;
+	}
+	
+	/**
+	 * Checks for the first null slot in the quiver[]
+	 * @return the slot in the quiver[] that's null, or -1 for a failure
+	 */
+	public int getFirstEmptyQuiverSlot()
+	{
+		for(int i = 0; i < quiver.length; i++)
+		{
+			if(quiver[i] == null) //Is the slot a value null? if so return the index
+			{
+				return i;
+			}
+		}				
+		return -1;
+	}
+
+	/**
+	 * Attempts to place an ItemStack it into the appropriate armour slot.
+	 * @param stack Stack to pick up
+	 * @return whatever's left, or null for a successful operation
+	 */
+	public ItemStack pickUpArmorItemStack(World world, EntityLivingPlayer player, ItemStack stack)
+	{
+		Item item = (ItemArmor)(Item.itemsList[stack.getItemID()]);
+		player.onArmorChange();
+		
+		if(item instanceof ItemArmorHelmet && armorInventory[0] == null)
+		{
+			armorInventory[0] = stack;
+			return null;			
+		}
+		else if(item instanceof ItemArmorBody && armorInventory[1] == null)
+		{
+			armorInventory[1] = stack;
+			return null;
+		}
+		else if(item instanceof ItemArmorBelt && armorInventory[2] == null)
+		{
+			armorInventory[2] = stack;
+			return null;
+		}
+		else if(item instanceof ItemArmorPants && armorInventory[3] == null)
+		{
+			armorInventory[3] = stack;
+			return null;
+		}
+		else if(item instanceof ItemArmorBoots && armorInventory[4] == null)
+		{
+			armorInventory[4] = stack;
+			return null;
+		}
+		else if(item instanceof ItemArmorGloves && armorInventory[5] == null)
+		{
+			armorInventory[5] = stack;
+			return null;
+		}
+		else if(item instanceof ItemArmorAccessory && armorInventory[6] == null)
+		{
+			armorInventory[6] = stack;
+			return null;
+		}
+		else if(item instanceof ItemArmorAccessory && armorInventory[7] == null)
+		{
+			armorInventory[7] = stack;
+			return null;
+		}
+		else if(item instanceof ItemArmorAccessory && armorInventory[8] == null)
+		{
+			armorInventory[8] = stack;
+			return null;			
+		}
+		else if(item instanceof ItemArmorAccessory && armorInventory[9] == null)
+		{
+			armorInventory[9] = stack;
+			return null;
+		}
+		
+		return stack;
+	}
+
+	/**
+	 * Attempts to place an ItemStack into the quiver.
+	 * @param stack Stack to pick up
+	 * @return whatever's left, or null for a successful operation
+	 */
+	public ItemStack pickUpQuiverItemStack(World world, EntityLivingPlayer player, ItemStack stack)
+	{
+		int slot;
+		int size = stack.getStackSize();
+		try		
+		{
+			player.onInventoryChange();
+		}
+		catch (Exception e)	//Try/catch- fixing lazy programming for many years!
+		{	
+		}
+		
+		if((slot = doesPartialQuiverStackExist(stack)) != -1) //Is there already a partial stack of the item?
+		{
+			if(quiver[slot].getStackSize() + size > quiver[slot].getMaxStackSize()) //Is there more than enough to fill that stack? is so fill up that stack and continue;
+			{
+				int t = stack.getMaxStackSize() - quiver[slot].getStackSize();
+				size -= t;
+				quiver[slot].addToStack(t);				
+			}
+			else //If there isn't, add the stacks and return
+			{
+				quiver[slot].addToStack(size);
+				return null;
+			}
+		}
+				
+		if((slot = getFirstEmptyQuiverSlot()) == -1) //Is there A free inventory space? If not return what's left of the itemStack 
+		{
+			stack.setStackSize(size);
+			return stack;
+		}
+		else //If there is space, Start adding items to the inventory
+		{
+			for(int i = 0; i < size; )
+			{
+				slot = getFirstEmptyQuiverSlot(); //Get first empty slot
+				if(slot == -1) break;
+				else
+				{
+					if(size > stack.getMaxStackSize()) //Is there more than a stack of the item? if so loop again
+					{
+						quiver[slot] = new ItemStack(stack.getItemID(), stack.getStackSize());
+						quiver[slot].setStackSize(stack.getMaxStackSize());
+						size -= stack.getMaxStackSize();
+						continue;
+					}
+					else //If not, put what's left of the stack in the inventory and return
+					{
+						quiver[slot] = new ItemStack(stack.getItemID(), stack.getStackSize());
+						quiver[slot].setStackSize(size);
+						size = 0;
+						return null;
+					}
+				}	
+			}
+		}
+		
+		stack.setStackSize(size);
+		return stack;
+	}
 	
 	/**
 	 * Attempts to remove items from the inventory, nothing is removed if there isnt enough.
@@ -358,13 +532,14 @@ public class InventoryPlayer
 	public boolean putItemStackInSlot(World world, EntityLivingPlayer player, ItemStack stack, int index)
 	{
 		player.onInventoryChange();
-		
-		if(stack == null) //the stack to be placed is null, so clear the slot in mainInventory[] (this has to get a bit hacky for control reasons)
+
+		//the stack to be placed is null, so clear the slot in mainInventory[] (this has to get a bit hacky for control reasons)
+		if(stack == null && mainInventory[index] != null) 
 		{
 			inventoryTotals.put(mainInventory[index].getItemName(), inventoryTotals.get(mainInventory[index].getItemName()) - mainInventory[index].getStackSize());		
 			mainInventory[index] = null;
 		}
-		else //otherwise put the stack in the inventory
+		else if(stack != null)//otherwise put the stack in the inventory
 		{
 			inventoryTotals.put(stack.getItemName(), inventoryTotals.get(stack.getItemName()) + stack.getStackSize());		
 			mainInventory[index] = new ItemStack(stack);	

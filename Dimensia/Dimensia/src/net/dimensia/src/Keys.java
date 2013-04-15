@@ -1,6 +1,9 @@
 package net.dimensia.src;
 
+import java.io.IOException;
+
 import net.dimensia.client.Dimensia;
+import net.dimensia.client.GameEngine;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
@@ -20,6 +23,7 @@ public class Keys
 	private static boolean actionKeys[] = new boolean[12];
 	private static boolean ic;
 	public static boolean ec;
+	public static boolean lshiftDown;
 	
 	/**
 	 * Everything in keys is static, so no instances may be created.
@@ -62,10 +66,14 @@ public class Keys
 			ec = false;
 		}
 		
+		//Check for the (left) shift modifier (this may be useful in other parts of the program)
+		lshiftDown = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT);
+		
 		if(Keyboard.isKeyDown(keybinds.inventoryToggle) && !ic) //Toggle inventory
 		{
 			ic = true;
 			player.isInventoryOpen = !player.isInventoryOpen;
+        	player.clearSwing();
 			if(!player.isInventoryOpen)
 			{
 				player.clearViewedChest();
@@ -92,115 +100,36 @@ public class Keys
         {
         	player.hasJumped();
         }
-		if(Keyboard.isKeyDown(Keyboard.KEY_1) && !actionKeys[0]) //Select Slot 1 of actionbar
-		{
-			actionKeys[0] = true;
-			player.selectedSlot = 0;
-		}
-		if(!Keyboard.isKeyDown(Keyboard.KEY_1))
-		{
-			actionKeys[0] = false;
-		}
-		if(Keyboard.isKeyDown(Keyboard.KEY_2) && !actionKeys[1]) //Select Slot 2 of actionbar
-		{
-			actionKeys[1] = true;
-			player.selectedSlot = 1;
-		}
-		if(!Keyboard.isKeyDown(Keyboard.KEY_2))
-		{
-			actionKeys[1] = false;
-		}
-		if(Keyboard.isKeyDown(Keyboard.KEY_3) && !actionKeys[2]) //Select Slot 3 of actionbar
-		{
-			actionKeys[2] = true;
-			player.selectedSlot = 2;
-		}
-		if(!Keyboard.isKeyDown(Keyboard.KEY_3))
-		{
-			actionKeys[2] = false;
-		}
-		if(Keyboard.isKeyDown(Keyboard.KEY_4) && !actionKeys[3]) //Select Slot 4 of actionbar
-		{
-			actionKeys[3] = true;
-			player.selectedSlot = 3;
-		}
-		if(!Keyboard.isKeyDown(Keyboard.KEY_4))
-		{
-			actionKeys[3] = false;
-		}
-		if(Keyboard.isKeyDown(Keyboard.KEY_5) && !actionKeys[4]) //Select Slot 5 of actionbar
-		{
-			actionKeys[4] = true;
-			player.selectedSlot = 4;
-		}
-		if(!Keyboard.isKeyDown(Keyboard.KEY_5))
-		{
-			actionKeys[4] = false;
-		}
-		if(Keyboard.isKeyDown(Keyboard.KEY_6) && !actionKeys[5]) //Select Slot 6 of actionbar
-		{
-			actionKeys[5] = true;
-			player.selectedSlot = 5;
-		}
-		if(!Keyboard.isKeyDown(Keyboard.KEY_6))
-		{
-			actionKeys[5] = false;
-		}
-		if(Keyboard.isKeyDown(Keyboard.KEY_7) && !actionKeys[6]) //Select Slot 7 of actionbar
-		{
-			actionKeys[6] = true;
-			player.selectedSlot = 6;
-		}
-		if(!Keyboard.isKeyDown(Keyboard.KEY_7))
-		{
-			actionKeys[6] = false;
-		}
-		if(Keyboard.isKeyDown(Keyboard.KEY_8) && !actionKeys[7]) //Select Slot 8 of actionbar
-		{
-			actionKeys[7] = true;
-			player.selectedSlot = 7;
-		}
-		if(!Keyboard.isKeyDown(Keyboard.KEY_8))
-		{
-			actionKeys[7] = false;
-		}
-		if(Keyboard.isKeyDown(Keyboard.KEY_9) && !actionKeys[8]) //Select Slot 9 of actionbar
-		{
-			actionKeys[8] = true;
-			player.selectedSlot = 8;
-		}
-		if(!Keyboard.isKeyDown(Keyboard.KEY_9))
-		{
-			actionKeys[8] = false;
-		}
-		if(Keyboard.isKeyDown(Keyboard.KEY_0) && !actionKeys[9]) //Select Slot 10 of actionbar
-		{
-			actionKeys[9] = true;
-			player.selectedSlot = 9;
-		}
-		if(!Keyboard.isKeyDown(Keyboard.KEY_0))
-		{
-			actionKeys[9] = false;
-		}
-		if(Keyboard.isKeyDown(Keyboard.KEY_MINUS) && !actionKeys[10]) //Select Slot 10 of actionbar
-		{
-			actionKeys[10] = true;
-			player.selectedSlot = 10;
-		}
-		if(!Keyboard.isKeyDown(Keyboard.KEY_MINUS))
-		{
-			actionKeys[10] = false;
-		}
-		if(Keyboard.isKeyDown(Keyboard.KEY_EQUALS) && !actionKeys[11]) //Select Slot 10 of actionbar
-		{
-			actionKeys[11] = true;
-			player.selectedSlot = 11;
-		}
-		if(!Keyboard.isKeyDown(Keyboard.KEY_EQUALS))
-		{
-			actionKeys[11] = false;
-		}
-		
+        
+        final int[] actionKeyValues = 
+        { 
+        		Keyboard.KEY_1, 
+        		Keyboard.KEY_2, 
+        		Keyboard.KEY_3, 
+        		Keyboard.KEY_4, 
+        		Keyboard.KEY_5, 
+        		Keyboard.KEY_6, 
+        		Keyboard.KEY_7, 
+        		Keyboard.KEY_8, 
+        		Keyboard.KEY_9, 
+        		Keyboard.KEY_0, 
+        		Keyboard.KEY_MINUS, 
+        		Keyboard.KEY_EQUALS 
+        };
+        
+        for(int i = 0; i < actionKeys.length; i++)
+        {
+        	if(Keyboard.isKeyDown(actionKeyValues[i]) && !actionKeys[i])
+        	{
+        		actionKeys[i] = true;
+        		player.selectedSlot = i;
+        		player.clearSwing();
+        	}
+        	if(!Keyboard.isKeyDown(Keyboard.KEY_EQUALS))
+        	{
+        		actionKeys[i] = false;
+        	}
+        }
 		
 		if(Dimensia.initInDebugMode)
 		{
@@ -231,10 +160,23 @@ public class Keys
 	        {
 	        	//for(int i = 0; i < 3;i++){
 	        	//player.registerStatusEffect(new StatusEffectStun(5, 1));
-	        	EntityLivingNPCEnemy enemy = new EntityLivingNPCEnemy(EntityLivingNPCEnemy.slime);//EntityLivingNPC.test.clone();
-				enemy.setPosition((int)player.x, (int)player.y);
-				world.addEntityToEnemyList(enemy);	
+//	        	EntityLivingNPCEnemy enemy = new EntityLivingNPCEnemy(EntityLivingNPCEnemy.slime);//EntityLivingNPC.test.clone();
+//				enemy.setPosition((int)player.x, (int)player.y);
+//				world.addEntityToEnemyList(enemy);	
 	        	//}
+	        	
+//	        	if(engine.renderMode != GameEngine.RENDER_MODE_WORLD_HELL)
+//	        	{
+//	        		try {
+//						engine.changeWorld(GameEngine.RENDER_MODE_WORLD_HELL);
+//					} catch (IOException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					} catch (ClassNotFoundException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//	        	}
 	        }   
 	        if(!Keyboard.isKeyDown(Keyboard.KEY_L))
 	        {

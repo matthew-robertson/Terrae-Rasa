@@ -13,7 +13,7 @@ public class StatusEffectRegeneration extends StatusEffect
 	{
 		if(ticksLeft % (40 / tier) == 0)
 		{
-			entity.healEntity(world, 4);
+			entity.heal_Textless(world, 4);
 		}
 		ticksLeft--;
 	}

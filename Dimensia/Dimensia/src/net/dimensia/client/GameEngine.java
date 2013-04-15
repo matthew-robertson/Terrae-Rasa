@@ -354,6 +354,7 @@ public class GameEngine
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.manaRegenerationPotion2, 200));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Spell.rejuvenate));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Spell.bulwark));
+		//	player.inventory.pickUpItemStack(world, player, new ItemStack(Item.gemDefense1, 100));
 		}		
 	}
 	
@@ -381,20 +382,18 @@ public class GameEngine
 		String worldName = "";
 		if(renderMode == RENDER_MODE_WORLD_EARTH)
 		{
-			worldName = world.getWorldName();
-			world.saveRemainingWorld("Earth");
+			world.saveRemainingWorld();
 			world = null;
 		}
 		else if(renderMode == RENDER_MODE_WORLD_HELL)
 		{
-			worldName = worldHell.getWorldName();
-			worldHell.saveRemainingWorld("Hell");
+			worldHell.saveRemainingWorld();
 			worldHell = null;
 		}
 		else if(renderMode == RENDER_MODE_WORLD_SKY)
 		{
 			worldName = worldSky.getWorldName();
-			worldSky.saveRemainingWorld("Sky");
+			worldSky.saveRemainingWorld();
 			worldSky = null;
 		}
 		
@@ -429,15 +428,15 @@ public class GameEngine
 	
 		if(renderMode == RENDER_MODE_WORLD_EARTH)
 		{
-			world.saveRemainingWorld("Earth");
+			world.saveRemainingWorld();
 		}
 		else if(renderMode == RENDER_MODE_WORLD_HELL)
 		{
-			world.saveRemainingWorld("Hell");
+			world.saveRemainingWorld();
 		}
 		else if(renderMode == RENDER_MODE_WORLD_SKY)
 		{
-			world.saveRemainingWorld("Sky");
+			world.saveRemainingWorld();
 		}
 	}
 }

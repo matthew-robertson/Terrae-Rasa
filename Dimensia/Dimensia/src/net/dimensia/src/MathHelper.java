@@ -14,6 +14,26 @@ import org.lwjgl.opengl.Display;
 public class MathHelper 
 {	
 	/**
+	 * Converts a radian measurement into a degree measurement
+	 * @param radian the radian to convert
+	 * @return the degree value representing the given radian
+	 */
+	public static float radianToDegree(float radian)
+	{
+		return (float) (radian * (180.0F / Math.PI));
+	}
+	
+	/**
+	 * Converts a degree measurement into a radian measurement.
+	 * @param degree the degree to convert 
+	 * @return the radian value representing the given degree
+	 */
+	public static float degreeToRadian(float degree)
+	{
+		return (float) (degree / (180.0F / Math.PI));
+	}
+	
+	/**
 	 * Rounds down a float value to the nearest 20th (0.05). For example, the value 6.7754f will be rounded down to 6.75f;
 	 * @param f the value to round down to the nearest 20th
 	 * @return the rounded down value (nearest 20th)

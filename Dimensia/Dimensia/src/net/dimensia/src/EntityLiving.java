@@ -941,14 +941,15 @@ public class EntityLiving extends Entity
 	
 	/**
 	 * Heals the entity for a certain amount of health, possibly periodic, that does not incur cooldown or text to screen.
+	 * @param world the world in use
 	 * @param health the amount of health to heal
 	 */
-	public void heal_Textless(int health)
+	public void heal_Textless(World world, int health)
 	{
-		health += health; 
-		if(health > maxHealth) //if health exceeds the maximum, set it to the maximum
+		this.health += health; 
+		if(this.health > maxHealth) //if health exceeds the maximum, set it to the maximum
 		{
-			health = maxHealth;
+			this.health = maxHealth;
 		}
 	}
 	

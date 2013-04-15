@@ -22,110 +22,47 @@ import net.dimensia.client.Dimensia;
  * NOTE: all x and y values used are for the chunk grid, not the blocks grid, or whatever(IE use
  * 1, not the chunk width or height...)
  */
-public class ChunkManager implements Serializable
+public class ChunkManager 
 {
-	private static final long serialVersionUID = 1L;
 	private final List<Integer> loadRequests;
 	private final ExecutorService threadPool;
 	private final ArrayList<Future<Chunk>> scheduledLoadOperations;
 	private final ArrayList<Future<Boolean>> scheduledSaveOperations;
 	private final String BASE_PATH;
-	private final String worldName;
+	private final String universeName;
 	private final List<Integer> chunkLock;
-	
-	/**
-	 * RequestedChunkData defines a private data structure to store data for a chunk load request. Currently contains:
-	 * <ul>
-	 *  <li>String dir
-	 *  <li>int x
-	 *  <li>int y
-	 * </ul>
-	 */
-	private class RequestedChunkData
-	{
-		public RequestedChunkData(String dir, int x)
-		{
-			this.x = x;
-			this.dir = dir;
-		}
-		
-		public int getX()
-		{
-			return x;
-		}
-		
-		public String getDir()
-		{
-			return dir;
-		}
-		
-		private String dir;
-		private int x;
-	}
-	
-	/**
-	 * RequestedChunkData defines a private data structure to store data for a chunk save request. Currently contains:
-	 * <ul>
-	 *  <li>String dir
-	 *  <li>int x
-	 *  <li>Chunk chunk
-	 * </ul>
-	 */
-	private class SavingChunkData
-	{
-		public SavingChunkData(Chunk chunk, String dir, int x)
-		{
-			this.chunk = chunk;
-			this.dir = dir;
-			this.x = x;
-		}
-		
-		public Chunk getChunk()
-		{
-			return chunk;
-		}
-		
-		public int getX()
-		{
-			return x;
-		}
-		
-		public String getDir()
-		{
-			return dir;
-		}
-		
-		private String dir;
-		private Chunk chunk;
-		private int x;
-	}
-	
+
 	/**
 	 * Constructs a new instance of ChunkManager, bound to the specific world. 4 Threads are created to help perform timely chunk operations. Additionally,
 	 * a BASE_PATH variable is assigned, leading to the Dimensia operating system for the specified OS. Additional directories are created if the required
 	 * directories for the world/chunk save are missing.
 	 * @param worldName the name of the world, to which this object belongs
+	 * @param worldName the name of the 'dimension' within the project (Ex. 'Earth')
 	 */
-	public ChunkManager(String worldName)
+	public ChunkManager(String universeName)
 	{
 		threadPool = Executors.newFixedThreadPool(4);
 		scheduledLoadOperations = new ArrayList<Future<Chunk>>(4);
 		scheduledSaveOperations = new ArrayList<Future<Boolean>>(4);
-		this.worldName = worldName;
+		this.universeName = universeName;
 		loadRequests = new ArrayList<Integer>(8);
 		chunkLock = new ArrayList<Integer>(16);
 		BASE_PATH = Dimensia.getBasePath();
 		
 		//Create missing folders
-		if(!new File(BASE_PATH + "/World Saves/" + worldName).exists()) //Folder for the world ('/worldName')
+		//Folder for the world ('/worldName')
+		if(!new File(BASE_PATH + "/World Saves/" + universeName).exists()) 
 		{
-			new File(BASE_PATH + "/World Saves/" + worldName).mkdir();
-			System.out.println("[ChunkManager] created directory @" + BASE_PATH + "/World Saves/" + worldName);
+			new File(BASE_PATH + "/World Saves/" + universeName).mkdir();
+			System.out.println("[ChunkManager] created directory @" + BASE_PATH + "/World Saves/" + universeName);
 		}
-		if(!new File(BASE_PATH + "/World Saves/" + worldName + "/Earth").exists()) //Sub-Folder ('/worldName/Earth') for the chunks
+	}
+	
+	private void verifyFolderExists(String subdir)
+	{
+		if(!new File(BASE_PATH + "/World Saves/" + universeName + "/" + subdir).exists()) 
 		{
-			new File(BASE_PATH + "/World Saves/" + worldName + "/Earth").mkdir();
-			System.out.println("[ChunkManager] created directory @" + BASE_PATH + "/World Saves/" + worldName + "/Earth");
+			new File(BASE_PATH + "/World Saves/" + universeName + "/" + subdir).mkdir();
 		}
 	}
 	
@@ -144,11 +81,7 @@ public class ChunkManager implements Serializable
 	public boolean requestChunk(String directory, World world, ConcurrentHashMap<String, Chunk> chunks, int x)
 	{
 		//Check if the chunk is being requested in an invalid (out of bounds) position
-		if(x < 0 || x >= (world.getWidth() / Chunk.getChunkWidth()))
-		{
-			return false;
-		}
-		if(chunkLocked(x))
+		if(x < 0 || x >= (world.getWidth() / Chunk.getChunkWidth()) || chunkLocked(x))
 		{
 			return false;
 		}
@@ -159,7 +92,6 @@ public class ChunkManager implements Serializable
 		{
 			if(loadRequests.get(i).toString().equals(key)) 
 			{
-				//System.out.println("Chunk @" + key + " already loaded");
 				return false;
 			}
 		}
@@ -168,16 +100,12 @@ public class ChunkManager implements Serializable
 		if(chunks.get(key) == null)
 		{
 			lockChunk(x);
-			//System.out.println("Load @" + key);
+			verifyFolderExists(directory);
 			loadRequests.add(x);
-			processChunkRequest(directory, x);
+			submitLoadOperation(directory, x);
 			return true;
 		}
-		else
-		{
-			return false;
-			//throw new RuntimeException("Illegal chunk request@ " + x + " " + y);
-		}
+		return false;
 	}
 	
 	/**
@@ -195,12 +123,8 @@ public class ChunkManager implements Serializable
 		{
 			return false;
 		}
-		
-		if(!new File(BASE_PATH + "/World Saves/" + worldName + "/" + directory).exists()) //Sub-Folder ('/worldName/Earth') for the chunks
-		{
-			new File(BASE_PATH + "/World Saves/" + worldName + "/" + directory).mkdir();
-			System.out.println("[ChunkManager] created directory @" + BASE_PATH + "/World Saves/" + worldName + "/" + directory);
-		}
+
+		verifyFolderExists(directory);
 		
 		String key = ""+x;
 		Chunk chunk = chunks.get(key);
@@ -210,12 +134,11 @@ public class ChunkManager implements Serializable
 		if(chunk == null)
 		{
 			return false;
-			//throw new RuntimeException("Tried to save chunk that doesnt exist @" + x + " " + y);
 		}
 		
 		lockChunk(x);
 		
-		processChunkSave(chunk, directory, x);
+		submitSaveOperation(chunk, directory, x);
 		return true;
 	}
 	
@@ -259,26 +182,20 @@ public class ChunkManager implements Serializable
 			}
 		}
 	}
-	
-	private void processChunkSave(Chunk chunk, String dir, int x)
+		
+	private void submitSaveOperation(Chunk chunk, String dir, int x)
 	{
-		submitSaveOperation(new SavingChunkData(chunk, dir, x));
-	}
-	
-	private void processChunkRequest(String dir,int x)
-	{
-		submitLoadOperation(new RequestedChunkData(dir, x));
-	}
-	
-	private void submitSaveOperation(SavingChunkData data)
-	{
-		Future<Boolean> event = threadPool.submit(new CallableSaveChunk(this, data.getChunk(), data.getX(), BASE_PATH + "/World Saves/" + worldName + "/" + data.getDir(), worldName));
+		Future<Boolean> event = threadPool.submit(new CallableSaveChunk(this,
+				chunk, x, BASE_PATH + "/World Saves/" + universeName + "/" + dir,
+				universeName));
 		scheduledSaveOperations.add(event);
 	}
 	
-	private void submitLoadOperation(RequestedChunkData data)	
+	private void submitLoadOperation(String dir, int x)	
 	{
-		Future<Chunk> event = threadPool.submit(new CallableLoadChunk(this, data.getX(), BASE_PATH + "/World Saves/" + worldName + "/" + data.getDir(), worldName));
+		Future<Chunk> event = threadPool.submit(new CallableLoadChunk(this, 
+				x, BASE_PATH + "/World Saves/" + universeName + "/" + dir, 
+				universeName));
 		scheduledLoadOperations.add(event);
 	}
 	
@@ -334,7 +251,6 @@ public class ChunkManager implements Serializable
 				{
 					if(loadRequests.get(j).toString().equals(key))
 					{
-					//	unlockChunk(chunk.getX());
 						loadRequests.remove(j);
 					}
 				}
@@ -348,17 +264,18 @@ public class ChunkManager implements Serializable
 	 * Saves all non-chunk data from a world into the worlddata.dat file.
 	 * @param world the world from which to save data
 	 */
-	public void saveWorldData(World world, String dir)
+	public void saveWorldData(World world)
 	{
 		try
 		{
-			GZIPOutputStream fileWriter = new GZIPOutputStream(new FileOutputStream(new File(BASE_PATH + "/World Saves/" + worldName + "/" + dir + "/worlddata.dat"))); //Open an output stream
+			GZIPOutputStream fileWriter = new GZIPOutputStream(
+					new FileOutputStream(new File(BASE_PATH + "/World Saves/"
+							+ universeName + "/" + world.getWorldName() + "/worlddata.dat"))); 
 		    ByteArrayOutputStream bos = new ByteArrayOutputStream(); //Open a stream to turn objects into byte[]
 			ObjectOutputStream s = new ObjectOutputStream(bos); //open the OOS, used to save serialized objects to file
 			
 			/**
 			Variables are saved in the following order:
-				worldName
 				width
 				height
 				chunkWidth
@@ -372,7 +289,6 @@ public class ChunkManager implements Serializable
 				biomesByColumn
 			**/
 
-			s.writeObject(world.getWorldName());
 			s.writeObject(world.getWidth());
 			s.writeObject(world.getHeight());
 			s.writeObject(world.getChunkWidth());
@@ -415,7 +331,6 @@ public class ChunkManager implements Serializable
 			try 
 			{
 				//Get the value of the callable, or wait if it's not done.
-				System.out.println(scheduledLoadOperations.get(0));
 				chunk = scheduledLoadOperations.get(0).get();	
 			}
 			catch (InterruptedException e) 
@@ -437,7 +352,6 @@ public class ChunkManager implements Serializable
 			{
 				if(loadRequests.get(j).toString().equals(key))
 				{
-					//unlockChunk(chunk.getX());
 					loadRequests.remove(j);
 				}
 			}

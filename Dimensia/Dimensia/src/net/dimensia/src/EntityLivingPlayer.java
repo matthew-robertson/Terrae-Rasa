@@ -47,21 +47,21 @@ public class EntityLivingPlayer extends EntityLiving
 	public int viewedChestX;
 	public int viewedChestY;
 	public boolean isViewingChest;	
-	
+	private static final float leftSwingBound = MathHelper.degreeToRadian(-120);
+	private static final float rightSwingBound = MathHelper.degreeToRadian(40);
 	public int strength;
 	public int dexterity;
 	public int intellect;
 	public int stamina;
 	public int baseMaxHealth;
-	public int baseMaxMana;
-	
+	public int baseMaxMana;	
 	public float respawnXPos;
-	public float respawnYPos;
-	public boolean isSwingingRight;
+	public float respawnYPos;	
+	private boolean isSwingingRight;
+	private boolean hasSwungTool;
+	private float rotateAngle;
 	public int selectedRecipe;
 	public int selectedSlot;
-	public boolean hasSwungTool;
-	public float rotateAngle;
 	public boolean isFacingRight;
 	public boolean isInventoryOpen;	
 	public InventoryPlayer inventory;
@@ -1359,5 +1359,81 @@ public class EntityLivingPlayer extends EntityLiving
 	public void spendSpecialEnergy(int amount)
 	{
 		specialEnergy -= amount;
+	}
+	
+	public float getToolRotationAngle()
+	{
+		return rotateAngle;
+	}
+	
+	public boolean isSwingingTool()
+	{
+		return hasSwungTool;
+	}
+	
+	public boolean getIsSwingingRight()
+	{
+		return isSwingingRight;
+	}
+	
+	/**
+	 * Adds the given radian value to the tool rotation angle. If this is negative, it will
+	 * be subtracted.
+	 * @param addition the amount to add to the tool rotation angle, in radians
+	 */
+	public void updateRotationAngle(float addition)
+	{
+		rotateAngle += addition;
+	}
+	
+	/**
+	 * Stops the swinging of the player weapon
+	 */
+	public void clearSwing()
+	{
+		hasSwungTool = false;
+	}
+	
+	/**
+	 * Updates the tool swing. This is based on a weapon's swing speed - a faster speed swings faster.
+	 */
+	public void updateSwing()
+	{
+		float swingSpeed = (float)((ItemTool)(Item.itemsList[inventory.getMainInventoryStack(selectedSlot).getItemID()])).swingSpeed;
+		if(isSwingingRight)
+		{
+            rotateAngle += MathHelper.degreeToRadian(10.0F * swingSpeed);	        
+            if(rotateAngle <= leftSwingBound || rotateAngle >= rightSwingBound )
+	        {
+	        	clearSwing();
+	        }
+		}
+		else
+		{
+			rotateAngle -= MathHelper.degreeToRadian(10F * swingSpeed);
+		    if(rotateAngle <= leftSwingBound || rotateAngle >= rightSwingBound)
+	        {
+	        	clearSwing();
+	        }
+		}
+	}
+	
+	/**
+	 * Starts swinging the tool based on direction, resetting the angle to an appropriate starting location. 
+	 * @param swingRight whether the swing is right, or not (IE left)
+	 */
+	public void startSwingingTool(boolean swingRight)
+	{
+		isSwingingRight = swingRight;
+		hasSwungTool = true;
+		
+		if(swingRight)
+		{
+			rotateAngle = leftSwingBound;			
+		}
+		else
+		{
+			rotateAngle = rightSwingBound;
+		}
 	}
 }

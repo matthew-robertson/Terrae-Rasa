@@ -9,7 +9,7 @@ public class RenderWorld extends Render
 	public void renderToolSwing(World world, EntityLivingPlayer player)
 	{
 		if(player.inventory.getMainInventoryStack(player.selectedSlot).getItemID() >= ActionbarItem.spellIndex || 
-				!player.hasSwungTool || 
+				!player.isSwingingTool() || 
 				(player.inventory.getMainInventoryStack(player.selectedSlot) == null) || 
 				!(Item.itemsList[player.inventory.getMainInventoryStack(player.selectedSlot).getItemID()] instanceof ItemTool))
 		{
@@ -22,7 +22,7 @@ public class RenderWorld extends Render
 		ItemTool heldItem = ((ItemTool)(Item.itemsList[player.inventory.getMainInventoryStack(player.selectedSlot).getItemID()]));
 		
 		double size = heldItem.size;		
-		double angle = player.rotateAngle / (180 / Math.PI);
+		double angle = player.getToolRotationAngle();
 		
 		double[] x_bounds = heldItem.xBounds;
 		double[] y_bounds = heldItem.yBounds;
@@ -63,9 +63,9 @@ public class RenderWorld extends Render
 		
         textures[player.inventory.getMainInventoryStack(player.selectedSlot).getItemID()].bind();        
         
-        if(!player.isSwingingRight)
+        if(!player.getIsSwingingRight())
         {
-        	GL11.glRotatef(player.rotateAngle, 0, 0, 1);
+        	GL11.glRotatef(MathHelper.radianToDegree(player.getToolRotationAngle()), 0, 0, 1);
             t.startDrawingQuads();
 	        t.addVertexWithUV(points[0].x, points[0].y, 0, 0, 1);
 	        t.addVertexWithUV(points[1].x, points[1].y, 0, 1, 1);
@@ -75,7 +75,7 @@ public class RenderWorld extends Render
         }
         else
         {
-        	GL11.glRotatef(player.rotateAngle + 90.0f, 0, 0, 1);
+        	GL11.glRotatef(MathHelper.radianToDegree(player.getToolRotationAngle()) + 90.0f, 0, 0, 1);
         	GL11.glScalef(-1, 1, 1);
         	t.startDrawingQuads();
         	t.addVertexWithUV(points[0].x, points[0].y, 0, 0, 1);
