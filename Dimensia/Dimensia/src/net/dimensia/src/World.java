@@ -652,7 +652,6 @@ public class World
 			}
 			else if (!projectileList.get(i).active){
 				projectileList.get(i).ticksNonActive++;
-				//System.out.println(projectileList.get(i).ticksNonActive);
 			}
 			
 			if(((MathHelper.distanceBetweenTwoPoints(player.x, player.y, projectileList.get(i).x, projectileList.get(i).y) > OUT_OF_RANGE) || projectileList.get(i).ticksNonActive > 80) && projectileList.get(i).getType() != 'm')

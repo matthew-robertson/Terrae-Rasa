@@ -34,6 +34,17 @@ public class MathHelper
 	}
 	
 	/**
+	 * Converts polar co-ordinates(magnitudes, radians) to rectangular (x,y).
+	 * @param magnitude magnitude of the vector
+	 * @param angle the radian value to convert using
+	 * @return rectangular co-ordinates for the vector
+	 */
+	public static Vector2F toRectangular(float magnitude, float angle){		
+		return new Vector2F((float) (magnitude * Math.cos(angle)), (float) (magnitude * Math.sin(angle)));
+		
+	}
+	
+	/**
 	 * Rounds down a float value to the nearest 20th (0.05). For example, the value 6.7754f will be rounded down to 6.75f;
 	 * @param f the value to round down to the nearest 20th
 	 * @return the rounded down value (nearest 20th)

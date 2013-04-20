@@ -11,6 +11,25 @@ public class Vector2F
 		this.y = y;
 	}
 	
+	public Vector2F multiplyScalar(float f){
+		return new Vector2F(x * f, y * f);
+	}
+	
+	public Vector2F addF(Vector2F vec)
+	{
+		return new Vector2F(x + vec.x, y + vec.y);
+	}
+	
+	public Vector2F add(Vector2 vec)
+	{
+		return new Vector2F(x + vec.x, y + vec.y);
+	}
+	
+	public Vector2F subtractF(Vector2F vec)
+	{
+		return new Vector2F(x - vec.x, y - vec.y);
+	}
+	
 	public Vector2F subtract(Vector2 vec)
 	{
 		return new Vector2F(x - vec.x, y - vec.y);
@@ -24,5 +43,13 @@ public class Vector2F
 	public String toString()
 	{
 		return "<" + x + "," + y + ">";
+	}
+	
+	public float getX(){
+		return x;
+	}
+	
+	public float getY(){
+		return y;
 	}
 }

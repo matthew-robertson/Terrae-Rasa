@@ -1200,7 +1200,7 @@ public class EntityLivingPlayer extends EntityLiving
 	 */
 	public void launchProjectileMagic(World world, float mouseX, float mouseY, ItemMagic item){		
 		if (mana >= item.getManaReq()){
-			int angle = MathHelper.angleMousePlayer(mouseX, mouseY, x, y) - 90;
+			int angle = MathHelper.angleMousePlayer(mouseX, mouseY, x, y);
 			if (angle < 0){
 				angle += 360;
 			}
