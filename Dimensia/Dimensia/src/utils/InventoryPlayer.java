@@ -28,12 +28,17 @@ import blocks.Block;
  * A new instance of <code>InventoryPlayer</code> creates a mainInventory of size 48, an armour inventory of size 
  * 10 (which is not fully used), and a garbage can of size 1 (see {@link #InventoryPlayer()} for any other 
  * uses of the Constructor).
+ * 
  * <br><br>
  * 
- * /home/alec/Desktop/Dimensia/Dimensia/src/net/dimensia/client/
+ * V1.1: All changes to the armour inventory should go through {@link #setArmorInventoryStack(EntityLivingPlayer, ItemStack, int)} now. 
+ * This is to ensure that player stats get updated appropriately.
+ * 
+ * <br><br>
+ * 
  * @author      Alec Sobeck
  * @author      Matthew Robertson
- * @version     1.0
+ * @version     1.1
  * @since       1.0
  */
 public class InventoryPlayer 
@@ -331,52 +336,52 @@ public class InventoryPlayer
 		
 		if(item instanceof ItemArmorHelmet && armorInventory[0] == null)
 		{
-			armorInventory[0] = stack;
+			setArmorInventoryStack(player, stack, 0);
 			return null;			
 		}
 		else if(item instanceof ItemArmorBody && armorInventory[1] == null)
 		{
-			armorInventory[1] = stack;
+			setArmorInventoryStack(player, stack, 1);
 			return null;
 		}
 		else if(item instanceof ItemArmorBelt && armorInventory[2] == null)
 		{
-			armorInventory[2] = stack;
+			setArmorInventoryStack(player, stack, 2);
 			return null;
 		}
 		else if(item instanceof ItemArmorPants && armorInventory[3] == null)
 		{
-			armorInventory[3] = stack;
+			setArmorInventoryStack(player, stack, 3);
 			return null;
 		}
 		else if(item instanceof ItemArmorBoots && armorInventory[4] == null)
 		{
-			armorInventory[4] = stack;
+			setArmorInventoryStack(player, stack, 4);
 			return null;
 		}
 		else if(item instanceof ItemArmorGloves && armorInventory[5] == null)
 		{
-			armorInventory[5] = stack;
+			setArmorInventoryStack(player, stack, 5);
 			return null;
 		}
 		else if(item instanceof ItemArmorAccessory && armorInventory[6] == null)
 		{
-			armorInventory[6] = stack;
+			setArmorInventoryStack(player, stack, 6);
 			return null;
 		}
 		else if(item instanceof ItemArmorAccessory && armorInventory[7] == null)
 		{
-			armorInventory[7] = stack;
+			setArmorInventoryStack(player, stack, 7);
 			return null;
 		}
 		else if(item instanceof ItemArmorAccessory && armorInventory[8] == null)
 		{
-			armorInventory[8] = stack;
+			setArmorInventoryStack(player, stack, 8);
 			return null;			
 		}
 		else if(item instanceof ItemArmorAccessory && armorInventory[9] == null)
 		{
-			armorInventory[9] = stack;
+			setArmorInventoryStack(player, stack, 9);
 			return null;
 		}
 		
@@ -587,19 +592,28 @@ public class InventoryPlayer
 	}
 	
 	/**
-	 * Tries to place an ItemStack in the selected index of the armorInventory[]
+	 * Tries to place an ItemStack in the selected index of the armorInventory[]. If null is given as an itemstack
+	 * then whatever is in that itemstack will be removed. Use this to remove or add armour from the armorInventory[]
+	 * and update player stats.
 	 * @param stack stack to place in armorInventory[]
 	 * @param index where to place the stack in armorInventory[]
 	 * @return success of the operation
 	 */
-	public boolean setArmorInventoryStack(ItemStack stack, int index)
+	public boolean setArmorInventoryStack(EntityLivingPlayer player, ItemStack stack, int index)
 	{
 		if(stack == null)
 		{
+			//If a piece of armor is being removed, then ensure its stats are appropriately neutralized
+			if(armorInventory[index] != null)
+			{
+				player.removeSingleArmorItem((ItemArmor)(Item.itemsList[armorInventory[index].getItemID()]));
+			}
 			armorInventory[index] = null;
 		}
 		else
 		{
+			//Apply a newly added armour piece's stats
+			player.applySingleArmorItem((ItemArmor)(Item.itemsList[stack.getItemID()]));
 			armorInventory[index] = new ItemStack(stack);
 		}
 		return true;
@@ -725,6 +739,7 @@ public class InventoryPlayer
 	 */
 	public void removeSavingRelic()
 	{
+		//TODO: Fix w/ angel's reprieve
 		for(int i = 0; i < armorInventory.length; i++)
 		{
 			if(armorInventory[i] != null)

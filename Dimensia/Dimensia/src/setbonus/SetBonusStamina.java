@@ -4,7 +4,7 @@ import entities.EntityLivingPlayer;
 
 public class SetBonusStamina extends SetBonus
 {
-	protected SetBonusStamina(float power) 
+	public SetBonusStamina(float power) 
 	{
 		super(power);
 	}

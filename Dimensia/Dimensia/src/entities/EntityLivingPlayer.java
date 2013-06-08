@@ -13,19 +13,12 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import net.dimensia.src.EnumSetBonuses;
-
 import org.lwjgl.input.Mouse;
 
-import client.Dimensia;
-
 import render.Render;
+import setbonus.SetBonus;
 import setbonus.SetBonusContainer;
-
-import enums.EnumColor;
-import enums.EnumDifficulty;
-import enums.EnumToolMaterial;
-
+import setbonus.SetBonusFactory;
 import utils.Cooldown;
 import utils.CraftingManager;
 import utils.InventoryPlayer;
@@ -33,9 +26,12 @@ import utils.ItemStack;
 import utils.MathHelper;
 import utils.Recipe;
 import world.World;
-
 import blocks.Block;
 import blocks.BlockLight;
+import client.Dimensia;
+import enums.EnumColor;
+import enums.EnumDifficulty;
+import enums.EnumToolMaterial;
 
 /**
  * <code>EntityLivingPlayer</code> extends <code>EntityLiving</code> and implements Serializable
@@ -97,6 +93,8 @@ public class EntityLivingPlayer extends EntityLiving
 	public InventoryPlayer inventory;
 	public boolean heavensReprieve;
 	
+	private boolean armorChanged;
+	
 	private int ticksSinceLastCast = 99999;
 	private int ticksInCombat;
 	private int ticksOfHealthRegen;
@@ -105,7 +103,6 @@ public class EntityLivingPlayer extends EntityLiving
 	private int ticksreq;
 	private int sx;
 	private int sy;		
-	private EnumSetBonuses[] setBonuses;
 	private CraftingManager craftingManager;
 	private Recipe[] allPossibleRecipes;
 	private final String playerName;
@@ -178,7 +175,6 @@ public class EntityLivingPlayer extends EntityLiving
 		viewedChestX = 0;
 		viewedChestY = 0;
 		isImmuneToCrits = false;
-		setBonuses = new EnumSetBonuses[0];		
 		craftingManager = new CraftingManager();
 		isNearCraftingTable = false;
 		isNearFurnace = false;
@@ -232,6 +228,11 @@ public class EntityLivingPlayer extends EntityLiving
 	{		
 		invincibilityTicks = (invincibilityTicks > 0) ? --invincibilityTicks : 0;
 		ticksSinceLastCast++;
+		if(armorChanged)
+		{
+			refreshSetBonuses();
+			armorChanged = false;
+		}		
 		checkForCombatStatus();
 		checkAndUpdateStatusEffects(world);
 		applyGravity(world); //Apply Gravity to the player (and jumping)
@@ -507,55 +508,7 @@ public class EntityLivingPlayer extends EntityLiving
 	 */
 	public void onArmorChange()
 	{
-		recalculateStatsFromArmor();
-		applyDefenseFromArmor();
-		applySetBonus();
-	}
-
-	/**
-	 * Attempts to recalculate stats and damage modifiers. <b>NOTE: WIP resets modifiers and stats! </b>
-	 */
-	private void recalculateStatsFromArmor()
-	{
-		dexterity = 0;
-		intellect = 0;
-		strength = 0;
-		stamina = 0;
-				
-		for(int i = 0; i < inventory.getArmorInventoryLength(); i++) //for each slot, reapply the stats
-		{
-			if(inventory.getArmorInventoryStack(i) != null)
-			{
-				ItemArmor item = (ItemArmor) Item.itemsList[inventory.getArmorInventoryStack(i).getItemID()]; 				
-				dexterity += item.getDexterity();
-				intellect += item.getIntellect();
-				strength += item.getStrength();
-				stamina += item.getStamina();
-			}
-		}
-		
-		rangeDamageModifier = 1.0f + 0.04f * dexterity;
-		meleeDamageModifier = 1.0f + 0.04f * strength;
-		magicDamageModifier = 1.0f + 0.04f * intellect;
-		maxHealth = baseMaxHealth + (stamina * HEALTH_FROM_STAMINA);
-		maxMana = baseMaxMana + (intellect * MANA_FROM_INTELLECT);
-	}
-	
-	/**
-	 * Recalculates defense values and default bonuses for armour 
-	 */
-	private void applyDefenseFromArmor()
-	{
-		defense = 0; //dangerous line of code to clear armour benefits
-		
-		for(int i = 0; i < inventory.getArmorInventoryLength(); i++) //for each slot, reapply the defense value
-		{
-			if(inventory.getArmorInventoryStack(i) != null)
-			{
-				ItemArmor item = (ItemArmor) Item.itemsList[inventory.getArmorInventoryStack(i).getItemID()]; 				
-				defense += item.getDefense();					
-			}
-		}
+		armorChanged = true;
 	}
 	
 	/**
@@ -712,311 +665,79 @@ public class EntityLivingPlayer extends EntityLiving
 		possibleInventoryRecipes = craftingManager.getPossibleInventoryRecipes(inventory);
 	}
 	
+
 	/**
-	 *  Applies all (set) bonuses from armour equipped. Important note: % modifiers (such as +10%) multiply the current value 
-	 *  by 10% (1.1), and are not additive. This may cause things to behave slightly different than expected, or otherwise behave wierdly
-	 *  This is subject to individual change, if balance requires it. Currently this is not the case though.
+	 * Recalculates damage modifiers and health based on stats.
 	 */
-	private void applySetBonus()
+	private void recalculateStats()
 	{
-		Vector<EnumSetBonuses> otherBonuses = new Vector<EnumSetBonuses>(10);
-		SetBonusContainer set =  EnumSetBonuses.getSetBonus(inventory);
-//		
-//		for(int i = 0; i < set.length; i++) //Add set bonus from armour
-//		{
-//			otherBonuses.add(set[i]);
-//		}
-//		
-		for(int i = 0; i < inventory.getArmorInventoryLength(); i++) //For each individual armour item
-		{
-			if(inventory.getArmorInventoryStack(i) != null) 
-			{
-				ItemArmor armor = (ItemArmor) Item.itemsList[inventory.getArmorInventoryStack(i).getItemID()]; 
-				for(EnumSetBonuses bonus : armor.getBonuses()) //Add all the bonuses from that piece
-				{
-					otherBonuses.add(bonus);
-				}
-			}
-		}
-		
-		EnumSetBonuses[] bonuses = new EnumSetBonuses[otherBonuses.size()];
-		otherBonuses.copyInto(bonuses);
-		
-		//Apply all the bonuses:
-		for(int i = 0; i < bonuses.length; i++)
-		{
-			if(bonuses[i] == EnumSetBonuses.DEFENSE1) // Apply +1 defense bonus
-			{
-				this.defense += 1;
-				continue;
-			}
-			if(bonuses[i] == EnumSetBonuses.DEFENSE2) // Apply +2 defense bonus
-			{
-				this.defense += 2;
-				continue;
-			}
-			if(bonuses[i] == EnumSetBonuses.DEFENSE3) // Apply +3 defense bonus
-			{
-				this.defense += 3;
-				continue;
-			}
-			if(bonuses[i] == EnumSetBonuses.DEFENSE4) // Apply +4 defense bonus
-			{
-				this.defense += 4;
-				continue;
-			}			
-			if(bonuses[i] == EnumSetBonuses.DEFENSE5) // Apply +5 defense bonus
-			{
-				this.defense += 5;
-				continue;
-			}			
-			if(bonuses[i] == EnumSetBonuses.DAMAGE_MAGIC_DONE_10) // Apply +10% magic damage
-			{
-				this.magicDamageModifier *= 1.1;
-				continue;
-			}			
-			if(bonuses[i] == EnumSetBonuses.DAMAGE_MAGIC_DONE_20) // Apply +20% magic damage
-			{
-				this.magicDamageModifier *= 1.2;
-				continue;
-			}			
-			if(bonuses[i] == EnumSetBonuses.DAMAGE_RANGE_DONE_10) // Apply +10% range damage
-			{
-				this.rangeDamageModifier *= 1.1;
-				continue;
-			}			
-			if(bonuses[i] == EnumSetBonuses.DAMAGE_RANGE_DONE_20) // Apply +20% range damage
-			{
-				this.rangeDamageModifier *= 1.2;
-				continue;
-			}			
-			if(bonuses[i] == EnumSetBonuses.DAMAGE_MELEE_DONE_10) // Apply +10% melee damage
-			{
-				this.meleeDamageModifier *= 1.1;
-				continue;
-			}			
-			if(bonuses[i] == EnumSetBonuses.DAMAGE_MELEE_DONE_20) // Apply +20% melee damage
-			{
-				this.meleeDamageModifier *= 1.2;
-				continue;
-			}			
-			if(bonuses[i] == EnumSetBonuses.DAMAGE_DONE_10) // Apply +10% all damage
-			{
-				this.allDamageModifier *= 1.1;
-				continue;
-			}			
-			if(bonuses[i] == EnumSetBonuses.DAMAGE_DONE_20) // Apply +10% all damage
-			{
-				this.allDamageModifier *= 1.2;
-				continue;
-			}			
-			if(bonuses[i] == EnumSetBonuses.MOVEMENT_SPEED_10) // Apply +10% movement speed
-			{
-				this.movementSpeedModifier *= 1.1;
-				continue;
-			}
-			if(bonuses[i] == EnumSetBonuses.MOVEMENT_SPEED_20) // Apply +20% movement speed
-			{
-				this.movementSpeedModifier *= 1.2;
-				continue;
-			}
-			if(bonuses[i] == EnumSetBonuses.MOVEMENT_SPEED_30) // Apply +30% movement speed
-			{
-				this.movementSpeedModifier *= 1.3;
-				continue;
-			}
-			if(bonuses[i] == EnumSetBonuses.FALL_IMMUNE) // Apply Fall Damage Immunity
-			{
-				this.isImmuneToFallDamage = true;
-				continue;
-			}
-			if(bonuses[i] == EnumSetBonuses.FIRE_IMMUNE) // Apply Fire (and lava) Damage Immunity 
-			{
-				this.isImmuneToFireDamage = true;
-				continue;
-			}
-			if(bonuses[i] == EnumSetBonuses.JUMP3) // Apply +3 block jump height and fall immunity
-			{
-				this.maxHeightFallenSafely += 18;
-				this.setUpwardJumpHeight(this.getUpwardJumpHeight() + 18);
-				continue;
-			}
-			if(bonuses[i] == EnumSetBonuses.JUMP3) // Apply +8 block jump height and fall immunity
-			{
-				this.maxHeightFallenSafely += 48;
-				this.setUpwardJumpHeight(this.getUpwardJumpHeight() + 48);
-				continue;
-			}
-			if(bonuses[i] == EnumSetBonuses.CRITICAL10) // Apply +10% critical strike chance
-			{
-				this.criticalStrikeChance *= 1.1;
-				continue;
-			}
-			if(bonuses[i] == EnumSetBonuses.CRITICAL20) // Apply +20% critical strike chance
-			{
-				this.criticalStrikeChance *= 1.2;
-				continue;
-			}
-			if(bonuses[i] == EnumSetBonuses.CRITICAL_IMMUNE) // Apply Critical Hit Immunity
-			{
-				this.isImmuneToCrits = true;
-				continue;
-			}
-			if(bonuses[i] == EnumSetBonuses.KNOCKBACK_20) // Apply +20% knockback power
-			{
-				this.knockbackModifier *= 1.2;
-				continue;
-			}
-			if(bonuses[i] == EnumSetBonuses.KNOCKBACK_40) // Apply +40% knockback power
-			{
-				this.knockbackModifier *= 1.4;
-				continue;
-			}
-			if(bonuses[i] == EnumSetBonuses.KNOCKBACK_60) // Apply +60% knockback power
-			{
-				this.knockbackModifier *= 1.6;
-				continue;
-			}
-			if(bonuses[i] == EnumSetBonuses.HEAVENS_REPRIEVE) // Apply the HEAVENS_REPRIEVE effect
-			{
-				this.heavensReprieve = true;
-				continue;
-			}
-		}
-		
-		removeOldBonuses();
-		this.setBonuses = bonuses;		
+		rangeDamageModifier = 1.0f + 0.04f * dexterity;
+		meleeDamageModifier = 1.0f + 0.04f * strength;
+		magicDamageModifier = 1.0f + 0.04f * intellect;
+		maxHealth = baseMaxHealth + (stamina * HEALTH_FROM_STAMINA);
+		maxMana = baseMaxMana + (intellect * MANA_FROM_INTELLECT);		
 	}
-		
+	
 	/**
-	 * Removes all the set effects previously applied to the player, before their armour changed.
-	 * <br><br>
-	 * [WARNING (From Alec)]: This is probably going to break at very least when dealing with immunities, because 
-	 * they're applied earlier on... so if duplicates of an item are present it's very possible things will go terribly wrong
-	 * and immunity wont be achievable (includes things like heavensReprieve too)
-	 */	
-	private void removeOldBonuses()
+	 * Applies defense, stats, and SetBonuses from a single piece of armour that is being equipped. These 
+	 * should be constant for a given piece of armour to allow for easy removing.
+	 * @param armor the piece of armour being equipped
+	 */
+	public void applySingleArmorItem(ItemArmor armor)
 	{
-		EnumSetBonuses[] bonuses = this.setBonuses;
-		
-		//Remove all the bonuses:
-		for(int i = 0; i < bonuses.length; i++)
+		SetBonus[] bonuses = armor.getBonuses();		
+		for(SetBonus bonus : bonuses)
 		{
-			//DONT do anything with the defense modifiers, they're already taken care of!
-			if(bonuses[i] == EnumSetBonuses.DAMAGE_MAGIC_DONE_10) // Remove +10% magic damage
-			{
-				this.magicDamageModifier /= 1.1;
-				continue;
-			}			
-			if(bonuses[i] == EnumSetBonuses.DAMAGE_MAGIC_DONE_20) // Remove +20% magic damage
-			{
-				this.magicDamageModifier /= 1.2;
-				continue;
-			}			
-			if(bonuses[i] == EnumSetBonuses.DAMAGE_RANGE_DONE_10) // Remove +10% range damage
-			{
-				this.rangeDamageModifier /= 1.1;
-				continue;
-			}			
-			if(bonuses[i] == EnumSetBonuses.DAMAGE_RANGE_DONE_20) // Remove +20% range damage
-			{
-				this.rangeDamageModifier /= 1.2;
-				continue;
-			}			
-			if(bonuses[i] == EnumSetBonuses.DAMAGE_MELEE_DONE_10) // Remove +10% melee damage
-			{
-				this.meleeDamageModifier /= 1.1;
-				continue;
-			}			
-			if(bonuses[i] == EnumSetBonuses.DAMAGE_MELEE_DONE_20) // Remove +20% melee damage
-			{
-				this.meleeDamageModifier /= 1.2;
-				continue;
-			}			
-			if(bonuses[i] == EnumSetBonuses.DAMAGE_DONE_10) // Remove +10% all damage
-			{
-				this.allDamageModifier /= 1.1;
-				continue;
-			}			
-			if(bonuses[i] == EnumSetBonuses.DAMAGE_DONE_20) // Remove +10% all damage
-			{
-				this.allDamageModifier /= 1.2;
-				continue;
-			}			
-			if(bonuses[i] == EnumSetBonuses.MOVEMENT_SPEED_10) // Remove +10% movement speed
-			{
-				this.movementSpeedModifier /= 1.1;
-				continue;
-			}
-			if(bonuses[i] == EnumSetBonuses.MOVEMENT_SPEED_20) // Remove +20% movement speed
-			{
-				this.movementSpeedModifier /= 1.2;
-				continue;
-			}
-			if(bonuses[i] == EnumSetBonuses.MOVEMENT_SPEED_30) // Remove +30% movement speed
-			{
-				this.movementSpeedModifier /= 1.3;
-				continue;
-			}
-			if(bonuses[i] == EnumSetBonuses.FALL_IMMUNE) // Remove Fall Damage Immunity
-			{
-				this.isImmuneToFallDamage = false;
-				continue;
-			}
-			if(bonuses[i] == EnumSetBonuses.FIRE_IMMUNE) // Remove Fire (and lava) Damage Immunity 
-			{
-				this.isImmuneToFireDamage = false;
-				continue;
-			}
-			if(bonuses[i] == EnumSetBonuses.JUMP3) // Remove +3 block jump height and fall immunity
-			{
-				this.maxHeightFallenSafely -= 18;
-				this.setUpwardJumpHeight(this.getUpwardJumpHeight() - 18);
-				continue;
-			}
-			if(bonuses[i] == EnumSetBonuses.JUMP3) // Remove +8 block jump height and fall immunity
-			{
-				this.maxHeightFallenSafely -= 48;
-				this.setUpwardJumpHeight(this.getUpwardJumpHeight() - 48);
-				continue;
-			}
-			if(bonuses[i] == EnumSetBonuses.CRITICAL10) // Remove +10% critical strike chance
-			{
-				this.criticalStrikeChance /= 1.1;
-				continue;
-			}
-			if(bonuses[i] == EnumSetBonuses.CRITICAL20) // Remove +20% critical strike chance
-			{
-				this.criticalStrikeChance /= 1.2;
-				continue;
-			}
-			if(bonuses[i] == EnumSetBonuses.CRITICAL_IMMUNE) // Remove Critical Hit Immunity
-			{
-				this.isImmuneToCrits = false;
-				continue;
-			}
-			if(bonuses[i] == EnumSetBonuses.KNOCKBACK_20) // Remove +20% knockback power
-			{
-				this.knockbackModifier /= 1.2;
-				continue;
-			}
-			if(bonuses[i] == EnumSetBonuses.KNOCKBACK_40) // Remove +40% knockback power
-			{
-				this.knockbackModifier /= 1.4;
-				continue;
-			}
-			if(bonuses[i] == EnumSetBonuses.KNOCKBACK_60) // Remove +60% knockback power
-			{
-				this.knockbackModifier /= 1.6;
-				continue;
-			}
-			if(bonuses[i] == EnumSetBonuses.HEAVENS_REPRIEVE) // Remove the HEAVENS_REPRIEVE effect
-			{
-				this.heavensReprieve = false;
-				continue;
-			}
+			bonus.apply(this);
+		}		
+		defense += armor.getDefense();
+		dexterity += armor.getDexterity();
+		intellect += armor.getIntellect();
+		strength += armor.getStrength();
+		stamina += armor.getStamina();
+		recalculateStats();
+	}
+	
+	/**
+	 * Removes defense, stats, and SetBonuses for a single piece of armour that is now being removed.
+	 * These should be the same as when it was equipped due to constant values in armour that do not
+	 * change.
+	 * @param armor the piece of armour being removed
+	 */
+	public void removeSingleArmorItem(ItemArmor armor)
+	{
+		SetBonus[] bonuses = armor.getBonuses();		
+		for(SetBonus bonus : bonuses)
+		{
+			bonus.remove(this);
+		}				
+		defense -= armor.getDefense();
+		dexterity -= armor.getDexterity();
+		intellect -= armor.getIntellect();
+		strength -= armor.getStrength();
+		stamina -= armor.getStamina();
+		recalculateStats();
+	}
+	
+	SetBonusContainer currentBonuses; 
+	//Auras container?
+	
+	/**
+	 * Updates set bonus data. Unused bonuses are removed and now ones are applied. The new bonuses are 
+	 * stored in the player's instance to be removed later.
+	 */
+	private void refreshSetBonuses()
+	{
+		if(currentBonuses != null)
+		{
+			currentBonuses.removeAll(this);
+			currentBonuses = null;
 		}
-	}	
+		currentBonuses = SetBonusFactory.getSetBonuses(inventory);
+		currentBonuses.applyAll(this);
+	}
+	
+	
 	
 	/**
 	 * Function called when the player is mining a block

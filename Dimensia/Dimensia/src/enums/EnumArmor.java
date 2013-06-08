@@ -1,22 +1,45 @@
 package enums;
 
+import java.util.Vector;
+
+import setbonus.SetBonus;
+import setbonus.SetBonusDefense;
+
 /**
  * EnumArmor defines the armour values given by a specific grade of equipment. These values are 
  * available for any piece of the Armour set (the helmet, chestpiece, and pants, boots, belts, and gloves). 
  * Defense values are generally: Chestpiece > helmet >= pants > boots >= gloves >= belt.
+ * <br><br>
+ * V1.1: EnumArmor now contains SetBonuses for a given grade of material.
+ * Ex. Gold has (2): +1Defense; (3): +2Defense; (4): +2Defense. Total = +5Defense
  * @author      Alec Sobeck
  * @author      Matthew Robertson
- * @version     1.0
+ * @version     1.1
  * @since       1.0
  */
 public enum EnumArmor 
 {
-	NOTHING(0, 0, 0, 0, 0, 0),
-	COPPER(2, 3, 2, 1, 1, 1),
-	BRONZE(2, 4, 3, 1, 1, 1),
-	IRON(3, 5, 4, 2, 2, 2),
-	SILVER(4, 6, 5, 3, 3, 3),
-	GOLD(5, 7, 5, 4, 4, 4);
+	NOTHING(0, 0, 0, 0, 0, 0, new SetBonus[]{ }),
+	COPPER(2, 3, 2, 1, 1, 1, new SetBonus[]{
+			new SetBonusDefense(1).setPiecesRequiredToActivate(3)
+		}),
+	BRONZE(2, 4, 3, 1, 1, 1, new SetBonus[]{ 
+			new SetBonusDefense(1).setPiecesRequiredToActivate(2), new SetBonusDefense(1).setPiecesRequiredToActivate(4)
+		}),
+	IRON(3, 5, 4, 2, 2, 2, new SetBonus[]{ 
+			new SetBonusDefense(1).setPiecesRequiredToActivate(2), 
+			new SetBonusDefense(2).setPiecesRequiredToActivate(4)
+		}),
+	SILVER(4, 6, 5, 3, 3, 3, new SetBonus[]{ 
+			new SetBonusDefense(1).setPiecesRequiredToActivate(2),
+			new SetBonusDefense(1).setPiecesRequiredToActivate(3),
+			new SetBonusDefense(2).setPiecesRequiredToActivate(4),
+		}),
+	GOLD(5, 7, 5, 4, 4, 4, new SetBonus[]{ 
+			new SetBonusDefense(1).setPiecesRequiredToActivate(2),
+			new SetBonusDefense(2).setPiecesRequiredToActivate(3),
+			new SetBonusDefense(2).setPiecesRequiredToActivate(4)
+		});
 
 	private final int helmDefense;
 	private final int bodyDefense;
@@ -24,8 +47,9 @@ public enum EnumArmor
 	private final int bootsDefense;
 	private final int glovesDefense;
 	private final int beltDefense;
+	private SetBonus[] bonuses;
 	
-	EnumArmor(int helmDef, int bodyDef, int pantsDef, int bootsDefense, int glovesDefense, int beltDefense)
+	EnumArmor(int helmDef, int bodyDef, int pantsDef, int bootsDefense, int glovesDefense, int beltDefense, SetBonus[] bonuses)
 	{
 		this.helmDefense = helmDef;
 		this.bodyDefense = bodyDef;
@@ -33,6 +57,7 @@ public enum EnumArmor
 		this.bootsDefense = bootsDefense;
 		this.glovesDefense = glovesDefense;
 		this.beltDefense = beltDefense;
+		this.bonuses = bonuses;
 	}
 	
 	public int getHelmetDefense()
@@ -63,5 +88,25 @@ public enum EnumArmor
 	public int getBeltDefense()
 	{
 		return beltDefense;
+	}
+	
+	public SetBonus[] getBonuses()
+	{
+		return bonuses;
+	}
+	
+	public SetBonus[] getBonuses(int piecesEquipped)
+	{
+		Vector<SetBonus> bonusVect = new Vector<SetBonus>();
+		for(SetBonus set : bonuses)
+		{
+			if(set.getPiecesRequiredToActivate() <= piecesEquipped)
+			{
+				bonusVect.add(set);
+			}
+		}
+		SetBonus[] bonus = new SetBonus[bonusVect.size()];
+		bonusVect.copyInto(bonus);
+		return bonus;
 	}
 }

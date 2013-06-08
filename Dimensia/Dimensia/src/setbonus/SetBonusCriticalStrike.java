@@ -4,7 +4,7 @@ import entities.EntityLivingPlayer;
 
 public class SetBonusCriticalStrike extends SetBonus
 {
-	protected SetBonusCriticalStrike(float power) 
+	public SetBonusCriticalStrike(float power) 
 	{
 		super(power);
 	}

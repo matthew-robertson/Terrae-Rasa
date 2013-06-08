@@ -1,11 +1,13 @@
 package items;
 
+import setbonus.SetBonus;
+import setbonus.SetBonusDamageAll;
+import setbonus.SetBonusSpeed;
 import utils.ActionbarItem;
 import entities.EntityProjectile;
 import enums.EnumArmor;
 import enums.EnumItemQuality;
 import enums.EnumToolMaterial;
-import net.dimensia.src.EnumSetBonuses;
 
 /**
  * <code>Item extends ActionbarItem</code> and defines the class for most non-<code>Block</code> 
@@ -47,6 +49,7 @@ import net.dimensia.src.EnumSetBonuses;
  */
 public class Item extends ActionbarItem
 {
+	/** Each tier of gear has a material - this is used to find a set bonus */
 	protected EnumToolMaterial material;
 	public EnumItemQuality itemQuality;	
 	protected int damage;
@@ -285,14 +288,16 @@ public class Item extends ActionbarItem
 	public static Item goldBelt = new ItemArmorBelt(129).setArmorType(EnumArmor.GOLD).setIconPosition(0, 2).setName("Gold Belt");
 	
 	public static Item rocketBoots = new ItemArmorAccessory(130).setIconPosition(0, 3).setName("Rocket Boots");	
-	public static Item ringOfVigor = new ItemArmorAccessory(131).setBonuses(new EnumSetBonuses[]{ 
-			EnumSetBonuses.DAMAGE_DONE_10 
+	public static Item ringOfVigor = new ItemArmorAccessory(131).setBonuses(new SetBonus[]{ 
+			new SetBonusDamageAll(0.1F)
 	}).setIconPosition(0, 3).setName("Ring of Vigor").setExtraTooltipInformation("This ring instills a sense of courage in its wearer.");	
-	public static Item talismanOfWinds = new ItemArmorAccessory(132).setBonuses(new EnumSetBonuses[]{ 
-			EnumSetBonuses.MOVEMENT_SPEED_10 
+	public static Item talismanOfWinds = new ItemArmorAccessory(132).setBonuses(new SetBonus[]{ 
+			new SetBonusSpeed(0.1F)
 	}).setIconPosition(0, 3).setName("Talisman of Winds");	
-	public static Item angelsSigil = new ItemArmorAccessory(133).setBonuses(new EnumSetBonuses[]{ 
-			 EnumSetBonuses.HEAVENS_REPRIEVE
+	public static Item angelsSigil = new ItemArmorAccessory(133).setBonuses(new SetBonus[]{ 
+			//
+			//TODO: THIS IS AN AURA NOW
+			//EnumSetBonuses.HEAVENS_REPRIEVE
 	}).setIconPosition(0, 3).setName("Angel's Sigil");	
 	
 	

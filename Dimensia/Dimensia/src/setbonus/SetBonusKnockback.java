@@ -4,7 +4,7 @@ import entities.EntityLivingPlayer;
 
 public class SetBonusKnockback extends SetBonus 
 {
-	protected SetBonusKnockback(float power)
+	public SetBonusKnockback(float power)
 	{
 		super(power);
 	}

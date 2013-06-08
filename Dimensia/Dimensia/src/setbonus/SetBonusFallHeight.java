@@ -4,7 +4,7 @@ import entities.EntityLivingPlayer;
 
 public class SetBonusFallHeight extends SetBonus
 {
-	protected SetBonusFallHeight(float power) 
+	public SetBonusFallHeight(float power) 
 	{
 		super(power);
 	}

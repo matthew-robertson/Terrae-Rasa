@@ -4,7 +4,7 @@ import entities.EntityLivingPlayer;
 
 public class SetBonusDexterity extends SetBonus
 {
-	protected SetBonusDexterity(float power) 
+	public SetBonusDexterity(float power) 
 	{
 		super(power);
 	}

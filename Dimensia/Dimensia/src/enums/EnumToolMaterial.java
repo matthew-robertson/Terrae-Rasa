@@ -1,5 +1,10 @@
 package enums;
 
+/**
+ * Tool Material 
+ * @author alec
+ *
+ */
 public enum EnumToolMaterial 
 {
 	/**

@@ -1,6 +1,5 @@
 package setbonus;
 
-import net.dimensia.src.EnumSetBonuses;
 import entities.EntityLivingPlayer;
 
 /**
@@ -15,13 +14,13 @@ import entities.EntityLivingPlayer;
  */
 public class SetBonusContainer 
 {
-	private EnumSetBonuses[] bonuses;
+	private SetBonus[] bonuses;
 	
 	/**
 	 * Constructs a new SetBonusContainer with the specified bonuses.
 	 * @param bonuses the bonuses for this container
 	 */
-	public SetBonusContainer(EnumSetBonuses[] bonuses)
+	public SetBonusContainer(SetBonus[] bonuses)
 	{
 		this.bonuses = bonuses;
 	}
@@ -31,7 +30,7 @@ public class SetBonusContainer
 	 * @param index the index of the set bonus to get
 	 * @return the set bonus at the given index
 	 */
-	public EnumSetBonuses getAtIndex(int index)
+	public SetBonus getAtIndex(int index)
 	{
 		return bonuses[index];
 	}
@@ -40,7 +39,7 @@ public class SetBonusContainer
 	 * Gets a list with all the set bonuses.
 	 * @return all the set bonuses in this container
 	 */
-	public EnumSetBonuses[] getAll()
+	public SetBonus[] getAll()
 	{
 		return bonuses;
 	}
@@ -54,14 +53,20 @@ public class SetBonusContainer
 		return bonuses.length;
 	}
 	
-	public void apply(EntityLivingPlayer player)
+	public void applyAll(EntityLivingPlayer player)
 	{
-		
+		for(SetBonus bonus : bonuses)
+		{
+			bonus.apply(player);
+		}
 	}
 	
-	public void remove(EntityLivingPlayer player)
+	public void removeAll(EntityLivingPlayer player)
 	{
-		
+		for(SetBonus bonus : bonuses)
+		{
+			bonus.remove(player);
+		}
 	}
 	
 }

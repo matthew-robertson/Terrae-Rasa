@@ -4,7 +4,7 @@ import entities.EntityLivingPlayer;
 
 public class SetBonusSpeed extends SetBonus
 {
-	protected SetBonusSpeed(float power) 
+	public SetBonusSpeed(float power) 
 	{
 		super(power);
 	}

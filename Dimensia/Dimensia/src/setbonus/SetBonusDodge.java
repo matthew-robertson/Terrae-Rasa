@@ -4,7 +4,7 @@ import entities.EntityLivingPlayer;
 
 public class SetBonusDodge extends SetBonus
 {
-	protected SetBonusDodge(float power) 
+	public SetBonusDodge(float power) 
 	{
 		super(power);
 	}

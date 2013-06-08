@@ -632,7 +632,7 @@ public class RenderUI extends Render
 		else if(whichInventory == 2) //Armor Inventory
 		{
 			mouseItem = player.inventory.getArmorInventoryStack(index);
-			player.inventory.setArmorInventoryStack(null, index);
+			player.inventory.setArmorInventoryStack(player, null, index);
 		}
 		else if(whichInventory == 3) //Trash
 		{
@@ -741,13 +741,13 @@ public class RenderUI extends Render
 				
 				if(player.inventory.getArmorInventoryStack(index) == null) //There's nothing there, so the mouse doesnt have to pickup something
 				{
-					player.inventory.setArmorInventoryStack(mouseItem, index);
+					player.inventory.setArmorInventoryStack(player, mouseItem, index);
 					mouseItem = null;
 				}
 				else //If there is an item there, swap that slot's item and the mouse's item.
 				{
 					ItemStack stack = player.inventory.getArmorInventoryStack(index);
-					player.inventory.setArmorInventoryStack(mouseItem, index);
+					player.inventory.setArmorInventoryStack(player, mouseItem, index);
 					mouseItem = stack;
 				}
 			}
@@ -1092,7 +1092,7 @@ public class RenderUI extends Render
 			
 			if(x > x1 && x < x1 + size && y > y1 && y < y1 + size && player.inventory.getArmorInventoryStack(i) != null) 
 			{
-				player.inventory.setArmorInventoryStack(player.inventory.pickUpItemStack(world, 
+				player.inventory.setArmorInventoryStack(player, player.inventory.pickUpItemStack(world, 
 						player, 
 						player.inventory.getArmorInventoryStack(i)), 
 						i);

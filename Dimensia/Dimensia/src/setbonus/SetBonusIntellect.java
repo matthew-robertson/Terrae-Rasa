@@ -4,7 +4,7 @@ import entities.EntityLivingPlayer;
 
 public class SetBonusIntellect extends SetBonus
 {
-	protected SetBonusIntellect(float power) 
+	public SetBonusIntellect(float power) 
 	{
 		super(power);
 	}

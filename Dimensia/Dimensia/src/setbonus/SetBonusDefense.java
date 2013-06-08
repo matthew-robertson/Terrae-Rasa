@@ -4,7 +4,7 @@ import entities.EntityLivingPlayer;
 
 public class SetBonusDefense extends SetBonus
 {
-	protected SetBonusDefense(float power) 
+	public SetBonusDefense(float power) 
 	{
 		super(power);
 	}

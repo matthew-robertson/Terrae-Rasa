@@ -4,7 +4,7 @@ import entities.EntityLivingPlayer;
 
 public class SetBonusDamageMelee extends SetBonus
 {
-	protected SetBonusDamageMelee(float power) 
+	public SetBonusDamageMelee(float power) 
 	{
 		super(power);
 	}

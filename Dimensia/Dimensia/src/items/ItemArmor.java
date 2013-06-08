@@ -3,14 +3,16 @@ package items;
 import java.util.ArrayList;
 import java.util.List;
 
-import enums.EnumArmor;
+import auras.Aura;
 
-import net.dimensia.src.EnumSetBonuses;
+import setbonus.SetBonus;
+import enums.EnumArmor;
 
 public class ItemArmor extends Item
 {
 	protected boolean isSavingRelic;
-	protected EnumSetBonuses[] bonuses;
+	protected SetBonus[] bonuses;
+	protected Aura[] auras;
 	protected EnumArmor armorType;
 	protected int defense;
 	protected int dexterity;
@@ -27,7 +29,8 @@ public class ItemArmor extends Item
 		dexterity = 0;
 		strength = 0;
 		armorType = EnumArmor.NOTHING;
-		bonuses = new EnumSetBonuses[0];
+		bonuses = new SetBonus[0];
+		auras = new Aura[0];
 	}
 	
 	protected ItemArmor setArmorType(EnumArmor type)
@@ -98,20 +101,21 @@ public class ItemArmor extends Item
 		return armorType;
 	}
 	
-	protected ItemArmor setBonuses(EnumSetBonuses[] bonuses)
+	protected ItemArmor setBonuses(SetBonus[] bonuses)
 	{
 		this.bonuses = bonuses;
-		
-		for(int i = 0; i < bonuses.length; i++)
-		{
-			if(bonuses[i] == EnumSetBonuses.HEAVENS_REPRIEVE)
-			{
-				isSavingRelic = true;
-				break;
-			}
-		}
-		
 		return this;
+	}
+	
+	protected ItemArmor setAuras(Aura[] auras)
+	{
+		this.auras = auras;
+		return this;
+	}
+	
+	protected Aura[] getAuras()
+	{
+		return auras;
 	}
 	
 	public int getDefense()
@@ -125,7 +129,7 @@ public class ItemArmor extends Item
 		return this;
 	}
 	
-	public EnumSetBonuses[] getBonuses()
+	public SetBonus[] getBonuses()
 	{
 		return bonuses;
 	}

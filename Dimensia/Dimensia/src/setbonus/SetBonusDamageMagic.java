@@ -4,7 +4,7 @@ import entities.EntityLivingPlayer;
 
 public class SetBonusDamageMagic extends SetBonus
 {
-	protected SetBonusDamageMagic(float power) 
+	public SetBonusDamageMagic(float power) 
 	{
 		super(power);
 	}
