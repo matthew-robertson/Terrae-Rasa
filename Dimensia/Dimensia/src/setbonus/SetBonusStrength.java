@@ -29,4 +29,8 @@ public class SetBonusStrength extends SetBonus
 		player.strength -= power;
 	}
 
+	public String toString()
+	{
+		return "+" + (int)power + " Strength";
+	}
 }

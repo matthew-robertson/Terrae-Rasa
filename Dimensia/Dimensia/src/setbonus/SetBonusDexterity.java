@@ -28,5 +28,9 @@ public class SetBonusDexterity extends SetBonus
 	{
 		player.dexterity -= power;
 	}
-
+	
+	public String toString()
+	{
+		return "+" + (int)power + " Dexterity";
+	}
 }

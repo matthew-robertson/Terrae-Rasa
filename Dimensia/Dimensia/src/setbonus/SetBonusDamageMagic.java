@@ -29,4 +29,8 @@ public class SetBonusDamageMagic extends SetBonus
 		player.magicDamageModifier/= (1 + power);
 	}
 
+	public String toString()
+	{
+		return "+" + (int)(power * 100) + "% Magic Damage";
+	}
 }

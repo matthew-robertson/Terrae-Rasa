@@ -29,4 +29,8 @@ public class SetBonusIntellect extends SetBonus
 		player.intellect -= power;
 	}
 
+	public String toString()
+	{
+		return "+" + (int)power + " Intellect";
+	}
 }

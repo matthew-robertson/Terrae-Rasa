@@ -29,4 +29,8 @@ public class SetBonusFallHeight extends SetBonus
 		player.maxHeightFallenSafely -= power; 
 	}
 
+	public String toString()
+	{
+		return "+" + (int)power + " Fall Height";
+	}
 }

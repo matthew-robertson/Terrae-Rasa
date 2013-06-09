@@ -28,5 +28,9 @@ public class SetBonusDefense extends SetBonus
 	{
 		player.defense -= power;
 	}
-
+	
+	public String toString()
+	{
+		return "+" + (int)power + " Defense";
+	}
 }

@@ -29,4 +29,8 @@ public class SetBonusDamageMelee extends SetBonus
 		player.meleeDamageModifier /= (1 + power);
 	}
 
+	public String toString()
+	{
+		return "+" + (int)(power * 100) + "% Melee Damage";
+	}
 }

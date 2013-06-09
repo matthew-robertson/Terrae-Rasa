@@ -28,4 +28,8 @@ public class SetBonusStamina extends SetBonus
 		player.stamina -= power;
 	}
 
+	public String toString()
+	{
+		return "+" + (int)power + " Stamina";
+	}
 }

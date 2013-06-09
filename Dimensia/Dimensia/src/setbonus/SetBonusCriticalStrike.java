@@ -29,4 +29,8 @@ public class SetBonusCriticalStrike extends SetBonus
 		player.criticalStrikeChance -= power;
 	}
 
+	public String toString()
+	{
+		return "+" + (int)(power * 100) + "% Critical Chance";
+	}
 }

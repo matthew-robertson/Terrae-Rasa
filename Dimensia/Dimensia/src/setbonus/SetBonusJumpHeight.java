@@ -28,4 +28,9 @@ public class SetBonusJumpHeight extends SetBonus
 	{
 		player.setUpwardJumpHeight(player.getUpwardJumpHeight() - power);
 	}
+
+	public String toString()
+	{
+		return "+" + (int)power + " Jump Height";
+	}
 }

@@ -30,4 +30,9 @@ public class SetBonusAttackSpeed extends SetBonus
 	{
 		player.attackSpeedModifier -= power;
 	}
+	
+	public String toString()
+	{
+		return "+" + (int)(power * 100) + "% Attack Speed";
+	}
 }

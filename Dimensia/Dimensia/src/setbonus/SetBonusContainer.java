@@ -70,7 +70,7 @@ public class SetBonusContainer
 	}
 	
 	/**
-	 * Applies all the SetBonuses in the SetBonusContainer
+	 * Applies all the SetBonuses in the SetBonusContainer to the player
 	 * @param player the player to apply the SetBonuses to
 	 */
 	public void applyAll(EntityLivingPlayer player)
@@ -82,7 +82,7 @@ public class SetBonusContainer
 	}
 	
 	/**
-	 * Removes all the SetBonuses in the SetBonusContainer
+	 * Removes all the SetBonuses in the SetBonusContainer from the player
 	 * @param player the player to remove the SetBonuses from
 	 */
 	public void removeAll(EntityLivingPlayer player)

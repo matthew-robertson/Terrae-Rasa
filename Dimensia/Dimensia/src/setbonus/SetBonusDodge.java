@@ -29,4 +29,8 @@ public class SetBonusDodge extends SetBonus
 		player.dodgeChance -= power;
 	}
 
+	public String toString()
+	{
+		return "+" + (int)(power * 100) + "% Dodge Chance";
+	}
 }

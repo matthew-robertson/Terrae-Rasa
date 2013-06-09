@@ -28,4 +28,9 @@ public class SetBonusSpeed extends SetBonus
 	{
 		player.movementSpeedModifier /= (1 + power);
 	}
+
+	public String toString()
+	{
+		return "+" + (int)(power * 100) + "% Movement Speed";
+	}
 }

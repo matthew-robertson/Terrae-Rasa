@@ -28,4 +28,9 @@ public class SetBonusKnockback extends SetBonus
 	{
 		player.knockbackModifier /= (1 + power);
 	}	
+	
+	public String toString()
+	{
+		return "+" + (int)(power * 100) + "% Knockback";
+	}
 }

@@ -29,4 +29,8 @@ public class SetBonusDamageAll extends SetBonus
 		player.allDamageModifier /= (1 + power);
 	}
 
+	public String toString()
+	{
+		return "+" + (int)(power * 100) + "% Damage";
+	}
 }

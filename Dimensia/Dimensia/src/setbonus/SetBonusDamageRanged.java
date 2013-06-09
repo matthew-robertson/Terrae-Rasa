@@ -29,4 +29,8 @@ public class SetBonusDamageRanged extends SetBonus
 		player.rangeDamageModifier /= (1 + power);
 	}
 
+	public String toString()
+	{
+		return "+" + (int)(power * 100) + "% Range Damage";
+	}
 }
