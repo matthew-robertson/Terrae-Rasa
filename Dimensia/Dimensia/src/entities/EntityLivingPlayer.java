@@ -9,6 +9,7 @@ import items.ItemToolAxe;
 import items.ItemToolHammer;
 import items.ItemToolPickaxe;
 
+import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -107,18 +108,19 @@ public class EntityLivingPlayer extends EntityLiving
 	private Recipe[] allPossibleRecipes;
 	private final String playerName;
 	private boolean inventoryChanged;
-	private boolean isNearCraftingTable;
-	private boolean isNearFurnace;
+
 	private final EnumDifficulty difficulty;
-	private Recipe[] possibleCraftingRecipes;
-	private Recipe[] possibleFurnaceRecipes;
-	private Recipe[] possibleInventoryRecipes;
+	
 	private final int MAXIMUM_BASE_MANA;
 	private final int MAXIMUM_BASE_HEALTH;
 	private final int MAX_BLOCK_PLACE_DISTANCE;
 	private Hashtable<String, Cooldown> cooldowns;
 	public final static int MAX_SPECIAL_ENERGY = 100;
 	public float specialEnergy;
+	
+	
+	private Dictionary<String, Boolean> nearBlock;
+	private Dictionary<String, Recipe[]> possibleRecipesByBlock;
 	
 	/**
 	 * Constructs a new instance of EntityLivingPlayer with default settings, inventory (includes 3 basic tools),
@@ -176,8 +178,6 @@ public class EntityLivingPlayer extends EntityLiving
 		viewedChestY = 0;
 		isImmuneToCrits = false;
 		craftingManager = new CraftingManager();
-		isNearCraftingTable = false;
-		isNearFurnace = false;
 		inventoryChanged = true;	
 		selectedRecipe = 0;
 		knockbackModifier = 1;
@@ -188,6 +188,17 @@ public class EntityLivingPlayer extends EntityLiving
 		heavensReprieve = false;
 		isReloaded = false;
 		cooldowns = new Hashtable<String, Cooldown>();
+		nearBlock = new Hashtable<String, Boolean>();
+		for(Block block : CraftingManager.getCraftingBlocks())
+		{
+			nearBlock.put(block.getName(), false);
+		}
+		nearBlock.put(Block.none.getName(), true);
+		possibleRecipesByBlock = new Hashtable<String, Recipe[]>();
+		for(Block block : CraftingManager.getCraftingBlocks())
+		{
+			possibleRecipesByBlock.put(block.getName(), new Recipe[] { });
+		}
 	}
 	
 	public EntityLivingPlayer(EntityLivingPlayer entity)
@@ -215,10 +226,19 @@ public class EntityLivingPlayer extends EntityLiving
 		isViewingChest = false;
 		inventory.initializeInventoryTotals(isReloaded);
 		craftingManager = new CraftingManager();
-		isNearCraftingTable = false;
-		isNearFurnace = false;
 		inventoryChanged = true;	
 		selectedRecipe = 0;
+		nearBlock = new Hashtable<String, Boolean>();
+		for(Block block : CraftingManager.getCraftingBlocks())
+		{
+			nearBlock.put(block.getName(), false);
+		}
+		nearBlock.put(Block.none.getName(), true);
+		possibleRecipesByBlock = new Hashtable<String, Recipe[]>();
+		for(Block block : CraftingManager.getCraftingBlocks())
+		{
+			possibleRecipesByBlock.put(block.getName(), new Recipe[] { });
+		}
 	}
 	
 	/**
@@ -546,44 +566,44 @@ public class EntityLivingPlayer extends EntityLiving
 	private void setAllRecipeArray()
 	{
 		//'int size' indicates how many recipes are able to be created, in total
-		int size = possibleInventoryRecipes.length; //InventoryRecipes are always possible, add their total no matter what
-		
-		if(isNearFurnace) //if the player is near a furnace, add the total length of the possibleFurnaceRecipes[]
+		//InventoryRecipes are always possible, add their total no matter what
+		int size = possibleRecipesByBlock.get(Block.none.getName()).length;
+		for(Block block : CraftingManager.getCraftingBlocks())
 		{
-			size += possibleFurnaceRecipes.length;
-		}
-		if(isNearCraftingTable) //if the player is near a crafting table, add the total length of the possibleCraftingTable[]
-		{
-			size += possibleCraftingRecipes.length;
+			if(nearBlock.get(block.getName()))
+			{
+				size += possibleRecipesByBlock.get(block.getName()).length;
+			}
 		}
 		Recipe[] recipes = new Recipe[size]; //create a temperary Recipe[] to store stuff in.S
 		
 		int i = 0; //used for standard looping. declared here so its value can be known after the loop
 		int k = 0; //the index in recipes[] to begin saving recipes
 		
-		if(isNearCraftingTable) //If the player is near a crafting table, add the recipes for that in.
+		for(Block block : CraftingManager.getCraftingBlocks())
 		{
-			for(i = 0; i < possibleCraftingRecipes.length; i++)
+			Recipe[] possibleRecipes = possibleRecipesByBlock.get(block.getName());
+			if(nearBlock.get(block.getName()))
 			{
-				recipes[k + i] = possibleCraftingRecipes[i];
+				for(i = 0; i < possibleRecipes.length; i++)
+				{
+					recipes[k + i] = possibleRecipes[i];
+				}
+				k += i;				
 			}
-			k += i;
 		}
-		if(isNearFurnace) //If the player is near a furnace, add the recipes for that in
+		//Inventory Default recipes
+		Recipe[] possibleRecipes = possibleRecipesByBlock.get(Block.none.getName());
+		if(nearBlock.get(Block.none.getName()))
 		{
-			for(i = 0; i < possibleFurnaceRecipes.length; i++)
+			for(i = 0; i < possibleRecipes.length; i++)
 			{
-				recipes[k + i] = possibleFurnaceRecipes[i];
+				recipes[k + i] = possibleRecipes[i];
 			}
-			k += i;		
-		}
-		for(i = 0; i < possibleInventoryRecipes.length; i++) //Add inventory recipes in
-		{
-			recipes[k + i] = possibleInventoryRecipes[i];
+			k += i;				
 		}
 		
 		allPossibleRecipes = recipes; //set the possible recipes to the temperary Recipe[]
-		
 		if(selectedRecipe >= allPossibleRecipes.length) //Fix the selectedRecipe Integer so that the crafting scroller doesnt go out of bounds
 		{
 			selectedRecipe = (allPossibleRecipes.length > 0) ? allPossibleRecipes.length - 1 : 0;
@@ -595,77 +615,69 @@ public class EntityLivingPlayer extends EntityLiving
 	 */
 	private void checkForNearbyBlocks(World world) 
 	{
+		Dictionary<String, Boolean> nearby = new Hashtable<String, Boolean>();
 		boolean recalculateRecipes = false;
 		final int detectionRadius = 2; //blocks away a player can detect a crafting_table/furnace/etc
 		
-		boolean nearCraftingTable = blockInBounds(world, -detectionRadius, detectionRadius, -detectionRadius, detectionRadius, Block.craftingTable); //if the player is near a crafting table
-		if(isNearCraftingTable != nearCraftingTable) //and they weren't just near one
-		{ 
-			recalculateRecipes = true; //recipes need recalculated
-		}
-	
-		boolean nearFurnace = blockInBounds(world, -detectionRadius, detectionRadius, -detectionRadius, detectionRadius, Block.furnace); //if the player is near a furnace
-		if(isNearFurnace != nearFurnace) //and they weren't just near one
+		//Check if the blocks in CraftingManager.getCraftingBlocks() are nearby
+		for(Block block : CraftingManager.getCraftingBlocks())
 		{
-			recalculateRecipes = true; //recipes need recalculated
+			nearby.put(block.getName(), 
+					   blockInBounds(world, -detectionRadius, detectionRadius, -detectionRadius, detectionRadius, block)); 
+			if(nearBlock.get(block.getName()) != nearby.get(block.getName())) //and they weren't just near one
+			{ 
+				recalculateRecipes = true; //recipes need recalculated
+			}
 		}
-		
-		if(recalculateRecipes || inventoryChanged) //if the recipes need recalulated or the inventory has changed
+		nearBlock.put(Block.none.getName(), true);
+			
+		//if the recipes need recalculated or the inventory has changed then recalculate recipes.
+		if(recalculateRecipes || inventoryChanged) 
 		{	
-			if(isNearCraftingTable != nearCraftingTable || inventoryChanged)
+			for(Block block : CraftingManager.getCraftingBlocks())
 			{
-				isNearCraftingTable = nearCraftingTable; 
-				updateCraftingRecipes(); //recalculate the crafting recipes
-			}	
-	
-			if(isNearFurnace != nearFurnace || inventoryChanged)
-			{
-				isNearFurnace = nearFurnace;
-				updateFurnaceRecipes(); //recalculate the furnace recipes
+				if(inventoryChanged || nearBlock.get(block.getName()) != nearby.get(block.getName()))
+				{
+					nearBlock.put(block.getName(), nearby.get(block.getName()));
+					updateRecipes(block);
+				}					
 			}
 		
-			updateInventoryRecipes(); //update inventory recipes
+			updateRecipes(Block.none); //update inventory recipes
 			setAllRecipeArray(); //set the crafting recipe array to the new recipes
 			inventoryChanged = false;
 		}
 	}
-		
+	
 	/**
 	 * Emergency or init function to brute force calculate all recipes
 	 */
 	public void updateAllPossibleRecipes()
 	{
-		updateCraftingRecipes();
-		updateFurnaceRecipes();
-		updateInventoryRecipes();		
+		updateAllRecipes();
 		setAllRecipeArray();
 	}
 	
 	/**
-	 * Updates the possibleCraftingRecipes[] to be accurate, after an inventoryChange generally
+	 * Updates the entire possibleRecipesByBlock to be accurate, after an inventoryChange generally
 	 */
-	private void updateCraftingRecipes()
+	private void updateAllRecipes()
 	{
-		possibleCraftingRecipes = craftingManager.getPossibleCraftingRecipes(inventory);		
+		for(Block block : CraftingManager.getCraftingBlocks())
+		{
+			possibleRecipesByBlock.put(block.getName(), craftingManager.getPossibleRecipesByBlock(inventory, block));		
+		}
 	}
 	
 	/**
-	 * Updates the possibleFurnaceRecipes[] to be accurate, after an inventoryChange generally
+	 * Updates one crafting block in the possibleRecipesByBlock Dictionary
+	 * @param block the block in possibleRecipesByBlock to update
 	 */
-	private void updateFurnaceRecipes()
+	private void updateRecipes(Block block)
 	{
-		possibleFurnaceRecipes = craftingManager.getPossibleFurnaceRecipes(inventory);
+		possibleRecipesByBlock.put(block.getName(), craftingManager.getPossibleRecipesByBlock(inventory, block));		
 	}
 	
-	/**
-	 * Updates the possibleInventoryRecipes[] to be accurate, after an inventoryChange generally
-	 */
-	private void updateInventoryRecipes()
-	{
-		possibleInventoryRecipes = craftingManager.getPossibleInventoryRecipes(inventory);
-	}
-	
-
 	/**
 	 * Recalculates damage modifiers and health based on stats.
 	 */

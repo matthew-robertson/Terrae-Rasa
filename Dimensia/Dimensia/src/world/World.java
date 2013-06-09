@@ -467,8 +467,9 @@ public class World
 		{
 			chunkManager.addAllLoadedChunks(this, getChunks());
 		}
-		if (player.inventory.getMainInventoryStack(player.selectedSlot).getItemID() < ActionbarItem.spellIndex && 
-				Mouse.isButtonDown(0) && player.inventory.getMainInventoryStack(player.selectedSlot) != null) 
+		if (player.inventory.getMainInventoryStack(player.selectedSlot) != null && 
+				player.inventory.getMainInventoryStack(player.selectedSlot).getItemID() < ActionbarItem.spellIndex && 
+				Mouse.isButtonDown(0)) 
 		{ //player mining, if applicable
 			player.breakBlock(this, ((Render.getCameraX() + MathHelper.getCorrectMouseXPosition()) / 6), ((Render.getCameraY() + MathHelper.getCorrectMouseYPosition()) / 6), (Item.itemsList[player.inventory.getMainInventoryStack(player.selectedSlot).getItemID()]));
 		}

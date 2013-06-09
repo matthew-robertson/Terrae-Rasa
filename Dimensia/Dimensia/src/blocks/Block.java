@@ -487,6 +487,7 @@ public class Block extends ActionbarItem
 	public static final Block[] blocksList = new Block[2048];
 	/** Block Declarations **/
 
+	public static Block none = new Block(2047).setName("None");
 	public static Block air = new Block();
 	public static Block dirt = new Block(1).setName("Dirt").setTileMap('g')
 			.setBlockHardness(40.0f).setIconIndex(0, 3).setBlockType(1);

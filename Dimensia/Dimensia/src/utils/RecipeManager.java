@@ -7,359 +7,316 @@ import java.util.Vector;
 
 import blocks.Block;
 
+/**
+ * RecipeManager contains the raw Recipe data for the entire game. All recipes are registered in a Vector which is not
+ * organized, and can then by requested by Block type using {@link #getRecipesByBlockType(Block)}. 
+ * 
+ * <br><br>
+ * 
+ * Additionally, all Recipe declarations are stored in RecipeManager.
+ * @author      Alec Sobeck
+ * @author      Matthew Robertson
+ * @version     1.0
+ * @since       1.0
+ */
 public class RecipeManager 
 {
-	public Vector<Recipe> craftingList;
-	public Vector<Recipe> furnaceList;
-	public Vector<Recipe> inventoryList;
+	private static final Vector<Recipe> unorganizedRecipes = new Vector<Recipe>(128);
 	
 	public RecipeManager()
 	{
-		if(craftingList == null)
-		{
-			craftingList = new Vector<Recipe>();
-		}
-		if(inventoryList == null)
-		{	
-			inventoryList = new Vector<Recipe>();
-		}
-		if(furnaceList == null)
-		{	
-			furnaceList = new Vector<Recipe>();
-		}	
 	}
 	
 	/**
-	 * Get the craftingList Vector as an array
-	 * @return craftingList vector as an array
+	 * Requests all the crafting recipes associated with a given Block. If the block is not a registered crafting Block 
+	 * this will return a Recipe[] of length 0.
+	 * @param block the Block that will be used to find associated crafting recipes
+	 * @return a Recipe[] of all the crafting recipes associated to this Block
 	 */
-	public Recipe[] getCraftingRecipesAsArray()
+	public Recipe[] getRecipesByBlockType(Block block)
 	{
-		Recipe[] recipes = new Recipe[craftingList.size()];
-		craftingList.copyInto(recipes);
-		return recipes;
-	}
-
-	/**
-	 * Get the furnaceList Vector as an array
-	 * @return furnaceList vector as an array
-	 */
-	public Recipe[] getFurnaceRecipesAsArray()
-	{
-		Recipe[] recipes = new Recipe[furnaceList.size()];
-		furnaceList.copyInto(recipes);
-		return recipes;
-	}
-	
-	/**
-	 * Get the inventoryList Vector as an array
-	 * @return inventoryList vector as an array
-	 */
-	public Recipe[] getInventoryRecipesAsArray()
-	{
-		Recipe[] recipes = new Recipe[inventoryList.size()];
-		inventoryList.copyInto(recipes);
-		return recipes;
-	}
-	
-	/**
-	 * add a recipe to the craftingList vector
-	 * @param recipe recipe to add.
-	 */
-	public void addCraftingRecipe(Recipe recipe)
-	{
-		if(craftingList == null)
+		Vector<Recipe> recipes = new Vector<Recipe>();
+		for (Recipe recipe : unorganizedRecipes)
 		{
-			craftingList = new Vector<Recipe>();
+			if(recipe.getRequiredBlock().getID() == block.getID()) //Compare IDs to ensure accuracy
+			{
+				recipes.add(recipe);
+			}
 		}
-		craftingList.add(recipe);
+		Recipe[] recipesAsArray = new Recipe[recipes.size()];
+		recipes.copyInto(recipesAsArray);
+		return recipesAsArray;
 	}
-
+		
 	/**
-	 * add a recipe to the furnaceList vector
-	 * @param recipe recipe to add.
+	 * Registers a crafting recipe in the unorganizedRecipes Vector. Ensure it has a Block matching a possible crafting block
+	 * in order to be retrieved for later use.
+	 * @param recipe the Recipe to register
 	 */
-	public void addFurnaceRecipe(Recipe recipe)
+	public void registerRecipe(Recipe recipe)
 	{
-		if(furnaceList == null)
-		{
-			furnaceList = new Vector<Recipe>();
-		}
-		furnaceList.add(recipe);
-	}
-	
-	/**
-	 * add a recipe to the inventoryList vector
-	 * @param recipe recipe to add.
-	 */
-	public void addInventoryRecipe(Recipe recipe)
-	{
-		if(inventoryList == null)
-		{
-			inventoryList = new Vector<Recipe>();
-		}
-		inventoryList.add(recipe);
+		unorganizedRecipes.add(recipe);
 	}
 	
 	/** Recipe Declarations **/
 	
-	Recipe copperAxe = new Recipe(this, new ItemStack(Item.copperAxe), 'c', new ItemStack[] {
+	Recipe copperAxe = new Recipe(this, new ItemStack(Item.copperAxe), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.copperIngot, 6), new ItemStack(Block.plank, 5)
 	});		
-	Recipe copperPickaxe = new Recipe(this, new ItemStack(Item.copperPickaxe), 'c', new ItemStack[] {
+	Recipe copperPickaxe = new Recipe(this, new ItemStack(Item.copperPickaxe), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.copperIngot, 7), new ItemStack(Block.plank, 5) 
 	});	
-	Recipe copperBroadSword = new Recipe(this, new ItemStack(Item.copperSword), 'c', new ItemStack[] {
+	Recipe copperBroadSword = new Recipe(this, new ItemStack(Item.copperSword), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.copperIngot, 6), new ItemStack(Block.plank, 5) 
 	});	
-	Recipe copperHammer = new Recipe(this, new ItemStack(Item.copperHammer), 'c', new ItemStack[] {
+	Recipe copperHammer = new Recipe(this, new ItemStack(Item.copperHammer), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.copperIngot, 5), new ItemStack(Block.plank, 5)
 	});		
-	Recipe copperChestplate = new Recipe(this, new ItemStack(Item.copperBody), 'c', new ItemStack[] {
+	Recipe copperChestplate = new Recipe(this, new ItemStack(Item.copperBody), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.copperIngot, 10) 
 	});	
-	Recipe copperHelmet = new Recipe(this, new ItemStack(Item.copperHelmet), 'c', new ItemStack[] {
+	Recipe copperHelmet = new Recipe(this, new ItemStack(Item.copperHelmet), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.copperIngot, 8) 
 	});	
-	Recipe copperGreaves = new Recipe(this, new ItemStack(Item.copperPants), 'c', new ItemStack[] {
+	Recipe copperGreaves = new Recipe(this, new ItemStack(Item.copperPants), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.copperIngot, 7)
 	});	
-	Recipe copperBelt = new Recipe(this, new ItemStack(Item.copperBelt), 'c', new ItemStack[] {
+	Recipe copperBelt = new Recipe(this, new ItemStack(Item.copperBelt), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.copperIngot, 5)
 	});	
-	Recipe copperBoots = new Recipe(this, new ItemStack(Item.copperBoots), 'c', new ItemStack[] {
+	Recipe copperBoots = new Recipe(this, new ItemStack(Item.copperBoots), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.copperIngot, 5)
 	});	
-	Recipe copperGloves = new Recipe(this, new ItemStack(Item.copperGloves), 'c', new ItemStack[] {
+	Recipe copperGloves = new Recipe(this, new ItemStack(Item.copperGloves), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.copperIngot, 5)
 	});	
 	
 	
-	Recipe bronzeAxe = new Recipe(this, new ItemStack(Item.bronzeAxe), 'c', new ItemStack[] {
+	Recipe bronzeAxe = new Recipe(this, new ItemStack(Item.bronzeAxe), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.bronzeIngot, 7), new ItemStack(Block.plank, 5)
 	});		
-	Recipe bronzePickaxe = new Recipe(this, new ItemStack(Item.bronzePickaxe), 'c', new ItemStack[] {
+	Recipe bronzePickaxe = new Recipe(this, new ItemStack(Item.bronzePickaxe), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.bronzeIngot, 9), new ItemStack(Block.plank, 5) 
 	});	
-	Recipe bronzeBroadSword = new Recipe(this, new ItemStack(Item.bronzeSword), 'c', new ItemStack[] {
+	Recipe bronzeBroadSword = new Recipe(this, new ItemStack(Item.bronzeSword), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.bronzeIngot, 8), new ItemStack(Block.plank, 5) 
 	});	
-	Recipe bronzeHammer = new Recipe(this, new ItemStack(Item.bronzeHammer), 'c', new ItemStack[] {
+	Recipe bronzeHammer = new Recipe(this, new ItemStack(Item.bronzeHammer), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.bronzeIngot, 6), new ItemStack(Block.plank, 5)
 	});		
-	Recipe bronzeChestplate = new Recipe(this, new ItemStack(Item.bronzeBody), 'c', new ItemStack[] {
+	Recipe bronzeChestplate = new Recipe(this, new ItemStack(Item.bronzeBody), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.bronzeIngot, 12) 
 	});	
-	Recipe bronzeHelmet = new Recipe(this, new ItemStack(Item.bronzeHelmet), 'c', new ItemStack[] {
+	Recipe bronzeHelmet = new Recipe(this, new ItemStack(Item.bronzeHelmet), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.bronzeIngot, 10)
 	});	
-	Recipe bronzeGreaves = new Recipe(this, new ItemStack(Item.bronzePants), 'c', new ItemStack[] {
+	Recipe bronzeGreaves = new Recipe(this, new ItemStack(Item.bronzePants), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.bronzeIngot, 8)
 	});		
-	Recipe bronzeBelt = new Recipe(this, new ItemStack(Item.bronzeBelt), 'c', new ItemStack[] {
+	Recipe bronzeBelt = new Recipe(this, new ItemStack(Item.bronzeBelt), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.bronzeIngot, 5)
 	});	
-	Recipe bronzeBoots = new Recipe(this, new ItemStack(Item.bronzeBoots), 'c', new ItemStack[] {
+	Recipe bronzeBoots = new Recipe(this, new ItemStack(Item.bronzeBoots), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.bronzeIngot, 5)
 	});	
-	Recipe bronzeGloves = new Recipe(this, new ItemStack(Item.bronzeGloves), 'c', new ItemStack[] {
+	Recipe bronzeGloves = new Recipe(this, new ItemStack(Item.bronzeGloves), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.bronzeIngot, 5)
 	});	
 	
-	Recipe ironAxe = new Recipe(this, new ItemStack(Item.ironAxe), 'c', new ItemStack[] {
+	Recipe ironAxe = new Recipe(this, new ItemStack(Item.ironAxe), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.ironIngot, 9), new ItemStack(Block.plank, 5)
 	});		
-	Recipe ironPickaxe = new Recipe(this, new ItemStack(Item.ironPickaxe), 'c', new ItemStack[] {
+	Recipe ironPickaxe = new Recipe(this, new ItemStack(Item.ironPickaxe), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.ironIngot, 10), new ItemStack(Block.plank, 5)
 	});	
-	Recipe ironBroadSword = new Recipe(this, new ItemStack(Item.ironSword), 'c', new ItemStack[] {
+	Recipe ironBroadSword = new Recipe(this, new ItemStack(Item.ironSword), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.ironIngot, 9), new ItemStack(Block.plank, 5) 
 	});	
-	Recipe ironHammer = new Recipe(this, new ItemStack(Item.ironHammer), 'c', new ItemStack[] {
+	Recipe ironHammer = new Recipe(this, new ItemStack(Item.ironHammer), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.ironIngot, 7), new ItemStack(Block.plank, 5)
 	});		
-	Recipe ironChestplate = new Recipe(this, new ItemStack(Item.ironBody), 'c', new ItemStack[] {
+	Recipe ironChestplate = new Recipe(this, new ItemStack(Item.ironBody), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.ironIngot, 13) 
 	});	
-	Recipe ironHelmet = new Recipe(this, new ItemStack(Item.ironHelmet), 'c', new ItemStack[] {
+	Recipe ironHelmet = new Recipe(this, new ItemStack(Item.ironHelmet), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.ironIngot, 11)
 	});	
-	Recipe ironGreaves = new Recipe(this, new ItemStack(Item.ironPants), 'c', new ItemStack[] {
+	Recipe ironGreaves = new Recipe(this, new ItemStack(Item.ironPants), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.ironIngot, 10)
 	});	
-	Recipe ironBelt = new Recipe(this, new ItemStack(Item.ironBelt), 'c', new ItemStack[] {
+	Recipe ironBelt = new Recipe(this, new ItemStack(Item.ironBelt), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.ironIngot, 7)
 	});	
-	Recipe ironBoots = new Recipe(this, new ItemStack(Item.ironBoots), 'c', new ItemStack[] {
+	Recipe ironBoots = new Recipe(this, new ItemStack(Item.ironBoots), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.ironIngot, 7)
 	});	
-	Recipe ironGloves = new Recipe(this, new ItemStack(Item.ironGloves), 'c', new ItemStack[] {
+	Recipe ironGloves = new Recipe(this, new ItemStack(Item.ironGloves), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.ironIngot, 7)
 	});	
 	
-	Recipe silverAxe = new Recipe(this, new ItemStack(Item.silverAxe), 'c', new ItemStack[] {
+	Recipe silverAxe = new Recipe(this, new ItemStack(Item.silverAxe), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.silverIngot, 10), new ItemStack(Block.plank, 5)
 	});		
-	Recipe silverPickaxe = new Recipe(this, new ItemStack(Item.silverPickaxe), 'c', new ItemStack[] {
+	Recipe silverPickaxe = new Recipe(this, new ItemStack(Item.silverPickaxe), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.silverIngot, 12), new ItemStack(Block.plank, 5)
 	});	
-	Recipe silverBroadSword = new Recipe(this, new ItemStack(Item.silverSword), 'c', new ItemStack[] {
+	Recipe silverBroadSword = new Recipe(this, new ItemStack(Item.silverSword), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.silverIngot, 11), new ItemStack(Block.plank, 5) 
 	});	
-	Recipe silverHammer = new Recipe(this, new ItemStack(Item.silverHammer), 'c', new ItemStack[] {
+	Recipe silverHammer = new Recipe(this, new ItemStack(Item.silverHammer), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.silverIngot, 9), new ItemStack(Block.plank, 5)
 	});		
-	Recipe silverChestplate = new Recipe(this, new ItemStack(Item.silverBody), 'c', new ItemStack[] {
+	Recipe silverChestplate = new Recipe(this, new ItemStack(Item.silverBody), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.silverIngot, 15) 
 	});	
-	Recipe silverHelmet = new Recipe(this, new ItemStack(Item.silverHelmet), 'c', new ItemStack[] {
+	Recipe silverHelmet = new Recipe(this, new ItemStack(Item.silverHelmet), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.silverIngot, 13)
 	});	
-	Recipe silverGreaves = new Recipe(this, new ItemStack(Item.silverPants), 'c', new ItemStack[] {
+	Recipe silverGreaves = new Recipe(this, new ItemStack(Item.silverPants), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.silverIngot, 12)
 	});	
-	Recipe silverBelt = new Recipe(this, new ItemStack(Item.silverBelt), 'c', new ItemStack[] {
+	Recipe silverBelt = new Recipe(this, new ItemStack(Item.silverBelt), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.silverIngot, 9)
 	});	
-	Recipe silverBoots = new Recipe(this, new ItemStack(Item.silverBoots), 'c', new ItemStack[] {
+	Recipe silverBoots = new Recipe(this, new ItemStack(Item.silverBoots), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.silverIngot, 9)
 	});	
-	Recipe silverGloves = new Recipe(this, new ItemStack(Item.silverGloves), 'c', new ItemStack[] {
+	Recipe silverGloves = new Recipe(this, new ItemStack(Item.silverGloves), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.silverIngot, 9)
 	});	
 	
-	Recipe goldAxe = new Recipe(this, new ItemStack(Item.goldAxe), 'c', new ItemStack[] {
+	Recipe goldAxe = new Recipe(this, new ItemStack(Item.goldAxe), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.goldIngot, 13), new ItemStack(Block.plank, 5)
 	});		
-	Recipe goldPickaxe = new Recipe(this, new ItemStack(Item.goldPickaxe), 'c', new ItemStack[] {
+	Recipe goldPickaxe = new Recipe(this, new ItemStack(Item.goldPickaxe), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.goldIngot, 15), new ItemStack(Block.plank, 5)
 	});	
-	Recipe goldBroadSword = new Recipe(this, new ItemStack(Item.goldSword), 'c', new ItemStack[] {
+	Recipe goldBroadSword = new Recipe(this, new ItemStack(Item.goldSword), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.goldIngot, 14), new ItemStack(Block.plank, 5) 
 	});	
-	Recipe goldHammer = new Recipe(this, new ItemStack(Item.goldHammer), 'c', new ItemStack[] {
+	Recipe goldHammer = new Recipe(this, new ItemStack(Item.goldHammer), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.goldIngot, 12), new ItemStack(Block.plank, 5)
 	});		
-	Recipe goldChestplate = new Recipe(this, new ItemStack(Item.goldBody), 'c', new ItemStack[] {
+	Recipe goldChestplate = new Recipe(this, new ItemStack(Item.goldBody), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.goldIngot, 18)
 	});	
-	Recipe goldHelmet = new Recipe(this, new ItemStack(Item.goldHelmet), 'c', new ItemStack[] {
+	Recipe goldHelmet = new Recipe(this, new ItemStack(Item.goldHelmet), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.goldIngot, 16)
 	});	
-	Recipe goldGreaves = new Recipe(this, new ItemStack(Item.goldPants), 'c', new ItemStack[] {
+	Recipe goldGreaves = new Recipe(this, new ItemStack(Item.goldPants), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.goldIngot, 15)
 	});	
-	Recipe goldBelt = new Recipe(this, new ItemStack(Item.goldBelt), 'c', new ItemStack[] {
+	Recipe goldBelt = new Recipe(this, new ItemStack(Item.goldBelt), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.goldIngot, 12)
 	});	
-	Recipe goldBoots = new Recipe(this, new ItemStack(Item.goldBoots), 'c', new ItemStack[] {
+	Recipe goldBoots = new Recipe(this, new ItemStack(Item.goldBoots), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.goldIngot, 12)
 	});	
-	Recipe goldGloves = new Recipe(this, new ItemStack(Item.goldGloves), 'c', new ItemStack[] {
+	Recipe goldGloves = new Recipe(this, new ItemStack(Item.goldGloves), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.goldIngot, 12)
 	});	
 	
-	Recipe woodenArrow = new Recipe(this, new ItemStack(Item.woodenArrow, 4), 'c', new ItemStack[] {
+	Recipe woodenArrow = new Recipe(this, new ItemStack(Item.woodenArrow, 4), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Block.plank, 5)
 	});
-	Recipe snowBlock = new Recipe(this, new ItemStack(Block.snow, 1), 'c', new ItemStack[] {
+	Recipe snowBlock = new Recipe(this, new ItemStack(Block.snow, 1), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.snowball, 5)
 	});
-	Recipe furnace = new Recipe(this, new ItemStack(Block.furnace), 'c', new ItemStack[] {
+	Recipe furnace = new Recipe(this, new ItemStack(Block.furnace), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Block.stone, 15), new ItemStack(Item.coal, 5)
 	});	
-	Recipe chest = new Recipe(this, new ItemStack(Block.chest), 'c', new ItemStack[] {
+	Recipe chest = new Recipe(this, new ItemStack(Block.chest), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Block.plank, 20) 
 	});	
-	Recipe ironChest = new Recipe(this, new ItemStack(Block.ironChest), 'c', new ItemStack[] {
+	Recipe ironChest = new Recipe(this, new ItemStack(Block.ironChest), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Block.plank, 5), new ItemStack(Item.ironIngot, 10)
 	});
 	
-	Recipe fence = new Recipe(this, new ItemStack(Block.fence), 'c', new ItemStack[]{
+	Recipe fence = new Recipe(this, new ItemStack(Block.fence), Block.craftingTable, new ItemStack[]{
 		new ItemStack(Block.plank, 1)
 	});	
-	Recipe woodTable = new Recipe(this, new ItemStack(Block.woodTable), 'c', new ItemStack[]{
+	Recipe woodTable = new Recipe(this, new ItemStack(Block.woodTable), Block.craftingTable, new ItemStack[]{
 		new ItemStack(Block.plank, 10)
 	});	
-	Recipe stoneTable = new Recipe(this, new ItemStack(Block.stoneTable), 'c', new ItemStack[]{
+	Recipe stoneTable = new Recipe(this, new ItemStack(Block.stoneTable), Block.craftingTable, new ItemStack[]{
 		new ItemStack(Block.stone, 10)
 	});	
-	Recipe woodLeftChair = new Recipe(this, new ItemStack(Block.woodChairLeft), 'c', new ItemStack[]{
+	Recipe woodLeftChair = new Recipe(this, new ItemStack(Block.woodChairLeft), Block.craftingTable, new ItemStack[]{
 		new ItemStack(Block.plank, 5)
 	});	
-	Recipe woodRightChair = new Recipe(this, new ItemStack(Block.woodChairRight), 'c', new ItemStack[]{
+	Recipe woodRightChair = new Recipe(this, new ItemStack(Block.woodChairRight), Block.craftingTable, new ItemStack[]{
 		new ItemStack(Block.plank, 5)
 	});	
-	Recipe stoneLeftChair = new Recipe(this, new ItemStack(Block.stoneChairLeft), 'c', new ItemStack[]{
+	Recipe stoneLeftChair = new Recipe(this, new ItemStack(Block.stoneChairLeft), Block.craftingTable, new ItemStack[]{
 		new ItemStack(Block.stone, 5)
 	});	
-	Recipe stoneRightChair = new Recipe(this, new ItemStack(Block.stoneChairRight), 'c', new ItemStack[]{
+	Recipe stoneRightChair = new Recipe(this, new ItemStack(Block.stoneChairRight), Block.craftingTable, new ItemStack[]{
 		new ItemStack(Block.stone, 5)
 	});	
-	Recipe stonePillarEnd = new Recipe(this, new ItemStack(Item.stonePillarEnd), 'c', new ItemStack[]{
+	Recipe stonePillarEnd = new Recipe(this, new ItemStack(Item.stonePillarEnd), Block.craftingTable, new ItemStack[]{
 		new ItemStack(Block.stone, 2)
 	});	
-	Recipe stonePillar = new Recipe(this, new ItemStack(Block.stonePillar), 'c', new ItemStack[]{
+	Recipe stonePillar = new Recipe(this, new ItemStack(Block.stonePillar), Block.craftingTable, new ItemStack[]{
 		new ItemStack(Block.stone, 2)
 	});	
-	Recipe diamondPillarEnd = new Recipe(this, new ItemStack(Item.diamondPillarEnd), 'c', new ItemStack[]{
+	Recipe diamondPillarEnd = new Recipe(this, new ItemStack(Item.diamondPillarEnd), Block.craftingTable, new ItemStack[]{
 		new ItemStack(Item.diamond, 2)
 	});	
-	Recipe diamondPillar = new Recipe(this, new ItemStack(Block.diamondPillar), 'c', new ItemStack[]{
+	Recipe diamondPillar = new Recipe(this, new ItemStack(Block.diamondPillar), Block.craftingTable, new ItemStack[]{
 		new ItemStack(Item.diamond, 2)
 	});
-	Recipe vial = new Recipe(this, new ItemStack(Item.vialOfWater), 'c', new ItemStack[]{
+	Recipe vial = new Recipe(this, new ItemStack(Item.vialOfWater), Block.craftingTable, new ItemStack[]{
 		new ItemStack(Block.glass, 2)
 	});
 	
 	//Alchemy Station (currently crafting bench)
-	Recipe healingPotion1 = new Recipe(this, new ItemStack(Item.healthPotion1), 'c', new ItemStack[]{
+	Recipe healingPotion1 = new Recipe(this, new ItemStack(Item.healthPotion1), Block.craftingTable, new ItemStack[]{
 		new ItemStack(Item.vialOfWater), new ItemStack(Item.healingHerb1)
 	});
-	Recipe healingPotion2 = new Recipe(this, new ItemStack(Item.healthPotion2), 'c', new ItemStack[]{
+	Recipe healingPotion2 = new Recipe(this, new ItemStack(Item.healthPotion2), Block.craftingTable, new ItemStack[]{
 		new ItemStack(Item.vialOfWater), new ItemStack(Item.healingHerb2)
 	});
-	Recipe magicPotion1 = new Recipe(this, new ItemStack(Item.manaPotion1), 'c', new ItemStack[]{
+	Recipe magicPotion1 = new Recipe(this, new ItemStack(Item.manaPotion1), Block.craftingTable, new ItemStack[]{
 		new ItemStack(Item.vialOfWater), new ItemStack(Item.magicHerb1)
 	});
-	Recipe magicPotion2 = new Recipe(this, new ItemStack(Item.manaPotion2), 'c', new ItemStack[]{
+	Recipe magicPotion2 = new Recipe(this, new ItemStack(Item.manaPotion2), Block.craftingTable, new ItemStack[]{
 		new ItemStack(Item.vialOfWater), new ItemStack(Item.magicHerb2)
 	});
 	
 	//Furnace Recipes:
-	Recipe copperIngot = new Recipe(this, new ItemStack(Item.copperIngot), 'f', new ItemStack[] {
+	Recipe copperIngot = new Recipe(this, new ItemStack(Item.copperIngot), Block.furnace, new ItemStack[] {
 		new ItemStack(Item.copperOre, 3) 
 	});
-	Recipe tinIngot = new Recipe(this, new ItemStack(Item.tinIngot), 'f', new ItemStack[] {
+	Recipe tinIngot = new Recipe(this, new ItemStack(Item.tinIngot), Block.furnace, new ItemStack[] {
 		new ItemStack(Item.tinOre, 3) 
 	});
-	Recipe bronzeIngot_Ore = new Recipe(this, new ItemStack(Item.bronzeIngot), 'f', new ItemStack[] {
+	Recipe bronzeIngot_Ore = new Recipe(this, new ItemStack(Item.bronzeIngot), Block.furnace, new ItemStack[] {
 		new ItemStack(Item.copperOre, 3), new ItemStack(Item.tinOre, 3) 
 	});
-	Recipe bronzeIngot_Bar = new Recipe(this, new ItemStack(Item.bronzeIngot), 'f', new ItemStack[] {
+	Recipe bronzeIngot_Bar = new Recipe(this, new ItemStack(Item.bronzeIngot), Block.furnace, new ItemStack[] {
 		new ItemStack(Item.copperIngot, 1), new ItemStack(Item.tinIngot, 1) 
 	});
-	Recipe ironIngot = new Recipe(this, new ItemStack(Item.ironIngot), 'f', new ItemStack[] {
+	Recipe ironIngot = new Recipe(this, new ItemStack(Item.ironIngot), Block.furnace, new ItemStack[] {
 		new ItemStack(Item.ironOre, 4) 
 	});
-	Recipe silverIngot = new Recipe(this, new ItemStack(Item.silverIngot), 'f', new ItemStack[] {
+	Recipe silverIngot = new Recipe(this, new ItemStack(Item.silverIngot), Block.furnace, new ItemStack[] {
 		new ItemStack(Item.silverOre, 4) 
 	});
-	Recipe goldIngot = new Recipe(this, new ItemStack(Item.goldIngot), 'f', new ItemStack[] {
+	Recipe goldIngot = new Recipe(this, new ItemStack(Item.goldIngot), Block.furnace, new ItemStack[] {
 		new ItemStack(Item.goldOre, 5) 
 	});
-	Recipe glass = new Recipe(this, new ItemStack(Block.sand), 'f', new ItemStack[] {
+	Recipe glass = new Recipe(this, new ItemStack(Block.sand), Block.furnace, new ItemStack[] {
 		new ItemStack(Block.glass) 
 	});
 	
 	//Inventory Defaults:
-	Recipe torches = new Recipe(this, new ItemStack(Block.torch), 'i', new ItemStack[] {
+	Recipe torches = new Recipe(this, new ItemStack(Block.torch), Block.none, new ItemStack[] {
 		new ItemStack(Item.coal, 1), new ItemStack(Block.plank, 1) 
 	});	
-	Recipe manaCrystal = new Recipe(this, new ItemStack(Item.manaCrystal), 'i', new ItemStack[] {
+	Recipe manaCrystal = new Recipe(this, new ItemStack(Item.manaCrystal), Block.none, new ItemStack[] {
 		new ItemStack(Item.manaStar, 15)
 	});	
-	Recipe craftingTable = new Recipe(this, new ItemStack(Block.craftingTable), 'i', new ItemStack[] {
+	Recipe craftingTable = new Recipe(this, new ItemStack(Block.craftingTable), Block.none, new ItemStack[] {
 		new ItemStack(Block.plank, 10)
 	});	
 	

@@ -2,7 +2,17 @@ package utils;
 
 import java.io.Serializable;
 
+import blocks.Block;
 
+/**
+ * A Recipe stores the data for a crafting recipe. This includes the recipe requirements, the result of the 
+ * recipe, and the Block required nearby to craft the recipe (Block.none indicates that it can be crafted
+ * at any time).
+ * @author      Alec Sobeck
+ * @author      Matthew Robertson
+ * @version     1.0
+ * @since       1.0
+ */
 public class Recipe 
 		implements Serializable
 {
@@ -11,29 +21,22 @@ public class Recipe
 	private ItemStack result; 
 	/** What the recipe requires. */
 	private ItemStack[] recipe; 
+	/** The block that has to be nearby to craft this. Block.none indicates no nearby block is needed. */
+	private Block requiredBlock;
 	
-	public Recipe(RecipeManager manager, ItemStack result, char type, ItemStack[] stacks)
+	/**
+	 * Creates a new Recipe and registers it in the RecipeManager.
+	 * @param manager the RecipeManager to register this Recipe in
+	 * @param result the ItemStack result of this Recipe
+	 * @param requiredBlock the required nearby Block to craft this Recipe - Block.none means no nearby Block requirement
+	 * @param stacks the materials required to craft this Recipe
+	 */
+	public Recipe(RecipeManager manager, ItemStack result, Block requiredBlock, ItemStack[] stacks)
 	{
 		this.recipe = stacks;
 		this.result = result;
-				
-		//add the recipe
-		if(type == 'c') //Crafting recipe
-		{
-			manager.addCraftingRecipe(this);
-		}	
-		else if(type == 'f') //Furnace recipe
-		{
-			manager.addFurnaceRecipe(this);			
-		}	
-		else if(type == 'i') //Default inventory recipe
-		{
-			manager.addInventoryRecipe(this);
-		}	
-		else //The recipe failed, throw an exception
-		{
-			throw new RuntimeException("Invalid recipe type");
-		}
+		this.requiredBlock = requiredBlock;
+		manager.registerRecipe(this);
 	}
 	
 	public final ItemStack getResult()
@@ -44,5 +47,19 @@ public class Recipe
 	public final ItemStack[] getRecipe()
 	{
 		return recipe;
+	}
+	
+	public final Block getRequiredBlock()
+	{
+		return requiredBlock;
+	}
+	
+	/**
+	 * Overrides Object.toString() for slightly improved naming. toString() now returns the name of the 
+	 * resulting ItemStack.
+	 */
+	public String toString()
+	{
+		return result.getItemName();
 	}
 }

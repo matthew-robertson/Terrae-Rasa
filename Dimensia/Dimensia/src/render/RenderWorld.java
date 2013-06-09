@@ -19,13 +19,17 @@ public class RenderWorld extends Render
 {
 	public void renderToolSwing(World world, EntityLivingPlayer player)
 	{
-		if(player.inventory.getMainInventoryStack(player.selectedSlot).getItemID() >= ActionbarItem.spellIndex || 
-				!player.isSwingingTool() || 
-				(player.inventory.getMainInventoryStack(player.selectedSlot) == null) || 
-				!(Item.itemsList[player.inventory.getMainInventoryStack(player.selectedSlot).getItemID()] instanceof ItemTool))
+		//The following conditions indicate that a tool swing should not be rendered:
+		//(1)There is nothing being held; (2): there isnt a tool swing; (3): The player is holding a spell; 
+		//(4): the player isnt holding a tool
+		if(player.inventory.getMainInventoryStack(player.selectedSlot) == null ||
+			!player.isSwingingTool() || 
+			player.inventory.getMainInventoryStack(player.selectedSlot).getItemID() >= ActionbarItem.spellIndex || 
+			!(Item.itemsList[player.inventory.getMainInventoryStack(player.selectedSlot).getItemID()] instanceof ItemTool))
 		{
 			return;
 		}
+		
 		double const_ = 9;
 		
 		GL11.glTranslatef(player.x + (float)const_, player.y + (float)const_, 0);
