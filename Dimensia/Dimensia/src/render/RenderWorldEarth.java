@@ -3,6 +3,8 @@ package render;
 
 import org.lwjgl.opengl.GL11;
 
+import client.Settings;
+
 import entities.EntityLivingPlayer;
 
 import world.World;
@@ -10,7 +12,7 @@ import world.World;
 public class RenderWorldEarth extends RenderWorld
 {	
 	RenderLight renderLight = new RenderLight();
-	public void render(World world, EntityLivingPlayer player) 
+	public void render(World world, EntityLivingPlayer player, Settings settings) 
 	{		
 		GL11.glEnable(GL11.GL_BLEND);
 
@@ -39,7 +41,7 @@ public class RenderWorldEarth extends RenderWorld
 		GL11.glAlphaFunc(GL11.GL_GREATER, 0.1f);
 		GL11.glEnable(GL11.GL_ALPHA_TEST); //cuts out blank junk in the background of text, etc	
 	
-		renderUI.render(world, player);		
+		renderUI.render(world, player, settings);		
 		
 		GL11.glDisable(GL11.GL_ALPHA_TEST);
 		GL11.glDisable(GL11.GL_BLEND);	

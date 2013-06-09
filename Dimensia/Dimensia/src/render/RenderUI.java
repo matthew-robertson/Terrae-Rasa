@@ -21,6 +21,8 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
+import client.Settings;
+
 import entities.EntityLivingItemStack;
 import entities.EntityLivingPlayer;
 import enums.EnumItemQuality;
@@ -113,36 +115,43 @@ public class RenderUI extends Render
 	 * <li>the garbage slot
 	 * <li>the recipe scroller
 	 */
-	public void render(World world, EntityLivingPlayer player)
+	public void render(World world, EntityLivingPlayer player, Settings settings)
 	{		
 		GL11.glEnable(GL11.GL_BLEND);
 		
-		renderHeartsAndMana(world, player); //The hearts and mana
-	
+		renderHeartsAndMana(world, player); //The hearts and mana	
 		if(player.isInventoryOpen)
 		{
 			renderInventory(world, player); //The full inventory if it's open
-			updateMouse(world, player); 
 			if(player.isViewingChest) //Chest(s) if they're being viewed
 			{
 				renderChest(world, player);
+			}			
+			if(!settings.menuOpen)
+			{
+				mouse(world, player);
+				attemptToRenderItemTooltip(world, player);
 			}
-			
-			attemptToRenderItemTooltip(world, player);
 		}	
 		else
 		{
 			renderActionBar(world, player);	//The actionbar if the inventory is closed
-		}
-		
-		renderStatusEffects(player);
-		
+		}		
+		renderStatusEffects(player);		
 		renderMouseItem(); //The item held by the mouse, if there is one
-		renderText(world, player); //Health and the 'Save And Quit' button
-		
+		renderText(world, player); //Health and the 'Save And Quit' button		
 		
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA); //Re-enable this so the lighting renders properly
 		GL11.glDisable(GL11.GL_BLEND);		
+	}
+
+	/**
+	 * Updates all mouse events on call. Including: chests, the mainInventory, the garbage, 
+	 * and the recipe scroller 
+	 */
+	private void mouse(World world, EntityLivingPlayer player)
+	{
+		mouseEventInventory(world, player);	
 	}
 	
 	/**
@@ -237,15 +246,6 @@ public class RenderUI extends Render
 			GL11.glColor4f(1, 1, 1, 1);
 		}
 		
-	}
-	
-	/**
-	 * Updates all mouse events on call. Including: chests, the mainInventory, the garbage, 
-	 * and the recipe scroller 
-	 */
-	private void updateMouse(World world, EntityLivingPlayer player)
-	{
-		mouseEventInventory(world, player);	
 	}
 	
 	/**

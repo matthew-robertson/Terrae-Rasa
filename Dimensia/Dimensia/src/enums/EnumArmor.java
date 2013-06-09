@@ -1,5 +1,6 @@
 package enums;
 
+import java.util.EnumSet;
 import java.util.Vector;
 
 import setbonus.SetBonus;
@@ -24,7 +25,8 @@ public enum EnumArmor
 			new SetBonusDefense(1).setPiecesRequiredToActivate(3)
 		}),
 	BRONZE(2, 4, 3, 1, 1, 1, new SetBonus[]{ 
-			new SetBonusDefense(1).setPiecesRequiredToActivate(2), new SetBonusDefense(1).setPiecesRequiredToActivate(4)
+			new SetBonusDefense(1).setPiecesRequiredToActivate(2), 
+			new SetBonusDefense(1).setPiecesRequiredToActivate(4)
 		}),
 	IRON(3, 5, 4, 2, 2, 2, new SetBonus[]{ 
 			new SetBonusDefense(1).setPiecesRequiredToActivate(2), 
@@ -48,6 +50,17 @@ public enum EnumArmor
 	private final int glovesDefense;
 	private final int beltDefense;
 	private SetBonus[] bonuses;
+	private static Vector<EnumArmor> armorTiers;
+	static
+	{
+		//Add all the EnumArmor to the armorTiers Vector to automatically update the SetBonusFactory and other classes
+		//of a change to EnumArmor
+		armorTiers = new Vector<EnumArmor>();
+		for (EnumArmor tier: EnumSet.allOf(EnumArmor.class))
+        {
+			armorTiers.add(tier);
+        }
+	}
 	
 	EnumArmor(int helmDef, int bodyDef, int pantsDef, int bootsDefense, int glovesDefense, int beltDefense, SetBonus[] bonuses)
 	{
@@ -58,6 +71,13 @@ public enum EnumArmor
 		this.glovesDefense = glovesDefense;
 		this.beltDefense = beltDefense;
 		this.bonuses = bonuses;
+	}
+	
+	public static EnumArmor[] getTiers()
+	{
+		EnumArmor[] tiers = new EnumArmor[armorTiers.size()];
+		armorTiers.copyInto(tiers);
+		return tiers;
 	}
 	
 	public int getHelmetDefense()
@@ -95,6 +115,13 @@ public enum EnumArmor
 		return bonuses;
 	}
 	
+	/**
+	 * Gets the active SetBonuses for a given tier of armour, based on the number of pieces equipped.
+	 * All SetBonuses which require less than or equal to that number of armour pieces equipped will 
+	 * be returned.
+	 * @param piecesEquipped the number of pieces from this set the player has equipped
+	 * @return the SetBonuses that are active, based on piecesEquipped
+	 */
 	public SetBonus[] getBonuses(int piecesEquipped)
 	{
 		Vector<SetBonus> bonusVect = new Vector<SetBonus>();

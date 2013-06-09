@@ -67,6 +67,7 @@ public class GameEngine
 	public EntityLivingPlayer player;
 	public Settings settings;
 	public RenderMenu renderMenu;
+	/** The number of game ticks per second - this will always be 20 */
 	public static final int TICKS_PER_SECOND = 20;
 	
 	/**
@@ -82,12 +83,10 @@ public class GameEngine
 		}
 		catch (IOException e) 
 		{
-			//e.printStackTrace();
 			settings = new Settings();
 		}
 		catch (ClassNotFoundException e) 
 		{
-			//e.printStackTrace();
 			settings = new Settings();
 		}
 	}
@@ -116,14 +115,18 @@ public class GameEngine
 		        loops = 0;
 		        while(System.currentTimeMillis() > next_game_tick && loops < MAX_FRAMESKIP) //Update the game 20 times/second 
 		        {
-		        	if(settings.menuOpen /*&& Dimensia.isMainMenuOpen*/)
+		        	Keys.universalKeyboard(world, player, settings, settings.keybinds);
+		        	
+		        	if(settings.menuOpen) //Ingame pause menu - distribute keyboard/mouse input appropriately
 		        	{ 
+		        		renderMenu.mouse(settings);
+		        		renderMenu.keyboard(settings);
 		        	}
 		        	else if(!Dimensia.isMainMenuOpen) //Handle game inputs if the main menu isnt open (aka the game is being played)
 		        	{
-		        		MouseInput.mouse(world, player);
 		        		Keys.keyboard(world, player, settings, settings.keybinds);	            
-		        		
+		        		MouseInput.mouse(world, player);
+		        				        			
 		        		if(renderMode == RENDER_MODE_WORLD_EARTH) //Player is in the overworld ('earth')
 		        		{
 		        			world.onWorldTick(player);
@@ -159,8 +162,7 @@ public class GameEngine
 		    	GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 				GL11.glClearColor(0,0,0,0);
 				GL11.glColor4f(1, 1, 1, 1);
-				GL11.glPushMatrix();
-		        
+				GL11.glPushMatrix();		        
 		        
 		        if(Dimensia.isMainMenuOpen) //if the main menu is open, render that, otherwise render the game
 		        {
@@ -170,15 +172,15 @@ public class GameEngine
 		        {
 		        	if(renderMode == RENDER_MODE_WORLD_EARTH)
 		    		{
-		        	 	RenderGlobal.render(world, player, renderMode); //Renders Everything on the screen for the game
+		        	 	RenderGlobal.render(world, player, renderMode, settings); //Renders Everything on the screen for the game
 		     		}
 		    		else if(renderMode == RENDER_MODE_WORLD_HELL)
 		    		{
-		    		 	RenderGlobal.render(worldHell, player, renderMode); //Renders Everything on the screen for the game
+		    		 	RenderGlobal.render(worldHell, player, renderMode, settings); //Renders Everything on the screen for the game
 		    		}
 		    		else if(renderMode == RENDER_MODE_WORLD_SKY)
 		    		{
-		    		 	RenderGlobal.render(worldSky, player, renderMode); //Renders Everything on the screen for the game
+		    		 	RenderGlobal.render(worldSky, player, renderMode, settings); //Renders Everything on the screen for the game
 		    		}
 		        	fps++;
 		        }
@@ -188,8 +190,7 @@ public class GameEngine
 		        	renderMenu.render(world, settings);
 		        }
 		        
-		        GL11.glPopMatrix();
-		        
+		        GL11.glPopMatrix();		        
 		        Display.swapBuffers(); //allows the display to update when using VBO's, probably
 		        Display.update(); //updates the display
 
@@ -347,6 +348,13 @@ public class GameEngine
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldGloves));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldBoots));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldBelt));
+			
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.silverHelmet));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.silverBody));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.silverPants));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.silverGloves));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.silverBoots));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.silverBelt));
 
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.snowball));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.woodenArrow, 100));

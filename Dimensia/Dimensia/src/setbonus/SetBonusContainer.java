@@ -1,5 +1,8 @@
 package setbonus;
 
+import java.io.Serializable;
+import java.util.Vector;
+
 import entities.EntityLivingPlayer;
 
 /**
@@ -13,7 +16,9 @@ import entities.EntityLivingPlayer;
  * @since       1.0
  */
 public class SetBonusContainer 
+		implements Serializable
 {
+	private static final long serialVersionUID = 1L;
 	private SetBonus[] bonuses;
 	
 	/**
@@ -25,6 +30,17 @@ public class SetBonusContainer
 		this.bonuses = bonuses;
 	}
 	
+	/**
+	 * Constructs a new SetBonusContainer with the specified bonuses. This version of the constructor 
+	 * accepts a Vector instead of an Array.
+	 * @param allSetBonuses a Vector of SetBonuses that will be stored in the SetBonusContainer
+	 */
+	public SetBonusContainer(Vector<SetBonus> allSetBonuses) 
+	{
+		this.bonuses = new SetBonus[allSetBonuses.size()];
+		allSetBonuses.copyInto(this.bonuses);
+	}
+
 	/**
 	 * Gets the set bonus at the given index. This will throw an exception if out of bounds.
 	 * @param index the index of the set bonus to get
@@ -53,6 +69,10 @@ public class SetBonusContainer
 		return bonuses.length;
 	}
 	
+	/**
+	 * Applies all the SetBonuses in the SetBonusContainer
+	 * @param player the player to apply the SetBonuses to
+	 */
 	public void applyAll(EntityLivingPlayer player)
 	{
 		for(SetBonus bonus : bonuses)
@@ -61,6 +81,10 @@ public class SetBonusContainer
 		}
 	}
 	
+	/**
+	 * Removes all the SetBonuses in the SetBonusContainer
+	 * @param player the player to remove the SetBonuses from
+	 */
 	public void removeAll(EntityLivingPlayer player)
 	{
 		for(SetBonus bonus : bonuses)
@@ -68,5 +92,4 @@ public class SetBonusContainer
 			bonus.remove(player);
 		}
 	}
-	
 }

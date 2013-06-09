@@ -112,7 +112,7 @@ public class GuiMainMenu extends Render
 	 */
 	private void keyboard()
 	{		
-		if(Keyboard.isKeyDown(Keyboard.KEY_ESCAPE) || Display.isCloseRequested())  //debug input
+		if(Keyboard.isKeyDown(Keyboard.KEY_ESCAPE) || Display.isCloseRequested())  
 		{
 			Dimensia.done = true;
 		}

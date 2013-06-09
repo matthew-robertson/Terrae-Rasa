@@ -73,69 +73,16 @@ public class RenderMenu extends Render
 		GL11.glEnable(GL11.GL_ALPHA_TEST);		
 
 		drawBackground();		
-		drawComponents();		
-		keyboard(settings);
-		mouseEvents(settings);		
+		drawComponents();	
 		
 		GL11.glDisable(GL11.GL_ALPHA_TEST);		
-	}
-	
-	/**
-	 * Draws a black partially transparent quad over the game when the menu is open, to give a more real
-	 * impression that the game is paused.
-	 */
-	private void drawBackground()
-	{
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		GL11.glEnable(GL11.GL_BLEND);
-		t.startDrawingQuads();
-		t.setColorRGBA_F(0,0, 0, 0.8F);
-		t.addVertexWithUV(0, Display.getHeight() / 2, 0, 0, 1);
-        t.addVertexWithUV(Display.getWidth() / 2, Display.getHeight() / 2, 0, 1, 1);
-        t.addVertexWithUV(Display.getWidth() / 2, 0, 0, 1, 0);
-        t.addVertexWithUV(0, 0, 0, 0, 0);
-		t.draw();
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		GL11.glDisable(GL11.GL_BLEND);
-	}
-	
-	/**
-	 * Draws all the components for a given part of the game menu
-	 */
-	private void drawComponents()
-	{
-		if(isOptionsMenuOpen)
-		{	
-			if(isGraphicsMenuOpen)
-			{
-				graphicsTitle.draw();	
-				return;
-			}
-			else if(isControlsMenuOpen)
-			{
-				keybindsTitle.draw();
-				inventoryToggleButton.draw();
-				return;
-			}
-			optionsTitle.draw();
-			graphicsButton.draw();
-			keybindsButton.draw();
-			autosaveButton.draw();
-			volumeSlider.draw();
-		}
-		else
-		{
-			mainMenuTitle.draw();
-			optionsButton.draw();
-			saveAndQuitButton.draw();
-		}
 	}
 	
 	/**
 	 * Handles mouse events for the pause menu
 	 * @param settings the client-wide settings object
 	 */
-	private void mouseEvents(Settings settings)
+	public void mouse(Settings settings)
 	{
 		GL11.glColor4f(1, 1, 1, 1);
 		
@@ -206,9 +153,60 @@ public class RenderMenu extends Render
 	}
 	
 	/**
+	 * Draws a black partially transparent quad over the game when the menu is open, to give a more real
+	 * impression that the game is paused.
+	 */
+	private void drawBackground()
+	{
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		GL11.glEnable(GL11.GL_BLEND);
+		t.startDrawingQuads();
+		t.setColorRGBA_F(0,0, 0, 0.8F);
+		t.addVertexWithUV(0, Display.getHeight() / 2, 0, 0, 1);
+        t.addVertexWithUV(Display.getWidth() / 2, Display.getHeight() / 2, 0, 1, 1);
+        t.addVertexWithUV(Display.getWidth() / 2, 0, 0, 1, 0);
+        t.addVertexWithUV(0, 0, 0, 0, 0);
+		t.draw();
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		GL11.glDisable(GL11.GL_BLEND);
+	}
+	
+	/**
+	 * Draws all the components for a given part of the game menu
+	 */
+	private void drawComponents()
+	{
+		if(isOptionsMenuOpen)
+		{	
+			if(isGraphicsMenuOpen)
+			{
+				graphicsTitle.draw();	
+				return;
+			}
+			else if(isControlsMenuOpen)
+			{
+				keybindsTitle.draw();
+				inventoryToggleButton.draw();
+				return;
+			}
+			optionsTitle.draw();
+			graphicsButton.draw();
+			keybindsButton.draw();
+			autosaveButton.draw();
+			volumeSlider.draw();
+		}
+		else
+		{
+			mainMenuTitle.draw();
+			optionsButton.draw();
+			saveAndQuitButton.draw();
+		}
+	}
+	
+	/**
 	 * Reads all keyboard input. (put key binds here), also passes input to text boxes 
 	 */
-	private void keyboard(Settings settings)
+	public void keyboard(Settings settings)
 	{		
 		if(Keyboard.isKeyDown(Keyboard.KEY_ESCAPE) && !Keys.ec && !Dimensia.isMainMenuOpen)
 		{

@@ -36,6 +36,20 @@ public class Keys
 	}
 	
 	/**
+	 * The following keyboard input will always be taken regardless of what part of the game engine is handling keyboard input.
+	 * @param world
+	 * @param player
+	 * @param settings
+	 * @param keybinds
+	 */
+	public static void universalKeyboard(World world, EntityLivingPlayer player, Settings settings, Keybinds keybinds)
+	{
+		//Check for the (left) shift modifier (this may be useful in other parts of the program)
+				lshiftDown = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT);
+				
+	}
+	
+	/**
 	 * Handles all standard keyboard input in the game. This includes all key binds and movement, but excludes
 	 * any typing in text boxes.
 	 * @param world
@@ -51,13 +65,6 @@ public class Keys
 				Dimensia.done = true;
 			}
 		}
-//		else
-//		{
-//			if(Display.isCloseRequested()) //Exit if Escape is pressed or the Window is Closed
-//			{
-//				Dimensia.done = true;
-//			}		
-//		}
 		
 		if(Keyboard.isKeyDown(Keyboard.KEY_ESCAPE) && !ec && !Dimensia.isMainMenuOpen)
 		{
@@ -69,8 +76,6 @@ public class Keys
 			ec = false;
 		}
 		
-		//Check for the (left) shift modifier (this may be useful in other parts of the program)
-		lshiftDown = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT);
 		
 		if(Keyboard.isKeyDown(keybinds.inventoryToggle) && !ic) //Toggle inventory
 		{

@@ -9,6 +9,7 @@ public class Settings
 {
 	private static final long serialVersionUID = 1L;
 	public boolean gamePaused = false;
+	/** A boolean which indicates whether or not the ingame pause menu is active. (True = paused) */
 	public boolean menuOpen = true;
 	public float volume = 0.5f;
 	public boolean smoothLighting = false;

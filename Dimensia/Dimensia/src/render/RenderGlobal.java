@@ -1,5 +1,6 @@
 package render;
 import client.GameEngine;
+import client.Settings;
 import entities.EntityLivingPlayer;
 import world.World;
 
@@ -15,19 +16,19 @@ public class RenderGlobal extends Render
 	 * @param player the player object for the given client, or singleplayer game
 	 * @param renderMode describes the world being rendered, based on the values in GameEngine.java
 	 */
-	public static void render(World world, EntityLivingPlayer player, int renderMode)
+	public static void render(World world, EntityLivingPlayer player, int renderMode, Settings settings)
 	{
 		if(renderMode == GameEngine.RENDER_MODE_WORLD_EARTH)
 		{
-			renderWorldEarth.render(world, player);
+			renderWorldEarth.render(world, player, settings);
 		}
 		else if(renderMode == GameEngine.RENDER_MODE_WORLD_HELL)
 		{
-			renderWorldHell.render(world, player);
+			renderWorldHell.render(world, player, settings);
 		}
 		else if(renderMode == GameEngine.RENDER_MODE_WORLD_SKY)
 		{
-			renderWorldSky.render(world, player);
+			renderWorldSky.render(world, player, settings);
 		}
 	}
 }

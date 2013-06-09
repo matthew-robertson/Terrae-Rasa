@@ -1,24 +1,37 @@
 package setbonus;
 
-import enums.EnumArmor;
 import items.Item;
 import items.ItemArmor;
+
+import java.util.Vector;
+
 import utils.InventoryPlayer;
 import utils.ItemStack;
+import enums.EnumArmor;
 
+/**
+ * SetBonusFactory determines the SetBonuses for a given set of armor equipped on a player. SetBonusFactory 
+ * exposes only the {@link #getSetBonuses(InventoryPlayer)} method which will return the SetBonuses for 
+ * that given player inventory. SetBonuses found using SetBonusFactory are returned as a SetBonusContainer.
+ * @author      Alec Sobeck
+ * @author      Matthew Robertson
+ * @version     1.0
+ * @since       1.0
+ */
 public class SetBonusFactory 
 {
-	public static final EnumArmor[] ARMOR_TYPES = 
-		{ 
-			EnumArmor.COPPER, 
-			EnumArmor.BRONZE, 
-			EnumArmor.IRON, 
-			EnumArmor.SILVER, 
-			EnumArmor.GOLD 
-		};
+	/** A list of all the EnumArmor tiers to consider. This is take directly from EnumArmor.getTiers(). */
+	private static final EnumArmor[] ARMOR_TYPES = EnumArmor.getTiers();
 	
-	private static SetBonus[] getByArmorType(InventoryPlayer inventory, EnumArmor type)
+	/**
+	 * Gets the active set bonuses for an armor type. This is based on the total number of pieces required.
+	 * @param inventory the player's inventory
+	 * @param type the EnumArmor tier to get SetBonuses for
+	 * @return a SetBonus[] of all the activate set bonuses for a given tier of gear
+	 */
+	private static SetBonus[] getBonusesByArmorType(InventoryPlayer inventory, EnumArmor type)
 	{
+		//Count the pieces of that tier active
 		int piecesEquipped = 0;
 		for(ItemStack stack : inventory.getArmorInventory())
 		{
@@ -27,69 +40,27 @@ public class SetBonusFactory
 				piecesEquipped++;
 			}
 		}		
-		return type.getBonuses(piecesEquipped);
+		//Get the set bonuses based on piecesEquipped
+		return type.getBonuses(piecesEquipped); 
 	}
 	
+	/**
+	 * Gets all the active SetBonuses for the player. This will consider all sets of gear, and can mix together 
+	 * different set bonuses such as the gold2Piece, and silver2Piece - giving the effect of both.
+	 * @param inventory the player's inventory
+	 * @return a SetBonusContainer containing all the activate SetBonuses for the player
+	 */
 	public static SetBonusContainer getSetBonuses(InventoryPlayer inventory)
 	{
-		SetBonus[] boni = getByArmorType(inventory, EnumArmor.GOLD);
-		
-		/**
-		 * Start here - 
-		 * DO this for all material grades, and then merge the results together somehow
-		 * (Vector?)
-		 * This should complete set bonuses and allow auras. 
-		 * 
-		 * 
-		 * 
-		 * 
-		 */
-		
-		if (inventory.getArmorInventoryStack(InventoryPlayer.HELMET_INDEX) == null ||
-			inventory.getArmorInventoryStack(InventoryPlayer.BODY_INDEX) == null || 
-			inventory.getArmorInventoryStack(InventoryPlayer.PANTS_INDEX) == null) //No set bonus possible
-			
-			{ 
-				return new SetBonusContainer(new SetBonus[] { });
+		Vector<SetBonus> allSetBonuses = new Vector<SetBonus>();
+		for(EnumArmor armorType : ARMOR_TYPES)
+		{
+			SetBonus[] setBonuses = getBonusesByArmorType(inventory, armorType);
+			for(SetBonus bonus : setBonuses)
+			{
+				allSetBonuses.add(bonus);
 			}
-			
-			if (inventory.getArmorInventoryStack(InventoryPlayer.HELMET_INDEX).getItemID() == Item.copperHelmet.getID() && 
-				inventory.getArmorInventoryStack(InventoryPlayer.BODY_INDEX).getItemID() == Item.copperBody.getID() && 
-				inventory.getArmorInventoryStack(InventoryPlayer.PANTS_INDEX).getItemID() == Item.copperPants.getID())
-			{ //Copper Set Bonus
-				//defense + 1... 
-				return new SetBonusContainer(new SetBonus[] { new SetBonusDefense(1) });
-			}
-			if (inventory.getArmorInventoryStack(InventoryPlayer.HELMET_INDEX).getItemID() == Item.bronzeHelmet.getID() && 
-				inventory.getArmorInventoryStack(InventoryPlayer.BODY_INDEX).getItemID() == Item.bronzeBody.getID() && 
-				inventory.getArmorInventoryStack(InventoryPlayer.PANTS_INDEX).getItemID() == Item.bronzePants.getID())
-			{ //Bronze Set Bonus
-				//defense + 2... 
-				return new SetBonusContainer(new SetBonus[] { new SetBonusDefense(2) });
-			}
-			if (inventory.getArmorInventoryStack(InventoryPlayer.HELMET_INDEX).getItemID() == Item.ironHelmet.getID() && 
-				inventory.getArmorInventoryStack(InventoryPlayer.BODY_INDEX).getItemID() == Item.ironBody.getID() && 
-				inventory.getArmorInventoryStack(InventoryPlayer.PANTS_INDEX).getItemID() == Item.ironPants.getID())
-			{ //Iron Set Bonus
-				//defense + 3... 
-				return new SetBonusContainer(new SetBonus[] { new SetBonusDefense(3) });
-			}
-			if (inventory.getArmorInventoryStack(InventoryPlayer.HELMET_INDEX).getItemID() == Item.silverHelmet.getID() && 
-				inventory.getArmorInventoryStack(InventoryPlayer.BODY_INDEX).getItemID() == Item.silverBody.getID() && 
-				inventory.getArmorInventoryStack(InventoryPlayer.PANTS_INDEX).getItemID() == Item.silverPants.getID())
-			{ //Silver Set Bonus - Defense +4
-				return new SetBonusContainer(new SetBonus[] { new SetBonusDefense(4) });
-			}
-			if (inventory.getArmorInventoryStack(InventoryPlayer.HELMET_INDEX).getItemID() == Item.goldHelmet.getID() && 
-				inventory.getArmorInventoryStack(InventoryPlayer.BODY_INDEX).getItemID() == Item.goldBody.getID() && 
-				inventory.getArmorInventoryStack(InventoryPlayer.PANTS_INDEX).getItemID() == Item.goldPants.getID())
-			{ //Gold Set Bonus - Defense +5
-				return new SetBonusContainer(new SetBonus[] { new SetBonusDefense(5) });
-			}
-			
-			return new SetBonusContainer(new SetBonus[] { }); //Nothing matched 
-			
+		}
+		return new SetBonusContainer(allSetBonuses);
 	}
-		
-		
 }
