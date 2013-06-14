@@ -43,6 +43,14 @@ public class Render
 	public final static int ICONS_PER_ROW =  ICONS_SHEET_WIDTH / 16;
 	public final static int ICONS_PER_COLUMN = ICONS_SHEET_HEIGHT / 16;
 	
+	//Items.png variables
+	public final static int ITEMS_SHEET_WIDTH = 512;
+	public final static int ITEMS_SHEET_HEIGHT = 256;
+	public final static int ITEMS_PER_ROW =  ICONS_SHEET_WIDTH / 16;
+	public final static int ITEMS_PER_COLUMN = ICONS_SHEET_HEIGHT / 16;
+	
+	
+	
 	public static Texture zombie;
 	public static Texture goblin;
 	public static Texture slime;

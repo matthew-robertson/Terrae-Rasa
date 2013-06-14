@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import auras.Aura;
+import auras.AuraHeavensReprieve;
 
 import setbonus.SetBonus;
 import enums.EnumArmor;
@@ -110,10 +111,17 @@ public class ItemArmor extends Item
 	protected ItemArmor setAuras(Aura[] auras)
 	{
 		this.auras = auras;
+		for(Aura aura : auras)
+		{
+			if(aura instanceof AuraHeavensReprieve)
+			{
+				isSavingRelic = true;
+			}
+		}
 		return this;
 	}
 	
-	protected Aura[] getAuras()
+	public Aura[] getAuras()
 	{
 		return auras;
 	}

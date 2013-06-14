@@ -198,22 +198,22 @@ public class RecipeManager
 		new ItemStack(Item.goldIngot, 12), new ItemStack(Block.plank, 5)
 	});		
 	Recipe goldChestplate = new Recipe(this, new ItemStack(Item.goldBody), Block.craftingTable, new ItemStack[] {
-		new ItemStack(Item.goldIngot, 18)
+		new ItemStack(Item.goldIngot, 18), new ItemStack(Item.silverIngot, 1)
 	});	
 	Recipe goldHelmet = new Recipe(this, new ItemStack(Item.goldHelmet), Block.craftingTable, new ItemStack[] {
-		new ItemStack(Item.goldIngot, 16)
+		new ItemStack(Item.goldIngot, 16), new ItemStack(Item.silverIngot, 1)
 	});	
 	Recipe goldGreaves = new Recipe(this, new ItemStack(Item.goldPants), Block.craftingTable, new ItemStack[] {
-		new ItemStack(Item.goldIngot, 15)
+		new ItemStack(Item.goldIngot, 15), new ItemStack(Item.silverIngot, 1)
 	});	
 	Recipe goldBelt = new Recipe(this, new ItemStack(Item.goldBelt), Block.craftingTable, new ItemStack[] {
-		new ItemStack(Item.goldIngot, 12)
+		new ItemStack(Item.goldIngot, 12), new ItemStack(Item.silverIngot, 1)
 	});	
 	Recipe goldBoots = new Recipe(this, new ItemStack(Item.goldBoots), Block.craftingTable, new ItemStack[] {
-		new ItemStack(Item.goldIngot, 12)
+		new ItemStack(Item.goldIngot, 12), new ItemStack(Item.silverIngot, 1)
 	});	
 	Recipe goldGloves = new Recipe(this, new ItemStack(Item.goldGloves), Block.craftingTable, new ItemStack[] {
-		new ItemStack(Item.goldIngot, 12)
+		new ItemStack(Item.goldIngot, 12), new ItemStack(Item.silverIngot, 1)
 	});	
 	
 	Recipe woodenArrow = new Recipe(this, new ItemStack(Item.woodenArrow, 4), Block.craftingTable, new ItemStack[] {

@@ -317,7 +317,7 @@ public class RenderUI extends Render
 		x1 = (int) (Display.getWidth() * 0.25f) - 13;
 		y1 = 8; 
 	
-		if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Middle
+		if(x > x1 && x < x1 + size && y > y1 && y < y1 + size && player.getAllPossibleRecipes().length > 0) //Middle
 		{
 			return player.getAllPossibleRecipes()[player.selectedRecipe].getResult();
 		}
@@ -1231,6 +1231,8 @@ public class RenderUI extends Render
 	 */
 	private void renderHeartsAndMana(World world, EntityLivingPlayer player)
 	{		
+		// --- Start Health bar
+		//The background (black part)
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glColor4f(0, 0, 0, 1);
 		int x1 = getCameraX() + 10;
@@ -1245,6 +1247,7 @@ public class RenderUI extends Render
 		t.draw();			
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		
+		//"Foreground" of the texture (red part)
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glColor4f(1, 0, 0, 1);
 		x1 = getCameraX() + 10;
@@ -1258,7 +1261,9 @@ public class RenderUI extends Render
 		t.addVertexWithUV(x1, y1, 0, 0, 0);
 		t.draw();			
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		// --- End Health bar
 		
+		// -- Start of Mana Bar
 		if(player.maxMana > 0)
 		{
 			GL11.glDisable(GL11.GL_TEXTURE_2D);
@@ -1289,12 +1294,17 @@ public class RenderUI extends Render
 			t.draw();			
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
 		}
+		// --- End of Mana Bar
+		
 		
 		//Special Energy
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glColor4f(0, 0, 0, 1);
 		x1 = getCameraX() + 10;
-		y1 = getCameraY() + 40;		
+		if(player.mana > 0)
+			y1 = getCameraY() + 40;		
+		else
+			y1 = getCameraY() + 25;
 		newX = (int) (100);
 		newY = 11;		
 		t.startDrawingQuads();
@@ -1307,8 +1317,10 @@ public class RenderUI extends Render
 		
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glColor4f(141F/255, 230F/255, 99F/255, 1);
-		x1 = getCameraX() + 10;
-		y1 = getCameraY() + 40;		
+		if(player.mana > 0)
+			y1 = getCameraY() + 40;		
+		else
+			y1 = getCameraY() + 25;
 		newX = (int) (player.specialEnergy / EntityLivingPlayer.MAX_SPECIAL_ENERGY * 100);
 		newY = 11;		
 		t.startDrawingQuads();
@@ -1319,157 +1331,7 @@ public class RenderUI extends Render
 		t.draw();			
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		
-		/*
-		float heartsFull = (float)player.health / 20;	//How many hearts are full? (partial hearts are important too!)	
-		float partialHeartValue = heartsFull - ((int)(player.health / 20));
-		player_heart.bind();
-		for(int i = 0; i < (player.maxHealth) / 20; i++) //Draw Heart images
-		{	
-			float newsize = 0;
-			float x = 0;
-			float y = 0;
-			float size = 11;
-
-			if((int)(heartsFull) > i) //Is the heart full?
-			{
-				newsize = 11; //Largest size
-			}
-			else
-			{
-				if(heartsFull > i) //Is the heart partially full? If so scale down the size proportunately
-				{
-					newsize = (7 + (partialHeartValue * 4)); //Scaled Size
-					x += (size - newsize) / 2;
-					y += (size - newsize) / 2;
-				}
-				else //The heart is empty if nothing else matches by this point
-				{
-					newsize = 7; //Smallest Size
-					x += 2;
-					y += 2;
-				}
-			}
-			
-			if(i < 10) //First Row of health
-			{	
-				x += (int) (getCameraX() + 3 + (i * (size + 1)));
-				y += getCameraY() + 15;
-			}
-			else //Second row of health
-			{
-				x += (int) (getCameraX() + 3 + ((i - 10) * (size + 1)));
-				y += (int) (getCameraY() + 15 + (size + 1));
-			}         
 		
-			//Draw the heart
-			GL11.glColor4f(1, 1, 1, 1); //Default colour for heart image
-			t.startDrawingQuads();
-			t.addVertexWithUV(x, y + newsize, 0, 0, 1);
-			t.addVertexWithUV(x + newsize, y + newsize, 0, 1, 1);
-			t.addVertexWithUV(x + newsize, y, 0, 1, 0);
-			t.addVertexWithUV(x, y, 0, 0, 0);
-			t.draw();	
-			
-			//Blend darkness over hearts to show lost health
-			if((int)(heartsFull) > i) //Full heart (full colour)
-			{
-				GL11.glColor4f(1, 1, 1, 1);
-			}
-			else
-			{
-				if(heartsFull > i) //Partial heart (partial colour)
-				{
-					GL11.glColor4f(0, 0, 0, 0.7f * MathHelper.inversedZeroToOneValue(heartsFull - i));
-				}
-				else //Empty heart (little colour)
-				{
-					GL11.glColor4f(0, 0, 0, 0.7f);
-				}
-			}
-			
-			//Draw the colour blended over the heart, to show lost health
-			t.startDrawingQuads();
-			t.addVertexWithUV(x, y + newsize, 0, 0, 1);
-			t.addVertexWithUV(x + newsize, y + newsize, 0, 1, 1);
-			t.addVertexWithUV(x + newsize, y, 0, 1, 0);
-			t.addVertexWithUV(x, y, 0, 0, 0);
-			t.draw();	
-		}		
-				
-		float manaFull = (float)player.mana / 20;	
-		float partialMana = manaFull - ((int)(player.mana / 20));
-		player_mana.bind();
-		for(int i = 0; i < (player.maxMana) / 20; i++) //Draw Mana Stars
-		{	
-			float newsize = 0;
-			float x = 0;
-			float y = 0;
-			int size = 11;
-
-			if((int)(manaFull) > i) //Is the mana star full?
-			{
-				newsize = 11; //Largest size
-			}
-			else
-			{
-				if(manaFull > i) //Is the mana star partial?
-				{
-					newsize = (7 + (partialMana * 4));
-					x += (size - newsize) / 2;
-					y += (size - newsize) / 2;
-				}
-				else //The mana star is empty if nothing else matches by this point
-				{
-					newsize = 7; //Smallest Size
-					x += 2;
-					y += 2;
-				}
-			}
-			
-			x += getCameraX() + 3 + ((size + 1) * i );
-			y += getCameraY() + 28;
-			
-			if(player.maxHealth > 200)
-			{
-				y += size;
-			}
-			
-			//Draw the Mana star
-			GL11.glColor4f(1, 1, 1, 1); 
-			t.startDrawingQuads();
-			t.addVertexWithUV(x, y + newsize, 0, 0, 1);
-			t.addVertexWithUV(x + newsize, y + newsize, 0, 1, 1);
-			t.addVertexWithUV(x + newsize, y, 0, 1, 0);
-			t.addVertexWithUV(x, y, 0, 0, 0);
-			t.draw();	
-			
-			//Blend darkness over mana star to show lost mana
-			if((int)(manaFull) > i) //Full mana star (full colour)
-			{
-				GL11.glColor4f(1, 1, 1, 1);
-			}
-			else
-			{
-				if(manaFull > i) //Partial mana star (partial colour)
-				{
-					GL11.glColor4f(0, 0, 0, 0.7f * MathHelper.inversedZeroToOneValue(manaFull - i));
-				}
-				else //Empty mana star (little colour)
-				{
-					GL11.glColor4f(0, 0, 0, 0.7f);
-				}
-			}
-			
-			//Draw the darkness blended over the mana heart image
-			t.startDrawingQuads();
-			t.addVertexWithUV(x, y + newsize, 0, 0, 1);
-			t.addVertexWithUV(x + newsize, y + newsize, 0, 1, 1);
-			t.addVertexWithUV(x + newsize, y, 0, 1, 0);
-			t.addVertexWithUV(x, y, 0, 0, 0);
-			t.draw();	
-		}
-		GL11.glColor4f(1, 1, 1, 1); //Safety Colour Clear 	
-		*/
 	}
 
 	/**
@@ -2021,14 +1883,21 @@ public class RenderUI extends Render
 			String health = new StringBuilder().append((int)player.health).append(" / ").append(player.maxHealth).toString();
 			trueTypeFont.drawString((getCameraX() + 35), (getCameraY() + 22), health, 0.3f, -0.3f);
 			
-			//Mana
+			//specialOffsetY is increased if the mana bar is rendered, because then the special bar is 
+			//rendered further down. Otherwise, special energy is rendered directly under the healthbar
+			int specialOffsetY = 37; 
 			int offset = (player.maxMana < 100) ? 5 : 0;
-			String mana = new StringBuilder().append((int)player.mana).append(" / ").append(player.maxMana).toString();
-			trueTypeFont.drawString((getCameraX() + 35 + offset), (getCameraY() + 37), mana, 0.3f, -0.3f);
-		
+			if(player.mana > 0) 
+			{
+				//Mana
+				String mana = new StringBuilder().append((int)player.mana).append(" / ").append(player.maxMana).toString();
+				trueTypeFont.drawString((getCameraX() + 35 + offset), (getCameraY() + 37), mana, 0.3f, -0.3f);
+				specialOffsetY += 15;
+			}
+			
 			//Special
 			String special = new StringBuilder().append((int)(player.specialEnergy / EntityLivingPlayer.MAX_SPECIAL_ENERGY * 100)).append("%").toString();
-			trueTypeFont.drawString((getCameraX() + 35 + offset), (getCameraY() + 52), special, 0.3f, -0.3f);
+			trueTypeFont.drawString((getCameraX() + 35 + offset), (getCameraY() + specialOffsetY), special, 0.3f, -0.3f);
 		}
 		
 		if(player.isInventoryOpen)

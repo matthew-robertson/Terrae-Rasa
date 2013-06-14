@@ -72,7 +72,8 @@ public class InventoryPlayer
 	public static final int PANTS_INDEX = 3;
 	public static final int BOOTS_INDEX = 4;
 	public static final int GLOVES_INDEX = 5;
-
+	public static final int ARMOR_INVENTORY_LENGTH = 10;
+	
 	/**
 	 * Only constructor for InventoryPlayer. <br>
 	 * Initializes the inventory to contain: <br>
@@ -606,14 +607,14 @@ public class InventoryPlayer
 			//If a piece of armor is being removed, then ensure its stats are appropriately neutralized
 			if(armorInventory[index] != null)
 			{
-				player.removeSingleArmorItem((ItemArmor)(Item.itemsList[armorInventory[index].getItemID()]));
+				player.removeSingleArmorItem((ItemArmor)(Item.itemsList[armorInventory[index].getItemID()]), index);
 			}
 			armorInventory[index] = null;
 		}
 		else
 		{
 			//Apply a newly added armour piece's stats
-			player.applySingleArmorItem((ItemArmor)(Item.itemsList[stack.getItemID()]));
+			player.applySingleArmorItem((ItemArmor)(Item.itemsList[stack.getItemID()]), index);
 			armorInventory[index] = new ItemStack(stack);
 		}
 		return true;
@@ -737,7 +738,7 @@ public class InventoryPlayer
 	 * Iterates through the armorInventory[], destroying the first item with a saving relic
 	 * attribute (to prevent death).
 	 */
-	public void removeSavingRelic()
+	public void removeSavingRelic(EntityLivingPlayer player)
 	{
 		//TODO: Fix w/ angel's reprieve
 		for(int i = 0; i < armorInventory.length; i++)
@@ -746,7 +747,7 @@ public class InventoryPlayer
 			{
 				if(((ItemArmor)(Item.itemsList[armorInventory[i].getItemID()])).getIsSavingRelic())
 				{
-					armorInventory[i] = null;
+					setArmorInventoryStack(player, null, i);
 					return;
 				}
 			}

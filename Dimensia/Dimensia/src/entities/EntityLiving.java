@@ -42,7 +42,7 @@ public class EntityLiving extends Entity
 {
 	private static final long serialVersionUID = 1L;
 	/** The flat damage reduction provided by 1 point of defense */
-	public final static float DEFENSE_REDUCTION_FLAT = 0.3F;
+	public final static float DEFENSE_REDUCTION_FLAT = 0.375F;
 	/** The percent of damage reduction provided by 1 point of defense (from 0-1F, where 1F is 100%)*/
 	public final static float DEFENSE_REDUCTION_PERCENT = 0.25F / 100F;
 	public boolean isFireImmune;
@@ -959,6 +959,11 @@ public class EntityLiving extends Entity
 		return 0.0f;
 	}
 		
+	/**
+	 * Applies the periodic bonuses of StatusEffects and then checks if they're expired. If an effect is expired, then
+	 * the StatusEffect is removed from the EntityLiving and no longer has an effect.
+	 * @param world the world that this entity is currently associated with
+	 */
 	public void checkAndUpdateStatusEffects(World world)
 	{
 		for(int i = 0; i < statusEffects.size(); i++)
@@ -976,18 +981,22 @@ public class EntityLiving extends Entity
 		}
 	}
 	
+	/**
+	 * Removes an absorb effect from this EntityLiving.
+	 * @param absorb the absorb effect to remove
+	 */
 	private void removeAbsorb(StatusEffectAbsorb absorb)
 	{
 		for(int i = 0; i < absorbs.size(); i++)
 		{
-			if(absorb == absorbs.get(i))
+			if(absorb.getID() == absorbs.get(i).getID())
 			{
 				absorbs.remove(i);
 			}
 		}
 	}
 	
-	private void registerAbsorb(StatusEffectAbsorb absorb)
+	protected void registerAbsorb(StatusEffectAbsorb absorb)
 	{
 		absorbs.add(absorb);
 	}

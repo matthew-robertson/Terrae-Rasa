@@ -15,10 +15,12 @@ import entities.EntityLivingPlayer;
  * @since       1.0
  */
 public abstract class SetBonus 
-	implements Serializable
+		implements Serializable, ISetBonus
 {
 	private static final long serialVersionUID = 1L;
+	/** A value that determines the strength of a set bonus. Effects vary by actual bonus. */
 	protected float power;
+	/** The number of pieces required to activate this set bonus. */
 	protected int piecesRequiredToActivate;
 	
 	/**
@@ -52,11 +54,7 @@ public abstract class SetBonus
 		this.piecesRequiredToActivate = pieces;
 		return this;
 	}
-	
-	public abstract void apply(EntityLivingPlayer player);
-	
-	public abstract void remove(EntityLivingPlayer player);
-	
+
 	public String toString()
 	{
 		return "SetBonus: Effect=None";

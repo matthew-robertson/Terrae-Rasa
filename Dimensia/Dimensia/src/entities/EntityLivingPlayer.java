@@ -9,10 +9,11 @@ import items.ItemToolAxe;
 import items.ItemToolHammer;
 import items.ItemToolPickaxe;
 
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Vector;
+import java.util.List;
 
 import org.lwjgl.input.Mouse;
 
@@ -20,6 +21,8 @@ import render.Render;
 import setbonus.SetBonus;
 import setbonus.SetBonusContainer;
 import setbonus.SetBonusFactory;
+import statuseffects.StatusEffect;
+import statuseffects.StatusEffectAbsorb;
 import utils.Cooldown;
 import utils.CraftingManager;
 import utils.InventoryPlayer;
@@ -27,6 +30,11 @@ import utils.ItemStack;
 import utils.MathHelper;
 import utils.Recipe;
 import world.World;
+import auras.Aura;
+import auras.AuraContainer;
+import auras.AuraHeavensReprieve;
+import auras.AuraTracker;
+import auras.IAura;
 import blocks.Block;
 import blocks.BlockLight;
 import client.Dimensia;
@@ -71,11 +79,11 @@ public class EntityLivingPlayer extends EntityLiving
 	private static final long serialVersionUID = 2L;
 	private final static int HEALTH_FROM_STAMINA = 10;
 	private final static int MANA_FROM_INTELLECT = 10;
+	private static final float leftSwingBound = MathHelper.degreeToRadian(-120);
+	private static final float rightSwingBound = MathHelper.degreeToRadian(40);
 	public int viewedChestX;
 	public int viewedChestY;
 	public boolean isViewingChest;	
-	private static final float leftSwingBound = MathHelper.degreeToRadian(-120);
-	private static final float rightSwingBound = MathHelper.degreeToRadian(40);
 	public int strength;
 	public int dexterity;
 	public int intellect;
@@ -92,7 +100,6 @@ public class EntityLivingPlayer extends EntityLiving
 	public boolean isFacingRight;
 	public boolean isInventoryOpen;	
 	public InventoryPlayer inventory;
-	public boolean heavensReprieve;
 	
 	private boolean armorChanged;
 	
@@ -117,10 +124,11 @@ public class EntityLivingPlayer extends EntityLiving
 	private Hashtable<String, Cooldown> cooldowns;
 	public final static int MAX_SPECIAL_ENERGY = 100;
 	public float specialEnergy;
-	
-	
 	private Dictionary<String, Boolean> nearBlock;
 	private Dictionary<String, Recipe[]> possibleRecipesByBlock;
+	private SetBonusContainer currentBonuses; 
+	private AuraTracker auraTracker;
+
 	
 	/**
 	 * Constructs a new instance of EntityLivingPlayer with default settings, inventory (includes 3 basic tools),
@@ -158,16 +166,6 @@ public class EntityLivingPlayer extends EntityLiving
 		baseMaxHealth = 100;
 		baseMaxMana = 0;
 		maxMana = 0;
-		if(Dimensia.initInDebugMode)
-		{
-			health = 1;
-			//maxHealth = 400;
-			mana = 1000;
-			baseMaxMana = 20;
-			maxMana = 20;
-			isAffectedByWalls = true; //pretty much no-clip
-			isImmuneToFallDamage = false;
-		}
 		this.difficulty = difficulty;
 		invincibilityTicks = 10;
 		selectedSlot = 0;
@@ -185,7 +183,6 @@ public class EntityLivingPlayer extends EntityLiving
 		rangeDamageModifier = 1;
 		magicDamageModifier = 1;
 		allDamageModifier = 1;
-		heavensReprieve = false;
 		isReloaded = false;
 		cooldowns = new Hashtable<String, Cooldown>();
 		nearBlock = new Hashtable<String, Boolean>();
@@ -199,6 +196,7 @@ public class EntityLivingPlayer extends EntityLiving
 		{
 			possibleRecipesByBlock.put(block.getName(), new Recipe[] { });
 		}
+		auraTracker = new AuraTracker();
 	}
 	
 	public EntityLivingPlayer(EntityLivingPlayer entity)
@@ -239,6 +237,7 @@ public class EntityLivingPlayer extends EntityLiving
 		{
 			possibleRecipesByBlock.put(block.getName(), new Recipe[] { });
 		}
+		auraTracker = new AuraTracker();
 	}
 	
 	/**
@@ -262,6 +261,7 @@ public class EntityLivingPlayer extends EntityLiving
 		checkForNearbyBlocks(world);	
 		verifyChestRange();
 		updateCooldowns();
+		auraTracker.update(this);
 	}
 	
 	/**
@@ -434,6 +434,7 @@ public class EntityLivingPlayer extends EntityLiving
 						);
 				damageAfterArmor = damageAfterAbsorbs(damageAfterArmor);
 				health -= damageAfterArmor; 
+				auraTracker.onDamageTaken(this);
 				//Show world text if applicable
 				if(showWorldText)
 				{
@@ -472,6 +473,7 @@ public class EntityLivingPlayer extends EntityLiving
 			{
 				health = maxHealth;
 			}
+			auraTracker.onHeal(this);
 			return true;
 		}
 		return false;
@@ -535,19 +537,14 @@ public class EntityLivingPlayer extends EntityLiving
 	 * Overrides EntityLiving onDeath() to provide special things like hardcore (mode) and itemdrops
 	 */
 	public void onDeath(World world)
-	{			
-		if(heavensReprieve) //If this special modifier is in place, it's not yet the player's time... 
-		{
-			health = maxHealth * 0.15f; //give the player 15% health back
-			invincibilityTicks = 120; //6 seconds immunity
-			heavensReprieve = false;
-			inventory.removeSavingRelic(); //destory something with that modifier (first thing to occur in the inventory) 
-			onArmorChange(); //flag the armour as changed
-		}
-		else //Otherwise they actually have died
+	{	
+		auraTracker.onDeath(this);
+		
+		//If the player is still dead, then trigger the respawn code
+		if(health <= 0)
 		{
 			//this is where things would be dropped if that was added.
-			health = (health < 100) ? 100 : health;
+			health = maxHealth;
 			world.spawnPlayer(this);
 		}
 	}
@@ -695,13 +692,16 @@ public class EntityLivingPlayer extends EntityLiving
 	 * should be constant for a given piece of armour to allow for easy removing.
 	 * @param armor the piece of armour being equipped
 	 */
-	public void applySingleArmorItem(ItemArmor armor)
+	public void applySingleArmorItem(ItemArmor armor, int index)
 	{
 		SetBonus[] bonuses = armor.getBonuses();		
 		for(SetBonus bonus : bonuses)
 		{
 			bonus.apply(this);
 		}		
+		
+		auraTracker.setAurasByPiece(new AuraContainer(armor.getAuras()), index);
+		
 		defense += armor.getDefense();
 		dexterity += armor.getDexterity();
 		intellect += armor.getIntellect();
@@ -716,13 +716,16 @@ public class EntityLivingPlayer extends EntityLiving
 	 * change.
 	 * @param armor the piece of armour being removed
 	 */
-	public void removeSingleArmorItem(ItemArmor armor)
+	public void removeSingleArmorItem(ItemArmor armor, int index)
 	{
 		SetBonus[] bonuses = armor.getBonuses();		
 		for(SetBonus bonus : bonuses)
 		{
 			bonus.remove(this);
-		}				
+		}		
+		
+		auraTracker.setAurasByPiece(null, index);
+		
 		defense -= armor.getDefense();
 		dexterity -= armor.getDexterity();
 		intellect -= armor.getIntellect();
@@ -731,11 +734,8 @@ public class EntityLivingPlayer extends EntityLiving
 		recalculateStats();
 	}
 	
-	SetBonusContainer currentBonuses; 
-	//Auras container?
-	
 	/**
-	 * Updates set bonus data. Unused bonuses are removed and now ones are applied. The new bonuses are 
+	 * Updates set bonus data. Unused bonuses are removed and new ones are applied. The new bonuses are 
 	 * stored in the player's instance to be removed later.
 	 */
 	private void refreshSetBonuses()
@@ -748,8 +748,23 @@ public class EntityLivingPlayer extends EntityLiving
 		currentBonuses = SetBonusFactory.getSetBonuses(inventory);
 		currentBonuses.applyAll(this);
 	}
-	
-	
+
+
+	/**
+	 * Updates aura bonus data. Unused auras are removed and new ones are applied. The new auras are 
+	 * stored in the player's instance to be removed later.
+	 */
+	private void refreshSetAuras()
+	{
+		if(currentBonuses != null)
+		{
+			currentBonuses.removeAll(this);
+			currentBonuses = null;
+		}
+		currentBonuses = SetBonusFactory.getSetBonuses(inventory);
+		currentBonuses.applyAll(this);
+	}
+
 	
 	/**
 	 * Function called when the player is mining a block
@@ -1135,5 +1150,14 @@ public class EntityLivingPlayer extends EntityLiving
 		{
 			rotateAngle = rightSwingBound;
 		}
+	}
+	
+	/**
+	 * If the player deals damage to a monster or something else this should be called. This will cause
+	 * auras to fire their onDamageDone() events.
+	 */
+	public void inflictedDamageToMonster() 
+	{
+		auraTracker.onDamageDone(this);
 	}
 }

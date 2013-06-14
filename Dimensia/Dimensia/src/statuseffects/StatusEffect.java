@@ -5,7 +5,22 @@ import java.io.Serializable;
 import entities.EntityLiving;
 import world.World;
 
-public class StatusEffect implements Serializable
+/**
+ * A StatusEffect is any short term beneficial or negative effect. They can be applied to an EntityLiving or any subclass
+ * thereof. A StatusEffect will persist until the remaining time expires. 
+ * <br><br>
+ * When applied a StatusEffect will call {@link #applyInitialEffect(EntityLiving)}, and when removed
+ * {@link #removeInitialEffect(EntityLiving)} will be called. Each game tick the effect is active 
+ * {@link #applyPeriodicBonus(World, EntityLiving)} will be called. None of these methods must do anything
+ * and don't in StatusEffect, but any subclass may override them to implement custom functionality.
+ * The apply and remove methods should directly counter each other to ensure that residual effects are
+ * not remaining.
+ *
+ * @author alec
+ *
+ */
+public class StatusEffect 
+		implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	public boolean reapplicationSkipsRemovalEffect;
@@ -18,6 +33,7 @@ public class StatusEffect implements Serializable
 	public boolean stacksIndependantly;
 	public float power;
 	public int ticksBetweenEffect;
+	public long id;
 	
 	/**
 	 * Creates a new status effect of no type. This class should be extended in order to make use of its functionality.
@@ -37,6 +53,7 @@ public class StatusEffect implements Serializable
 		stacksIndependantly = true;
 		this.ticksBetweenEffect = ticksBetweenEffect;
 		this.power = power;
+		this.id = System.nanoTime();
 	}
 	
 	public StatusEffect(StatusEffect effect)
@@ -46,6 +63,11 @@ public class StatusEffect implements Serializable
 		this.tier = effect.tier;
 		this.power = effect.power;
 		this.ticksBetweenEffect = effect.ticksBetweenEffect;
+		this.id = effect.id;
+		this.isBeneficialEffect = effect.isBeneficialEffect;
+		this.iconX = effect.iconX;
+		this.iconY = effect.iconY;
+		this.stacksIndependantly = effect.stacksIndependantly;
 	}
 	
 	public void applyInitialEffect(EntityLiving entity)
@@ -70,6 +92,11 @@ public class StatusEffect implements Serializable
 	{
 		this.iconX = x;
 		this.iconY = y;
+	}
+	
+	public long getID()
+	{
+		return id;
 	}
 	
 	public String toString()
