@@ -347,6 +347,10 @@ public class GameEngine
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.talismanOfWinds));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ringOfVigor));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goddessesTear));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.magicalCloud));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.berserkersEssence));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.guardianAmulet));
+			
 			
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldSword));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.silverSword));

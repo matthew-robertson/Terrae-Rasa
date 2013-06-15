@@ -1,12 +1,16 @@
 package items;
 
-import auras.Aura;
-import auras.AuraHeavensReprieve;
 import setbonus.SetBonus;
+import setbonus.SetBonusAttackSpeed;
 import setbonus.SetBonusDamageAll;
+import setbonus.SetBonusDefense;
+import setbonus.SetBonusFallHeight;
 import setbonus.SetBonusIntellect;
 import setbonus.SetBonusSpeed;
+import setbonus.SetBonusStrength;
 import utils.ActionbarItem;
+import auras.Aura;
+import auras.AuraHeavensReprieve;
 import entities.EntityProjectile;
 import enums.EnumArmor;
 import enums.EnumItemQuality;
@@ -285,7 +289,7 @@ public class Item extends ActionbarItem
 	public static Item goldGloves = new ItemArmorGloves(128).setArmorType(EnumArmor.GOLD).setIconPosition(20, 4).setName("Gold Gloves");
 	public static Item goldBelt = new ItemArmorBelt(129).setArmorType(EnumArmor.GOLD).setIconPosition(20, 5).setName("Gold Belt");
 	
-	public static Item rocketBoots = new ItemArmorAccessory(130).setIconPosition(0, 3).setName("Rocket Boots");	
+	public static Item rocketBoots = new ItemArmorAccessory(130).setIconPosition(0, 0).setName("Rocket Boots");	
 	public static Item ringOfVigor = new ItemArmorAccessory(131).setBonuses(new SetBonus[]{ 
 			new SetBonusDamageAll(0.1F)
 	}).setIconPosition(15, 2).setName("Ring of Vigor").setExtraTooltipInformation("This ring instills a sense of courage in its wearer.");	
@@ -298,6 +302,15 @@ public class Item extends ActionbarItem
 	public static Item goddessesTear = new ItemArmorAccessory(134).setBonuses(new SetBonus[]{ 
 			new SetBonusIntellect(8)
 	}).setIconPosition(15, 4).setName("Goddess' Tear").setExtraTooltipInformation("This tear contains immense magical power.");	
+	public static Item magicalCloud = new ItemArmorAccessory(135).setBonuses(new SetBonus[]{ 
+			new SetBonusFallHeight(8)
+	}).setIconPosition(15, 5).setName("Magical Cloud").setExtraTooltipInformation("As light as air itself.");	
+	public static Item berserkersEssence = new ItemArmorAccessory(136).setBonuses(new SetBonus[]{ 
+			new SetBonusStrength(3), new SetBonusAttackSpeed(0.1F)
+	}).setIconPosition(15, 0).setName("Berserker's Essence").setExtraTooltipInformation("You sense deep inner rage within the essence.");	
+	public static Item guardianAmulet = new ItemArmorAccessory(137).setBonuses(new SetBonus[]{ 
+			new SetBonusDefense(6), 
+	}).setIconPosition(15, 6).setName("Amulet of the Guardian").setExtraTooltipInformation("This amulet contains great defensive power.");	
 	
 	
 	public static Item copperCoin = new ItemCoin(200).setIconPosition(0, 0).setName("Copper Coin");
@@ -309,7 +322,7 @@ public class Item extends ActionbarItem
 	public static Item diamondPillarEnd = new Item(206).setIconPosition(4,11).setName("Diamond P");
 	public static Item goldPillarEnd = new Item(207).setIconPosition(4,12).setName("Gold P");
 	
-	public static Item woodenArrow = new ItemAmmo(300).setProjectile(EntityProjectile.woodenArrow).setIconPosition(0, 8).setName("Wooden Arrow");
+	public static Item woodenArrow = new ItemAmmo(300).setProjectile(EntityProjectile.woodenArrow).setIconPosition(0, 0).setName("Wooden Arrow");
 	
 	public static Item snowball = new ItemRanged(301, 50).setAmmo(Item.woodenArrow).setCooldownTicks(10).setName("Snow Ball").setIconPosition(14, 0);
 	public static Item magicMissileSpell = new ItemMagic(302, 1, 10, EntityProjectile.magicMissile).setName("Tome of Magic Missile").setIconPosition(6, 0);
@@ -322,45 +335,45 @@ public class Item extends ActionbarItem
 	public static Item healthPotion2 = new ItemPotionHealth(345, 150).setIconPosition(6, 1).setName("Healing Potion");
 	public static Item manaStar = new ItemPotionMana(346, 25).setIconPosition(12, 3).setName("Mana Star");
 		
-	public static Item healingHerb1 = new Item(347).setIconPosition(0, 1).setName("Minor Healing Herb");
-	public static Item healingHerb2 = new Item(348).setIconPosition(0, 1).setName("Healing Herb");
-	public static Item magicHerb1 = new Item(349).setIconPosition(0, 1).setName("Minor Magic Herb");
-	public static Item magicHerb2 = new Item(350).setIconPosition(0, 1).setName("Magic Herb");
-	public static Item vialEmpty = new Item(351).setIconPosition(0, 1).setName("Empty Vial");
-	public static Item vialOfWater = new Item(352).setIconPosition(0, 1).setName("Vial of Water");
+	public static Item healingHerb1 = new Item(347).setIconPosition(0, 0).setName("Minor Healing Herb");
+	public static Item healingHerb2 = new Item(348).setIconPosition(0, 0).setName("Healing Herb");
+	public static Item magicHerb1 = new Item(349).setIconPosition(0, 0).setName("Minor Magic Herb");
+	public static Item magicHerb2 = new Item(350).setIconPosition(0, 0).setName("Magic Herb");
+	public static Item vialEmpty = new Item(351).setIconPosition(0, 0).setName("Empty Vial");
+	public static Item vialOfWater = new Item(352).setIconPosition(0, 0).setName("Vial of Water");
 	
 	public static Item regenerationPotion1 = new ItemPotionRegeneration(359, 90, 1, 4, 40).setIconPosition(9, 1).setName("Minor Regen Potion");
 	public static Item regenerationPotion2 = new ItemPotionRegeneration(360, 90, 2, 8, 40).setIconPosition(9, 2).setName("Regen Potion");
-	public static Item regenerationPotion3 = new ItemPotionRegeneration(361, 90, 3, 12, 40).setIconPosition(0, 2).setName("regen potion 3");
-	public static Item regenerationPotion4 = new ItemPotionRegeneration(362, 90, 4, 16, 40).setIconPosition(0, 2).setName("regen potion 4");
+	public static Item regenerationPotion3 = new ItemPotionRegeneration(361, 90, 3, 12, 40).setIconPosition(0, 0).setName("regen potion 3");
+	public static Item regenerationPotion4 = new ItemPotionRegeneration(362, 90, 4, 16, 40).setIconPosition(0, 0).setName("regen potion 4");
 	public static Item attackSpeedPotion1 = new ItemPotionAttackSpeed(363, 180, 1, 0.1F, 1).setIconPosition(9, 3).setName("Minor Attack Speed Potion");
 	public static Item attackSpeedPotion2 = new ItemPotionAttackSpeed(364, 180, 2, 0.2F, 1).setIconPosition(9, 4).setName("Attack Speed Potion");
-	public static Item attackSpeedPotion3 = new ItemPotionAttackSpeed(365, 180, 3, 0.3F, 1).setIconPosition(0, 2).setName("attack speed potion 3");
-	public static Item attackSpeedPotion4 = new ItemPotionAttackSpeed(366, 180, 4, 0.4F, 1).setIconPosition(0, 2).setName("attack speed potion 4");
+	public static Item attackSpeedPotion3 = new ItemPotionAttackSpeed(365, 180, 3, 0.3F, 1).setIconPosition(0, 0).setName("attack speed potion 3");
+	public static Item attackSpeedPotion4 = new ItemPotionAttackSpeed(366, 180, 4, 0.4F, 1).setIconPosition(0, 0).setName("attack speed potion 4");
 	public static Item criticalChancePotion1 = new ItemPotionCriticalBuff(367, 180, 1, 0.1F, 1).setIconPosition(10, 1).setName("Minor Critical Potion");
 	public static Item criticalChancePotion2 = new ItemPotionCriticalBuff(368, 180, 2, 0.2F, 1).setIconPosition(10, 2).setName("Critical Potion");
-	public static Item criticalChancePotion3 = new ItemPotionCriticalBuff(369, 180, 3, 0.3F, 1).setIconPosition(0, 2).setName("critical chance potion 3");
-	public static Item criticalChancePotion4 = new ItemPotionCriticalBuff(370, 180, 4, 0.4F, 1).setIconPosition(0, 2).setName("critical chance potion 4");
+	public static Item criticalChancePotion3 = new ItemPotionCriticalBuff(369, 180, 3, 0.3F, 1).setIconPosition(0, 0).setName("critical chance potion 3");
+	public static Item criticalChancePotion4 = new ItemPotionCriticalBuff(370, 180, 4, 0.4F, 1).setIconPosition(0, 0).setName("critical chance potion 4");
 	public static Item damageBuffPotion1 = new ItemPotionDamageBuff(371, 75, 1, 0.1F, 1).setIconPosition(12, 1).setName("Minor Damage Potion");
 	public static Item damageBuffPotion2 = new ItemPotionDamageBuff(372, 75, 2, 0.2F, 1).setIconPosition(12, 2).setName("Damage Potion");
-	public static Item damageBuffPotion3 = new ItemPotionDamageBuff(373, 75, 3, 0.3F, 1).setIconPosition(0, 2).setName("damage buff potion 3");
-	public static Item damageBuffPotion4 = new ItemPotionDamageBuff(374, 75, 4, 0.4F, 1).setIconPosition(0, 2).setName("damage buff potion 4");
+	public static Item damageBuffPotion3 = new ItemPotionDamageBuff(373, 75, 3, 0.3F, 1).setIconPosition(0, 0).setName("damage buff potion 3");
+	public static Item damageBuffPotion4 = new ItemPotionDamageBuff(374, 75, 4, 0.4F, 1).setIconPosition(0, 0).setName("damage buff potion 4");
 	public static Item dodgePotion1 = new ItemPotionDodge(379, 120, 1, 0.12F, 1).setIconPosition(11, 1).setName("Minor Dodge Potion");
 	public static Item dodgePotion2 = new ItemPotionDodge(380, 120, 2, 0.2F, 1).setIconPosition(11, 2).setName("Dodge Potion");
-	public static Item dodgePotion3 = new ItemPotionDodge(381, 120, 3, 0.3F, 1).setIconPosition(0, 2).setName("dodge potion 3");
-	public static Item dodgePotion4 = new ItemPotionDodge(382, 120, 4, 0.4F, 1).setIconPosition(0, 2).setName("dodge potion 4");
+	public static Item dodgePotion3 = new ItemPotionDodge(381, 120, 3, 0.3F, 1).setIconPosition(0, 0).setName("dodge potion 3");
+	public static Item dodgePotion4 = new ItemPotionDodge(382, 120, 4, 0.4F, 1).setIconPosition(0, 0).setName("dodge potion 4");
 	public static Item manaRegenerationPotion1 = new ItemPotionManaRegeneration(383, 150, 1, 6, 40).setIconPosition(6, 3).setName("Minor Mana Regen Potion");
 	public static Item manaRegenerationPotion2 = new ItemPotionManaRegeneration(384, 150, 2, 10, 40).setIconPosition(6, 4).setName("Mana Regen Potion");
-	public static Item manaRegenerationPotion3 = new ItemPotionManaRegeneration(385, 150, 3, 15, 40).setIconPosition(0, 2).setName("mana regen potion 3");
-	public static Item manaRegenerationPotion4 = new ItemPotionManaRegeneration(386, 150, 4, 21, 40).setIconPosition(0, 2).setName("mana regen potion 4");
+	public static Item manaRegenerationPotion3 = new ItemPotionManaRegeneration(385, 150, 3, 15, 40).setIconPosition(0, 0).setName("mana regen potion 3");
+	public static Item manaRegenerationPotion4 = new ItemPotionManaRegeneration(386, 150, 4, 21, 40).setIconPosition(0, 0).setName("mana regen potion 4");
 	public static Item steelSkinPotion1 = new ItemPotionSteelSkin(387, 150, 1, 8, 1).setIconPosition(7, 3).setName("Minor Steel Skin Potion");
 	public static Item steelSkinPotion2 = new ItemPotionSteelSkin(388, 150, 2, 16, 1).setIconPosition(7, 4).setName("Steel Skin Potion");
-	public static Item steelSkinPotion3 = new ItemPotionSteelSkin(389, 150, 3, 24, 1).setIconPosition(0, 2).setName("steel skin potion 3");
-	public static Item steelSkinPotion4 = new ItemPotionSteelSkin(390, 150, 4, 32, 1).setIconPosition(0, 2).setName("steel skin potion 4");
+	public static Item steelSkinPotion3 = new ItemPotionSteelSkin(389, 150, 3, 24, 1).setIconPosition(0, 0).setName("steel skin potion 3");
+	public static Item steelSkinPotion4 = new ItemPotionSteelSkin(390, 150, 4, 32, 1).setIconPosition(0, 0).setName("steel skin potion 4");
 	public static Item swiftnessPotion1 = new ItemPotionSwiftness(391, 360, 1, 0.15F, 1).setIconPosition(13, 1).setName("Minor Swiftness Potion");
 	public static Item swiftnessPotion2 = new ItemPotionSwiftness(392, 360, 2, 0.3F, 1).setIconPosition(13, 2).setName("Swiftness Potion");
-	public static Item swiftnessPotion3 = new ItemPotionSwiftness(393, 360, 3, 0.45F, 1).setIconPosition(0, 2).setName("swiftness potion 3");
-	public static Item swiftnessPotion4 = new ItemPotionSwiftness(394, 360, 4, 0.6F, 1).setIconPosition(0, 2).setName("swiftness potion 4");
+	public static Item swiftnessPotion3 = new ItemPotionSwiftness(393, 360, 3, 0.45F, 1).setIconPosition(0, 0).setName("swiftness potion 3");
+	public static Item swiftnessPotion4 = new ItemPotionSwiftness(394, 360, 4, 0.6F, 1).setIconPosition(0, 0).setName("swiftness potion 4");
 	public static Item absorbPotion1 = new ItemPotionAbsorb(395, 30, 1, 50, 1).setIconPosition(9, 1).setName("Minor Absorb Potion");
 	public static Item absorbPotion2 = new ItemPotionAbsorb(396, 30, 1, 100, 1).setIconPosition(9, 1).setName("Absorb Potion");
 	
