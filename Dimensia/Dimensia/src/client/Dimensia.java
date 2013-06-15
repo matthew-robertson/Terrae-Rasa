@@ -45,7 +45,7 @@ public class Dimensia
 	private Frame dimensiaFrame;
 	private Canvas dimensiaCanvas;
 	private static String osName;
-	private final static String VERSION = "Alpha 1.0.29";	
+	private final static String VERSION = "Alpha 0.0.30";	
 	private final static String WINDOW_TITLE = "Dimensia " + VERSION;
 	private final static String WINDOWS_BASE_PATH = new StringBuilder().append("C:/Users/").append(System.getProperty("user.name")).append("/AppData/Roaming/Dimensia").toString();
 	private final static String MAC_BASE_PATH = new StringBuilder().append("/Users/").append(System.getProperty("user.name")).append("/Library/Application").append(" Support/Dimensia").toString();

@@ -69,9 +69,6 @@ public class RecipeManager
 	Recipe copperBroadSword = new Recipe(this, new ItemStack(Item.copperSword), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.copperIngot, 6), new ItemStack(Block.plank, 5) 
 	});	
-	Recipe copperHammer = new Recipe(this, new ItemStack(Item.copperHammer), Block.craftingTable, new ItemStack[] {
-		new ItemStack(Item.copperIngot, 5), new ItemStack(Block.plank, 5)
-	});		
 	Recipe copperChestplate = new Recipe(this, new ItemStack(Item.copperBody), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.copperIngot, 10) 
 	});	
@@ -101,9 +98,6 @@ public class RecipeManager
 	Recipe bronzeBroadSword = new Recipe(this, new ItemStack(Item.bronzeSword), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.bronzeIngot, 8), new ItemStack(Block.plank, 5) 
 	});	
-	Recipe bronzeHammer = new Recipe(this, new ItemStack(Item.bronzeHammer), Block.craftingTable, new ItemStack[] {
-		new ItemStack(Item.bronzeIngot, 6), new ItemStack(Block.plank, 5)
-	});		
 	Recipe bronzeChestplate = new Recipe(this, new ItemStack(Item.bronzeBody), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.bronzeIngot, 12) 
 	});	
@@ -132,9 +126,6 @@ public class RecipeManager
 	Recipe ironBroadSword = new Recipe(this, new ItemStack(Item.ironSword), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.ironIngot, 9), new ItemStack(Block.plank, 5) 
 	});	
-	Recipe ironHammer = new Recipe(this, new ItemStack(Item.ironHammer), Block.craftingTable, new ItemStack[] {
-		new ItemStack(Item.ironIngot, 7), new ItemStack(Block.plank, 5)
-	});		
 	Recipe ironChestplate = new Recipe(this, new ItemStack(Item.ironBody), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.ironIngot, 13) 
 	});	
@@ -163,9 +154,6 @@ public class RecipeManager
 	Recipe silverBroadSword = new Recipe(this, new ItemStack(Item.silverSword), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.silverIngot, 11), new ItemStack(Block.plank, 5) 
 	});	
-	Recipe silverHammer = new Recipe(this, new ItemStack(Item.silverHammer), Block.craftingTable, new ItemStack[] {
-		new ItemStack(Item.silverIngot, 9), new ItemStack(Block.plank, 5)
-	});		
 	Recipe silverChestplate = new Recipe(this, new ItemStack(Item.silverBody), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.silverIngot, 15) 
 	});	
@@ -194,9 +182,6 @@ public class RecipeManager
 	Recipe goldBroadSword = new Recipe(this, new ItemStack(Item.goldSword), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.goldIngot, 14), new ItemStack(Block.plank, 5) 
 	});	
-	Recipe goldHammer = new Recipe(this, new ItemStack(Item.goldHammer), Block.craftingTable, new ItemStack[] {
-		new ItemStack(Item.goldIngot, 12), new ItemStack(Block.plank, 5)
-	});		
 	Recipe goldChestplate = new Recipe(this, new ItemStack(Item.goldBody), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.goldIngot, 18), new ItemStack(Item.silverIngot, 1)
 	});	

@@ -335,29 +335,51 @@ public class GameEngine
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldOre, 15));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.tinIngot, 100));	
  
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldHelmet));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldHelmet));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldBody));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldPants));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldGloves));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldBoots));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldBelt));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldHelmet));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldHelmet));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldBody));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldPants));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldGloves));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldBoots));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldBelt));
 
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.angelsSigil, 2));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.divineCross));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.talismanOfWinds));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ringOfVigor));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goddessesTear));
 			
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.silverHelmet));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.silverBody));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.silverPants));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.silverGloves));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.silverBoots));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.silverBelt));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldSword));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.silverSword));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ironSword));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.bronzeSword));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.copperSword));
 			
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ironHelmet));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ironBody));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ironPants));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ironGloves));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ironBoots));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ironBelt));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldPickaxe));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.silverPickaxe));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ironPickaxe));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.bronzePickaxe));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.copperPickaxe));
+			
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldAxe));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.silverAxe));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ironAxe));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.bronzeAxe));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.copperAxe));
+			
+			
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.silverHelmet));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.silverBody));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.silverPants));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.silverGloves));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.silverBoots));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.silverBelt));
+			
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ironHelmet));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ironBody));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ironPants));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ironGloves));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ironBoots));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ironBelt));
 			
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.bronzeHelmet));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.bronzeBody));

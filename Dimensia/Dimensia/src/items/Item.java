@@ -4,6 +4,7 @@ import auras.Aura;
 import auras.AuraHeavensReprieve;
 import setbonus.SetBonus;
 import setbonus.SetBonusDamageAll;
+import setbonus.SetBonusIntellect;
 import setbonus.SetBonusSpeed;
 import utils.ActionbarItem;
 import entities.EntityProjectile;
@@ -210,30 +211,25 @@ public class Item extends ActionbarItem
 	public static final Item[] itemsList = new Item[spellIndex];
 	/** Item Declarations **/	
 
-	public static Item copperAxe = new ItemToolAxe(1).setDamageDone(4).setName("Copper Axe").setIconPosition(0, 7).setToolMaterial(EnumToolMaterial.COPPER);	
-	public static Item copperPickaxe = new ItemToolPickaxe(2).setDamageDone(3).setName("Copper Pickaxe").setIconPosition(0, 6).setToolMaterial(EnumToolMaterial.COPPER);	
-	public static Item copperHammer = new ItemToolHammer(3).setDamageDone(3).setName("Copper Hammer").setIconPosition(0, 5).setToolMaterial(EnumToolMaterial.COPPER);
-	public static Item copperSword = new ItemToolSword(4).setDamageDone(6).setName("Copper Sword").setIconPosition(0, 4).setToolMaterial(EnumToolMaterial.COPPER);	
+	public static Item copperAxe = new ItemToolAxe(1).setDamageDone(4).setName("Copper Axe").setIconPosition(16 ,8).setToolMaterial(EnumToolMaterial.COPPER);	
+	public static Item copperPickaxe = new ItemToolPickaxe(2).setDamageDone(3).setName("Copper Pickaxe").setIconPosition(16, 7).setToolMaterial(EnumToolMaterial.COPPER);	
+	public static Item copperSword = new ItemToolSword(4).setDamageDone(6).setName("Copper Sword").setIconPosition(16, 6).setToolMaterial(EnumToolMaterial.COPPER);	
 	
-	public static Item bronzeAxe = new ItemToolAxe(5).setDamageDone(5).setName("Bronze Axe").setIconPosition(0, 7).setToolMaterial(EnumToolMaterial.BRONZE);	
-	public static Item bronzePickaxe = new ItemToolPickaxe(6).setDamageDone(4).setName("Bronze Pickaxe").setIconPosition(0, 6).setToolMaterial(EnumToolMaterial.BRONZE);	
-	public static Item bronzeHammer = new ItemToolHammer(7).setDamageDone(4).setName("Bronze Hammer").setIconPosition(0, 5).setToolMaterial(EnumToolMaterial.BRONZE);
-	public static Item bronzeSword = new ItemToolSword(8).setDamageDone(7).setName("Bronze Sword").setIconPosition(0, 4).setToolMaterial(EnumToolMaterial.BRONZE);	
+	public static Item bronzeAxe = new ItemToolAxe(5).setDamageDone(5).setName("Bronze Axe").setIconPosition(17, 8).setToolMaterial(EnumToolMaterial.BRONZE);	
+	public static Item bronzePickaxe = new ItemToolPickaxe(6).setDamageDone(4).setName("Bronze Pickaxe").setIconPosition(17, 7).setToolMaterial(EnumToolMaterial.BRONZE);	
+	public static Item bronzeSword = new ItemToolSword(8).setDamageDone(7).setName("Bronze Sword").setIconPosition(17, 6).setToolMaterial(EnumToolMaterial.BRONZE);	
 	
-	public static Item ironAxe = new ItemToolAxe(9).setDamageDone(7).setName("Iron Axe").setIconPosition(1, 7).setToolMaterial(EnumToolMaterial.IRON);	
-	public static Item ironPickaxe = new ItemToolPickaxe(10).setDamageDone(4).setName("Iron Pickaxe").setIconPosition(1, 6).setToolMaterial(EnumToolMaterial.IRON);	
-	public static Item ironHammer = new ItemToolHammer(11).setDamageDone(5).setName("Iron Hammer").setIconPosition(1, 5).setToolMaterial(EnumToolMaterial.IRON);
-	public static Item ironSword = new ItemToolSword(12).setDamageDone(9).setName("Iron Sword").setIconPosition(1, 4).setToolMaterial(EnumToolMaterial.IRON);	
+	public static Item ironAxe = new ItemToolAxe(9).setDamageDone(7).setName("Iron Axe").setIconPosition(18, 8).setToolMaterial(EnumToolMaterial.IRON);	
+	public static Item ironPickaxe = new ItemToolPickaxe(10).setDamageDone(4).setName("Iron Pickaxe").setIconPosition(18, 7).setToolMaterial(EnumToolMaterial.IRON);	
+	public static Item ironSword = new ItemToolSword(12).setDamageDone(9).setName("Iron Sword").setIconPosition(18, 6).setToolMaterial(EnumToolMaterial.IRON);	
 	
-	public static Item silverAxe = new ItemToolAxe(13).setDamageDone(8).setName("Silver Axe").setIconPosition(2, 7).setToolMaterial(EnumToolMaterial.SILVER);	
-	public static Item silverPickaxe = new ItemToolPickaxe(14).setDamageDone(5).setName("Silver Pickaxe").setIconPosition(2, 6).setToolMaterial(EnumToolMaterial.SILVER);	
-	public static Item silverHammer = new ItemToolHammer(15).setDamageDone(6).setName("Silver Hammer").setIconPosition(2, 5).setToolMaterial(EnumToolMaterial.SILVER);
-	public static Item silverSword = new ItemToolSword(16).setDamageDone(11).setName("Silver Sword").setIconPosition(2, 4).setToolMaterial(EnumToolMaterial.SILVER);	
+	public static Item silverAxe = new ItemToolAxe(13).setDamageDone(8).setName("Silver Axe").setIconPosition(19, 8).setToolMaterial(EnumToolMaterial.SILVER);	
+	public static Item silverPickaxe = new ItemToolPickaxe(14).setDamageDone(5).setName("Silver Pickaxe").setIconPosition(19, 7).setToolMaterial(EnumToolMaterial.SILVER);	
+	public static Item silverSword = new ItemToolSword(16).setDamageDone(11).setName("Silver Sword").setIconPosition(19, 6).setToolMaterial(EnumToolMaterial.SILVER);	
 	
-	public static Item goldAxe = new ItemToolAxe(17).setDamageDone(9).setName("Gold Axe").setIconPosition(4, 7).setToolMaterial(EnumToolMaterial.GOLD);	
-	public static Item goldPickaxe = new ItemToolPickaxe(18).setDamageDone(7).setName("Gold Pickaxe").setIconPosition(4, 6).setToolMaterial(EnumToolMaterial.GOD).setItemQuality(EnumItemQuality.LEGENDARY);	
-	public static Item goldHammer = new ItemToolHammer(19).setDamageDone(8).setName("Gold Hammer").setIconPosition(4, 5).setToolMaterial(EnumToolMaterial.GOLD);
-	public static Item goldSword = new ItemToolSword(20).setDamageDone(14).setName("Gold Sword").setIconPosition(4, 4).setToolMaterial(EnumToolMaterial.GOLD);	
+	public static Item goldAxe = new ItemToolAxe(17).setDamageDone(9).setName("Gold Axe").setIconPosition(20, 8).setToolMaterial(EnumToolMaterial.GOLD);	
+	public static Item goldPickaxe = new ItemToolPickaxe(18).setDamageDone(7).setName("Gold Pickaxe").setIconPosition(20, 7).setToolMaterial(EnumToolMaterial.GOD).setItemQuality(EnumItemQuality.LEGENDARY);	
+	public static Item goldSword = new ItemToolSword(20).setDamageDone(14).setName("Gold Sword").setIconPosition(20, 6).setToolMaterial(EnumToolMaterial.GOLD);	
 	
 	public static Item copperIngot = new Item(51).setIconPosition(3, 9).setName("Copper Ingot");
 	public static Item tinIngot = new Item(52).setIconPosition(3, 10).setName("Tin Ingot");
@@ -292,13 +288,16 @@ public class Item extends ActionbarItem
 	public static Item rocketBoots = new ItemArmorAccessory(130).setIconPosition(0, 3).setName("Rocket Boots");	
 	public static Item ringOfVigor = new ItemArmorAccessory(131).setBonuses(new SetBonus[]{ 
 			new SetBonusDamageAll(0.1F)
-	}).setIconPosition(0, 3).setName("Ring of Vigor").setExtraTooltipInformation("This ring instills a sense of courage in its wearer.");	
+	}).setIconPosition(15, 2).setName("Ring of Vigor").setExtraTooltipInformation("This ring instills a sense of courage in its wearer.");	
 	public static Item talismanOfWinds = new ItemArmorAccessory(132).setBonuses(new SetBonus[]{ 
 			new SetBonusSpeed(0.1F)
-	}).setIconPosition(0, 3).setName("Talisman of Winds");	
-	public static Item angelsSigil = new ItemArmorAccessory(133).setAuras(new Aura[]{ 
+	}).setIconPosition(15, 3).setName("Talisman of Winds").setExtraTooltipInformation("May the winds of fortune always be at your back.");	
+	public static Item divineCross = new ItemArmorAccessory(133).setAuras(new Aura[]{ 
 			new AuraHeavensReprieve()
-	}).setIconPosition(0, 0).setName("Angel's Sigil");	
+	}).setIconPosition(15, 1).setName("Divine Cross").setExtraTooltipInformation("This holy cross will destroy itself to save the wearer.");	
+	public static Item goddessesTear = new ItemArmorAccessory(134).setBonuses(new SetBonus[]{ 
+			new SetBonusIntellect(8)
+	}).setIconPosition(15, 4).setName("Goddess' Tear").setExtraTooltipInformation("This tear contains immense magical power.");	
 	
 	
 	public static Item copperCoin = new ItemCoin(200).setIconPosition(0, 0).setName("Copper Coin");
