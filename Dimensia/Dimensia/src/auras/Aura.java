@@ -32,7 +32,7 @@ public abstract class Aura
 	/** The remaining time before this aura can reactivate, in game ticks. */
 	protected int remainingCooldown;
 	/** The chance for this Aura to activate, where 0F indicates never and 1F indicates always. */
-	protected float activationChance;
+	protected double activationChance;
 	/** A number unique to this aura, used to distinguish it from other auras it. */
 	private final long id;
 	
@@ -45,7 +45,7 @@ public abstract class Aura
 		this.id = System.nanoTime();
 	}
 
-	protected Aura(int maxCooldown, float activationChance)
+	protected Aura(int maxCooldown, double activationChance)
 	{
 		this.random = new Random();
 		this.remainingCooldown = 0;

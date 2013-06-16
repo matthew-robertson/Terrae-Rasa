@@ -14,7 +14,7 @@ public class SetBonusIntellect extends SetBonus
 {
 	private static final long serialVersionUID = 1L;
 
-	public SetBonusIntellect(float power) 
+	public SetBonusIntellect(double power) 
 	{
 		super(power);
 	}

@@ -15,7 +15,7 @@ public class SetBonusManaBoost extends SetBonus
 {
 	private static final long serialVersionUID = 1L;
 
-	protected SetBonusManaBoost(float power) 
+	protected SetBonusManaBoost(double power) 
 	{
 		super(power);
 	}

@@ -14,19 +14,19 @@ public class SetBonusFallHeight extends SetBonus
 {
 	private static final long serialVersionUID = 1L;
 
-	public SetBonusFallHeight(float power) 
+	public SetBonusFallHeight(double power) 
 	{
 		super(power);
 	}
 
 	public void apply(EntityLivingPlayer player) 
 	{
-		player.maxHeightFallenSafely += power;
+		player.maxHeightFallenSafely += 6 * power;
 	}
 
 	public void remove(EntityLivingPlayer player) 
 	{
-		player.maxHeightFallenSafely -= power; 
+		player.maxHeightFallenSafely -= 6 * power; 
 	}
 
 	public String toString()

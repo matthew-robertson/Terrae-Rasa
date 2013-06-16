@@ -19,7 +19,7 @@ public abstract class SetBonus
 {
 	private static final long serialVersionUID = 1L;
 	/** A value that determines the strength of a set bonus. Effects vary by actual bonus. */
-	protected float power;
+	protected double power;
 	/** The number of pieces required to activate this set bonus. */
 	protected int piecesRequiredToActivate;
 	
@@ -27,7 +27,7 @@ public abstract class SetBonus
 	 * Only a subclass of SetBonus can use this constructor because this class requires subclassing.
 	 * @param power the strength of the SetBonus, varying by effect
 	 */
-	protected SetBonus(float power)
+	protected SetBonus(double power)
 	{
 		this.power = power;
 		this.piecesRequiredToActivate = 1;
@@ -38,7 +38,7 @@ public abstract class SetBonus
 	 * @param power the strength of the SetBonus, varying by effect
 	 * @param piecesRequiredToActivate the number of pieces required to activate this set bonus
 	 */
-	protected SetBonus(float power, int piecesRequiredToActivate)
+	protected SetBonus(double power, int piecesRequiredToActivate)
 	{
 		this.power = power;
 		this.piecesRequiredToActivate = piecesRequiredToActivate;

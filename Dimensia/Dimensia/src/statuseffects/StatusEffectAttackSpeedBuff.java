@@ -14,7 +14,7 @@ public class StatusEffectAttackSpeedBuff extends StatusEffect
 	 * @param power the strength of the attack speed buff
 	 * @param ticksBetweenEffect the number of game ticks between the periodic effect being applied, if applicable
 	 */
-	public StatusEffectAttackSpeedBuff(float durationSeconds, int tier, float power, int ticksBetweenEffect) 
+	public StatusEffectAttackSpeedBuff(double durationSeconds, int tier, double power, int ticksBetweenEffect) 
 	{
 		super(durationSeconds, tier, power, ticksBetweenEffect);
 		iconX = 14;

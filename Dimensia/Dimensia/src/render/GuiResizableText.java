@@ -66,21 +66,21 @@ public class GuiResizableText
 		screenX = Display.getWidth();
 		screenY = Display.getHeight();
 		
-		float f = (float)(trueTypeFont.getWidth(text)) / 232;
-		float w = (Display.getWidth() * 0.25f) - (f * scale);
-		float x = (float)w - (f * 232 / (4 / scale));		
+		double f = (double)(trueTypeFont.getWidth(text)) / 232;
+		double w = (Display.getWidth() * 0.25f) - (f * scale);
+		double x = (double)w - (f * 232 / (4 / scale));		
 					
 		centery = (int)cy;
 		mouseY = (int)(cy - 30);
 		mouseX = (int)x;
 		mouseHeight = 22;
-		mouseWidth = (int)(((float)(trueTypeFont.getWidth(text)) + 20.0f) / (2.0f / scale));		
+		mouseWidth = (int)(((double)(trueTypeFont.getWidth(text)) + 20.0f) / (2.0f / scale));		
 	}
 		
 	/**
 	 * Set bounds for the mouse and drawing (where to draw)
 	 */
-	public void setBounds(float cy/*CenterY*/, float x/*MouseX*/, float w/*MouseWidth*/) //Set the Mouse/Text Area Bounds
+	public void setBounds(double cy/*CenterY*/, double x/*MouseX*/, double w/*MouseWidth*/) //Set the Mouse/Text Area Bounds
 	{
 		centery = (int)cy;
 		mouseY = (int)(cy - 30);
@@ -116,10 +116,10 @@ public class GuiResizableText
 	public void setMouse()
 	{
 		//If the screensize has changed, the mouse listening positions need to be corrected
-		float fw = (float)(trueTypeFont.getWidth(text)) / 232;
-		float ac = (Display.getWidth() * 0.25f) - (fw * scale);
-		float mx = (float)(trueTypeFont.getWidth(text)) + 20.0f;
-		setBounds((float)(centery), (float)ac - (fw * 232 / 4), mx / 2); 
+		double fw = (double)(trueTypeFont.getWidth(text)) / 232;
+		double ac = (Display.getWidth() * 0.25f) - (fw * scale);
+		double mx = (double)(trueTypeFont.getWidth(text)) + 20.0f;
+		setBounds((double)(centery), (double)ac - (fw * 232 / 4), mx / 2); 
 	}
 	
 	/**
@@ -140,11 +140,11 @@ public class GuiResizableText
 		}
 		else
 		{
-			final float greyColor = 0.56078434f; //Base Colour 
-			final float toWhiteModifier = 1.785714f; //Modifier to get from Base Colour to white
-			float modifiedScale = scale; //Fixes things with a scale that can go below 1.0f 
-			float scaleRatio = 1; 
-			float f = (maxScale - baseScale) / baseScale;
+			final double greyColor = 0.56078434f; //Base Colour 
+			final double toWhiteModifier = 1.785714f; //Modifier to get from Base Colour to white
+			double modifiedScale = scale; //Fixes things with a scale that can go below 1.0f 
+			double scaleRatio = 1; 
+			double f = (maxScale - baseScale) / baseScale;
 			
 			if(f >= 0.51f) //Is the text able to scale up too large? 
 			{
@@ -165,9 +165,9 @@ public class GuiResizableText
 			}
 			
 			//use of oneOrGreater ensures the colour is always at least the original grey or lighter
-			float newColor = greyColor * MathHelper.oneOrGreater((float)((modifiedScale - 1) * scaleRatio * 2.0f) * toWhiteModifier);
+			double newColor = greyColor * MathHelper.oneOrGreater((double)((modifiedScale - 1) * scaleRatio * 2.0f) * toWhiteModifier);
 						
-			GL11.glColor4f(newColor, newColor, newColor, 1); //Set the recalculated colour
+			GL11.glColor4d(newColor, newColor, newColor, 1); //Set the recalculated colour
 		}
 		
 		float y = centery - 22.0f * (1 - scale); //Adjusted Text Y Position

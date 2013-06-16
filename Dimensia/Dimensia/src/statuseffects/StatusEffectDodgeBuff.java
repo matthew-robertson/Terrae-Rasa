@@ -15,7 +15,7 @@ public class StatusEffectDodgeBuff extends StatusEffect
 	 * @param power the strength of the dodge buff
 	 * @param ticksBetweenEffect the number of game ticks between the periodic effect being applied, if applicable
 	 */
-	public StatusEffectDodgeBuff(float durationSeconds, int tier, float power, int ticksBetweenEffect)
+	public StatusEffectDodgeBuff(double durationSeconds, int tier, double power, int ticksBetweenEffect)
 	{
 		super(durationSeconds, tier, power, ticksBetweenEffect);
 		iconX = 11;

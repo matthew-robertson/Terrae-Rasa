@@ -9,11 +9,9 @@ import items.ItemToolAxe;
 import items.ItemToolHammer;
 import items.ItemToolPickaxe;
 
-import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.List;
 
 import org.lwjgl.input.Mouse;
 
@@ -21,8 +19,6 @@ import render.Render;
 import setbonus.SetBonus;
 import setbonus.SetBonusContainer;
 import setbonus.SetBonusFactory;
-import statuseffects.StatusEffect;
-import statuseffects.StatusEffectAbsorb;
 import utils.Cooldown;
 import utils.CraftingManager;
 import utils.InventoryPlayer;
@@ -30,11 +26,8 @@ import utils.ItemStack;
 import utils.MathHelper;
 import utils.Recipe;
 import world.World;
-import auras.Aura;
 import auras.AuraContainer;
-import auras.AuraHeavensReprieve;
 import auras.AuraTracker;
-import auras.IAura;
 import blocks.Block;
 import blocks.BlockLight;
 import client.Dimensia;
@@ -79,8 +72,8 @@ public class EntityLivingPlayer extends EntityLiving
 	private static final long serialVersionUID = 2L;
 	private final static int HEALTH_FROM_STAMINA = 10;
 	private final static int MANA_FROM_INTELLECT = 10;
-	private static final float leftSwingBound = MathHelper.degreeToRadian(-120);
-	private static final float rightSwingBound = MathHelper.degreeToRadian(40);
+	private static final double leftSwingBound = MathHelper.degreeToRadian(-120);
+	private static final double rightSwingBound = MathHelper.degreeToRadian(40);
 	public int viewedChestX;
 	public int viewedChestY;
 	public boolean isViewingChest;	
@@ -90,11 +83,11 @@ public class EntityLivingPlayer extends EntityLiving
 	public int stamina;
 	public int baseMaxHealth;
 	public int baseMaxMana;	
-	public float respawnXPos;
-	public float respawnYPos;	
+	public double respawnXPos;
+	public double respawnYPos;	
 	private boolean isSwingingRight;
 	private boolean hasSwungTool;
-	private float rotateAngle;
+	private double rotateAngle;
 	public int selectedRecipe;
 	public int selectedSlot;
 	public boolean isFacingRight;
@@ -123,7 +116,7 @@ public class EntityLivingPlayer extends EntityLiving
 	private final int MAX_BLOCK_PLACE_DISTANCE;
 	private Hashtable<String, Cooldown> cooldowns;
 	public final static int MAX_SPECIAL_ENERGY = 100;
-	public float specialEnergy;
+	public double specialEnergy;
 	private Dictionary<String, Boolean> nearBlock;
 	private Dictionary<String, Recipe[]> possibleRecipesByBlock;
 	private SetBonusContainer currentBonuses; 
@@ -147,13 +140,13 @@ public class EntityLivingPlayer extends EntityLiving
 		baseSpeed = 5.0f;
 		width = 12;
 		height = 18;
+		maxHeightFallenSafely = 78;
 		blockHeight = 3;
 		blockWidth = 2;
 		setRespawnPosition(50, 0);		
 		setUpwardJumpHeight(48);
 		upwardJumpCounter = 0;
 		jumpSpeed = 5;
-		fallSpeed = 3;
 		canJumpAgain = true;
 		inventory = new InventoryPlayer();
 		playerName = name;
@@ -334,15 +327,18 @@ public class EntityLivingPlayer extends EntityLiving
 	 * @param damage the damage inflicted
 	 * @param penetratesArmor whether or not the damage penetrates the player's armor points (defense)
 	 */
-	public void inflictNonCombatDamage(World world, int damage, boolean penetratesArmor, boolean renderDamage)
+	public void damageNonCombat(World world, int damage, boolean penetratesArmor, boolean renderDamage)
 	{
 		if(invincibilityTicks <= 0)
 		{
-			if(penetratesArmor)
+			if(!penetratesArmor)
 			{
-				float damageAfterArmor = ((damage - (defense / 2)) > 0) ? (damage - (defense / 2)) : 1;
+				double damageAfterArmor = MathHelper.floorOne(
+						(damage * (1F - DEFENSE_REDUCTION_PERCENT * defense)) - (defense * DEFENSE_REDUCTION_FLAT)									
+						);
 				damageAfterArmor = damageAfterAbsorbs(damageAfterArmor);
 				health -= damageAfterArmor;
+				auraTracker.onDamageTaken(this);
 				if(renderDamage)
 				{
 					String message = (damageAfterArmor == 0) ? "Absorb" : ""+(int)damageAfterArmor;
@@ -352,13 +348,14 @@ public class EntityLivingPlayer extends EntityLiving
 			else
 			{
 				health -= damage;
+				auraTracker.onDamageTaken(this);
 				if(renderDamage)
 				{
 					world.addTemporaryText(""+(int)damage, (int)x - 2, (int)y - 3, 20, EnumColor.RED);
 				}
 			}
 			
-			if(isDead()) //if the player has died
+			if(isDead()) //check if the player has died
 			{
 				onDeath(world);
 				world.clearEntityList();
@@ -371,31 +368,37 @@ public class EntityLivingPlayer extends EntityLiving
 	 */
 	public void applyGravity(World world) 
 	{
-		if(isJumping) //If the entity is jumping upwards, move them up
-		{
-			moveEntityUp(world, jumpSpeed * movementSpeedModifier);			
-		}
-		else if(!isOnGround(world) && isAffectedByGravity) //otherwise, if the entity is in the air, make them fall
-		{
-			moveEntityDown(world, MathHelper.getFallSpeed(fallSpeed * movementSpeedModifier, ticksFallen));
-			ticksFallen++;
-		}	
-		
 		if(isOnGround(world)) //Is the entity on the ground? If so they can jump again
 		{
-			if((isJumping || !canJumpAgain) && isAffectedByGravity && !isImmuneToFallDamage) //if the entity can take fall damage
+			//Check for fall damage
+			if((isJumping || !canJumpAgain) && 
+				isAffectedByGravity && 
+				!isImmuneToFallDamage && 
+				distanceFallen > maxHeightFallenSafely) 
 			{
-				float fallDamage = MathHelper.getFallDamage(distanceFallen, maxHeightFallenSafely); //calculate the fall damage
+				//calculate the fall damage
+				double fallDamage = MathHelper.getFallDamage(jumpSpeed, world.g, ticksFallen); 
 				if(fallDamage > 0)
 				{
-					inflictNonCombatDamage(world, (int)fallDamage, true, true); //damage the player with non-combat defense affected damage
+					//damage the player with non-combat defense affected damage
+					damageNonCombat(world, (int)fallDamage, true, true); 
 				}
 			}
 			
 			ticksFallen = 0;
 			canJumpAgain = true;
 			distanceFallen = 0;
-		}		
+		}
+		
+		if(isJumping) //If the entity is jumping upwards, move them up
+		{
+			moveEntityUp(world, jumpSpeed * movementSpeedModifier);			
+		}
+		else if(!isOnGround(world) && isAffectedByGravity) //otherwise, if the entity is in the air, make them fall
+		{
+			moveEntityDown(world, MathHelper.getFallSpeed(jumpSpeed, world.g, ticksFallen));
+			ticksFallen++;
+		}	
 	}
 	
 	/**
@@ -429,7 +432,7 @@ public class EntityLivingPlayer extends EntityLiving
 				//The player will be invincible for 750 ms after hit
 				invincibilityTicks = 15; 
 				//Determine the damage after armour, with a floor of 1 damage and then apply absorbs
-				float damageAfterArmor = MathHelper.floorOne(
+				double damageAfterArmor = MathHelper.floorOne(
 						(d * (1F - DEFENSE_REDUCTION_PERCENT * defense)) - (defense * DEFENSE_REDUCTION_FLAT)									
 						);
 				damageAfterArmor = damageAfterAbsorbs(damageAfterArmor);
@@ -512,7 +515,7 @@ public class EntityLivingPlayer extends EntityLiving
 	{
 		if(!isInCombat)
 		{
-			float amountHealed = (ticksOfHealthRegen / 1800f < 0.55f) ? (ticksOfHealthRegen / 1800f) : 0.55f;
+			double amountHealed = (ticksOfHealthRegen / 1800f < 0.55f) ? (ticksOfHealthRegen / 1800f) : 0.55f;
 			health += amountHealed;
 			ticksOfHealthRegen++;	
 		}
@@ -913,7 +916,7 @@ public class EntityLivingPlayer extends EntityLiving
 	 * @param mouseY = y position to create the projectile at
 	 * @param item = Item to be used to launch projectile (what projectile is needed)
 	 */
-	public void launchProjectileMagic(World world, float mouseX, float mouseY, ItemMagic item){		
+	public void launchProjectileMagic(World world, double mouseX, double mouseY, ItemMagic item){		
 		if (mana >= item.getManaReq()){
 			int angle = MathHelper.angleMousePlayer(mouseX, mouseY, x, y);
 			if (angle < 0){
@@ -933,7 +936,7 @@ public class EntityLivingPlayer extends EntityLiving
 	 * @param mouseY = y position to create the projectile at
 	 * @param item = Item to be used to launch projectile (to determine what projectile is needed)
 	 */
-	public void launchProjectileWeapon(World world, float mouseX, float mouseY, ItemRanged item){
+	public void launchProjectileWeapon(World world, double mouseX, double mouseY, ItemRanged item){
 		if (ticksSinceLastCast > item.getCooldownTicks()){
 			ItemStack[] ammo = item.getAmmoAsArray();
 			for (int i = 0; i < ammo.length; i++){			
@@ -1076,7 +1079,7 @@ public class EntityLivingPlayer extends EntityLiving
 		specialEnergy -= amount;
 	}
 	
-	public float getToolRotationAngle()
+	public double getToolRotationAngle()
 	{
 		return rotateAngle;
 	}
@@ -1096,7 +1099,7 @@ public class EntityLivingPlayer extends EntityLiving
 	 * be subtracted.
 	 * @param addition the amount to add to the tool rotation angle, in radians
 	 */
-	public void updateRotationAngle(float addition)
+	public void updateRotationAngle(double addition)
 	{
 		rotateAngle += addition;
 	}
@@ -1114,7 +1117,7 @@ public class EntityLivingPlayer extends EntityLiving
 	 */
 	public void updateSwing()
 	{
-		float swingSpeed = (float)((ItemTool)(Item.itemsList[inventory.getMainInventoryStack(selectedSlot).getItemID()])).swingSpeed;
+		double swingSpeed = (double)((ItemTool)(Item.itemsList[inventory.getMainInventoryStack(selectedSlot).getItemID()])).swingSpeed;
 		if(isSwingingRight)
 		{
             rotateAngle += MathHelper.degreeToRadian(10.0F * swingSpeed);	        

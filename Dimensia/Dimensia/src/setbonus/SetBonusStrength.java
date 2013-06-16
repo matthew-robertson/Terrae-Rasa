@@ -14,7 +14,7 @@ public class SetBonusStrength extends SetBonus
 {
 	private static final long serialVersionUID = 1L;
 
-	public SetBonusStrength(float power) 
+	public SetBonusStrength(double power) 
 	{
 		super(power);
 	}

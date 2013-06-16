@@ -14,7 +14,7 @@ public class SetBonusDamageMelee extends SetBonus
 {
 	private static final long serialVersionUID = 1L;
 
-	public SetBonusDamageMelee(float power) 
+	public SetBonusDamageMelee(double power) 
 	{
 		super(power);
 	}

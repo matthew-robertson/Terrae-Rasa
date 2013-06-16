@@ -157,13 +157,13 @@ public class EntityLivingNPC extends EntityLiving
 		return this;
 	}
 	
-	protected EntityLivingNPC setBaseSpeed(float f)
+	protected EntityLivingNPC setBaseSpeed(double f)
 	{
 		baseSpeed = f;
 		return this;
 	}
 	
-	public EntityLivingNPC setJumpSpeed(float f){
+	public EntityLivingNPC setJumpSpeed(double f){
 		jumpSpeed = f;
 		return this;
 	}
@@ -179,12 +179,12 @@ public class EntityLivingNPC extends EntityLiving
 		return name;
 	}
 	
-	public float getWidth()
+	public double getWidth()
 	{
 		return width;
 	}
 	
-	public float getHeight()
+	public double getHeight()
 	{
 		return height; 
 	}
@@ -194,17 +194,17 @@ public class EntityLivingNPC extends EntityLiving
 		return texture;
 	}
 	
-	public float getBlockWidth()
+	public double getBlockWidth()
 	{
 		return blockWidth;
 	}
 	
-	public float getBlockHeight()
+	public double getBlockHeight()
 	{
 		return blockHeight;
 	}
 	
-	public float getJumpSpeed(){
+	public double getJumpSpeed(){
 		return jumpSpeed;
 	}
 		

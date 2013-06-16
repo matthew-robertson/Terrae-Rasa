@@ -6,7 +6,7 @@ import world.World;
 
 public class ItemPotionAttackSpeed extends ItemPotion
 {
-	public ItemPotionAttackSpeed(int i, int duration, int tier, float power, int ticksBetweenEffect) 
+	public ItemPotionAttackSpeed(int i, int duration, int tier, double power, int ticksBetweenEffect) 
 	{
 		super(i, duration, tier, power, ticksBetweenEffect);
 	}

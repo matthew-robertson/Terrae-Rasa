@@ -127,8 +127,8 @@ public class Render
 		final int height = (int) (Display.getHeight() / 2) + 2;
 		final int xAdjust = (int) (Display.getWidth() * 0.239);
 		final int yAdjust = (int) (Display.getHeight() * 0.188);
-		float sx = MathHelper.inverseValue((int)player.x) + xAdjust;
-		float sy = MathHelper.inverseValue((int)player.y) + yAdjust;
+		double sx = MathHelper.inverseValue((int)player.x) + xAdjust;
+		double sy = MathHelper.inverseValue((int)player.y) + yAdjust;
 		if(sx > 0) sx = 0; //Bounds checking
 		if(sy > 0) sy = 0;				
 		if(sx < MathHelper.inverseValue(world.getWidth()) * 6 + width) 
@@ -138,7 +138,7 @@ public class Render
 		
 		cameraX = (int) sx;
 		cameraY = (int) sy;
-		GL11.glTranslatef(sx, sy, -2000F);	//Adjust the camera	
+		GL11.glTranslated(sx, sy, -2000F);	//Adjust the camera	
 	}
 	
 	/**

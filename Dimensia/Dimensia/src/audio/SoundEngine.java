@@ -1,4 +1,4 @@
-package net.dimensia.src;
+package audio;
 
 /**
  * Sort of complements sound manager. Right now its main use is to hold sounds as static things I guess

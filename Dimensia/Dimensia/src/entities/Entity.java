@@ -2,8 +2,11 @@ package entities;
 import java.io.Serializable;
 
 /**
- * This class is a base class for Entities, and contains some basic information and methods. For a more complete entity, Entity
- * should be extended, and given custom functionality/methods/fields. This class contains fields for:
+ * This class is a base class for Entities, and contains some basic information and methods. Any Entity that exists
+ * in the world should inherite from Entity. For a more complete entity, Entity should be subclasses, and given 
+ * custom functionality. This class contains fields for:
+ 
+ * 
  * <br><br>
  * <li>Position (x, y)
  * <li>Jumping and Gravity
@@ -22,19 +25,23 @@ import java.io.Serializable;
  * @version     1.0
  * @since       1.0
  */
-public class Entity implements Serializable
+public class Entity 
+		implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	protected boolean isAffectedByWalls;
 	protected boolean isAffectedByGravity;
+	
+	public double x;
+	public double y;
+	protected double upwardJumpCounter; //Holds the value of the jump, reset when hitting the ground	
+	
+	//
 	protected boolean canJumpAgain; //Can the entity jump?
 	protected boolean isJumping;	
-	private float upwardJumpHeight; //Determines the jump distance
-	protected float jumpSpeed;
-	public float x;
-	public float y;
-	protected float fallSpeed;
-	protected float upwardJumpCounter; //Holds the value of the jump, reset when hitting the ground	
+	private double upwardJumpHeight; //Determines the jump distance
+	protected double jumpSpeed;
+	
 	
 	public Entity()
 	{
@@ -52,7 +59,6 @@ public class Entity implements Serializable
 		this.jumpSpeed = entity.jumpSpeed;
 		this.x = entity.x;
 		this.y = entity.y;
-		this.fallSpeed = entity.fallSpeed;
 		this.upwardJumpCounter = entity.upwardJumpCounter; 
 	}
 	
@@ -85,28 +91,28 @@ public class Entity implements Serializable
 		return isAffectedByWalls;
 	}
 	
-	public float getX()
+	public double getX()
 	{
 		return x;
 	}
 	
-	public float getY()
+	public double getY()
 	{
 		return y;
 	}
 
-	public float getUpwardJumpHeight() 
+	public double getUpwardJumpHeight() 
 	{
 		return upwardJumpHeight;
 	}
 
-	public Entity setUpwardJumpHeight(float upwardJumpHeight)
+	public Entity setUpwardJumpHeight(double upwardJumpHeight)
 	{
 		this.upwardJumpHeight = upwardJumpHeight;
 		return this;
 	}
 	
-	public Entity setJumpSpeed(float speed)
+	public Entity setJumpSpeed(double speed)
 	{
 		this.jumpSpeed = speed;
 		return this;

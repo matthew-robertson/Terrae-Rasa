@@ -14,7 +14,7 @@ public class SetBonusJumpHeight extends SetBonus
 {
 	private static final long serialVersionUID = 1L;
 
-	public SetBonusJumpHeight(float power) 
+	public SetBonusJumpHeight(double power) 
 	{
 		super(power);
 	}

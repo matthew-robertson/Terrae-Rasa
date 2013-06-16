@@ -32,7 +32,7 @@ public class RenderWorld extends Render
 		
 		double const_ = 9;
 		
-		GL11.glTranslatef(player.x + (float)const_, player.y + (float)const_, 0);
+		GL11.glTranslated(player.x + (double)const_, player.y + (double)const_, 0);
 		
 		ItemTool heldItem = ((ItemTool)(Item.itemsList[player.inventory.getMainInventoryStack(player.selectedSlot).getItemID()]));
 		
@@ -80,7 +80,7 @@ public class RenderWorld extends Render
         
         if(!player.getIsSwingingRight())
         {
-        	GL11.glRotatef(MathHelper.radianToDegree(player.getToolRotationAngle()), 0, 0, 1);
+        	GL11.glRotated(MathHelper.radianToDegree(player.getToolRotationAngle()), 0, 0, 1);
             t.startDrawingQuads();
 	        t.addVertexWithUV(points[0].x, points[0].y, 0, 0, 1);
 	        t.addVertexWithUV(points[1].x, points[1].y, 0, 1, 1);
@@ -90,7 +90,7 @@ public class RenderWorld extends Render
         }
         else
         {
-        	GL11.glRotatef(MathHelper.radianToDegree(player.getToolRotationAngle()) + 90.0f, 0, 0, 1);
+        	GL11.glRotated(MathHelper.radianToDegree(player.getToolRotationAngle()) + 90.0f, 0, 0, 1);
         	GL11.glScalef(-1, 1, 1);
         	t.startDrawingQuads();
         	t.addVertexWithUV(points[0].x, points[0].y, 0, 0, 1);

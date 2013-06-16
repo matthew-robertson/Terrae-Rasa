@@ -44,15 +44,15 @@ public class GuiResizableTextUncentered
 	private static TrueTypeFont trueTypeFont; /*This has pretty heavy overhead to create. Should it be static?*/
 	private int screenX;
 	private int screenY;
-	private float maxScale;
-	private float baseScale;
-	private float scale;
-	private float x;
-	private float y;
-	private float mouseY;
-	private float mouseWidth;
-	private float mouseHeight;
-	private float mouseX;	
+	private double maxScale;
+	private double baseScale;
+	private double scale;
+	private double x;
+	private double y;
+	private double mouseY;
+	private double mouseWidth;
+	private double mouseHeight;
+	private double mouseX;	
 	private String text;
 	
 	/**
@@ -80,7 +80,7 @@ public class GuiResizableTextUncentered
 	 * @param halign the horizontal alignment (Align enum) of the component
 	 * @param valign the vertical alignment (Align enum) of the component
 	 */
-	public GuiResizableTextUncentered(String message, float base, float max, int x, int y, ALIGN halign, ALIGN valign)
+	public GuiResizableTextUncentered(String message, double base, double max, int x, int y, ALIGN halign, ALIGN valign)
 	{
 		if(trueTypeFont == null)
 		{
@@ -112,7 +112,7 @@ public class GuiResizableTextUncentered
 	/**
 	 * Set the mouse bounds
 	 */
-	public void setBounds(float x, float y, float w, float h)
+	public void setBounds(double x, double y, double w, double h)
 	{
 		mouseY = y;
 		mouseX = x;
@@ -143,12 +143,12 @@ public class GuiResizableTextUncentered
 	}	
 	
 	/**
-	 * Does math for setBounds(float, float, float, float), based on alignment, then hands off to that
+	 * Does math for setBounds(double, double, double, double), based on alignment, then hands off to that
 	 */
 	public void setMouse()
 	{
-		float newX = this.x;
-		float newY = this.y;
+		double newX = this.x;
+		double newY = this.y;
 		
 		if(hAlignment == ALIGN.H_ALIGN_RIGHT)
 		{
@@ -175,8 +175,8 @@ public class GuiResizableTextUncentered
 		}
 				
 		GL11.glColor4f(1, 1, 1, 1);		
-		float x = this.x;
-		float y = this.y;
+		double x = this.x;
+		double y = this.y;
 		int textAlign = TrueTypeFont.ALIGN_LEFT;
 		
 		if(hAlignment == ALIGN.H_ALIGN_RIGHT) //Right alignment 
@@ -199,7 +199,12 @@ public class GuiResizableTextUncentered
 		}
 		
 		//Text
-		trueTypeFont.drawString(Render.getCameraX() + x, Render.getCameraY() + y, text, scale, MathHelper.inverseValue(scale)/*Inverse for easier calculations*/, textAlign); //Render the Text		
+		trueTypeFont.drawString((float)(Render.getCameraX() + x), 
+				(float)(Render.getCameraY() + y), 
+				text, 
+				(float)scale, 
+				(float)MathHelper.inverseValue(scale)/*Inverse for easier calculations*/, 
+				textAlign); //Render the Text		
 	}
 	
 	/**
@@ -208,7 +213,7 @@ public class GuiResizableTextUncentered
 	 * @param base the minimum scale
 	 * @param max the maximum scale 
 	 */
-	public void setScales(float base, float max)
+	public void setScales(double base, double max)
 	{
 		baseScale = base;
 		scale = base;

@@ -14,7 +14,7 @@ public class StatusEffectDamageBuff extends StatusEffect
 	 * @param power the strength of the damage buff
 	 * @param ticksBetweenEffect the number of game ticks between the periodic effect being applied, if applicable
 	 */
-	public StatusEffectDamageBuff(float durationSeconds, int tier, float power, int ticksBetweenEffect) 
+	public StatusEffectDamageBuff(double durationSeconds, int tier, double power, int ticksBetweenEffect) 
 	{
 		super(durationSeconds, tier, power, ticksBetweenEffect);
 		iconX = 15;

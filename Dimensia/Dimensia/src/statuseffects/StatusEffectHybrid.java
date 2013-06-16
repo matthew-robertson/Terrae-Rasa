@@ -18,7 +18,7 @@ public class StatusEffectHybrid extends StatusEffect
 	/** The effects caused by this HybridEffect*/
 	private StatusEffect[] effects;
 	
-	public StatusEffectHybrid(float durationSeconds, int tier, float power, int ticksBetweenEffect, StatusEffect[] effects) 
+	public StatusEffectHybrid(double durationSeconds, int tier, double power, int ticksBetweenEffect, StatusEffect[] effects) 
 	{
 		super(durationSeconds, tier, power, ticksBetweenEffect);
 		iconX = 0;

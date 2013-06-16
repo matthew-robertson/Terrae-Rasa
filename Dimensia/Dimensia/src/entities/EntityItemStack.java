@@ -22,8 +22,9 @@ import blocks.Block;
 public class EntityItemStack extends EntityLiving
 {
 	private static final long serialVersionUID = 1L;
+	private double fallSpeed;
 	
-	public EntityItemStack(float x, float y, ItemStack stack)
+	public EntityItemStack(double x, double y, ItemStack stack)
 	{
 		super();
 		if(stack.getItemID() < 2048) //Blocks are 6x6 render size
@@ -52,8 +53,8 @@ public class EntityItemStack extends EntityLiving
 		fallSpeed = 1.8f; 
 		maxHealth = 1;
 		health = 1;
-		blockWidth = (float)(width) / 6;
-		blockHeight = (float)(height) / 6;
+		blockWidth = (double)(width) / 6;
+		blockHeight = (double)(height) / 6;
 		ticksBeforePickup = 20;
 		this.stack = stack;
 	}
@@ -92,7 +93,7 @@ public class EntityItemStack extends EntityLiving
 
 		for(int i = 0; i < blocks.length; i++)
 		{
-			if(!blocks[i].isPassable()) //hittest has failed
+			if(blocks[i].getIsSolid()) //hittest has failed
 			{
 				flag = false;
 				break;

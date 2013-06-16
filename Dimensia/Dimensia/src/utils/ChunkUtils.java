@@ -28,8 +28,8 @@ public class ChunkUtils
 	public static Chunk[] getRequiredChunks(World world, EntityLivingPlayer player)
 	{
 		Chunk[] chunks;
-		final int width = (int)((float)(Display.getWidth() / 6) / 1.85);;
-		float x = ((player.x - (0.25f * Display.getWidth())) / 6);
+		final int width = (int)((double)(Display.getWidth() / 6) / 1.85);;
+		double x = ((player.x - (0.25f * Display.getWidth())) / 6);
 		if(x < 0) x = 0;
 		if(width + x > world.getWidth()) x = world.getWidth() - width - 1;
 			

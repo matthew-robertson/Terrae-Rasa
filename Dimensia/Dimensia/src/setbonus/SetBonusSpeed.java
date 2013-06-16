@@ -14,7 +14,7 @@ public class SetBonusSpeed extends SetBonus
 {
 	private static final long serialVersionUID = 1L;
 
-	public SetBonusSpeed(float power) 
+	public SetBonusSpeed(double power) 
 	{
 		super(power);
 	}

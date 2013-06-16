@@ -6,7 +6,7 @@ import world.World;
 
 public class ItemPotionDodge extends ItemPotion
 {
-	public ItemPotionDodge(int i, int duration, int tier, float power, int ticksBetweenEffect) 
+	public ItemPotionDodge(int i, int duration, int tier, double power, int ticksBetweenEffect) 
 	{
 		super(i, duration, tier, power, ticksBetweenEffect);
 	}

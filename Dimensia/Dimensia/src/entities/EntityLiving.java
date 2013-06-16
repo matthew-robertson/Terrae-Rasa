@@ -20,7 +20,7 @@ import world.World;
  * <br><br>
  * <li>Apply gravity: {@link #applyGravity(World)}
  * <li>Check for nearby blocks: {@link #blockInBounds(World, int, int, int, int, Block)}
- * <li>Check for vertexes inside the Entity: {@link #inBounds(float, float)}, or {@link #inBounds(float, float, float, float)}
+ * <li>Check for vertexes inside the Entity: {@link #inBounds(double, double)}, or {@link #inBounds(double, double, double, double)}
  * <li>Check if the entity has health left: {@link #isDead()}
  * <li>Damage the entity: {@link #damageEntity(World, int, boolean)} 
  * <li>Handle a jump: {@link #hasJumped()}
@@ -42,42 +42,43 @@ public class EntityLiving extends Entity
 {
 	private static final long serialVersionUID = 1L;
 	/** The flat damage reduction provided by 1 point of defense */
-	public final static float DEFENSE_REDUCTION_FLAT = 0.375F;
+	public final static double DEFENSE_REDUCTION_FLAT = 0.375F;
 	/** The percent of damage reduction provided by 1 point of defense (from 0-1F, where 1F is 100%)*/
-	public final static float DEFENSE_REDUCTION_PERCENT = 0.25F / 100F;
+	public final static double DEFENSE_REDUCTION_PERCENT = 0.25F / 100F;
 	public boolean isFireImmune;
-	public float attackSpeedModifier;
-	public float knockbackModifier;
-	public float meleeDamageModifier;
-	public float rangeDamageModifier;
-	public float magicDamageModifier;
-	public float allDamageModifier;
+	public double attackSpeedModifier;
+	public double knockbackModifier;
+	public double meleeDamageModifier;
+	public double rangeDamageModifier;
+	public double magicDamageModifier;
+	public double allDamageModifier;
 	public boolean isStunned;
 	public List<StatusEffect> statusEffects;
 	public int ticksFallen;
 	/** (chance to crit / 100) */
-	public float criticalStrikeChance; 
+	public double criticalStrikeChance; 
 	/** (Chance to dodge / 100) */
-	public float dodgeChance;
+	public double dodgeChance;
 	public boolean isImmuneToCrits;
 	public boolean isImmuneToFallDamage;
 	public boolean isImmuneToFireDamage;
 	public int invincibilityTicks;
 	public int textureWidth;
 	public int textureHeight;
-	public float width;
-	public float height;
-	public float blockWidth;
-	public float blockHeight;
-	public float distanceFallen;
-	public float maxHeightFallenSafely;
-	public float baseSpeed;
-	public float movementSpeedModifier;
+	public double width;
+	public double height;
+	public double blockWidth;
+	public double blockHeight;
+	public double distanceFallen;
+	/**The maximum safe fall height in pixels not blocks.*/
+	public double maxHeightFallenSafely;
+	public double baseSpeed;
+	public double movementSpeedModifier;
 	public int maxHealth;
 	public int maxMana;
-	public float mana;
-	public float defense;
-	public float health;
+	public double mana;
+	public double defense;
+	public double health;
 	public boolean alert;
 	public List<StatusEffectAbsorb> absorbs;
 	
@@ -115,7 +116,6 @@ public class EntityLiving extends Entity
 		distanceFallen = 0;
 		maxHeightFallenSafely = 72;
 		jumpSpeed = 6;
-		fallSpeed = 3;
 		isJumping = false;
 		canJumpAgain = true;
 		isImmuneToFallDamage = false;
@@ -202,7 +202,7 @@ public class EntityLiving extends Entity
 	 * @return true if jump is needed, false if not
 	 */
 	public int isJumpRequired(World world, boolean direction, boolean up){
-		float heightCheck;
+		double heightCheck;
 		
 		if ((alert) || (up && !alert)){
 			heightCheck = getUpwardJumpHeight() / 6;
@@ -328,9 +328,9 @@ public class EntityLiving extends Entity
 	 * @param damageAfterArmor
 	 * @return
 	 */
-	protected float damageAfterAbsorbs(float damageAfterArmor)
+	protected double damageAfterAbsorbs(double damageAfterArmor)
 	{		
-		float newValue = damageAfterArmor;
+		double newValue = damageAfterArmor;
 		for(int i = 0; i < absorbs.size(); i++)
 		{
 			if(damageAfterArmor == 0)
@@ -374,7 +374,7 @@ public class EntityLiving extends Entity
 				//Set the entity immune to damage for 250ms
 				invincibilityTicks = 5; 
 				//Determine the damage after armour, with a floor of 1 damage and then apply absorbs
-				float damageAfterArmor = MathHelper.floorOne(
+				double damageAfterArmor = MathHelper.floorOne(
 						(d * (1F - DEFENSE_REDUCTION_PERCENT * defense)) - (defense * DEFENSE_REDUCTION_FLAT)					
 						);
 				damageAfterArmor = damageAfterAbsorbs(damageAfterArmor);
@@ -448,7 +448,7 @@ public class EntityLiving extends Entity
 	 * @param h height of the entity to compare against this entity
 	 * @return Whether a point falls in bounds or not
 	 */
-	public boolean inBounds(float x, float y, float w, float h)
+	public boolean inBounds(double x, double y, double w, double h)
 	{
 		if ((x >= this.x && x <= this.x + 12 && y >= this.y && y <= this.y + 18) //top left
 		|| (x + w >= this.x && x + w <= this.x + 12 && y >= this.y && y <= this.y + 18) //top right
@@ -465,7 +465,7 @@ public class EntityLiving extends Entity
 	 * @param y the y point to test against this entity
 	 * @return whether the point is in bounds or not
 	 */
-	public boolean inBounds(float x, float y)
+	public boolean inBounds(double x, double y)
 	{
 		return (x >= this.x && x <= this.x + width && y >= this.y && y <= this.y + height);
 	}
@@ -496,7 +496,7 @@ public class EntityLiving extends Entity
 		return false;
 	}
 	
-	public String getDirectionOfQuadRelativeToEntityPosition(float x, float y, float width, float height) //NYI
+	public String getDirectionOfQuadRelativeToEntityPosition(double x, double y, double width, double height) //NYI
 	{
 		if((x + (width * .5)) < this.x)
 			return "left";
@@ -513,21 +513,14 @@ public class EntityLiving extends Entity
 	 */
 	public void applyGravity(World world) 
 	{
-		if(isJumping) //If the entity is jumping upwards, move them up
-		{
-			moveEntityUp(world, jumpSpeed * movementSpeedModifier);			
-		}
-		else if(!isOnGround(world) && isAffectedByGravity) //otherwise, if the entity is in the air, make them fall
-		{
-			moveEntityDown(world, MathHelper.getFallSpeed(fallSpeed * movementSpeedModifier, ticksFallen));
-			ticksFallen++;
-		}	
-		
-		if(isOnGround(world)) //Is the entity on the ground? If so they can jump again
+				if(isOnGround(world)) //Is the entity on the ground? If so they can jump again
 		{
 			if((isJumping || !canJumpAgain) && isAffectedByGravity && !isImmuneToFallDamage) //if the entity can take fall damage
 			{
-				float fallDamage = MathHelper.getFallDamage(distanceFallen, maxHeightFallenSafely); //calculate the fall damage
+				//calculate the fall damage
+				double fallDamage = MathHelper.getFallDamage(jumpSpeed, 
+						world.g, 
+						ticksFallen); 
 				if(fallDamage > 0)
 				{
 					damageEntity(world, (int)fallDamage, ((Math.random() < 0.1f) ? true : false), false, true); //damage the entity
@@ -537,7 +530,17 @@ public class EntityLiving extends Entity
 			ticksFallen = 0;
 			canJumpAgain = true;
 			distanceFallen = 0;
-		}		
+		}	
+				
+		if(isJumping) //If the entity is jumping upwards, move them up
+		{
+			moveEntityUp(world, jumpSpeed * movementSpeedModifier);			
+		}
+		else if(!isOnGround(world) && isAffectedByGravity) //otherwise, if the entity is in the air, make them fall
+		{
+			moveEntityDown(world, MathHelper.getFallSpeed(jumpSpeed, world.g, ticksFallen));
+			ticksFallen++;
+		}	
 	}
 	
 	/**
@@ -554,7 +557,8 @@ public class EntityLiving extends Entity
 	}
 	
 	/**
-	 * Determines whether the entity standing on something solid?
+	 * Determines whether the entity standing on something solid
+	 * @return true if the entity is standing on something solid, otherwise false
 	 */
 	public boolean isOnGround(World world)		
 	{
@@ -563,7 +567,7 @@ public class EntityLiving extends Entity
 		{
 			for(int i = 0; i < xOffset; i++) //for each block below the entity, check if any are solid
 			{
-				if(!world.getBlock((int)(x / 6) + i, (int)((y / 6) + Math.ceil(blockHeight))).isPassable())
+				if(world.getBlock((int)(x / 6) + i, (int)((y / 6) + Math.ceil(blockHeight))).getIsSolid())
 				{
 					return true; //if one is solid, they entity is on the ground
 				}
@@ -572,6 +576,7 @@ public class EntityLiving extends Entity
 		}
 		catch(Exception e) //if there's an out of bounds error, assume the player is standing on something solid
 		{
+			e.printStackTrace();
 			return true;
 		}
 	}
@@ -579,9 +584,9 @@ public class EntityLiving extends Entity
 	/**
 	 * Applies a jump to the entity's Y Position. Disables jumping if (y < 0) or the upwardJumpCounter exceeds the upwardJumpHeight.
 	 */
-	public void moveEntityUp(World world, float jumpSpeed)
+	public void moveEntityUp(World world, double jumpSpeed)
 	{		
-		float movementValue = jumpSpeed;
+		double movementValue = jumpSpeed;
 		int loops = (int) (movementValue / 6) + 1;
 		
 		if(isStunned)
@@ -592,7 +597,7 @@ public class EntityLiving extends Entity
 		
 		for(int i = 0; i < loops; i++)
 		{
-			float f = canMoveUp(world);
+			double f = canMoveUp(world);
 			
 			if((y - f) >= 0 && f >= movementValue) //full movement
 			{
@@ -634,7 +639,7 @@ public class EntityLiving extends Entity
 	 * Gets how far up the entity can move, upto 1 block (6 ortho units). Use multiple times to go further. 
 	 * @return how far the entity can move, upto 6 ortho units (1 block)
 	 */
-	private float canMoveUp(World world)
+	protected double canMoveUp(World world)
 	{
 		if((int)(y / 6) <= 0) //bounds check
 		{
@@ -652,7 +657,7 @@ public class EntityLiving extends Entity
 		
 		for(int i = 0; i < blocks.length; i++)
 		{
-			if(!blocks[i].isPassable()) //hittest has failed
+			if(blocks[i].getIsSolid()) //hittest has failed
 			{
 				flag = false;
 				break;
@@ -683,14 +688,14 @@ public class EntityLiving extends Entity
 	/**
 	 * Applies downward gravity to the entity 	
 	 */
-	public void moveEntityDown(World world, float fallSpeed)  
+	public void moveEntityDown(World world, double fallSpeed)  
 	{		
-		float movementValue = fallSpeed;
+		double movementValue = fallSpeed;
 		int loops = (int) (movementValue / 6) + 1;
 		
 		for(int i = 0; i < loops; i++)
 		{
-			float f = canMoveDown(world);
+			double f = canMoveDown(world);
 			
 			if(y + f < (world.getHeight() * 6) && f >= movementValue) //full movement
 			{
@@ -718,7 +723,7 @@ public class EntityLiving extends Entity
 	 */
 	public void moveEntityRight(World world)
 	{
-		float movementValue = MathHelper.roundDownFloat20th(baseSpeed * movementSpeedModifier);
+		double movementValue = MathHelper.roundDowndouble20th(baseSpeed * movementSpeedModifier);
 		int loops = (int) (movementValue / 6) + 1;
 		
 		if(isStunned)
@@ -728,8 +733,8 @@ public class EntityLiving extends Entity
 		
 		for(int i = 0; i < loops; i++)
 		{
-			float possibleMovement = canMoveRight(world);
-			float actualMovement = (movementValue > 6) ? 6 : movementValue;
+			double possibleMovement = canMoveRight(world);
+			double actualMovement = (movementValue > 6) ? 6 : movementValue;
 			
 			if(actualMovement > possibleMovement)
 			{
@@ -753,7 +758,7 @@ public class EntityLiving extends Entity
 	 */
 	public void moveEntityLeft(World world) 
 	{
-		float movementValue = (int)(baseSpeed * movementSpeedModifier);
+		double movementValue = (int)(baseSpeed * movementSpeedModifier);
 		int loops = (int) (movementValue / 6) + 1;
 		
 		if(isStunned)
@@ -763,8 +768,8 @@ public class EntityLiving extends Entity
 		
 		for(int i = 0; i < loops; i++)
 		{
-			float possibleMovement = canMoveLeft(world);
-			float actualMovement = (movementValue > 6) ? 6 : movementValue;
+			double possibleMovement = canMoveLeft(world);
+			double actualMovement = (movementValue > 6) ? 6 : movementValue;
 						
 			if(actualMovement > possibleMovement)
 			{
@@ -785,7 +790,7 @@ public class EntityLiving extends Entity
 	 * Tries to move the entity right. This version of the method dictates how far to move right. Basespeed is NOT Applied!
 	 * @param movementValue the distance to move right, if possible
 	 */
-	public void moveEntityRight(World world, float movementValue)
+	public void moveEntityRight(World world, double movementValue)
 	{
 		int loops = (int) (movementValue / 6) + 1;
 		
@@ -796,8 +801,8 @@ public class EntityLiving extends Entity
 		
 		for(int i = 0; i < loops; i++)
 		{
-			float possibleMovement = canMoveRight(world);
-			float actualMovement = (movementValue > 6) ? 6 : movementValue;
+			double possibleMovement = canMoveRight(world);
+			double actualMovement = (movementValue > 6) ? 6 : movementValue;
 
 			if(actualMovement > possibleMovement)
 			{
@@ -817,7 +822,7 @@ public class EntityLiving extends Entity
 	 * Tries to move the entity left. This version of the method dictates how far to move left. Basespeed is NOT Applied!
 	 * @param movementValue the distance to move left, it possible
 	 */
-	public void moveEntityLeft(World world, float movementValue) 
+	public void moveEntityLeft(World world, double movementValue) 
 	{
 		int loops = (int) (movementValue / 6) + 1;
 		
@@ -828,8 +833,8 @@ public class EntityLiving extends Entity
 		
 		for(int i = 0; i < loops; i++)
 		{
-			float possibleMovement = canMoveLeft(world);
-			float actualMovement = (movementValue > 6) ? 6 : movementValue;
+			double possibleMovement = canMoveLeft(world);
+			double actualMovement = (movementValue > 6) ? 6 : movementValue;
 
 			if(actualMovement > possibleMovement)
 			{
@@ -849,7 +854,7 @@ public class EntityLiving extends Entity
 	 * Gets how far right can the entity move (0-6 ortho)
 	 * @return the distance that can be moved right (from 0-6 ortho)
 	 */
-	private float canMoveRight(World world)
+	protected double canMoveRight(World world)
 	{
 		if(!isAffectedByWalls) //no point in performing a hittest
 			return 6;
@@ -865,7 +870,7 @@ public class EntityLiving extends Entity
 		
 		for(int i = 0; i < blocks.length; i++)
 		{
-			if(!blocks[i].isPassable()) //the hittest has failed
+			if(blocks[i].getIsSolid()) //the hittest has failed
 			{
 				flag = false;
 				break;
@@ -884,7 +889,7 @@ public class EntityLiving extends Entity
 	 * Gets how far left can the entity move (0-6 ortho)
 	 * @return the distance that can be moved left (from 0-6 ortho)
 	 */
-	private float canMoveLeft(World world)
+	protected double canMoveLeft(World world)
 	{
 		if(!isAffectedByWalls) //no point in performing a hittest
 			return 6;
@@ -899,7 +904,7 @@ public class EntityLiving extends Entity
 		
 		for(int i = 0; i < blocks.length; i++)
 		{
-			if(!blocks[i].isPassable()) //is the block isnt passable, the hittest has failed
+			if(blocks[i].getIsSolid()) //is the block isnt passable, the hittest has failed
 			{
 				flag = false;
 				break;
@@ -917,13 +922,13 @@ public class EntityLiving extends Entity
 	 * Gets how far the entity can fall, upto 1 block (use multiple times to go further)
 	 * @return the distance it's possible to fall, upto 6 ortho units (1 block)
 	 */
-	private float canMoveDown(World world)
+	protected double canMoveDown(World world)
 	{
 		int offset = (int) ((y % 6 == 0) ? blockHeight : (blockHeight + 1)); 
 		
-		if((int)((y + fallSpeed) / 6) + offset + 1 > world.getHeight() - 1) //bounds check
+		if((int)(y / 6) + offset > world.getHeight() - 2) //bounds check
 		{
-			return 6.0f;
+			return 0F;
 		}
 		
 		Block[] blocks = new Block[(int) (blockWidth + ((x % 6 == 0) ? 0 : 1))]; //blocks to check
@@ -931,12 +936,12 @@ public class EntityLiving extends Entity
 		
 		for(int i = 0; i < blocks.length; i++) //get blocks to check
 		{
-			blocks[i] = world.getBlock((x / 6) + i, ((y + fallSpeed) / 6) + offset); 
+			blocks[i] = world.getBlock((x / 6) + i, (int)(y / 6) + offset); 
 		}		
 
 		for(int i = 0; i < blocks.length; i++)
 		{
-			if(!blocks[i].isPassable()) //hittest has failed
+			if(blocks[i].getIsSolid()) //hittest has failed
 			{
 				flag = false;
 				break;
@@ -948,9 +953,9 @@ public class EntityLiving extends Entity
 		}
 		
 		
-		if(flag && y + fallSpeed < world.getHeight() * 6) //Normal Gravity
+		if(flag && y < world.getHeight() * 6) //Normal Gravity
 		{
-			return fallSpeed;
+			return 6.0F;
 		}
 		else if(y % 6 != 0) //Near ground partial gravity 
 		{

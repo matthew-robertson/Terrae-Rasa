@@ -16,7 +16,7 @@ public class StatusEffectRegeneration extends StatusEffect
 	 * @param ticksBetweenEffect the number of game ticks between heals
 	 * @param percentageBased true if the effect heals a % of player health; false if it heals a flat amount
 	 */
-	public StatusEffectRegeneration(float durationSeconds, int tier, float power, int ticksBetweenEffect, boolean percentageBased) 
+	public StatusEffectRegeneration(double durationSeconds, int tier, double power, int ticksBetweenEffect, boolean percentageBased) 
 	{
 		super(durationSeconds, tier, power, ticksBetweenEffect);
 		iconX = 14;

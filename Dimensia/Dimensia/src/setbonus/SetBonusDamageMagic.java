@@ -14,7 +14,7 @@ public class SetBonusDamageMagic extends SetBonus
 {
 	private static final long serialVersionUID = 1L;
 
-	public SetBonusDamageMagic(float power) 
+	public SetBonusDamageMagic(double power) 
 	{
 		super(power);
 	}

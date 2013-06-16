@@ -14,7 +14,7 @@ public class SetBonusDodge extends SetBonus
 {
 	private static final long serialVersionUID = 1L;
 
-	public SetBonusDodge(float power) 
+	public SetBonusDodge(double power) 
 	{
 		super(power);
 	}

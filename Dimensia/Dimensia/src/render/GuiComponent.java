@@ -24,13 +24,13 @@ public abstract class GuiComponent
 	/** The background texture of the gui component being rendered*/
 	protected Texture renderTexture;
 	/** The width of the button as a % of the screen, between 0.0F and 1.0F*/
-	protected float width;
+	protected double width;
 	/** The height of the button as a % of the screen, between 0.0F and 1.0F*/
-	protected float height;
+	protected double height;
 	/** The x position as a % of the screen, between 0.0F and 1.0F */
-	protected float x;
+	protected double x;
 	/** The y position as a % of the screen, between 0.0F and 1.0F */
-	protected float y;
+	protected double y;
 	
 	/**
 	 * Initializes all the variables to their default values and creates the font renderer if it's null.
@@ -54,7 +54,7 @@ public abstract class GuiComponent
 	 * Sets the width of the button as a percent of the screen width
 	 * @param width the new width of the width, in percent, between 0.0F and 1.0F
 	 */
-	public void setWidth(float width)
+	public void setWidth(double width)
 	{
 		this.width = width;
 	}
@@ -63,7 +63,7 @@ public abstract class GuiComponent
 	 * Sets the height of the button as a percent of the screen height
 	 * @param height the new height of the button, in percent, between 0.0F and 1.0F
 	 */
-	public void setHeight(float height)
+	public void setHeight(double height)
 	{
 		this.height = height;
 	}

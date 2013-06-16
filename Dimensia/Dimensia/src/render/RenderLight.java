@@ -43,7 +43,7 @@ public class RenderLight extends Render
 		{
 			BlockLight block = (BlockLight)(player.getHandheldLight());
 			LightUtils lightUtils = new LightUtils();
-			float[][] lightMap = lightUtils.getLightMap(world, 
+			double[][] lightMap = lightUtils.getLightMap(world, 
 					((int)(player.x / 6)) + ((player.isFacingRight) ? 1 : 0), 
 					((int)(player.y / 6)) + 1, 
 					block.lightRadius, 
@@ -127,9 +127,9 @@ public class RenderLight extends Render
 							int xm = x1 * BLOCK_SIZE; 
 							int ym = y1 * BLOCK_SIZE; 
 							
-							float torchLight = lightMap[chunkXOffset + k - (playerX - radius)][l - (playerY - radius)];
-							float chunkLight = chunks[i].light[k][l];
-							float newLight = (chunkLight - torchLight >= 0.0F) ? chunks[i].light[k][l] - torchLight : 0.0F;
+							double torchLight = lightMap[chunkXOffset + k - (playerX - radius)][l - (playerY - radius)];
+							double chunkLight = chunks[i].light[k][l];
+							double newLight = (chunkLight - torchLight >= 0.0F) ? chunks[i].light[k][l] - torchLight : 0.0F;
 														
 							t.setColorRGBA(0, 0, 0, (int)(newLight * 255F));
 							t.addVertexWithUV(xm, BLOCK_SIZE + ym, 0, 0, 0.03125);

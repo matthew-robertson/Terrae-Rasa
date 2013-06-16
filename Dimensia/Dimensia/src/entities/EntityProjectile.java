@@ -22,15 +22,15 @@ public class EntityProjectile extends EntityParticle
 	public int damage;
 	public boolean isFriendly;
 	public boolean isHostile;
-	protected float speed;
+	protected double speed;
 	protected String name;
 	protected int direction;	
-	public float criticalStrikeChance;
+	public double criticalStrikeChance;
 	public int iconIndex;
 	protected ItemStack drop;
 	public int ticksNonActive;
 	
-	public EntityProjectile(int i, String name, int damage, char c, int w, int h, float s){
+	public EntityProjectile(int i, String name, int damage, char c, int w, int h, double s){
 		super (w, h);
 		projectileId = i;
 		type = c;
@@ -93,13 +93,13 @@ public class EntityProjectile extends EntityParticle
 	/**
 	 * Applies a jump to the entity's Y Position. Disables jumping if (y < 0) or the upwardJumpCounter exceeds the upwardJumpHeight.
 	 */
-	public void moveEntityUp(World world, float movementValue)
+	public void moveEntityUp(World world, double movementValue)
 	{		
 		int loops = (int) (movementValue) + 1;	
 		
 		for(int i = 0; i < loops; i++)
 		{
-			float f = canMoveUp(world);			
+			double f = canMoveUp(world);			
 			y += f;							
 			if(y < 0) 
 			{
@@ -117,13 +117,13 @@ public class EntityProjectile extends EntityParticle
 	}	
 	
 	
-	public void moveEntityDown(World world, float movementValue)  
+	public void moveEntityDown(World world, double movementValue)  
 	{		
 		int loops = (int) (movementValue) + 1;
 		
 		for(int i = 0; i < loops; i++)
 		{
-			float f = canMoveDown(world);
+			double f = canMoveDown(world);
 			
 			y += f;
 			
@@ -153,7 +153,7 @@ public class EntityProjectile extends EntityParticle
 		return this;
 	}
 
-	public EntityProjectile setXLocAndYLoc(float x, float y){
+	public EntityProjectile setXLocAndYLoc(double x, double y){
 		this.x = x;
 		this.y = y;
 		return this;
@@ -168,7 +168,7 @@ public class EntityProjectile extends EntityParticle
 	public EntityProjectile setDirection(int d){
 		direction = d;
 		double r = Math.toRadians(d);
-		velocity = MathHelper.toRectangular(speed, (float) r);
+		velocity = MathHelper.toRectangular(speed, (double) r);
 		velocity.y = -velocity.y;
 		
 		return this;

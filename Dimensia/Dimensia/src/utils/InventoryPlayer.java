@@ -820,4 +820,38 @@ public class InventoryPlayer
 	{
 		return  (quiver[index] != null) ? new ItemStack(quiver[index]) : null;
 	}
+	
+	
+	
+	
+	/**
+	 * Attempts to combine two ItemStack in the specified quiver slot
+	 * @param stack stack to combine with the current one
+	 * @param index where to combine stacks in quiver[]
+	 * @return success of operation
+	 */
+	public boolean combineItemStacksInQuiverSlot(World world, EntityLivingPlayer player, ItemStack stack, int index)
+	{
+		player.onInventoryChange();
+		if(quiver[index] == null || quiver[index].getItemID() != stack.getItemID())
+		{	
+			return false;
+		}
+		quiver[index].addToStack(stack.getStackSize());
+		return true;
+	}
+	
+
+	/**
+	 * Adjusts the stacksize of an Itemstack in the quiver[]. This will do nothing if that stack is null.
+	 * @param index the index of the ItemStack in the quiver[]
+	 * @param newStackSize the new stacksize of the ItemStack
+	 */
+	public void adjustQuiverStackSize(int index, int newStackSize)
+	{
+		if(quiver[index] != null && quiver[index].getStackSize() != newStackSize)
+		{
+			quiver[index].setStackSize(newStackSize);
+		}
+	}
 }

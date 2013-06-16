@@ -91,7 +91,7 @@ public class Block extends ActionbarItem
 	protected int blockTier;
 	protected EnumBlockMaterial material;
 	protected boolean breakable;
-	protected float hardness;
+	protected double hardness;
 	protected boolean passable;
 	public boolean isSolid;
 	protected int hRange;
@@ -215,7 +215,7 @@ public class Block extends ActionbarItem
 		return this;
 	}
 
-	protected Block setBlockHardness(float f)
+	protected Block setBlockHardness(double f)
 	{
 		hardness = f;
 		return this;
@@ -378,7 +378,7 @@ public class Block extends ActionbarItem
 		return this;
 	}
 
-	public float getBlockHardness()
+	public double getBlockHardness()
 	{
 		return hardness;
 	}
@@ -446,11 +446,6 @@ public class Block extends ActionbarItem
 	public int getLRange() 
 	{
 		return lRange;
-	}
-
-	public boolean isPassable() // Is it possible to walk through this block?
-	{
-		return (id == 0 || passable || this == null);
 	}
 
 	public int getBitMap() {

@@ -7,7 +7,6 @@ import items.Item;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import net.dimensia.src.SoundManager;
 
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
@@ -28,6 +27,7 @@ import world.World;
 import world.WorldHell;
 import world.WorldSky;
 
+import audio.SoundManager;
 import blocks.Block;
 
 /**

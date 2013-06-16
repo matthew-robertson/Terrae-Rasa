@@ -11,7 +11,7 @@ public class Settings
 	public boolean gamePaused = false;
 	/** A boolean which indicates whether or not the ingame pause menu is active. (True = paused) */
 	public boolean menuOpen = true;
-	public float volume = 0.5f;
+	public double volume = 0.5f;
 	public boolean smoothLighting = false;
 	public boolean weatherEnabled = true;
 

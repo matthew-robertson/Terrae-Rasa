@@ -6,7 +6,7 @@ public class StatusEffectFallHeight extends StatusEffect
 {
 	private static final long serialVersionUID = 1L;
 
-	public StatusEffectFallHeight(float durationSeconds, int tier, int power, int ticksBetweenEffect) 
+	public StatusEffectFallHeight(double durationSeconds, int tier, int power, int ticksBetweenEffect) 
 	{
 		super(durationSeconds, tier, power, ticksBetweenEffect);
 		this.isBeneficialEffect = false;

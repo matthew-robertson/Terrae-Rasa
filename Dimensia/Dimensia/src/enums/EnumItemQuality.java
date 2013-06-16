@@ -1,7 +1,7 @@
 package enums;
 
 /**
- * Item Quality constants with RGBA values for their tooltips, using floats of value 0.0F to 1.0F. Call
+ * Item Quality constants with RGBA values for their tooltips, using doubles of value 0.0F to 1.0F. Call
  * {@link #getAsArray()} on an EnumItemQuality to get an array of the colours in format { r, g, b, a } or
  * request the properties individually using dot notation.
  * @author      Alec Sobeck
@@ -15,12 +15,12 @@ public enum EnumItemQuality
 	RARE(0.0F, 0.0F, 1.0F, 1.0F),
 	LEGENDARY(1.0F, 215.0F/255.0F, 0.0F, 1.0F);
 	
-	public float r;
-	public float g;
-	public float b;
-	public float a;
+	public double r;
+	public double g;
+	public double b;
+	public double a;
 	
-	EnumItemQuality(float r, float g, float b, float a)
+	EnumItemQuality(double r, double g, double b, double a)
 	{
 		this.r = r;
 		this.g = g;
@@ -29,11 +29,11 @@ public enum EnumItemQuality
 	}
 
 	/**
-	 * Gets the colour of the item as a float array
-	 * @return a float array of format { r, g, b, a }
+	 * Gets the colour of the item as a double array
+	 * @return a double array of format { r, g, b, a }
 	 */
-	public float[] getAsArray()
+	public double[] getAsArray()
 	{
-		return new float[] { r, g, b, a };
+		return new double[] { r, g, b, a };
 	}	
 }

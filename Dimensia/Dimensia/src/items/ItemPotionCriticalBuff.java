@@ -6,7 +6,7 @@ import world.World;
 
 public class ItemPotionCriticalBuff extends ItemPotion
 {
-	public ItemPotionCriticalBuff(int i, int duration, int tier, float power, int ticksBetweenEffect) 
+	public ItemPotionCriticalBuff(int i, int duration, int tier, double power, int ticksBetweenEffect) 
 	{
 		super(i, duration, tier, power, ticksBetweenEffect);
 	}

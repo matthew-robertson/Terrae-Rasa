@@ -17,7 +17,7 @@ import blocks.Block;
  * <br><br>
  * Each method in <code>Chunk</code> is either synchronized or final to make <code>Chunk</code> 
  * relatively Thread-Safe overall. All setters (for example: <code>{@link #setBlock(Block, int, int)}, 
- * {@link #setChanged(boolean)}, {@link #setLight(float, int, int)}</code>) are synchronized, all getters are 
+ * {@link #setChanged(boolean)}, {@link #setLight(double, int, int)}</code>) are synchronized, all getters are 
  * final. All fields in <code>Chunk</code> are final.
  * 
  * <br><br>
@@ -37,11 +37,11 @@ public class Chunk
 	private static final long serialVersionUID = 2L;
 	private Biome biome;
 	/** Light is the total of ambient and diffuse light. This value is inverted (0.0F becomes 1.0F, etc) to optimize rendering */
-	public final float[][] light;
+	public final double[][] light;
 	/** Diffuse light is light from light sources*/
-	public final float[][] diffuseLight;
+	public final double[][] diffuseLight;
 	/** Ambient light is light from the sun */
-	public final float[][] ambientLight;
+	public final double[][] ambientLight;
 	public final Block[][] backWalls;
 	public final Block[][] blocks;
 	private final int X;
@@ -75,9 +75,9 @@ public class Chunk
 		}
 		
 		setFlaggedForLightingUpdate(false);
-		light = new float[CHUNK_WIDTH][CHUNK_HEIGHT];
-		diffuseLight = new float[CHUNK_WIDTH][CHUNK_HEIGHT];
-		ambientLight = new float[CHUNK_WIDTH][CHUNK_HEIGHT];
+		light = new double[CHUNK_WIDTH][CHUNK_HEIGHT];
+		diffuseLight = new double[CHUNK_WIDTH][CHUNK_HEIGHT];
+		ambientLight = new double[CHUNK_WIDTH][CHUNK_HEIGHT];
 		this.X = x;
 	}
 	
@@ -122,7 +122,7 @@ public class Chunk
 	 * Gets the light[][] stored in this instanceof Chunk
 	 * @return the light array for this Chunk
 	 */
-	public final float[][] getLight()
+	public final double[][] getLight()
 	{
 		return light;
 	}
@@ -145,7 +145,7 @@ public class Chunk
 	 * @param y a value from 0 to ChunkHeight, to retrieve from the light[][]
 	 * @return the currently calculated light value of light[x][y]
 	 */
-	public final float getLight(int x, int y)
+	public final double getLight(int x, int y)
 	{
 		return light[x][y];
 	}
@@ -177,7 +177,7 @@ public class Chunk
 	 * @param x a value from 0 to ChunkWidth	
 	 * @param y a value from 0 to ChunkHeight
 	 */
-	public synchronized void setDiffuseLight(float strength, int x, int y)
+	public synchronized void setDiffuseLight(double strength, int x, int y)
 	{
 		diffuseLight[x][y] = strength;
 	}
@@ -188,7 +188,7 @@ public class Chunk
 	 * @param x a value from 0 to ChunkWidth	 
 	 * @param y a value from 0 to ChunkHeight
 	 */
-	public synchronized void setAmbientLight(float strength, int x, int y)
+	public synchronized void setAmbientLight(double strength, int x, int y)
 	{
 		ambientLight[x][y] = strength;
 	}
@@ -218,7 +218,7 @@ public class Chunk
 	 * @param y a value from 0 to ChunkHeight
 	 * @return the diffuse light value from diffuseLight[x][y]
 	 */
-	public final float getDiffuseLight(int x, int y)
+	public final double getDiffuseLight(int x, int y)
 	{
 		return diffuseLight[x][y];
 	}
@@ -230,7 +230,7 @@ public class Chunk
 	 * @param y a value from 0 to ChunkHeight
 	 * @return the diffuse light value from ambientLight[x][y]
 	 */
-	public final float getAmbientLight(int x, int y)
+	public final double getAmbientLight(int x, int y)
 	{
 		return ambientLight[x][y];
 	}

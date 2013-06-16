@@ -10,7 +10,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -19,25 +18,8 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.zip.GZIPInputStream;
 
-
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.GL11;
-
-import entities.EntityLivingItemStack;
-import entities.EntityLivingNPC;
-import entities.EntityLivingNPCEnemy;
-import entities.EntityLivingPlayer;
-import entities.EntityProjectile;
-import enums.EnumColor;
-import enums.EnumDifficulty;
-import enums.EnumEventType;
-
-import blocks.Block;
-import blocks.BlockChest;
-import blocks.BlockGrass;
-import blocks.BlockLight;
-import blocks.BlockPillar;
 
 import render.Render;
 import statuseffects.StatusEffectStun;
@@ -49,6 +31,19 @@ import utils.MetaDataHelper;
 import utils.SpawnManager;
 import utils.Vector2F;
 import utils.WorldText;
+import blocks.Block;
+import blocks.BlockChest;
+import blocks.BlockGrass;
+import blocks.BlockLight;
+import blocks.BlockPillar;
+import entities.EntityLivingItemStack;
+import entities.EntityLivingNPC;
+import entities.EntityLivingNPCEnemy;
+import entities.EntityLivingPlayer;
+import entities.EntityProjectile;
+import enums.EnumColor;
+import enums.EnumDifficulty;
+import enums.EnumEventType;
 
 /**
  * <code>World implements Serializable</code> <br>
@@ -88,7 +83,9 @@ import utils.WorldText;
  */
 public class World
 {
-//	private static final long serialVersionUID = 1L;	
+	private static final int GAMETICKSPERDAY = 28800; 
+	private static final int GAMETICKSPERHOUR = 1200;
+	public final double g = 1.8;
 	public Hashtable<String, Boolean> chunksLoaded;
 	
 	public Weather weather;
@@ -108,14 +105,12 @@ public class World
 	private boolean weatherFinished;
 	private EnumDifficulty difficulty;
 	private final Random random = new Random();
-	private final int GAMETICKSPERDAY = 28800; 
-	private final int GAMETICKSPERHOUR = 1200;
 	protected String worldName;
 	private long worldTime;
 	private ConcurrentHashMap<String, Chunk> chunks;
 	private int width; //Width in blocks, not pixels
 	private int height; //Height in blocks, not pixels
-	private float previousLightLevel;
+	private double previousLightLevel;
 	private EntityLivingNPCEnemy[] spawnList;
 	private LightUtils utils;
 	private boolean lightingUpdateRequired;
@@ -355,14 +350,14 @@ public class World
 	/**
 	 * Gets the light value of the sun. Full light is a value of 1.0f, minimal (night) light is .2f
 	 */
-	public float getLightLevel()
+	public double getLightLevel()
 	{
 		//LightLevel of 1.0f is full darkness (it's reverse due to blending mechanics)
 		//Light Levels By Time: 20:00-4:00->20%; 4:00-8:00->20% to 100%; 8:00-16:00->100%; 16:00-20:00->20% to 100%;  
 		
-		float time = (float)(worldTime) / GAMETICKSPERHOUR; 
+		double time = (double)(worldTime) / GAMETICKSPERHOUR; 
 		
-		return (time > 8 && time < 16) ? 1.0f : (time >= 4 && time <= 8) ? MathHelper.roundDownFloat20th(((((time - 4) / 4.0F) * 0.8F) + 0.2F)) : (time >= 16 && time <= 20) ? MathHelper.roundDownFloat20th(1.0F - ((((time - 16) / 4.0F) * 0.8F) + 0.2F)) : 0.2f;
+		return (time > 8 && time < 16) ? 1.0f : (time >= 4 && time <= 8) ? MathHelper.roundDowndouble20th(((((time - 4) / 4.0F) * 0.8F) + 0.2F)) : (time >= 16 && time <= 20) ? MathHelper.roundDowndouble20th(1.0F - ((((time - 16) / 4.0F) * 0.8F) + 0.2F)) : 0.2f;
 	}
 		
 	/**
@@ -773,7 +768,7 @@ public class World
 		//int totalTries = 500;		
 		//WARNING, THE LINE ABOVE IS VERY, VERY AGGRESSIVE SPAWNING. NOT INTENDED FOR RELEASE BUT TESTING INSTEAD
 		
-		float time = (float)(worldTime) / GAMETICKSPERHOUR; 
+		double time = (double)(worldTime) / GAMETICKSPERHOUR; 
 		if(time < 4 || time > 20) //spawn more at night
 		{
 			totalTries += (3 + random.nextInt(3));
@@ -860,7 +855,7 @@ public class World
 				{
 					for(int k = 0; k < spawnList[entitych].getBlockWidth(); k++)//X
 					{
-						if(!getBlock(xoff + k, yoff + j).isPassable())
+						if(getBlock(xoff + k, yoff + j).getIsSolid())
 						{
 							throw new RuntimeException("Dummy");
 						}
@@ -877,7 +872,7 @@ public class World
 			try
 			{
 				//Ground Entity:
-				if((!getBlock(xoff, (yoff + 3)).isPassable() || !getBlock(xoff + 1, (yoff + 3)).isPassable())) //make sure there's actually ground to spawn on
+				if((getBlock(xoff, (yoff + 3)).getIsSolid() || getBlock(xoff + 1, (yoff + 3)).getIsSolid())) //make sure there's actually ground to spawn on
 				{
 					EntityLivingNPCEnemy enemy = new EntityLivingNPCEnemy(spawnList[entitych]);
 					enemy.setPosition(xoff * 6, yoff * 6);
@@ -948,7 +943,7 @@ public class World
 	 * @param testy
 	 * @return
 	 */
-	boolean pnpoly(int nvert, double vertx[], double verty[], float testx, float testy)
+	boolean pnpoly(int nvert, double vertx[], double verty[], double testx, double testy)
 	{
 	  int i, j;
 	  boolean c = false;
@@ -1003,8 +998,8 @@ public class World
 		
 		for(int i = 0; i < entityList.size(); i++)
 		{
-			float entity_x = entityList.get(i).x + entityList.get(i).width;
-			float  entity_y = entityList.get(i).y + entityList.get(i).height;
+			double entity_x = entityList.get(i).x + entityList.get(i).width;
+			double  entity_y = entityList.get(i).y + entityList.get(i).height;
 
 			if(pnpoly(scaled_points.length, x_points, y_points, entity_x, entity_y))
 			{
@@ -1014,7 +1009,7 @@ public class World
 					continue;
 				}				
 				
-				//entityList.get(i).inBounds((float)x_points[j], (float)y_points[j])
+				//entityList.get(i).inBounds((double)x_points[j], (double)y_points[j])
 				boolean flag = ((Math.random() < player.criticalStrikeChance) ? true : false);
 				int damageDone =((ItemTool) Item.itemsList[player.inventory.getMainInventoryStack(player.selectedSlot).getItemID()]).getDamageDone();
 				damageDone = (int) (damageDone * player.allDamageModifier * player.meleeDamageModifier);
@@ -1305,7 +1300,10 @@ public class World
 	 */
 	public void breakTree(EntityLivingPlayer player, int mx, int my){
 		
-		do{
+		//Loop as long as part of the tree is above
+		while(my >= 1 && getBlock(mx, my-1).getID() == Block.tree.getID() || 
+				getBlock(mx, my-1).getID() == Block.treetopc2.getID())
+		{
 			if(my >= 1)
 			{
 				if (getBlock(mx, my-1).getID() == Block.tree.getID()){ //If there's a tree above, break it
@@ -1336,8 +1334,7 @@ public class World
 				}
 			}
 			my--; //Move the check upwards 1 block
-		}while (my >= 1 && getBlock(mx, my-1).getID() == Block.tree.getID()  //Loop as long as part of the tree is above
-			|| getBlock(mx, my-1).getID() == Block.treetopc2.getID());
+		}	
 	}
 
 	/**
@@ -1398,14 +1395,11 @@ public class World
 	 */
 	public void breakCactus(EntityLivingPlayer player, int mx, int my)
 	{
-		do
+		while(getBlock(mx, my-1).getID() == Block.cactus.getID())
 		{
-			if (getBlock(mx, my-1) == Block.cactus) //If there's a cactus block above, break it
-			{ 
-				handleBlockBreakEvent(player, mx, my-1);
-			}
+			handleBlockBreakEvent(player, mx, my-1);
 			my--;
-		}while(getBlock(mx, my-1) == Block.cactus);
+		}
 	}
 		
 	/**
@@ -1490,12 +1484,12 @@ public class World
 		
 	/**
 	 * Gets the block at the specified (x,y). Useful for easily getting a block at the specified location; Terrible for mass usage, such as in rendering.
-	 * This version of the method accepts floats, and casts them to Integers.
+	 * This version of the method accepts doubles, and casts them to Integers.
 	 * @param x the block's x location in the new world map
 	 * @param y the block's y location in the new world map
 	 * @return the block at the location specified (this should never be null)
 	 */
-	public Block getBlock(float x, float y)
+	public Block getBlock(double x, double y)
 	{
 		return getChunks().get(""+(int)(x / Chunk.getChunkWidth())).getBlock((int)x % Chunk.getChunkWidth(), (int)y);
 	}
@@ -1606,12 +1600,12 @@ public class World
 	/**
 	 * Sets the block at the specified (x,y). Useful for easily setting a block at the specified location; Terrible for mass usage.
 	 * This version of the method does not check if the chunk is actually loaded, therefore it may sometimes fail for bizarre or very, very
-	 * far away requests. It will however, simply catch that Exception, should it occur. This version of the method uses floats.
+	 * far away requests. It will however, simply catch that Exception, should it occur. This version of the method uses doubles.
 	 * @param block the block that the specified (x,y) will be set to
 	 * @param x the block's x location in the new world map
 	 * @param y the block's y location in the new world map
 	 */
-	public void setBlock(Block block, float x, float y)
+	public void setBlock(Block block, double x, double y)
 	{
 		try
 		{
@@ -1718,7 +1712,7 @@ public class World
 	 * @param y the y position of the Block to check for light in the world map
 	 * @return the light value of that square, or 1.0f if that square is null or doesnt exist.
 	 */
-	public float getLight(int x, int y)
+	public double getLight(int x, int y)
 	{
 		try
 		{
@@ -1907,17 +1901,17 @@ public class World
 		
 	/**
 	 * Gets the background block at the specified (x,y). Useful for easily getting a backgroundblock at the specified location; 
-	 * Terrible for mass usage, such as in rendering. This method accepts floats, and casts them to Integers.
+	 * Terrible for mass usage, such as in rendering. This method accepts doubles, and casts them to Integers.
 	 * @param x the block's x location in the new world map
 	 * @param y the block's y location in the new world map
 	 * @return the block at the location specified (this should never be null)
 	 */
-	public Block getBackBlock(float x, float y)
+	public Block getBackBlock(double x, double y)
 	{
 		return getChunks().get(""+(int)(x / Chunk.getChunkWidth())).getBlock((int)x % Chunk.getChunkWidth(), (int)y);
 	}
 	
-	public void setAmbientLight(float x, float y, float strength)
+	public void setAmbientLight(double x, double y, double strength)
 	{
 		try
 		{
@@ -1929,7 +1923,7 @@ public class World
 		}
 	}
 		
-	public void setDiffuseLight(float x, float y, float strength)
+	public void setDiffuseLight(double x, double y, double strength)
 	{
 		try
 		{
@@ -1941,7 +1935,7 @@ public class World
 		}
 	}
 
-	public float getAmbientLight(int x, int y)
+	public double getAmbientLight(int x, int y)
 	{
 		try
 		{
@@ -1954,7 +1948,7 @@ public class World
 		return 1.0f;
 	}
 	
-	public float getDiffuseLight(int x, int y)
+	public double getDiffuseLight(int x, int y)
 	{
 		try
 		{

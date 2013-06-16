@@ -7,7 +7,7 @@ public class StatusEffectStun extends StatusEffect
 {
 	private static final long serialVersionUID = 1L;
 
-	public StatusEffectStun(float durationSeconds, int tier, int power, int ticksBetweenEffect) 
+	public StatusEffectStun(double durationSeconds, int tier, int power, int ticksBetweenEffect) 
 	{
 		super(durationSeconds, tier, power, ticksBetweenEffect);
 		this.isBeneficialEffect = false;

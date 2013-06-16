@@ -24,7 +24,7 @@ public class StatusEffectAbsorb extends StatusEffect
 	 * @param tier the tier of the absorb 
 	 * @param absorb the amount this StatusEffect will absorb, in total damage
 	 */
-	public StatusEffectAbsorb(float durationSeconds, int tier, int absorb) 
+	public StatusEffectAbsorb(double durationSeconds, int tier, int absorb) 
 	{
 		super(durationSeconds, tier, absorb, 1);
 		this.iconX = 12;
@@ -49,7 +49,7 @@ public class StatusEffectAbsorb extends StatusEffect
 	 * @param damageDone the damage to deal to the absorb
 	 * @return the damage left over from the absorb after damaging it, a value of 0 indicates the absorb is fully used
 	 */
-	public int absorbDamage(float damageDone)
+	public int absorbDamage(double damageDone)
 	{
 		if(damageDone <= remainingAbsorb)
 		{

@@ -23,8 +23,9 @@ import blocks.Block;
 public class EntityLivingItemStack extends EntityLiving
 {
 	private static final long serialVersionUID = 1L;
+	private double fallSpeed;
 	
-	public EntityLivingItemStack(float x, float y, ItemStack stack)
+	public EntityLivingItemStack(double x, double y, ItemStack stack)
 	{
 		super();
 		if(stack.getItemID() < ActionbarItem.itemIndex) //Blocks are 6x6 render size
@@ -55,8 +56,8 @@ public class EntityLivingItemStack extends EntityLiving
 		fallSpeed = 1.8f; 
 		maxHealth = 1;
 		health = 1;
-		blockWidth = (float)(width) / 6;
-		blockHeight = (float)(height) / 6;
+		blockWidth = (double)(width) / 6;
+		blockHeight = (double)(height) / 6;
 		ticksBeforePickup = 20;
 		this.stack = stack;
 	}
@@ -95,7 +96,7 @@ public class EntityLivingItemStack extends EntityLiving
 
 		for(int i = 0; i < blocks.length; i++)
 		{
-			if(!blocks[i].isPassable()) //hittest has failed
+			if(blocks[i].getIsSolid()) //hittest has failed
 			{
 				flag = false;
 				break;

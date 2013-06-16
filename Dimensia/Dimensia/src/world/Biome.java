@@ -11,10 +11,10 @@ public class Biome implements Serializable, Cloneable
 {
 	private static final long serialVersionUID = 1L;
 	protected int biomeID;
-	protected float x;
-	protected float y;
-	protected float width;
-	protected float height;
+	protected double x;
+	protected double y;
+	protected double width;
+	protected double height;
 	protected List<EntityLivingNPCEnemy> spawnableEntites;
 	protected String biomeName;
 	
@@ -57,7 +57,7 @@ public class Biome implements Serializable, Cloneable
 	 * @param h the height of the biome (in blocks) generally the height of the world
 	 * @return a biome of set bounds. this return may or may not be useful.
 	 */
-	public Biome setBiomeBounds(float x, float y, float w, float h)
+	public Biome setBiomeBounds(double x, double y, double w, double h)
 	{
 		this.x = x;
 		this.y = y;
@@ -66,22 +66,22 @@ public class Biome implements Serializable, Cloneable
 		return this;
 	}
 	
-	public final float getX()
+	public final double getX()
 	{
 		return x;
 	}
 	
-	public final float getY()
+	public final double getY()
 	{
 		return y;
 	}
 	
-	public final float getWidth()
+	public final double getWidth()
 	{
 		return width;
 	}
 	
-	public final float getHeight()
+	public final double getHeight()
 	{
 		return height;
 	}

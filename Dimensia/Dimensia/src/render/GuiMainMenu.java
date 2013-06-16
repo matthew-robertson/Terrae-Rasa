@@ -56,7 +56,7 @@ public class GuiMainMenu extends Render
 	private boolean isCreatingWorld;
 	private boolean isPlayMenuOpen;
 	private boolean isWorldMenuOpen;	
-	private float logoAngle; //Angle of tilt for logo rotation
+	private double logoAngle; //Angle of tilt for logo rotation
 	private int logoModifier; //Direction modifier for logo rotation
 	private boolean isDeletingCharacter;
 	private boolean isDeletingWorld;
@@ -651,7 +651,7 @@ public class GuiMainMenu extends Render
 	{
 		GL11.glLoadIdentity();
 		GL11.glTranslatef(Display.getWidth() * 0.25f, 69, -2000f); //Move to the center of the image
-		GL11.glRotatef(logoAngle, 0, 0, 1.0f); //Rotate image back and forth
+		GL11.glRotated(logoAngle, 0, 0, 1.0f); //Rotate image back and forth
 		
 		int yoff = -64; //Where to draw on the Y
 		int xoff = -128; //Where to draw on the X

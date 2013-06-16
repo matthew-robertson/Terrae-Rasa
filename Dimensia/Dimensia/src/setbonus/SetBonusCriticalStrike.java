@@ -14,7 +14,7 @@ public class SetBonusCriticalStrike extends SetBonus
 {
 	private static final long serialVersionUID = 1L;
 
-	public SetBonusCriticalStrike(float power) 
+	public SetBonusCriticalStrike(double power) 
 	{
 		super(power);
 	}

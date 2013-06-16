@@ -24,13 +24,13 @@ public class GuiTextbox
 {	
 	private int MAX_TEXT_CHARACTERS;
 	private static TrueTypeFont trueTypeFont; /*This has pretty heavy overhead to create. Should it be static?*/
-	private float width;
-	private float height;
+	private double width;
+	private double height;
 	private int screenX;
 	private int screenY;
-	private float textScale;	
-	private float x;
-	private float y;
+	private double textScale;	
+	private double x;
+	private double y;
 	private boolean centerComponent;	
 	private boolean isFocused;	
 	private String text;
@@ -96,7 +96,12 @@ public class GuiTextbox
 		}
 		drawBounds();
 		GL11.glColor4f(1, 1, 1, 1);
-		trueTypeFont.drawString(x + 8, y + 27, text + "_", textScale, MathHelper.inverseValue(textScale), TrueTypeFont.ALIGN_LEFT); //Render the Text
+		trueTypeFont.drawString((float)(x + 8),
+				(float)(y + 27), 
+				text + "_", 
+				(float)textScale, 
+				(float)MathHelper.inverseValue(textScale), 
+				TrueTypeFont.ALIGN_LEFT); //Render the Text
 	}
 	
 	/**

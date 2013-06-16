@@ -21,8 +21,8 @@ public class RenderEntities extends Render
 		GL11.glColor4f(1, 1, 1, 1);
 		if(player.isFacingRight) //facing right (default)
 		{
-			float x = (int)player.x;
-	        float y = (int)player.y;
+			double x = (int)player.x;
+	        double y = (int)player.y;
 			playerTexture.bind(); 
 	        t.startDrawingQuads();
 	        t.addVertexWithUV(x, y + 18, 0, 0, 1);
@@ -86,10 +86,10 @@ public class RenderEntities extends Render
 	public void renderEntityLivingNPCEnemy(Texture tex, EntityLivingNPCEnemy enemy)
 	{
 		GL11.glColor4f(1, 1, 1, 1);
-		float x = (int)enemy.x;
-        float y = (int)enemy.y;
-        float eh = enemy.getHeight();
-        float ew = enemy.getWidth();
+		double x = (int)enemy.x;
+        double y = (int)enemy.y;
+        double eh = enemy.getHeight();
+        double ew = enemy.getWidth();
 				
         //System.out.println("[RenderEntities]" + enemy + " " + tex);
         
@@ -110,10 +110,10 @@ public class RenderEntities extends Render
 	public void renderEntityLivingNPC(Texture tex, EntityLivingNPC npc)
 	{
 		GL11.glColor4f(1, 1, 1, 1);
-		float x = (int)npc.x;
-        float y = (int)npc.y;
-        float eh = npc.getHeight();
-        float ew = npc.getWidth();
+		double x = (int)npc.x;
+        double y = (int)npc.y;
+        double eh = npc.getHeight();
+        double ew = npc.getWidth();
 				
 		tex.bind(); 
         t.startDrawingQuads();
@@ -132,14 +132,14 @@ public class RenderEntities extends Render
 	public void renderEntityProjectile(EntityProjectile projectile)
 	{
 		GL11.glColor4f(1, 1, 1, 1);
-		float x = (int)projectile.getX();
-        float y = (int)projectile.getY();
-        float ph = projectile.height;
-		float pw = projectile.width;
-		float tx = (float)((projectile.iconIndex / 16) * 16) / 256;
-	    float ty = (float)((projectile.iconIndex % 16) * 16) / 256;
-		float tw = tx + ((float)projectile.blockWidth  / 16);
-		float th = ty + ((float)projectile.blockHeight / 16);
+		double x = (int)projectile.getX();
+        double y = (int)projectile.getY();
+        double ph = projectile.height;
+		double pw = projectile.width;
+		double tx = (double)((projectile.iconIndex / 16) * 16) / 256;
+	    double ty = (double)((projectile.iconIndex % 16) * 16) / 256;
+		double tw = tx + ((double)projectile.blockWidth  / 16);
+		double th = ty + ((double)projectile.blockHeight / 16);
 		PROJECTILES.bind();
         t.startDrawingQuads();
         t.addVertexWithUV(x, y + ph, 0, tx, th);
@@ -157,10 +157,10 @@ public class RenderEntities extends Render
 		for(int i = 0; i < world.itemsList.size(); i++)
 		{
 			GL11.glColor4f(1, 1, 1, 1);
-			float x = world.itemsList.get(i).x;
-	        float y = world.itemsList.get(i).y;
-			float w = world.itemsList.get(i).width;
-			float h = world.itemsList.get(i).height;
+			double x = world.itemsList.get(i).x;
+	        double y = world.itemsList.get(i).y;
+			double w = world.itemsList.get(i).width;
+			double h = world.itemsList.get(i).height;
 			textures[world.itemsList.get(i).stack.getItemID()].bind(); 
 	        t.startDrawingQuads();
 	        t.addVertexWithUV(x, y + h, 0, 0, 1);
@@ -184,9 +184,9 @@ public class RenderEntities extends Render
 		GL11.glColor4f(1, 1, 1, 1);
 	}
 	
-	public void renderText(String message, int x, int y, float[] colours)
+	public void renderText(String message, int x, int y, double[] colours)
 	{
-		GL11.glColor4f(colours[0], colours[1], colours[2], colours[3]);
+		GL11.glColor4d(colours[0], colours[1], colours[2], colours[3]);
 		trueTypeFont.drawString(x, y, message, 0.4f, -0.4f, TrueTypeFont.ALIGN_LEFT);
 	}
 		

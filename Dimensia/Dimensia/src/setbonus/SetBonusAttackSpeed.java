@@ -15,7 +15,7 @@ public class SetBonusAttackSpeed extends SetBonus
 {
 	private static final long serialVersionUID = 1L;
 
-	public SetBonusAttackSpeed(float power) 
+	public SetBonusAttackSpeed(double power) 
 	{
 		super(power);
 	}

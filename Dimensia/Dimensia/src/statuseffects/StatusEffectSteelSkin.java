@@ -6,7 +6,7 @@ public class StatusEffectSteelSkin extends StatusEffect
 {
 	private static final long serialVersionUID = 1L;
 
-	public StatusEffectSteelSkin(float durationSeconds, int tier, float power, int ticksBetweenEffect)
+	public StatusEffectSteelSkin(double durationSeconds, int tier, double power, int ticksBetweenEffect)
 	{
 		super(durationSeconds, tier, power, ticksBetweenEffect);
 		iconX = 15;

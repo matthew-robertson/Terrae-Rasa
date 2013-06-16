@@ -31,7 +31,7 @@ public class StatusEffect
 	public int iconX;
 	public int iconY;
 	public boolean stacksIndependantly;
-	public float power;
+	public double power;
 	public int ticksBetweenEffect;
 	public long id;
 	
@@ -42,7 +42,7 @@ public class StatusEffect
 	 * @param power the strength of the effect
 	 * @param ticksBetweenEffect the number of game ticks between the periodic effect being applied, if applicable
 	 */
-	public StatusEffect(float durationSeconds, int tier, float power, int ticksBetweenEffect)
+	public StatusEffect(double durationSeconds, int tier, double power, int ticksBetweenEffect)
 	{
 		reapplicationSkipsRemovalEffect = false;
 		ticksLeft = (int) (durationSeconds * 20);

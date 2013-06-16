@@ -52,16 +52,16 @@ public class MouseInput
 					{
 						ItemMagic spell = (ItemMagic) item;
 						player.launchProjectileMagic(world, 
-								(float)(Render.getCameraX() + MathHelper.getCorrectMouseXPosition()), 
-								(float)(Render.getCameraY() + MathHelper.getCorrectMouseYPosition()), 
+								(double)(Render.getCameraX() + MathHelper.getCorrectMouseXPosition()), 
+								(double)(Render.getCameraY() + MathHelper.getCorrectMouseYPosition()), 
 								spell);
 					}
 					else if (item instanceof ItemRanged)
 					{
 						ItemRanged weapon = (ItemRanged) item;
 						player.launchProjectileWeapon(world, 
-								(float)(Render.getCameraX() + MathHelper.getCorrectMouseXPosition()), 
-								(float)(Render.getCameraY() + MathHelper.getCorrectMouseYPosition()), 
+								(double)(Render.getCameraX() + MathHelper.getCorrectMouseXPosition()), 
+								(double)(Render.getCameraY() + MathHelper.getCorrectMouseYPosition()), 
 								weapon);
 					}
 					//Try to mine a block
@@ -92,8 +92,8 @@ public class MouseInput
 				//If player is holding a block
 				if (!player.isInventoryOpen && player.inventory.getMainInventoryStack(active).getItemID() < ActionbarItem.itemIndex) 
 				{
-					mouseBX = (int) ((float)(Render.getCameraX() + MathHelper.getCorrectMouseXPosition()) / 6);
-					mouseBY = (int) ((float)(Render.getCameraY() + MathHelper.getCorrectMouseYPosition()) / 6);				
+					mouseBX = (int) ((double)(Render.getCameraX() + MathHelper.getCorrectMouseXPosition()) / 6);
+					mouseBY = (int) ((double)(Render.getCameraY() + MathHelper.getCorrectMouseYPosition()) / 6);				
 					
 					double d = Math.sqrt(( 
 						(Math.pow(((MathHelper.getCorrectMouseXPosition() + Render.getCameraX()) - (player.x + ((player.isFacingRight) ? 9 : 3))), 2)) +

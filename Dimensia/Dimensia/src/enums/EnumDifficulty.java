@@ -16,14 +16,14 @@ public enum EnumDifficulty
 	NORMAL(1.0f),
 	HARDCORE(1.5f);
 
-	public float damageModifier;
+	public double damageModifier;
 	
-	EnumDifficulty(float f)
+	EnumDifficulty(double f)
 	{
 		damageModifier = f;
 	}
 	
-	public float getDamageModifier()
+	public double getDamageModifier()
 	{
 		return damageModifier;
 	}

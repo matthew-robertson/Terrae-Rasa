@@ -25,8 +25,8 @@ public class GuiButton
 	private int screenY;
 	private boolean centerComponent;
 	private int buttonIndex;
-	private float width;
-	private float height;
+	private double width;
+	private double height;
 	private float x;
 	private float y;
 	
@@ -111,7 +111,7 @@ public class GuiButton
 		t.draw();
 		
 		//Text:
-		float xOffset = (width - ((trueTypeFont.getWidth(values[buttonIndex]) / 2) * 1.125f)) / 2;
+		float xOffset = (float) ((width - ((trueTypeFont.getWidth(values[buttonIndex]) / 2) * 1.125f)) / 2);
 		trueTypeFont.drawString(x + xOffset, y + 30, values[buttonIndex], 1, -1, TrueTypeFont.ALIGN_LEFT); //Render the Text	
 	}
 	

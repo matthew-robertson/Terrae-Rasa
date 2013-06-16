@@ -14,7 +14,7 @@ public class SetBonusKnockback extends SetBonus
 {
 	private static final long serialVersionUID = 1L;
 
-	public SetBonusKnockback(float power)
+	public SetBonusKnockback(double power)
 	{
 		super(power);
 	}

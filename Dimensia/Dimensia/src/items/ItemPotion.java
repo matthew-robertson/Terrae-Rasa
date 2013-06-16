@@ -5,9 +5,9 @@ public class ItemPotion extends Item
 	protected int tier;
 	protected int durationSeconds;
 	protected int ticksBetweenEffect;
-	protected float power;
+	protected double power;
 	
-	public ItemPotion(int i, int durationSeconds, int tier, float power, int ticksBetweenEffect)
+	public ItemPotion(int i, int durationSeconds, int tier, double power, int ticksBetweenEffect)
 	{
 		super(i);
 		this.durationSeconds = durationSeconds;

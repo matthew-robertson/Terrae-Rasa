@@ -35,9 +35,9 @@ public class Vector2F
 		return new Vector2F(x - vec.x, y - vec.y);
 	}
 	
-	public double length()
+	public float length()
 	{
-		return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+		return (float) Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
 	}
 	
 	public String toString()

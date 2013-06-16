@@ -133,8 +133,8 @@ public class RenderBlocks extends Render
 							{
 								int blockHeight = block.blockHeight;
 								int blockWidth = block.blockWidth;		
-							    float tx = (block.iconX * 16F) / 512F;
-							    float ty = (block.iconY * 16F) / 256F;
+							    double tx = (block.iconX * 16F) / 512F;
+							    double ty = (block.iconY * 16F) / 256F;
 								double tw = tx + (block.textureWidth / 512);
 								double th = ty + (block.textureHeight / 256);				
 								int xm = x1 * 6; 
@@ -153,8 +153,8 @@ public class RenderBlocks extends Render
 						{
 							int blockHeight = block.blockHeight;
 							int blockWidth = block.blockWidth;		
-						    float tx = (block.iconX * 16F) / 512;
-						    float ty = (block.iconY * 16F) / 256;
+						    double tx = (block.iconX * 16F) / 512;
+						    double ty = (block.iconY * 16F) / 256;
 						    double tw = tx + (block.textureWidth / 512);
 						    double th = ty + (block.textureHeight / 256);				
 							int xm = x1 * 6; 

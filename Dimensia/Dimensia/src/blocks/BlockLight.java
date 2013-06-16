@@ -3,7 +3,7 @@ package blocks;
 public class BlockLight extends Block
 {
 	private static final long serialVersionUID = 1L;
-	public float lightStrength;
+	public double lightStrength;
 	public int lightRadius;
 	
 	protected BlockLight(int i)
@@ -19,19 +19,19 @@ public class BlockLight extends Block
 	 * @param radius the max distance of the light in blocks
 	 * @return the updated block
 	 */
-	public Block setLightStrengthAndRadius(float strength, int radius)
+	public Block setLightStrengthAndRadius(double strength, int radius)
 	{
 		this.lightStrength = strength;
 		this.lightRadius = radius;
 		return this;
 	}
 	
-	public float getLightStrength()
+	public double getLightStrength()
 	{
 		return lightStrength;
 	}
 	
-	public float getLightRadius()
+	public double getLightRadius()
 	{
 		return lightRadius;
 	}

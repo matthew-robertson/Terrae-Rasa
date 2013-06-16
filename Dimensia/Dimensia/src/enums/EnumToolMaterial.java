@@ -28,12 +28,12 @@ public enum EnumToolMaterial
 	TIER12		(10.0f , 12, 45.0f, ""), //5 
 	GOD			(100.0f , 12, 45.0f, ""); //This is intended for testing 
 	
-	public float strength;
+	public double strength;
 	public int toolTier;
-	public float distance;
+	public double distance;
 	public String materialName;
 	
-	EnumToolMaterial(float s, int t, float d, String name)
+	EnumToolMaterial(double s, int t, double d, String name)
 	{
 		strength = s;
 		toolTier = t;
@@ -41,7 +41,7 @@ public enum EnumToolMaterial
 		distance = d;
 	}
 
-	public float getStrength()
+	public double getStrength()
 	{
 		return strength;
 	}
@@ -56,7 +56,7 @@ public enum EnumToolMaterial
 		return materialName;
 	}
 	
-	public float getDistance()
+	public double getDistance()
 	{
 		return distance;
 	}

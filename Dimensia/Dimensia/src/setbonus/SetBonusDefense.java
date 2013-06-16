@@ -14,7 +14,7 @@ public class SetBonusDefense extends SetBonus
 {
 	private static final long serialVersionUID = 1L;
 
-	public SetBonusDefense(float power) 
+	public SetBonusDefense(double power) 
 	{
 		super(power);
 	}

@@ -37,7 +37,7 @@ public class WeatherSnow extends Weather
 	 * @param y the y postion in worldMap
 	 * @return the Block at the specified position
 	 */
-	private Block getBlockAtPosition(World world, float x, float y)
+	private Block getBlockAtPosition(World world, double x, double y)
 	{
 		return world.getBlockGenerate(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)x / 6), MathHelper.returnIntegerInWorldMapBounds_X(world, (int)y / 6));
 	}
@@ -49,9 +49,9 @@ public class WeatherSnow extends Weather
 	 * @param y the y postion in worldMap
 	 * @return the Block at the specified position
 	 */
-	private boolean isInBlock(World world, float x, float y)
+	private boolean isInBlock(World world, double x, double y)
 	{
-		return !(world.getBlockGenerate(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)x / 6), MathHelper.returnIntegerInWorldMapBounds_X(world, (int)y / 6)).isPassable());
+		return (world.getBlockGenerate(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)x / 6), MathHelper.returnIntegerInWorldMapBounds_X(world, (int)y / 6)).getIsSolid());
 	}
 	
 	/**

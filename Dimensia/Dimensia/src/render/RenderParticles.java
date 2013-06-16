@@ -34,8 +34,8 @@ public class RenderParticles extends Render
 		t.startDrawingQuads(); 
 		for(int i = 0; i < weatherSnow.snow.length; i++) //Draw all the snow particles
 		{
-			float x = weatherSnow.snow[i].x;
-			float y = weatherSnow.snow[i].y;
+			double x = weatherSnow.snow[i].x;
+			double y = weatherSnow.snow[i].y;
 			t.addVertexWithUV(x , y + size, 0, 0, 1);
 			t.addVertexWithUV(x + size, y + size, 0, 1, 1);
 			t.addVertexWithUV(x + size, y, 0, 1, 0);

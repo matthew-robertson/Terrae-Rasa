@@ -33,6 +33,7 @@ import blocks.BlockChest;
 import spells.Spell;
 import statuseffects.StatusEffect;
 import utils.ActionbarItem;
+import utils.InventoryPlayer;
 import utils.ItemStack;
 import utils.MathHelper;
 import utils.MetaDataHelper;
@@ -508,7 +509,7 @@ public class RenderUI extends Render
 			frameX += getCameraX();
 			
 			//Find out how long does the tooltip actually has to be
-			float requiredHeight = (boldTooltip.getHeight(itemName)) + 
+			double requiredHeight = (boldTooltip.getHeight(itemName)) + 
 					PADDING * (setBonusesList.size() + stats.length) + 
 					((plainTooltip.getHeight(itemName)) * 0.5f * (stats.length)) + 
 					((boldTooltip.getHeight(itemName)) * 0.5f * (setBonusesList.size())) + 
@@ -539,10 +540,10 @@ public class RenderUI extends Render
 			t.addVertexWithUV(frameX, frameY, 0, 0, 0);
 			t.draw();
 			
-			GL11.glColor4f(quality.r, quality.g, quality.b, 1.0F);
+			GL11.glColor4d(quality.r, quality.g, quality.b, 1.0F);
 			
 			//Title
-			//float xOffset = frameX + ((tooltipWidth) * 0.95f) * 0.5f;
+			//double xOffset = frameX + ((tooltipWidth) * 0.95f) * 0.5f;
 			float yOffset = frameY + boldTooltip.getHeight(itemName);
 			boldTooltip.drawString(frameX + PADDING, yOffset, itemName, xScale , -1, TrueTypeFont.ALIGN_LEFT); 
 			
@@ -689,42 +690,42 @@ public class RenderUI extends Render
 			{
 				Item item = Item.itemsList[mouseItem.getItemID()];			
 				//Check if the item is actually valid for the selected slot:
-				if(index == 0) //Helmet
+				if(index == InventoryPlayer.HELMET_INDEX) //Helmet
 				{
 					if(!(item != null) || !(item instanceof ItemArmorHelmet))
 					{
 						return;
 					}	
 				}
-				else if(index == 1) //Body
+				else if(index == InventoryPlayer.BODY_INDEX) //Body
 				{
 					if(!(item != null) || !(item instanceof ItemArmorBody))
 					{
 						return;
 					}	
 				}
-				else if(index == 2) //Belt
+				else if(index == InventoryPlayer.BELT_INDEX) //Belt
 				{
 					if(!(item != null) || !(item instanceof ItemArmorBelt))
 					{
 						return;
 					}	
 				}			
-				else if(index == 3) //Pants
+				else if(index == InventoryPlayer.PANTS_INDEX) //Pants
 				{
 					if(!(item != null) || !(item instanceof ItemArmorPants))
 					{
 						return;
 					}	
 				}
-				else if(index == 4) //Boots
+				else if(index == InventoryPlayer.BOOTS_INDEX) //Boots
 				{
 					if(!(item != null) || !(item instanceof ItemArmorBoots))
 					{
 						return;
 					}	
 				}
-				else if(index == 5) //Gloves
+				else if(index == InventoryPlayer.GLOVES_INDEX) //Gloves
 				{
 					if(!(item != null) || !(item instanceof ItemArmorGloves))
 					{
@@ -758,7 +759,7 @@ public class RenderUI extends Render
 				mouseItem = null;
 			}
 			else if(whichInventory == 4) //Quiver
-			{
+			{								
 				Item item = Item.itemsList[mouseItem.getItemID()];
 				if(!(item instanceof ItemAmmo))
 				{
@@ -770,6 +771,24 @@ public class RenderUI extends Render
 					player.inventory.setQuiverStack(mouseItem, index);
 					mouseItem = null;
 				}
+				else if(player.inventory.getQuiverStack(index).getItemID() == mouseItem.getItemID())
+				{
+				
+					if(player.inventory.getQuiverStack(index).getStackSize() + mouseItem.getStackSize() 
+							<= player.inventory.getQuiverStack(index).getMaxStackSize())
+					{
+						player.inventory.combineItemStacksInQuiverSlot(world, player, mouseItem, index);
+						mouseItem = null;
+					}
+					else
+					{
+						mouseItem.removeFromStack((player.inventory.getQuiverStack(index).getMaxStackSize() - 
+								player.inventory.getQuiverStack(index).getStackSize()));
+						player.inventory.adjustQuiverStackSize(index, player.inventory.getQuiverStack(index).getMaxStackSize());
+					}
+				}
+				
+				
 				else //If there is an item there, swap that slot's item and the mouse's item.
 				{
 					ItemStack stack = player.inventory.getQuiverStack(index);
@@ -1713,9 +1732,9 @@ public class RenderUI extends Render
 			t.startDrawingQuads();  
 			for(int i = 0; i < player.getAllPossibleRecipes()[player.selectedRecipe].getRecipe().length; i++) //Panes for the recipe ingredients
 			{
-				float newSize = 20;
-				float newX = x + 2 + ((newSize + 2) * i);
-				float newY = y + size + 2;
+				double newSize = 20;
+				double newX = x + 2 + ((newSize + 2) * i);
+				double newY = y + size + 2;
 				t.addVertexWithUV(newX, newY + newSize, 0, 0, 1);
 				t.addVertexWithUV(newX + newSize, newY + newSize, 0, 1, 1);
 				t.addVertexWithUV(newX + newSize, newY, 0, 1, 0);
@@ -1813,7 +1832,7 @@ public class RenderUI extends Render
 			}
 			for(int i = 0; i < player.getAllPossibleRecipes()[player.selectedRecipe].getRecipe().length; i++) //Images of the ingredients for the selected recipe
 			{
-				float newSize = 12;
+				double newSize = 12;
 				float newX = x + ((size + 5) * i);
 				float newY = y + size + 10;
 				textures[player.getAllPossibleRecipes()[player.selectedRecipe].getRecipe()[i].getItemID()].bind();

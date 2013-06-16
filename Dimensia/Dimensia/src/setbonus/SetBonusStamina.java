@@ -13,7 +13,7 @@ public class SetBonusStamina extends SetBonus
 {
 	private static final long serialVersionUID = 1L;
 
-	public SetBonusStamina(float power) 
+	public SetBonusStamina(double power) 
 	{
 		super(power);
 	}

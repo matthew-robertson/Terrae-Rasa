@@ -14,7 +14,7 @@ public class SetBonusDexterity extends SetBonus
 {
 	private static final long serialVersionUID = 1L;
 
-	public SetBonusDexterity(float power) 
+	public SetBonusDexterity(double power) 
 	{
 		super(power);
 	}

@@ -7,7 +7,7 @@ public class StatusEffectPoison extends StatusEffect
 {
 	private static final long serialVersionUID = 1L;
 
-	public StatusEffectPoison(float durationSeconds, int tier, int power, int ticksBetweenEffect) 
+	public StatusEffectPoison(double durationSeconds, int tier, int power, int ticksBetweenEffect) 
 	{
 		super(durationSeconds, tier, power, ticksBetweenEffect);
 		this.isBeneficialEffect = false;

@@ -6,7 +6,7 @@ public class StatusEffectJump extends StatusEffect
 {
 	private static final long serialVersionUID = 1L;
 
-	public StatusEffectJump(float durationSeconds, int tier, int power, int ticksBetweenEffect) 
+	public StatusEffectJump(double durationSeconds, int tier, int power, int ticksBetweenEffect) 
 	{
 		super(durationSeconds, tier, power, ticksBetweenEffect);
 		this.isBeneficialEffect = false;

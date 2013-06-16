@@ -14,7 +14,7 @@ public class StatusEffectDazed extends StatusEffect
 	 * @param power the strength of the daze
 	 * @param ticksBetweenEffect the number of game ticks between the periodic effect being applied, if applicable
 	 */
-	public StatusEffectDazed(float durationSeconds, int tier, float power, int ticksBetweenEffect) 
+	public StatusEffectDazed(double durationSeconds, int tier, double power, int ticksBetweenEffect) 
 	{
 		super(durationSeconds, tier, power, ticksBetweenEffect);
 		this.isBeneficialEffect = false;

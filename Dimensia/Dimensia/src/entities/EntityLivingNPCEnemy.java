@@ -173,18 +173,18 @@ public class EntityLivingNPCEnemy extends EntityLivingNPC
 		return this;
 	}
 	
-	protected EntityLivingNPCEnemy setBaseSpeed(float f)
+	protected EntityLivingNPCEnemy setBaseSpeed(double f)
 	{
 		baseSpeed = f;
 		return this;
 	}
 		
-	public float getWidth()
+	public double getWidth()
 	{
 		return width;
 	}
 	
-	public float getHeight()
+	public double getHeight()
 	{
 		return height; 
 	}
@@ -224,12 +224,12 @@ public class EntityLivingNPCEnemy extends EntityLivingNPC
 		return (drops.size() > 0) ? stacks : null; 
 	}
 	
-	public float getBlockWidth()
+	public double getBlockWidth()
 	{
 		return blockWidth;
 	}
 	
-	public float getBlockHeight()
+	public double getBlockHeight()
 	{
 		return blockHeight;
 	}
@@ -307,7 +307,7 @@ public class EntityLivingNPCEnemy extends EntityLivingNPC
 	public final static EntityLivingNPCEnemy dino = new EntityLivingNPCEnemy(3, "Dinosaur").setIsAlert(true).setSpawnVector("forest", "night").setBlockAndWorldDimensions(5,4).setTexture(Render.dino).setMaxHealth(150).setDamageDone(20).setBaseSpeed(3.4f).setDrops(new MonsterDrop[]{
 			new MonsterDrop(new ItemStack(Item.ringOfVigor), 1, 1, 100), new MonsterDrop(new ItemStack(Item.coal), 1, 3, 4), new MonsterDrop(new ItemStack(Item.healingHerb2), 1, 1, 20) 
 	});
-	//public final static EntityLivingNPCEnemy floatingEye = new EntityLivingNPCEnemy(4, "Eyeball").setDamageDone(12).setMaxHealth(60);
+	//public final static EntityLivingNPCEnemy doubleingEye = new EntityLivingNPCEnemy(4, "Eyeball").setDamageDone(12).setMaxHealth(60);
 	
 	
 }

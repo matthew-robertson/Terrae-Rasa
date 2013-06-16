@@ -6,7 +6,7 @@ public class StatusEffectFatalWounds extends StatusEffect
 {
 	private static final long serialVersionUID = 1L;
 
-	public StatusEffectFatalWounds(float durationSeconds, int tier, int power, int ticksBetweenEffect) 
+	public StatusEffectFatalWounds(double durationSeconds, int tier, int power, int ticksBetweenEffect) 
 	{
 		super(durationSeconds, tier, power, ticksBetweenEffect);
 		reapplicationSkipsRemovalEffect = true;
