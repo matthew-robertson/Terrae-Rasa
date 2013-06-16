@@ -1,6 +1,6 @@
 package utils;
 
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 import render.Render;
 import world.World;
 
@@ -222,9 +222,9 @@ public class ActionbarItem
 	/**
 	 * onRightClick(...) can be overriden to do something unique when an ActionbarItem is right clicked on the actionbar.
 	 * @param world the World in use
-	 * @param entity the EntityLivingPlayer in use
+	 * @param entity the EntityPlayer in use
 	 */
-	public void onRightClick(World world, EntityLivingPlayer entity)
+	public void onRightClick(World world, EntityPlayer entity)
 	{
 	}
 }

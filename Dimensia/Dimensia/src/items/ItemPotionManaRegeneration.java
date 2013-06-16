@@ -1,6 +1,6 @@
 package items;
 
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 import statuseffects.StatusEffectManaRegeneration;
 import world.World;
 
@@ -11,7 +11,7 @@ public class ItemPotionManaRegeneration extends ItemPotion
 		super(i, duration, tier, power, ticksBetweenEffect);
 	}
 	
-	public void onRightClick(World world, EntityLivingPlayer player)
+	public void onRightClick(World world, EntityPlayer player)
 	{
 		player.registerStatusEffect(new StatusEffectManaRegeneration(durationSeconds, tier, power, ticksBetweenEffect));
 		player.inventory.removeItemsFromInventoryStack(1, player.selectedSlot);

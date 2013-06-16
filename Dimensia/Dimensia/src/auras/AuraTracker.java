@@ -3,7 +3,7 @@ package auras;
 import java.io.Serializable;
 
 import utils.InventoryPlayer;
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 
 /**
  * AuraTracker holds all data and methods relating to the player's Auras. In Version 1.0, each piece of armour has its own
@@ -14,12 +14,12 @@ import entities.EntityLivingPlayer;
  * the method call to AuraTracker will be the same as it would be to a specific aura. Therefore, AuraTracker supports all the different
  * events that an individual Aura can have:
  * <ul>
- * <li>{@link #onDamageDone(EntityLivingPlayer)}</li>
- * <li>{@link #onDamageTaken(EntityLivingPlayer)}</li>
- * <li>{@link #onDeath(EntityLivingPlayer)}</li>
- * <li>{@link #onHeal(EntityLivingPlayer)}</li>
- * <li>{@link #onPercentageHealth(EntityLivingPlayer)}</li>
- * <li>{@link #onStatusEffectGained(EntityLivingPlayer)}</li>
+ * <li>{@link #onDamageDone(EntityPlayer)}</li>
+ * <li>{@link #onDamageTaken(EntityPlayer)}</li>
+ * <li>{@link #onDeath(EntityPlayer)}</li>
+ * <li>{@link #onHeal(EntityPlayer)}</li>
+ * <li>{@link #onPercentageHealth(EntityPlayer)}</li>
+ * <li>{@link #onStatusEffectGained(EntityPlayer)}</li>
  * </ul>
  * @author      Alec Sobeck
  * @author      Matthew Robertson
@@ -55,7 +55,7 @@ public class AuraTracker
 	 * Updates all Auras, in all the different slots AuraContainers.
 	 * @param player the player to whom this AuraTracker belongs.
 	 */
-	public void update(EntityLivingPlayer player)
+	public void update(EntityPlayer player)
 	{
 		for(int i = 0; i < aurasByPiece.length; i++)
 		{
@@ -70,7 +70,7 @@ public class AuraTracker
 	}
 	
 	
-	public void onDamageDone(EntityLivingPlayer player) 
+	public void onDamageDone(EntityPlayer player) 
 	{
 		for(int i = 0; i < aurasByPiece.length; i++)
 		{
@@ -85,7 +85,7 @@ public class AuraTracker
 	}
 	
 
-	public void onDamageTaken(EntityLivingPlayer player) 
+	public void onDamageTaken(EntityPlayer player) 
 	{
 		for(int i = 0; i < aurasByPiece.length; i++)
 		{
@@ -100,7 +100,7 @@ public class AuraTracker
 	}
 	
 
-	public void onHeal(EntityLivingPlayer player) 
+	public void onHeal(EntityPlayer player) 
 	{
 		for(int i = 0; i < aurasByPiece.length; i++)
 		{
@@ -115,7 +115,7 @@ public class AuraTracker
 	}
 	
 
-	public void onPercentageHealth(EntityLivingPlayer player) 
+	public void onPercentageHealth(EntityPlayer player) 
 	{
 		for(int i = 0; i < aurasByPiece.length; i++)
 		{
@@ -129,7 +129,7 @@ public class AuraTracker
 		}
 	}
 
-	public void onDeath(EntityLivingPlayer player) 
+	public void onDeath(EntityPlayer player) 
 	{
 		for(int i = 0; i < aurasByPiece.length; i++)
 		{
@@ -145,7 +145,7 @@ public class AuraTracker
 	
 	/*
 
-	public void onStatusEffectGained(EntityLivingPlayer player)
+	public void onStatusEffectGained(EntityPlayer player)
 	{
 		for(int i = 0; i < aurasByPiece.length; i++)
 		{

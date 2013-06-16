@@ -26,12 +26,14 @@ public class StatusEffectDazed extends StatusEffect
 
 	public void applyInitialEffect(EntityLiving entity)
 	{	
-		entity.movementSpeedModifier *= (1F - power);
+		entity.setMovementSpeedModifier(entity.getMovementSpeedModifier()
+				* (1F - power));
 	}
 	
 	public void removeInitialEffect(EntityLiving entity)
 	{	
-		entity.movementSpeedModifier /= (1F - power);
+		entity.setMovementSpeedModifier(entity.getMovementSpeedModifier()
+				/ (1F - power));
 	}
 	
 	public String toString()

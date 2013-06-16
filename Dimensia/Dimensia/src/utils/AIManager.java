@@ -3,7 +3,7 @@ package utils;
 import java.util.Random;
 
 import entities.EntityLiving;
-import entities.EntityLivingNPC;
+import entities.EntityNPC;
 import entities.EntityProjectile;
 
 import world.World;
@@ -25,7 +25,7 @@ public class AIManager {
 	 * @param target - the actor to be chased or fled from
 	 * @param chase - true if the actor should chase, false if the actor should run away
 	 */
-	public static void AIChaseAndRetreat(World world, EntityLiving npc, EntityLiving target, boolean chase){
+	public static void AIChaseAndRetreat(World world, EntityNPC npc, EntityLiving target, boolean chase){
 		//If the target is to the right of the npc
 		if (target.getX() < npc.getX()){
 			if (chase){
@@ -59,7 +59,7 @@ public class AIManager {
 	 * @param world - current world
 	 * @param npc - the actor to be moved
 	 */
-	public static void AIWander(World world, EntityLivingNPC npc){
+	public static void AIWander(World world, EntityNPC npc){
 		//If there are no values set, pick a direction and distance
 		Random gen = new Random();
 		if (npc.wanderLeft <= 0 && npc.wanderRight <= 0){
@@ -90,13 +90,13 @@ public class AIManager {
 			if (npc.wanderRight > 0){
 				if (npc.isWalkingSafe(world, false)){
 					AIMoveRight(world, npc, up);
-					npc.wanderRight -= npc.baseSpeed * npc.movementSpeedModifier;
+					npc.wanderRight -= npc.getBaseSpeed() * npc.getMovementSpeedModifier();
 				}
 			}
 			else if (npc.wanderLeft > 0){
 				if (npc.isWalkingSafe(world, false)){
 					AIMoveLeft(world, npc, up);
-					npc.wanderLeft -= npc.baseSpeed * npc.movementSpeedModifier;
+					npc.wanderLeft -= npc.getBaseSpeed() * npc.getMovementSpeedModifier();
 				}
 			}
 			npc.ticksSinceLastWander = 0;
@@ -109,9 +109,9 @@ public class AIManager {
 	 * @param npc - the actor to move
 	 * @param up - whether or not they want to move up
 	 */
-	public static void AIMoveLeft(World world, EntityLiving npc, boolean up){
+	public static void AIMoveLeft(World world, EntityNPC npc, boolean up){
 		if (npc.isJumpPossibleAndNeeded(world, false, up)){
-			npc.hasJumped();
+			npc.tryToJumpAgain();
 		}
 		npc.moveEntityLeft(world);
 	}
@@ -122,9 +122,9 @@ public class AIManager {
 	 * @param npc - the actor to move
 	 * @param up - whether or not they want to move up
 	 */
-	public static void AIMoveRight(World world, EntityLiving npc, boolean up){
+	public static void AIMoveRight(World world, EntityNPC npc, boolean up){
 		if (npc.isJumpPossibleAndNeeded(world, true, up)){
-			npc.hasJumped();
+			npc.tryToJumpAgain();
 		}
 		npc.moveEntityRight(world);
 	}
@@ -136,8 +136,8 @@ public class AIManager {
 	 * @param angle - angle to fire at
 	 * @param projectile - projectile to launch
 	 */
-	public static void AIProjectile(World world, EntityLivingNPC npc, int angle, EntityProjectile projectile){
-		npc.launchProjectile(world, angle, projectile);
+	public static void AIProjectile(World world, EntityNPC npc, int angle, EntityProjectile projectile){
+		world.launchProjectile(world, angle, projectile, npc.x, npc.y);
 		npc.ticksSinceLastProjectile = 0;
 	}
 	
@@ -148,12 +148,12 @@ public class AIManager {
 	 * @param y - y location of the target
 	 * @param projectile - projectile to launch
 	 */
-	public static void AIProjectile(World world, EntityLivingNPC npc, int x, int y, EntityProjectile projectile){
+	public static void AIProjectile(World world, EntityNPC npc, int x, int y, EntityProjectile projectile){
 		int angle = MathHelper.angleMousePlayer(x, y, npc.x, npc.y) - 90;
 		if (angle < 0){
 			angle += 360;
 		}
-		npc.launchProjectile(world, angle, projectile);
+		world.launchProjectile(world, angle, projectile, npc.x, npc.y);
 		npc.ticksSinceLastProjectile = 0;
 	}		
 }

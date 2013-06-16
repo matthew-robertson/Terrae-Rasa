@@ -36,29 +36,29 @@ import enums.EnumDifficulty;
 import enums.EnumToolMaterial;
 
 /**
- * <code>EntityLivingPlayer</code> extends <code>EntityLiving</code> and implements Serializable
+ * <code>EntityPlayer</code> extends <code>EntityLiving</code> and implements Serializable
  * <br><br>
- * EntityLivingPlayer implements all the features needed for the user's character. 
+ * EntityPlayer implements all the features needed for the user's character. 
  * <br><br>
- * There are several methods of significance in EntityLivingPlayer, serving different purposes. 
+ * There are several methods of significance in EntityPlayer, serving different purposes. 
  * The first is {@link #onWorldTick(World)}. This method should be called every single world tick,
  * and this is how the player gets updated regularly. This should apply things like regen, gravity,
  * and update cooldowns or invincibility (things based on world ticks). onWorldTick(World) can also
  * do things like check nearby blocks, to see if recipes need updated. Anything that should be 
  * done regularly, but not every frame, essentially.
  * <br><br>
- * A second major component of <code>EntityLivingPlayer</code> is recipe updating. The Recipe[] used are based off 
+ * A second major component of <code>EntityPlayer</code> is recipe updating. The Recipe[] used are based off 
  * of what craftManager decides are possible for the inventory object passed to it. 
- * <code>EntityLivingPlayer</code> provides a method to check for nearby blocks, and update recipes as required 
+ * <code>EntityPlayer</code> provides a method to check for nearby blocks, and update recipes as required 
  * {@link #checkForNearbyBlocks(World)}, based on the result for craftingManager. 
  * <br><br>
- * The third major component of <code>EntityLivingPlayer</code> is armour management. This is done almost 
+ * The third major component of <code>EntityPlayer</code> is armour management. This is done almost 
  * automatically through a single method - {@link #onArmorChange()}. This method recalculates the armor
  * bonuses of the armour, as well as the set bonuses. It then proceeds to cancel the previous ones. 
  * <b>NOTE: This method does dangerous things, and more than likely is going to terribly ruin any attempt 
  * at adding a +defense potion, or -defense debuff. It WILL have to be recoded, with little doubt.</b>
  * <br><br>
- * The final major component of <code>EntityLivingPlayer</code> is block breaking, through the method 
+ * The final major component of <code>EntityPlayer</code> is block breaking, through the method 
  * {@link #breakBlock(World, int, int, Item)}. This method is what handles mining, and any 
  * gradual block breaking done by the player. A block break is automatically send to the 'world map' upon
  * completion of the mining.
@@ -67,7 +67,7 @@ import enums.EnumToolMaterial;
  * @version     1.0 
  * @since       1.0
  */
-public class EntityLivingPlayer extends EntityLiving
+public class EntityPlayer extends EntityLiving
 {
 	private static final long serialVersionUID = 2L;
 	private final static int HEALTH_FROM_STAMINA = 10;
@@ -85,9 +85,11 @@ public class EntityLivingPlayer extends EntityLiving
 	public int baseMaxMana;	
 	public double respawnXPos;
 	public double respawnYPos;	
+	
 	private boolean isSwingingRight;
 	private boolean hasSwungTool;
 	private double rotateAngle;
+	
 	public int selectedRecipe;
 	public int selectedSlot;
 	public boolean isFacingRight;
@@ -124,23 +126,23 @@ public class EntityLivingPlayer extends EntityLiving
 
 	
 	/**
-	 * Constructs a new instance of EntityLivingPlayer with default settings, inventory (includes 3 basic tools),
+	 * Constructs a new instance of EntityPlayer with default settings, inventory (includes 3 basic tools),
 	 * and the specified name/difficulty. The default reset position is set to (50, 0), but this
 	 * value is essentially worthless, and should be reset.
 	 * @param name the player's name
 	 * @param difficulty the difficulty setting the player has selected (EnumDifficulty)
 	 */
-	public EntityLivingPlayer(String name, EnumDifficulty difficulty)
+	public EntityPlayer(String name, EnumDifficulty difficulty)
 	{
 		super();		
 		stamina = 0;
 		specialEnergy = 100;
 		isJumping = false;
-		movementSpeedModifier = 1.0f;		
-		baseSpeed = 5.0f;
+		setMovementSpeedModifier(1.0f);		
+		setBaseSpeed(5.0f);
 		width = 12;
 		height = 18;
-		maxHeightFallenSafely = 78;
+		setMaxHeightFallenSafely(78);
 		blockHeight = 3;
 		blockWidth = 2;
 		setRespawnPosition(50, 0);		
@@ -192,7 +194,7 @@ public class EntityLivingPlayer extends EntityLiving
 		auraTracker = new AuraTracker();
 	}
 	
-	public EntityLivingPlayer(EntityLivingPlayer entity)
+	public EntityPlayer(EntityPlayer entity)
 	{
 		throw new RuntimeException("Support Not Implemented - Was this action actually required?");
 	}
@@ -336,7 +338,7 @@ public class EntityLivingPlayer extends EntityLiving
 				double damageAfterArmor = MathHelper.floorOne(
 						(damage * (1F - DEFENSE_REDUCTION_PERCENT * defense)) - (defense * DEFENSE_REDUCTION_FLAT)									
 						);
-				damageAfterArmor = damageAfterAbsorbs(damageAfterArmor);
+				damageAfterArmor = dealDamageToAbsorbs(damageAfterArmor);
 				health -= damageAfterArmor;
 				auraTracker.onDamageTaken(this);
 				if(renderDamage)
@@ -347,7 +349,7 @@ public class EntityLivingPlayer extends EntityLiving
 			}
 			else
 			{
-				health -= damage;
+				health -= dealDamageToAbsorbs(damage);
 				auraTracker.onDamageTaken(this);
 				if(renderDamage)
 				{
@@ -374,7 +376,7 @@ public class EntityLivingPlayer extends EntityLiving
 			if((isJumping || !canJumpAgain) && 
 				isAffectedByGravity && 
 				!isImmuneToFallDamage && 
-				distanceFallen > maxHeightFallenSafely) 
+				distanceFallen > getMaxHeightFallenSafely()) 
 			{
 				//calculate the fall damage
 				double fallDamage = MathHelper.getFallDamage(jumpSpeed, world.g, ticksFallen); 
@@ -392,7 +394,7 @@ public class EntityLivingPlayer extends EntityLiving
 		
 		if(isJumping) //If the entity is jumping upwards, move them up
 		{
-			moveEntityUp(world, jumpSpeed * movementSpeedModifier);			
+			moveEntityUp(world, jumpSpeed * getMovementSpeedModifier());			
 		}
 		else if(!isOnGround(world) && isAffectedByGravity) //otherwise, if the entity is in the air, make them fall
 		{
@@ -435,7 +437,7 @@ public class EntityLivingPlayer extends EntityLiving
 				double damageAfterArmor = MathHelper.floorOne(
 						(d * (1F - DEFENSE_REDUCTION_PERCENT * defense)) - (defense * DEFENSE_REDUCTION_FLAT)									
 						);
-				damageAfterArmor = damageAfterAbsorbs(damageAfterArmor);
+				damageAfterArmor = dealDamageToAbsorbs(damageAfterArmor);
 				health -= damageAfterArmor; 
 				auraTracker.onDamageTaken(this);
 				//Show world text if applicable
@@ -947,11 +949,11 @@ public class EntityLivingPlayer extends EntityLiving
 						angle += 360;
 					}
 					if (isFacingRight){
-						world.addEntityToProjectileList(new EntityProjectile(ammunition.getProjectile()).setDrop(ammunition).setXLocAndYLoc(x, y)
+						world.addEntityToProjectileList(new EntityProjectile(ammunition.getProjectile()).setDrop(new ItemStack(ammunition)).setXLocAndYLoc(x, y)
 								.setDirection(angle).setDamage((ammunition.getProjectile().getDamage() + item.getDamage())));
 					}
 					else{
-						world.addEntityToProjectileList(new EntityProjectile(ammunition.getProjectile()).setDrop(ammunition).setXLocAndYLoc(x, y)
+						world.addEntityToProjectileList(new EntityProjectile(ammunition.getProjectile()).setDrop(new ItemStack(ammunition)).setXLocAndYLoc(x, y)
 								.setDirection(angle).setDamage((ammunition.getProjectile().getDamage() + item.getDamage())));
 					}
 					inventory.removeItemsFromInventoryStack(1, inventory.doesPartialStackExist(ammo[i]));

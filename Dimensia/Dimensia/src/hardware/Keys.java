@@ -7,14 +7,14 @@ import client.Dimensia;
 import client.Keybinds;
 import client.Settings;
 
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 
 import world.World;
 
 /**
  * <code>Keys</code> is responsible for handling most keyboard input within the application. Keyboard input
  * for the main menu is self-contained in <code>GuiMainMenu</code>, but all other keyboard input
- * is handled here. Currently only implements one method {@link #keyboard(World, EntityLivingPlayer, Settings)}
+ * is handled here. Currently only implements one method {@link #keyboard(World, EntityPlayer, Settings)}
  * to handle ingame key binds. All methods in Keys are static, so it cannot be instantiated.
  * @author      Alec Sobeck
  * @author      Matthew Robertson
@@ -42,7 +42,7 @@ public class Keys
 	 * @param settings
 	 * @param keybinds
 	 */
-	public static void universalKeyboard(World world, EntityLivingPlayer player, Settings settings, Keybinds keybinds)
+	public static void universalKeyboard(World world, EntityPlayer player, Settings settings, Keybinds keybinds)
 	{
 		//Check for the (left) shift modifier (this may be useful in other parts of the program)
 				lshiftDown = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT);
@@ -56,7 +56,7 @@ public class Keys
 	 * @param player
 	 * @param settings
 	 */
-	public static void keyboard(World world, EntityLivingPlayer player, Settings settings, Keybinds keybinds)
+	public static void keyboard(World world, EntityPlayer player, Settings settings, Keybinds keybinds)
 	{	
 		if(Dimensia.initInDebugMode)
 		{
@@ -106,7 +106,7 @@ public class Keys
         }
         if(Keyboard.isKeyDown(Keyboard.KEY_SPACE)) //Jump
         {
-        	player.hasJumped();
+        	player.tryToJumpAgain();
         }
         
         final int[] actionKeyValues = 
@@ -168,7 +168,7 @@ public class Keys
 	        {
 	        	//for(int i = 0; i < 3;i++){
 	        	//player.registerStatusEffect(new StatusEffectStun(5, 1));
-//	        	EntityLivingNPCEnemy enemy = new EntityLivingNPCEnemy(EntityLivingNPCEnemy.slime);//EntityLivingNPC.test.clone();
+//	        	EntityNPCEnemy enemy = new EntityNPCEnemy(EntityNPCEnemy.slime);//EntityNPC.test.clone();
 //				enemy.setPosition((int)player.x, (int)player.y);
 //				world.addEntityToEnemyList(enemy);	
 	        	//}

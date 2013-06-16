@@ -17,17 +17,17 @@ public class StatusEffectStun extends StatusEffect
 
 	public void applyInitialEffect(EntityLiving entity)
 	{	
-		entity.isStunned = true;
+		entity.setStunned(true);
 	}
 	
 	public void removeInitialEffect(EntityLiving entity)
 	{	
-		entity.isStunned = false;
+		entity.setStunned(false);
 	}
 	
 	public void applyPeriodicBonus(World world, EntityLiving entity)
 	{
-		entity.isStunned = true;
+		entity.setStunned(true);
 		ticksLeft--;
 	}
 	

@@ -5,7 +5,7 @@ import io.Chunk;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 
 import utils.ChunkUtils;
 import utils.LightUtils;
@@ -15,7 +15,7 @@ import blocks.BlockLight;
 
 public class RenderLight extends Render
 {	
-	public void render(World world, EntityLivingPlayer player)
+	public void render(World world, EntityPlayer player)
 	{
 		adjustCameraToLastPosition();
 		final int width = (int)(Display.getWidth() / 11.1);

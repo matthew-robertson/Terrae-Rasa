@@ -7,7 +7,6 @@ import items.Item;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
@@ -15,10 +14,6 @@ import render.GuiMainMenu;
 import render.RenderGlobal;
 import render.RenderMenu;
 import spells.Spell;
-
-import entities.EntityLivingPlayer;
-import enums.EnumDifficulty;
-
 import utils.ErrorUtils;
 import utils.FileManager;
 import utils.ItemStack;
@@ -26,15 +21,15 @@ import utils.LightUtils;
 import world.World;
 import world.WorldHell;
 import world.WorldSky;
-
-import audio.SoundManager;
 import blocks.Block;
+import entities.EntityPlayer;
+import enums.EnumDifficulty;
 
 /**
  * <code>GameEngine</code> is the class responsible for running the main game loop, and other core features of multiple worlds.
  * <code>GameEngine</code> defines 4 important methods. 
  * <br><br>
- * The method {@link #startGame(World, EntityLivingPlayer)} defines the method to actually start the game with the specified World object
+ * The method {@link #startGame(World, EntityPlayer)} defines the method to actually start the game with the specified World object
  * and player. This will close the main menu and begin rendering based on the Chunk data. 
  * <br><br>
  * Most of the application's life cycle is spent in {@link #run()} method, which contains the main game loop. This handles
@@ -59,12 +54,12 @@ public class GameEngine
 							   RENDER_MODE_WORLD_SKY  = 3;
 	/** The currently selected RENDER_MODE_WORLD value, detailing what world to update, load, and render.*/
 	private int renderMode;
-	public SoundManager soundManager;
+	//public SoundManager soundManager;
 	public GuiMainMenu mainMenu;
 	public World world;
 	public WorldHell worldHell;
 	public WorldSky worldSky;
-	public EntityLivingPlayer player;
+	public EntityPlayer player;
 	public Settings settings;
 	public RenderMenu renderMenu;
 	/** The number of game ticks per second - this will always be 20 */
@@ -233,7 +228,7 @@ public class GameEngine
 	 * @param world the world to play on.
 	 * @param player the player to play on.
 	 */
-	public void startGame(World world, EntityLivingPlayer player)
+	public void startGame(World world, EntityPlayer player)
 	{
 		if(this.world != null)
 		{
@@ -290,7 +285,7 @@ public class GameEngine
 			Dimensia.isMainMenuOpen = false;
 			FileManager fileManager = new FileManager();
 			world = fileManager.generateNewWorld("World", 1200, 800, EnumDifficulty.EASY);//EnumWorldSize.LARGE.getWidth(), EnumWorldSize.LARGE.getHeight());
-			player = fileManager.generateAndSavePlayer("!!", EnumDifficulty.NORMAL);//new EntityLivingPlayer("Test player", EnumDifficulty.NORMAL);
+			player = fileManager.generateAndSavePlayer("!!", EnumDifficulty.NORMAL);//new EntityPlayer("Test player", EnumDifficulty.NORMAL);
 			world.addPlayerToWorld(player);
 			world.assessForAverageSky();
 			LightUtils utils = new LightUtils();
@@ -301,7 +296,8 @@ public class GameEngine
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.chest, 100));
 
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.ironChest, 100));
-			
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.snowball, 16));
+						
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.healthPotion1, 100));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.healthPotion2, 100));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.manaPotion1, 100));

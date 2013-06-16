@@ -36,10 +36,10 @@ import blocks.BlockChest;
 import blocks.BlockGrass;
 import blocks.BlockLight;
 import blocks.BlockPillar;
-import entities.EntityLivingItemStack;
-import entities.EntityLivingNPC;
-import entities.EntityLivingNPCEnemy;
-import entities.EntityLivingPlayer;
+import entities.EntityItemStack;
+import entities.EntityNPC;
+import entities.EntityNPCEnemy;
+import entities.EntityPlayer;
 import entities.EntityProjectile;
 import enums.EnumColor;
 import enums.EnumDifficulty;
@@ -89,10 +89,10 @@ public class World
 	public Hashtable<String, Boolean> chunksLoaded;
 	
 	public Weather weather;
-	public List<EntityLivingItemStack> itemsList;
+	public List<EntityItemStack> itemsList;
 	public List<WorldText> temporaryText; 
-	public List<EntityLivingNPCEnemy> entityList;
-	public List<EntityLivingNPC> npcList;
+	public List<EntityNPCEnemy> entityList;
+	public List<EntityNPC> npcList;
 	public List<EntityProjectile> projectileList;
 	public SpawnManager manager;
 	
@@ -111,7 +111,7 @@ public class World
 	private int width; //Width in blocks, not pixels
 	private int height; //Height in blocks, not pixels
 	private double previousLightLevel;
-	private EntityLivingNPCEnemy[] spawnList;
+	private EntityNPCEnemy[] spawnList;
 	private LightUtils utils;
 	private boolean lightingUpdateRequired;
 	
@@ -121,11 +121,11 @@ public class World
 	public World()
 	{
 		setChunks(new ConcurrentHashMap<String, Chunk>(10));
-		entityList = new ArrayList<EntityLivingNPCEnemy>(255);
+		entityList = new ArrayList<EntityNPCEnemy>(255);
 		projectileList = new ArrayList<EntityProjectile>(255);
-		npcList = new ArrayList<EntityLivingNPC>(255);
+		npcList = new ArrayList<EntityNPC>(255);
 		temporaryText = new ArrayList<WorldText>(100);
-		itemsList = new ArrayList<EntityLivingItemStack>(250);
+		itemsList = new ArrayList<EntityItemStack>(250);
 		chunksLoaded= new Hashtable<String, Boolean>(25);
 		manager = new SpawnManager();
 		utils = new LightUtils();
@@ -147,11 +147,11 @@ public class World
 		setChunks(new ConcurrentHashMap<String, Chunk>(10));
 		this.width = width;
 		this.height = height; 
-		entityList = new ArrayList<EntityLivingNPCEnemy>(255);
+		entityList = new ArrayList<EntityNPCEnemy>(255);
 		projectileList = new ArrayList<EntityProjectile>(255);
-		npcList = new ArrayList<EntityLivingNPC>(255);
+		npcList = new ArrayList<EntityNPC>(255);
 		temporaryText = new ArrayList<WorldText>(100);
-		itemsList = new ArrayList<EntityLivingItemStack>(250);
+		itemsList = new ArrayList<EntityItemStack>(250);
 		chunksLoaded= new Hashtable<String, Boolean>(25);
 		worldTime = (long) (6.5 * GAMETICKSPERHOUR);
 		worldName = "Earth";
@@ -181,7 +181,7 @@ public class World
 	 * @param player the player to be added
 	 * @return the player with updated position (x, y)
 	 */
-	public EntityLivingPlayer spawnPlayer(EntityLivingPlayer player) 
+	public EntityPlayer spawnPlayer(EntityPlayer player) 
 	{
 		if(player.inventory.isEmpty())
 		{
@@ -263,7 +263,7 @@ public class World
 		worldTime = Long.valueOf((ois.readObject()).toString()).longValue();
 		totalBiomes = Integer.valueOf((ois.readObject()).toString()).intValue();
 		difficulty = (EnumDifficulty)ois.readObject();
-		itemsList = (ArrayList<EntityLivingItemStack>)ois.readObject();
+		itemsList = (ArrayList<EntityItemStack>)ois.readObject();
 		
 		System.out.println("Loaded And Applied World Data");
 		ois.close();
@@ -276,7 +276,7 @@ public class World
 	 * Adds a player to the world. Currently multiplayer placeholder.
 	 * @param player the player to add
 	 */
-	public void addPlayerToWorld(EntityLivingPlayer player)
+	public void addPlayerToWorld(EntityPlayer player)
 	{
 		requestRequiredChunks(getWorldCenterBlock(), averageSkyHeight);
 		chunkManager.addAllLoadedChunks_Wait(this, getChunks());
@@ -309,7 +309,7 @@ public class World
 	public void clearEntityList()
 	{
 //		entityList.clear();
-		entityList = new ArrayList<EntityLivingNPCEnemy>(255);
+		entityList = new ArrayList<EntityNPCEnemy>(255);
 	}
 	
 	/**
@@ -331,7 +331,7 @@ public class World
 	/**
 	 * Keeps track of the worldtime and updates the light if needed
 	 */
-	public void updateWorldTime(EntityLivingPlayer player)
+	public void updateWorldTime(EntityPlayer player)
 	{
 		//worldTime / GAMETICKSPERHOUR = the hour (from 00:00 to 24:00)
 		worldTime++;
@@ -379,19 +379,19 @@ public class World
 	}
 	
 	/**
-	 * Adds an EntityLivingNPCEnemy to the entityList in this instance of World
+	 * Adds an EntityNPCEnemy to the entityList in this instance of World
 	 * @param enemy the enemy to add to entityList
 	 */
-	public void addEntityToEnemyList(EntityLivingNPCEnemy enemy)
+	public void addEntityToEnemyList(EntityNPCEnemy enemy)
 	{
 		entityList.add(enemy);
 	}
 	
 	/**
-	 * Adds an EntityLivingNPC to the npcList in this instance of World
+	 * Adds an EntityNPC to the npcList in this instance of World
 	 * @param npc the npc to add to entityList
 	 */
-	public void addEntityToNPCList(EntityLivingNPC npc)
+	public void addEntityToNPCList(EntityNPC npc)
 	{
 		npcList.add(npc);
 	}
@@ -409,7 +409,7 @@ public class World
 	 * Adds an EntityLivingItemStack to the itemsList in this instance of World
 	 * @param stack the EntityLivingItemStack to add to itemsList
 	 */
-	public void addItemStackToItemList(EntityLivingItemStack stack)
+	public void addItemStackToItemList(EntityItemStack stack)
 	{
 		itemsList.add(stack);
 	}
@@ -431,9 +431,9 @@ public class World
 	/**
 	 * Calls all the methods to update the world and its inhabitants
 	 */
-	public void onWorldTick(EntityLivingPlayer player)
+	public void onWorldTick(EntityPlayer player)
 	{		
-	//	spawnMonsters(player);				
+		spawnMonsters(player);				
 		causeWeather();		
 		//update the player
 		
@@ -513,15 +513,18 @@ public class World
 	/**
 	 * Picks up itemstacks that the player is standing on (or very near to)
 	 */
-	private void performPlayerItemHittests(EntityLivingPlayer player)
+	private void performPlayerItemHittests(EntityPlayer player)
 	{
 		for(int i = 0; i < itemsList.size(); i++)
 		{
-			double distance = MathHelper.distanceBetweenTwoPoints(itemsList.get(i).x + (itemsList.get(i).width / 2), itemsList.get(i).y + (itemsList.get(i).height / 2),
-																  player.x + (player.width / 2), player.y + (player.height / 2));
-			if(distance <= itemsList.get(i).width * 1.75 && itemsList.get(i).ticksBeforePickup <= 0) 
-			{ //is the player near the itemstack, and can it be picked up yet?
-				ItemStack stack = player.inventory.pickUpItemStack(this, player, itemsList.get(i).stack); //if so try to pick it up
+			double distance = MathHelper.distanceBetweenTwoPoints(itemsList.get(i).x + (itemsList.get(i).width / 2), 
+					itemsList.get(i).y + (itemsList.get(i).height / 2),
+					player.x + (player.width / 2), 
+					player.y + (player.height / 2));
+			//Check if the itemstack is near the player and able to be picked up
+			if(distance <= itemsList.get(i).width * 1.75 && itemsList.get(i).canBePickedUp()) 
+			{
+				ItemStack stack = player.inventory.pickUpItemStack(this, player, itemsList.get(i).getStack()); //if so try to pick it up
 				
 				if(stack == null) //nothing's left, remove the null element
 				{
@@ -529,12 +532,12 @@ public class World
 				}
 				else //otherwise, put back what's left
 				{
-					itemsList.get(i).stack = stack;				
+					itemsList.get(i).setStack(stack);				
 				}
 			}
 			else
 			{
-				itemsList.get(i).ticksBeforePickup--; 
+				itemsList.get(i).update(); 
 			}	
 		}
 	}
@@ -542,7 +545,7 @@ public class World
 	/**
 	 * applies AI to npcs
 	 */
-	private void updateNPCs(EntityLivingPlayer player){
+	private void updateNPCs(EntityPlayer player){
 		for (int i = 0; i < npcList.size(); i++){
 			if (npcList.get(i).isDead()){
 				npcList.remove(i);
@@ -561,7 +564,7 @@ public class World
 	 * 
 	 * @param player
 	 */
-	private void updateMonsters(EntityLivingPlayer player)
+	private void updateMonsters(EntityPlayer player)
 	{
 		final int OUT_OF_RANGE = (int) ((Display.getHeight() > Display.getWidth()) ? Display.getHeight() * 0.75 : Display.getWidth() * 0.75);
 		for(int i = 0; i < entityList.size(); i++)
@@ -573,7 +576,7 @@ public class World
 				{
 					for(ItemStack stack : drops) //drop each of them
 					{
-						addItemStackToItemList(new EntityLivingItemStack(entityList.get(i).x - 1, entityList.get(i).y - 1, stack));
+						addItemStackToItemList(new EntityItemStack(entityList.get(i).x - 1, entityList.get(i).y - 1, stack));
 					}
 				}
 				entityList.remove(i);
@@ -670,7 +673,7 @@ public class World
 	 * Updates (and possibly removes) projectiles
 	 * @param player - player to compare distances against
 	 */
-	private void updateProjectiles(EntityLivingPlayer player)
+	private void updateProjectiles(EntityPlayer player)
 	{
 		final int OUT_OF_RANGE = (int) ((Display.getHeight() > Display.getWidth()) ? Display.getHeight() * 0.75 : Display.getWidth() * 0.75);
 		for(int i = 0; i < projectileList.size(); i++)
@@ -682,15 +685,19 @@ public class World
 				projectileList.get(i).ticksNonActive++;
 			}
 			
-			if(((MathHelper.distanceBetweenTwoPoints(player.x, player.y, projectileList.get(i).x, projectileList.get(i).y) > OUT_OF_RANGE) || projectileList.get(i).ticksNonActive > 80) && projectileList.get(i).getType() != 'm')
-			{ //If the projectile is too far away, remove it
+			//If the projectile is too far away, remove it
+			if(((MathHelper.distanceBetweenTwoPoints(player.x, player.y, projectileList.get(i).x, projectileList.get(i).y) > OUT_OF_RANGE) || 
+					projectileList.get(i).ticksNonActive > 80))
+			{ 
 				if (projectileList.get(i).ticksNonActive > 1 && projectileList.get(i).getDrop() != null){
-					addItemStackToItemList(new EntityLivingItemStack(projectileList.get(i).x - 1, projectileList.get(i).y - 1, projectileList.get(i).getDrop()));
+					addItemStackToItemList(new EntityItemStack(projectileList.get(i).x - 1, projectileList.get(i).y - 1, projectileList.get(i).getDrop()));
 				}
 				projectileList.remove(i);
 				continue;
 			}
-			else if (((MathHelper.distanceBetweenTwoPoints(player.x, player.y, projectileList.get(i).x, projectileList.get(i).y) > OUT_OF_RANGE) || projectileList.get(i).ticksNonActive > 1) && projectileList.get(i).getType() == 'm'){
+			else if (((MathHelper.distanceBetweenTwoPoints(player.x, player.y, projectileList.get(i).x, projectileList.get(i).y) > OUT_OF_RANGE) || 
+					projectileList.get(i).ticksNonActive > 1)) 
+			{
 				projectileList.remove(i);
 				continue;
 			}
@@ -700,7 +707,7 @@ public class World
 	/**
 	 * Sees if any monsters have hit (are in range of) the player
 	 */
-	private void performPlayerMonsterHittests(EntityLivingPlayer player)
+	private void performPlayerMonsterHittests(EntityPlayer player)
 	{
 		for(int i = 0; i < entityList.size(); i++)
 		{
@@ -714,7 +721,7 @@ public class World
 	/**
 	 * Sees if any projectiles have hit (are in range of) players or npcs
 	 */
-	private void performProjectileHittests(EntityLivingPlayer player)
+	private void performProjectileHittests(EntityPlayer player)
 	{
 		for (int i = 0; i < projectileList.size(); i++){
 			if (projectileList.get(i).isFriendly){
@@ -762,7 +769,7 @@ public class World
 	 * Attempts to spawn monsters, based on random numbers
 	 * @return number of monsters successfully spawned
 	 */
-	private int spawnMonsters(EntityLivingPlayer player)
+	private int spawnMonsters(EntityPlayer player)
 	{
 		int totalTries = 2 + random.nextInt(4);
 		//int totalTries = 500;		
@@ -874,7 +881,7 @@ public class World
 				//Ground Entity:
 				if((getBlock(xoff, (yoff + 3)).getIsSolid() || getBlock(xoff + 1, (yoff + 3)).getIsSolid())) //make sure there's actually ground to spawn on
 				{
-					EntityLivingNPCEnemy enemy = new EntityLivingNPCEnemy(spawnList[entitych]);
+					EntityNPCEnemy enemy = new EntityNPCEnemy(spawnList[entitych]);
 					enemy.setPosition(xoff * 6, yoff * 6);
 					entityList.add(enemy);
 					counter++;
@@ -955,7 +962,7 @@ public class World
 	  return c;
 	}
 	
-	private void performEnemyToolHittests(EntityLivingPlayer player) //Work in progress, not yet fully implemented
+	private void performEnemyToolHittests(EntityPlayer player) //Work in progress, not yet fully implemented
 	{
 		if(player.inventory.getMainInventoryStack(player.selectedSlot) == null ||
 				player.inventory.getMainInventoryStack(player.selectedSlot).getItemID() >= ActionbarItem.spellIndex ||
@@ -1061,14 +1068,14 @@ public class World
 	 * @param mx x position in the 'world map'
 	 * @param my y position in the 'world map'
 	 */
-	private void handleBlockBreakEvent(EntityLivingPlayer player, int mx, int my)
+	private void handleBlockBreakEvent(EntityPlayer player, int mx, int my)
 	{
 		if(!getBlock(mx, my).hasMetaData) //normal block
 		{
 			ItemStack stack = getBlock(mx, my).getDroppedItem();
 			if(stack != null) //if there's an item to drop, add it to the list of dropped items
 			{
-				addItemStackToItemList(new EntityLivingItemStack((mx * 6) - 1, (my * 6) - 2, stack));
+				addItemStackToItemList(new EntityItemStack((mx * 6) - 1, (my * 6) - 2, stack));
 			}
 			
 			if(getBlock(mx, my) instanceof BlockLight)
@@ -1118,7 +1125,7 @@ public class World
 				{
 					if(stacks[i] != null)
 					{
-						addItemStackToItemList(new EntityLivingItemStack((mx * 6) + random.nextInt(8) - 2, (my * 6) + random.nextInt(8) - 2, stacks[i])); //drop the item into the world
+						addItemStackToItemList(new EntityItemStack((mx * 6) + random.nextInt(8) - 2, (my * 6) + random.nextInt(8) - 2, stacks[i])); //drop the item into the world
 					}
 				}
 				
@@ -1158,7 +1165,7 @@ public class World
 					}					
 				}
 				
-				addItemStackToItemList(new EntityLivingItemStack((mx * 6) - 1, (my * 6) - 2, stack)); //drop the item into the world
+				addItemStackToItemList(new EntityItemStack((mx * 6) - 1, (my * 6) - 2, stack)); //drop the item into the world
 			}
 		}		
 		getBlockGenerate(mx-1,my).setBitMap(updateBlockBitMap(mx-1, my));
@@ -1176,7 +1183,7 @@ public class World
 	 * @param my y position in the worldmap array, of the block being placed
 	 * @param block the block to be placed
 	 */
-	public void placeBlock(EntityLivingPlayer player, int mx, int my, Block block)
+	public void placeBlock(EntityPlayer player, int mx, int my, Block block)
 	{
 		if(block.hasMetaData) //if the block is large
 		{
@@ -1298,7 +1305,7 @@ public class World
 	 * @param mx x position in worldmap array, of the BlockWood
 	 * @param my y position in the worldmap array, of the BlockWood
 	 */
-	public void breakTree(EntityLivingPlayer player, int mx, int my){
+	public void breakTree(EntityPlayer player, int mx, int my){
 		
 		//Loop as long as part of the tree is above
 		while(my >= 1 && getBlock(mx, my-1).getID() == Block.tree.getID() || 
@@ -1393,7 +1400,7 @@ public class World
 	 * @param mx the x position of the first block in worldMap
 	 * @param my the y position of the first block in worldMap
 	 */
-	public void breakCactus(EntityLivingPlayer player, int mx, int my)
+	public void breakCactus(EntityPlayer player, int mx, int my)
 	{
 		while(getBlock(mx, my-1).getID() == Block.cactus.getID())
 		{
@@ -1416,7 +1423,7 @@ public class World
 	 * @param x the x position of the block to break (in the 'world map')
 	 * @param y the y position of the block to break (in the 'world map')
 	 */
-	public void breakBlock(EntityLivingPlayer player, int x, int y)
+	public void breakBlock(EntityPlayer player, int x, int y)
 	{
 		handleBlockBreakEvent(player, x, y);
 		breakCactus(player, x, y);
@@ -1729,7 +1736,7 @@ public class World
 	 * Checks for chunks that need to be loaded or unloaded, based on the player's screen size. The range in which chunks stay loaded increases if the player's 
 	 * screen size is larger. (It's about ((width/2.2), (height/2.2))). 
 	 */
-	private void updateChunks(EntityLivingPlayer player)
+	private void updateChunks(EntityPlayer player)
 	{
 		//How far to check for chunks (in blocks)
 		final int loadDistanceHorizontally = (((int)(Display.getWidth() / 2.2) + 3) > Chunk.getChunkWidth()) ? ((int)(Display.getWidth() / 2.2) + 3) : Chunk.getChunkWidth();
@@ -1996,7 +2003,7 @@ public class World
 	 * the world has changed, or if the chunk (for whatever reason) has been flagged for a lighting update by a source.
 	 * @param player
 	 */
-	public void applyLightingUpdates(EntityLivingPlayer player)
+	public void applyLightingUpdates(EntityPlayer player)
 	{
 		//If the light level has changed, update the ambient lighting.
 		if(lightingUpdateRequired)
@@ -2028,4 +2035,15 @@ public class World
         }
 	}
 	
+
+	/** 
+	 * Launches a projectile
+	 * @param world - current world
+	 * @param angle - the angle at which to launch the projectile
+	 * @param projectile - the projectile to launch
+	 */
+	public void launchProjectile(World world, int angle, EntityProjectile projectile, double x, double y)
+	{
+		addEntityToProjectileList(new EntityProjectile(projectile).setXLocAndYLoc(x, y).setDirection(angle));
+	}
 }

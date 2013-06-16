@@ -1,17 +1,17 @@
 package auras;
 
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 
 /**
  * IAura defines the different event listeners an Aura can implement. These must be implemented by the base class of all Auras - Aura.
  * Version 1.0 defines the following methods:
  * <ul>
- * <li>{@link #onDamageDone(EntityLivingPlayer)}</li>
- * <li>{@link #onDamageTaken(EntityLivingPlayer)}</li>
- * <li>{@link #onDeath(EntityLivingPlayer)}</li>
- * <li>{@link #onHeal(EntityLivingPlayer)}</li>
- * <li>{@link #onPercentageHealth(EntityLivingPlayer)}</li>
- * <li>{@link #onStatusEffectGained(EntityLivingPlayer)}</li>
+ * <li>{@link #onDamageDone(EntityPlayer)}</li>
+ * <li>{@link #onDamageTaken(EntityPlayer)}</li>
+ * <li>{@link #onDeath(EntityPlayer)}</li>
+ * <li>{@link #onHeal(EntityPlayer)}</li>
+ * <li>{@link #onPercentageHealth(EntityPlayer)}</li>
+ * <li>{@link #onStatusEffectGained(EntityPlayer)}</li>
  * </ul>
  * @author      Alec Sobeck
  * @author      Matthew Robertson
@@ -20,13 +20,13 @@ import entities.EntityLivingPlayer;
  */
 public interface IAura 
 {
-	public abstract void onDamageDone(EntityLivingPlayer player); 
+	public abstract void onDamageDone(EntityPlayer player); 
 
-	public abstract void onDamageTaken(EntityLivingPlayer player); 
+	public abstract void onDamageTaken(EntityPlayer player); 
 
-	public abstract void onHeal(EntityLivingPlayer player);
+	public abstract void onHeal(EntityPlayer player);
 
-	public abstract void onPercentageHealth(EntityLivingPlayer player); 
+	public abstract void onPercentageHealth(EntityPlayer player); 
 
-	public abstract void onDeath(EntityLivingPlayer player); 
+	public abstract void onDeath(EntityPlayer player); 
 }

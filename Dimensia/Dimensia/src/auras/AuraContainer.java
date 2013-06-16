@@ -3,7 +3,7 @@ package auras;
 import java.io.Serializable;
 import java.util.Vector;
 
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 
 /**
  * An aura container holds an array of auras for further use. For example, this is useful when 

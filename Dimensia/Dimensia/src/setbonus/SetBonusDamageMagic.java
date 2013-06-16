@@ -1,6 +1,6 @@
 package setbonus;
 
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 
 /**
  * SetBonusDamageMagic extends SetBonus to provide changes to a player's magic damage modifier (magic damage type). This allows 
@@ -19,12 +19,12 @@ public class SetBonusDamageMagic extends SetBonus
 		super(power);
 	}
 
-	public void apply(EntityLivingPlayer player) 
+	public void apply(EntityPlayer player) 
 	{
 		player.magicDamageModifier *= (1 + power);
 	}
 
-	public void remove(EntityLivingPlayer player) 
+	public void remove(EntityPlayer player) 
 	{
 		player.magicDamageModifier/= (1 + power);
 	}

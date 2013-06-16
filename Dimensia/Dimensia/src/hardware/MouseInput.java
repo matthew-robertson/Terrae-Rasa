@@ -8,7 +8,7 @@ import items.ItemRanged;
 
 import org.lwjgl.input.Mouse;
 
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 
 import render.Render;
 import spells.Spell;
@@ -24,9 +24,9 @@ public class MouseInput
 {	
 	private static boolean mouseLock = false;
 	
-	public static void mouse(World world, EntityLivingPlayer player)
+	public static void mouse(World world, EntityPlayer player)
 	{
-		if(player.isStunned)
+		if(player.isStunned())
 		{
 			return;
 		}

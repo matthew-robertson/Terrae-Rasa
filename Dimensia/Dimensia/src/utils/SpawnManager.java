@@ -2,41 +2,41 @@ package utils;
 
 import java.util.Vector;
 
-import entities.EntityLivingNPCEnemy;
+import entities.EntityNPCEnemy;
 
 public class SpawnManager
 {
-	public Vector<EntityLivingNPCEnemy> forestNightEnemies;
-	public Vector<EntityLivingNPCEnemy> desertNightEnemies;
-	public Vector<EntityLivingNPCEnemy> arcticNightEnemies;
-	public Vector<EntityLivingNPCEnemy> forestDayEnemies;
-	public Vector<EntityLivingNPCEnemy> desertDayEnemies;
-	public Vector<EntityLivingNPCEnemy> arcticDayEnemies;
+	public Vector<EntityNPCEnemy> forestNightEnemies;
+	public Vector<EntityNPCEnemy> desertNightEnemies;
+	public Vector<EntityNPCEnemy> arcticNightEnemies;
+	public Vector<EntityNPCEnemy> forestDayEnemies;
+	public Vector<EntityNPCEnemy> desertDayEnemies;
+	public Vector<EntityNPCEnemy> arcticDayEnemies;
 	
 	public SpawnManager()
 	{
 		if (forestNightEnemies == null){
-			forestNightEnemies = new Vector<EntityLivingNPCEnemy>();
+			forestNightEnemies = new Vector<EntityNPCEnemy>();
 		}
 		
 		if (forestDayEnemies == null){
-			forestDayEnemies = new Vector<EntityLivingNPCEnemy>();
+			forestDayEnemies = new Vector<EntityNPCEnemy>();
 		}
 		
 		if (desertNightEnemies == null){
-			desertNightEnemies = new Vector<EntityLivingNPCEnemy>();
+			desertNightEnemies = new Vector<EntityNPCEnemy>();
 		}
 		
 		if (desertDayEnemies == null){
-			desertDayEnemies = new Vector<EntityLivingNPCEnemy>();
+			desertDayEnemies = new Vector<EntityNPCEnemy>();
 		}
 		
 		if (arcticNightEnemies == null){
-			arcticNightEnemies = new Vector<EntityLivingNPCEnemy>();
+			arcticNightEnemies = new Vector<EntityNPCEnemy>();
 		}
 		
 		if (arcticDayEnemies == null){
-			arcticDayEnemies = new Vector<EntityLivingNPCEnemy>();
+			arcticDayEnemies = new Vector<EntityNPCEnemy>();
 		}
 		
 		setSpawnVector();		
@@ -46,9 +46,9 @@ public class SpawnManager
 	 * Get the forestNightEnemies Vector as an array
 	 * @return forestNightEnemies Vector as an array
 	 */
-	public EntityLivingNPCEnemy[] getForestNightEnemiesAsArray()
+	public EntityNPCEnemy[] getForestNightEnemiesAsArray()
 	{
-		EntityLivingNPCEnemy[] enemies = new EntityLivingNPCEnemy[forestNightEnemies.size()];
+		EntityNPCEnemy[] enemies = new EntityNPCEnemy[forestNightEnemies.size()];
 		forestNightEnemies.copyInto(enemies);
 		return enemies;
 	}
@@ -57,9 +57,9 @@ public class SpawnManager
 	 * Get the desertNightEnemies Vector as an array
 	 * @return desertNightEnemies Vector as an array
 	 */
-	public EntityLivingNPCEnemy[] getDesertNightEnemiesAsArray()
+	public EntityNPCEnemy[] getDesertNightEnemiesAsArray()
 	{
-		EntityLivingNPCEnemy[] enemies = new EntityLivingNPCEnemy[desertNightEnemies.size()];
+		EntityNPCEnemy[] enemies = new EntityNPCEnemy[desertNightEnemies.size()];
 		desertNightEnemies.copyInto(enemies);
 		return enemies;
 	}
@@ -68,9 +68,9 @@ public class SpawnManager
 	 * Get the arcticNightEnemies Vector as an array
 	 * @return arcticNightEnemies Vector as an array
 	 */
-	public EntityLivingNPCEnemy[] getArcticNightEnemiesAsArray()
+	public EntityNPCEnemy[] getArcticNightEnemiesAsArray()
 	{
-		EntityLivingNPCEnemy[] enemies = new EntityLivingNPCEnemy[arcticNightEnemies.size()];
+		EntityNPCEnemy[] enemies = new EntityNPCEnemy[arcticNightEnemies.size()];
 		arcticNightEnemies.copyInto(enemies);
 		return enemies;
 	}
@@ -79,9 +79,9 @@ public class SpawnManager
 	 * Get the forestDayEnemies Vector as an array
 	 * @return forestDayEnemies Vector as an array
 	 */
-	public EntityLivingNPCEnemy[] getForestDayEnemiesAsArray()
+	public EntityNPCEnemy[] getForestDayEnemiesAsArray()
 	{
-		EntityLivingNPCEnemy[] enemies = new EntityLivingNPCEnemy[forestDayEnemies.size()];
+		EntityNPCEnemy[] enemies = new EntityNPCEnemy[forestDayEnemies.size()];
 		forestDayEnemies.copyInto(enemies);
 		return enemies;
 	}
@@ -90,9 +90,9 @@ public class SpawnManager
 	 * Get the desertDayEnemies Vector as an array
 	 * @return desertDayEnemies Vector as an array
 	 */
-	public EntityLivingNPCEnemy[] getDesertDayEnemiesAsArray()
+	public EntityNPCEnemy[] getDesertDayEnemiesAsArray()
 	{
-		EntityLivingNPCEnemy[] enemies = new EntityLivingNPCEnemy[desertDayEnemies.size()];
+		EntityNPCEnemy[] enemies = new EntityNPCEnemy[desertDayEnemies.size()];
 		desertDayEnemies.copyInto(enemies);
 		return enemies;
 	}
@@ -101,9 +101,9 @@ public class SpawnManager
 	 * Get the arcticDayEnemies Vector as an array
 	 * @return arcticDayEnemies Vector as an array
 	 */
-	public EntityLivingNPCEnemy[] getArcticDayEnemiesAsArray()
+	public EntityNPCEnemy[] getArcticDayEnemiesAsArray()
 	{
-		EntityLivingNPCEnemy[] enemies = new EntityLivingNPCEnemy[arcticDayEnemies.size()];
+		EntityNPCEnemy[] enemies = new EntityNPCEnemy[arcticDayEnemies.size()];
 		arcticDayEnemies.copyInto(enemies);
 		return enemies;
 	}
@@ -112,11 +112,11 @@ public class SpawnManager
 	 * add an enemy to the forestNightEnemies vector
 	 * @param enemy to add.
 	 */
-	public void addForestNightEnemy(EntityLivingNPCEnemy enemy)
+	public void addForestNightEnemy(EntityNPCEnemy enemy)
 	{
 		if(forestNightEnemies == null)
 		{
-			forestNightEnemies = new Vector<EntityLivingNPCEnemy>();
+			forestNightEnemies = new Vector<EntityNPCEnemy>();
 		}
 		forestNightEnemies.add(enemy);
 	}
@@ -125,11 +125,11 @@ public class SpawnManager
 	 * add an enemy to the desertNightEnemies vector
 	 * @param enemy to add.
 	 */
-	public void addDesertNightEnemy(EntityLivingNPCEnemy enemy)
+	public void addDesertNightEnemy(EntityNPCEnemy enemy)
 	{
 		if(desertNightEnemies == null)
 		{
-			desertNightEnemies = new Vector<EntityLivingNPCEnemy>();
+			desertNightEnemies = new Vector<EntityNPCEnemy>();
 		}
 		desertNightEnemies.add(enemy);
 	}
@@ -138,11 +138,11 @@ public class SpawnManager
 	 * add an enemy to the arcticNightEnemies vector
 	 * @param enemy to add.
 	 */
-	public void addArcticNightEnemy(EntityLivingNPCEnemy enemy)
+	public void addArcticNightEnemy(EntityNPCEnemy enemy)
 	{
 		if(arcticNightEnemies == null)
 		{
-			arcticNightEnemies = new Vector<EntityLivingNPCEnemy>();
+			arcticNightEnemies = new Vector<EntityNPCEnemy>();
 		}
 		arcticNightEnemies.add(enemy);
 	}
@@ -151,11 +151,11 @@ public class SpawnManager
 	 * add an enemy to the forestDayEnemies vector
 	 * @param enemy to add.
 	 */
-	public void addForestDayEnemy(EntityLivingNPCEnemy enemy)
+	public void addForestDayEnemy(EntityNPCEnemy enemy)
 	{
 		if(forestDayEnemies == null)
 		{
-			forestDayEnemies = new Vector<EntityLivingNPCEnemy>();
+			forestDayEnemies = new Vector<EntityNPCEnemy>();
 		}
 		forestDayEnemies.add(enemy);
 	}
@@ -164,11 +164,11 @@ public class SpawnManager
 	 * add an enemy to the desertDayEnemies vector
 	 * @param enemy to add.
 	 */
-	public void addDesertDayEnemy(EntityLivingNPCEnemy enemy)
+	public void addDesertDayEnemy(EntityNPCEnemy enemy)
 	{
 		if(desertDayEnemies == null)
 		{
-			desertDayEnemies = new Vector<EntityLivingNPCEnemy>();
+			desertDayEnemies = new Vector<EntityNPCEnemy>();
 		}
 		desertDayEnemies.add(enemy);
 	}
@@ -177,11 +177,11 @@ public class SpawnManager
 	 * add an enemy to the desertDayEnemies vector
 	 * @param enemy to add.
 	 */
-	public void addArcticDayEnemy(EntityLivingNPCEnemy enemy)
+	public void addArcticDayEnemy(EntityNPCEnemy enemy)
 	{
 		if(arcticDayEnemies == null)
 		{
-			arcticDayEnemies = new Vector<EntityLivingNPCEnemy>();
+			arcticDayEnemies = new Vector<EntityNPCEnemy>();
 		}
 		arcticDayEnemies.add(enemy);
 	}
@@ -189,7 +189,7 @@ public class SpawnManager
 	/**
 	 * @depreciated [Forced compiler warning]-> replace string == string2 with string.equals(string2)
 	 * 
-	 * Sets possible spawn locations (biomes/times) for the EntityLivingNPCEnemy 
+	 * Sets possible spawn locations (biomes/times) for the EntityNPCEnemy 
 	 * instance the method is called on.
 	 * @param manager
 	 * @param t = chosen biome/time to allow spawning
@@ -197,11 +197,11 @@ public class SpawnManager
 	 */
 	private void setSpawnVector()
 	{
-		for(int i = 0; i < EntityLivingNPCEnemy.enemyList.length; i++)
+		for(int i = 0; i < EntityNPCEnemy.enemyList.length; i++)
 		{
-			if(EntityLivingNPCEnemy.enemyList[i] != null)
+			if(EntityNPCEnemy.enemyList[i] != null)
 			{
-				EntityLivingNPCEnemy enemy = new EntityLivingNPCEnemy(EntityLivingNPCEnemy.enemyList[i]);
+				EntityNPCEnemy enemy = new EntityNPCEnemy(EntityNPCEnemy.enemyList[i]);
 				String type = enemy.type;
 				String time = enemy.time;
 				

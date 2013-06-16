@@ -1,6 +1,6 @@
 package items;
 
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 import statuseffects.StatusEffectAbsorb;
 import world.World;
 
@@ -11,7 +11,7 @@ public class ItemPotionAbsorb extends ItemPotion
 		super(i, duration, tier, power, ticksBetweenEffect);
 	}
 	
-	public void onRightClick(World world, EntityLivingPlayer player)
+	public void onRightClick(World world, EntityPlayer player)
 	{
 		if(!player.isOnCooldown(id))
 		{

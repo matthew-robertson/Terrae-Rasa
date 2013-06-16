@@ -5,14 +5,14 @@ import org.lwjgl.opengl.GL11;
 
 import client.Settings;
 
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 
 import world.World;
 
 public class RenderWorldEarth extends RenderWorld
 {	
 	RenderLight renderLight = new RenderLight();
-	public void render(World world, EntityLivingPlayer player, Settings settings) 
+	public void render(World world, EntityPlayer player, Settings settings) 
 	{		
 		GL11.glEnable(GL11.GL_BLEND);
 

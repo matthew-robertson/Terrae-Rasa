@@ -1,6 +1,6 @@
 package setbonus;
 
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 
 /**
  * SetBonusSpeed extends SetBonus to provide changes to a player's movement speed. This allows an item to increase the player's
@@ -19,14 +19,16 @@ public class SetBonusSpeed extends SetBonus
 		super(power);
 	}
 
-	public void apply(EntityLivingPlayer player) 
+	public void apply(EntityPlayer player) 
 	{
-		player.movementSpeedModifier *= (1 + power);
+		player.setMovementSpeedModifier(player.getMovementSpeedModifier()
+				* (1 + power));
 	}
 
-	public void remove(EntityLivingPlayer player) 
+	public void remove(EntityPlayer player) 
 	{
-		player.movementSpeedModifier /= (1 + power);
+		player.setMovementSpeedModifier(player.getMovementSpeedModifier()
+				/ (1 + power));
 	}
 
 	public String toString()

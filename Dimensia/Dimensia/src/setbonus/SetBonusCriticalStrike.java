@@ -1,6 +1,6 @@
 package setbonus;
 
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 
 /**
  * SetBonusCriticalStrike extends SetBonus to increase the player's critical chance by a given amount. Critical Strike Chance
@@ -19,12 +19,12 @@ public class SetBonusCriticalStrike extends SetBonus
 		super(power);
 	}
 
-	public void apply(EntityLivingPlayer player) 
+	public void apply(EntityPlayer player) 
 	{
 		player.criticalStrikeChance += power;
 	}
 
-	public void remove(EntityLivingPlayer player) 
+	public void remove(EntityPlayer player) 
 	{
 		player.criticalStrikeChance -= power;
 	}

@@ -1,6 +1,6 @@
 package spells;
 
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 import statuseffects.StatusEffectAbsorb;
 import world.World;
 
@@ -26,10 +26,10 @@ public class SpellBulwark extends Spell
 	}
 	
 	/**
-	 * Overrides ActionbarItem.onRightClick(World, EntityLivingPlayer) to implement the spell effect of SpellBulwark - the 
+	 * Overrides ActionbarItem.onRightClick(World, EntityPlayer) to implement the spell effect of SpellBulwark - the 
 	 * absorb shield. Calling this will fail to use the spell if not enough special energy is available.
 	 */
-	public void onRightClick(World world, EntityLivingPlayer player)
+	public void onRightClick(World world, EntityPlayer player)
 	{
 		if(player.specialEnergy >= cost)
 		{

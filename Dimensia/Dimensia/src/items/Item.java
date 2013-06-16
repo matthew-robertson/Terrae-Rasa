@@ -322,10 +322,10 @@ public class Item extends ActionbarItem
 	public static Item diamondPillarEnd = new Item(206).setIconPosition(4,11).setName("Diamond P");
 	public static Item goldPillarEnd = new Item(207).setIconPosition(4,12).setName("Gold P");
 	
-	public static Item woodenArrow = new ItemAmmo(300).setProjectile(EntityProjectile.woodenArrow).setIconPosition(0, 0).setName("Wooden Arrow");
+	public static Item woodenArrow = new ItemAmmo(300).setProjectile(new EntityProjectile(7, 1, 1, 8f).setIconIndex(0,1).setIsFriendly(true)).setIconPosition(0, 0).setName("Wooden Arrow");
 	
 	public static Item snowball = new ItemRanged(301, 50).setAmmo(Item.woodenArrow).setCooldownTicks(10).setName("Snow Ball").setIconPosition(14, 0);
-	public static Item magicMissileSpell = new ItemMagic(302, 1, 10, EntityProjectile.magicMissile).setName("Tome of Magic Missile").setIconPosition(6, 0);
+	//public static Item magicMissileSpell = new ItemMagic(302, 1, 10, EntityProjectile.magicMissile).setName("Tome of Magic Missile").setIconPosition(6, 0);
 	public static Item heartCrystal = new ItemHeartCrystal(340).setIconPosition(7, 0).setName("Heart Crystal");
 	public static Item manaCrystal = new ItemManaCrystal(341).setIconPosition(6, 0).setName("Mana Crystal");
 	

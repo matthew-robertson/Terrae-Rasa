@@ -23,12 +23,14 @@ public class StatusEffectSwiftness extends StatusEffect
 
 	public void applyInitialEffect(EntityLiving entity)
 	{	
-		entity.movementSpeedModifier *= 1 + power;
+		entity.setMovementSpeedModifier(entity.getMovementSpeedModifier()
+				* (1 + power));
 	}
 	
 	public void removeInitialEffect(EntityLiving entity)
 	{	
-		entity.movementSpeedModifier /= 1 + power;
+		entity.setMovementSpeedModifier(entity.getMovementSpeedModifier()
+				/ (1 + power));
 	}
 	
 	public String toString()

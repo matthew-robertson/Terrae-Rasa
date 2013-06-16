@@ -16,12 +16,12 @@ public class StatusEffectFallHeight extends StatusEffect
 
 	public void applyInitialEffect(EntityLiving entity)
 	{	
-		entity.maxHeightFallenSafely += power;
+		entity.setMaxHeightFallenSafely(entity.getMaxHeightFallenSafely() + power);
 	}
 	
 	public void removeInitialEffect(EntityLiving entity)
 	{	
-		entity.maxHeightFallenSafely -= power;
+		entity.setMaxHeightFallenSafely(entity.getMaxHeightFallenSafely() - power);
 	}
 	
 	public String toString()

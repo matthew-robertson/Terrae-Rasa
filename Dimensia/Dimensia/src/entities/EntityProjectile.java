@@ -3,42 +3,31 @@ package entities;
 import utils.ItemStack;
 import utils.MathHelper;
 import world.World;
-import items.Item;
 
 /*
  * m - requires mp
  * b - requires bow
  */
-/**
- * 
- * @author Matt
- * 
- */
 public class EntityProjectile extends EntityParticle 
 {
 	private static final long serialVersionUID = 1L;
-	protected char type;
-	protected int projectileId;
 	public int damage;
 	public boolean isFriendly;
 	public boolean isHostile;
 	protected double speed;
-	protected String name;
 	protected int direction;	
 	public double criticalStrikeChance;
-	public int iconIndex;
+	public int iconX;
+	public int iconY;
 	protected ItemStack drop;
 	public int ticksNonActive;
 	
-	public EntityProjectile(int i, String name, int damage, char c, int w, int h, double s){
-		super (w, h);
-		projectileId = i;
-		type = c;
+	public EntityProjectile(int damage, int width, int height, double speed){
+		super (width, height);
 		x = 0;
 		y = 0;
 		ticksNonActive = 0;
-		this.name = name;
-		speed = s;
+		this.speed = speed;
 		direction = 0;
 		active = true;
 		ticksActive = 1;
@@ -46,39 +35,30 @@ public class EntityProjectile extends EntityParticle
 		isHostile = false;		
 		this.damage = damage;
 		criticalStrikeChance = 0.05f;
-		
-		if (projectileList[i] != null){
-			throw new RuntimeException("Entity already exists @" + i);
-		}		
-		projectileList[i] = this;
 	}
 	
+	/**
+	 * Creates a deep copy of the given EntityProjectile, calling all super class copy constructors.
+	 * @param entity the EntityProjectile to make a deep copy of
+	 */
 	public EntityProjectile(EntityProjectile entity)
 	{
 		super(entity);
-
-		this.type = entity.type;
-		this.projectileId = entity.projectileId;
 		this.damage = entity.damage;
-		this.active = entity.active; 
 		this.isFriendly = entity.isFriendly;
 		this.isHostile = entity.isHostile;
 		this.speed = entity.speed;
-		this.name = entity.name;
 		this.direction = entity.direction;
-		this.blockWidth = entity.blockWidth;
-		this.width = entity.width;
-		this.blockHeight = entity.blockHeight;
-		this.height = entity.height;
 		this.criticalStrikeChance = entity.criticalStrikeChance;
-		this.iconIndex = entity.iconIndex;
+		this.iconX = entity.iconX;
+		this.iconY = entity.iconY;
 		this.drop = entity.drop;
 		this.ticksNonActive = entity.ticksNonActive;
 	}
 	
 	/**
 	 * Moves the projectile based off of its x and y veloctiy as well as gravity.
-	 * @param world = the current world
+	 * @param world the current world
 	 */
 	public void moveProjectile(World world){
 		this.integrate(world);		
@@ -89,60 +69,7 @@ public class EntityProjectile extends EntityParticle
 			setIsHostile(false);
 		}		
 	}	
-	
-	/**
-	 * Applies a jump to the entity's Y Position. Disables jumping if (y < 0) or the upwardJumpCounter exceeds the upwardJumpHeight.
-	 */
-	public void moveEntityUp(World world, double movementValue)
-	{		
-		int loops = (int) (movementValue) + 1;	
-		
-		for(int i = 0; i < loops; i++)
-		{
-			double f = canMoveUp(world);			
-			y += f;							
-			if(y < 0) 
-			{
-				y = 0;
-				break;
-			}
-			if(y > (world.getHeight() * 6) - blockHeight * 6 - 6)
-			{
-				y = (world.getHeight() * 6) - blockHeight * 6 - 6;
-				break;
-			}
 			
-			movementValue -= f;
-		}
-	}	
-	
-	
-	public void moveEntityDown(World world, double movementValue)  
-	{		
-		int loops = (int) (movementValue) + 1;
-		
-		for(int i = 0; i < loops; i++)
-		{
-			double f = canMoveDown(world);
-			
-			y += f;
-			
-			
-			if(y > (world.getHeight() * 6) - blockHeight * 6 - 6)
-			{
-				y = (world.getHeight() * 6) - blockHeight * 6 - 6;
-				break;
-			}
-
-			movementValue -= f;
-		}
-	}	
-	
-	public EntityProjectile setType(char c){
-		type = c;
-		return this;
-	}
-	
 	public EntityProjectile setXLoc(int x){
 		this.x = x;
 		return this;
@@ -164,18 +91,16 @@ public class EntityProjectile extends EntityParticle
 		return this;
 	}
 
-
 	public EntityProjectile setDirection(int d){
 		direction = d;
-		double r = Math.toRadians(d);
-		velocity = MathHelper.toRectangular(speed, (double) r);
+		velocity = MathHelper.toRectangular(speed, Math.toRadians(d));
 		velocity.y = -velocity.y;
-		
 		return this;
 	}
 	
-	public EntityProjectile setIconIndex(int i, int j){
-		iconIndex = i * 16 + j;
+	public EntityProjectile setIconIndex(int x, int y) {
+		iconX = x;
+		iconY = y;
 		return this;
 	}
 	
@@ -194,26 +119,9 @@ public class EntityProjectile extends EntityParticle
 		return this;
 	}
 	
-	public EntityProjectile setDrop(Item d){
-		drop = new ItemStack(d);
+	public EntityProjectile setDrop(ItemStack stack){
+		drop = new ItemStack(stack);
 		return this;
-	}
-	
-	
-	public int getBlockWidth(){
-		return blockWidth;
-	}
-	
-	public int getBlockHeight(){
-		return blockHeight;
-	}
-	
-	public char getType(){
-		return type;
-	}
-	
-	public int getProjectileId(){
-		return projectileId;
 	}
 			
 	public int getDamage(){
@@ -236,13 +144,10 @@ public class EntityProjectile extends EntityParticle
 		return drop;
 	}
 	
-	public String getName(){
-		return name;
-	}
 	
-	public EntityProjectile[] projectileList = new EntityProjectile[2];
-	
-	public final static EntityProjectile magicMissile = new EntityProjectile(0, "Magic Missile", 5, 'm', 1, 1, 7f).setAffectedByGravity(false).setIconIndex(0,0).setIsFriendly(true);
-	public final static EntityProjectile woodenArrow = new EntityProjectile(1, "wooden Arrow", 7, 'b', 1, 1, 8f).setIconIndex(0,1).setIsFriendly(true);
+//	public EntityProjectile[] projectileList = new EntityProjectile[2];
+//	
+//	public final static EntityProjectile magicMissile = new EntityProjectile(5, 1, 1, 7f).setAffectedByGravity(false).setIconIndex(0,0).setIsFriendly(true);
+//	public final static EntityProjectile woodenArrow = new EntityProjectile(7, 1, 1, 8f).setIconIndex(0,1).setIsFriendly(true);
 	
 }

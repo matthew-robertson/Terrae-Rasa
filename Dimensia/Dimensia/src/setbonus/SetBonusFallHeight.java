@@ -1,6 +1,6 @@
 package setbonus;
 
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 
 /**
  * SetBonusFallHeight extends SetBonus to increase the player's distance fallen safely. Each point of power allows the player
@@ -19,14 +19,14 @@ public class SetBonusFallHeight extends SetBonus
 		super(power);
 	}
 
-	public void apply(EntityLivingPlayer player) 
+	public void apply(EntityPlayer player) 
 	{
-		player.maxHeightFallenSafely += 6 * power;
+		player.setMaxHeightFallenSafely(player.getMaxHeightFallenSafely() + 6 * power);
 	}
 
-	public void remove(EntityLivingPlayer player) 
+	public void remove(EntityPlayer player) 
 	{
-		player.maxHeightFallenSafely -= 6 * power; 
+		player.setMaxHeightFallenSafely(player.getMaxHeightFallenSafely() - 6 * power); 
 	}
 
 	public String toString()

@@ -1,6 +1,6 @@
 package auras;
 
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 
 public class AuraHeavensReprieve extends Aura
 {
@@ -11,7 +11,7 @@ public class AuraHeavensReprieve extends Aura
 		super();
 	}
 	
-	public void onDeath(EntityLivingPlayer player) 
+	public void onDeath(EntityPlayer player) 
 	{
 		if(player.health <= 0)
 		{

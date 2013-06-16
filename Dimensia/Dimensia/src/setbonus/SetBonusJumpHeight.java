@@ -1,6 +1,6 @@
 package setbonus;
 
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 
 /**
  * SetBonusJumpHeight extends SetBonus to increase the player's jump height by a given amount. This is a fixed amount, indicated
@@ -19,12 +19,12 @@ public class SetBonusJumpHeight extends SetBonus
 		super(power);
 	}
 
-	public void apply(EntityLivingPlayer player) 
+	public void apply(EntityPlayer player) 
 	{
 		player.setUpwardJumpHeight(player.getUpwardJumpHeight() + power);
 	}
 
-	public void remove(EntityLivingPlayer player) 
+	public void remove(EntityPlayer player) 
 	{
 		player.setUpwardJumpHeight(player.getUpwardJumpHeight() - power);
 	}

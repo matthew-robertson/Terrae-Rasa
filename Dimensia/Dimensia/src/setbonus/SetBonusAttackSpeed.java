@@ -1,6 +1,6 @@
 package setbonus;
 
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 
 /**
  * SetBonusAttackSpeed power extends SetBonus to increase the player's attack speed by a given amount. Attack Speed
@@ -20,13 +20,13 @@ public class SetBonusAttackSpeed extends SetBonus
 		super(power);
 	}
 
-	public void apply(EntityLivingPlayer player) 
+	public void apply(EntityPlayer player) 
 	{
 		//Is this the right stack method?
 		player.attackSpeedModifier += power;
 	}
 
-	public void remove(EntityLivingPlayer player) 
+	public void remove(EntityPlayer player) 
 	{
 		player.attackSpeedModifier -= power;
 	}

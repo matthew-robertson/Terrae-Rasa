@@ -1,6 +1,6 @@
 package items;
 
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 import statuseffects.StatusEffectSteelSkin;
 import world.World;
 
@@ -11,7 +11,7 @@ public class ItemPotionSteelSkin extends ItemPotion
 		super(i, duration, tier, power, ticksBetweenEffect);
 	}
 	
-	public void onRightClick(World world, EntityLivingPlayer player)
+	public void onRightClick(World world, EntityPlayer player)
 	{
 		player.registerStatusEffect(new StatusEffectSteelSkin(durationSeconds, tier, power, ticksBetweenEffect));
 		player.inventory.removeItemsFromInventoryStack(1, player.selectedSlot);

@@ -1,6 +1,6 @@
 package items;
 
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 import world.World;
 
 public class ItemPotionHealth extends Item
@@ -13,7 +13,7 @@ public class ItemPotionHealth extends Item
 		healthRestored = h;
 	}
 	
-	public void onRightClick(World world, EntityLivingPlayer player)
+	public void onRightClick(World world, EntityPlayer player)
 	{
 		if(!player.isOnCooldown(id))
 		{

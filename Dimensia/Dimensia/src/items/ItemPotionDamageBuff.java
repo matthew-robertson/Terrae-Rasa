@@ -1,6 +1,6 @@
 package items;
 
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 import statuseffects.StatusEffectDamageBuff;
 import world.World;
 
@@ -11,7 +11,7 @@ public class ItemPotionDamageBuff extends ItemPotion
 		super(i, duration, tier, power, ticksBetweenEffect);
 	}
 	
-	public void onRightClick(World world, EntityLivingPlayer player)
+	public void onRightClick(World world, EntityPlayer player)
 	{
 		player.registerStatusEffect(new StatusEffectDamageBuff(durationSeconds, tier, power, ticksBetweenEffect));
 		player.inventory.removeItemsFromInventoryStack(1, player.selectedSlot);

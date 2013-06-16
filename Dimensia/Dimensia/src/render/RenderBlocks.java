@@ -5,7 +5,7 @@ import io.Chunk;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 
 import utils.ChunkUtils;
 import world.World;
@@ -14,7 +14,7 @@ import blocks.Block;
 
 public class RenderBlocks extends Render
 {
-	public void renderBackwall(World world, EntityLivingPlayer player)
+	public void renderBackwall(World world, EntityPlayer player)
 	{
 		adjustCamera(world, player);
 		final int xsize = (int)(Display.getWidth() / 11.1);
@@ -180,7 +180,7 @@ public class RenderBlocks extends Render
 		t.draw();
 	}
 	
-	public void render(World world, EntityLivingPlayer player) 
+	public void render(World world, EntityPlayer player) 
 	{
 		adjustCameraToLastPosition();
 		final int xsize = (int)(Display.getWidth() / 11.1);

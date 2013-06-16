@@ -2,9 +2,9 @@ package render;
 
 import org.lwjgl.opengl.GL11;
 
-import entities.EntityLivingNPC;
-import entities.EntityLivingNPCEnemy;
-import entities.EntityLivingPlayer;
+import entities.EntityNPC;
+import entities.EntityNPCEnemy;
+import entities.EntityPlayer;
 import entities.EntityProjectile;
 
 import utils.Texture;
@@ -16,7 +16,7 @@ public class RenderEntities extends Render
 	/**
 	 * Renders the player entity
 	 */
-	public void renderPlayer(World world, EntityLivingPlayer player)
+	public void renderPlayer(World world, EntityPlayer player)
 	{
 		GL11.glColor4f(1, 1, 1, 1);
 		if(player.isFacingRight) //facing right (default)
@@ -53,7 +53,7 @@ public class RenderEntities extends Render
 	{
 		for(int i = 0; i < world.entityList.size(); i++)
 		{
-			renderEntityLivingNPCEnemy(world.entityList.get(i).getTexture(), (EntityLivingNPCEnemy) world.entityList.get(i));
+			renderEntityNPCEnemy(world.entityList.get(i).getTexture(), (EntityNPCEnemy) world.entityList.get(i));
 		}
 	}
 	
@@ -62,7 +62,7 @@ public class RenderEntities extends Render
 	 */
 	public void renderNPCs(World world){
 		for(int i = 0; i < world.npcList.size(); i++){
-			renderEntityLivingNPC(world.npcList.get(i).getTexture(), (EntityLivingNPC) world.npcList.get(i));
+			renderEntityNPC(world.npcList.get(i).getTexture(), (EntityNPC) world.npcList.get(i));
 		}
 	}
 
@@ -83,7 +83,7 @@ public class RenderEntities extends Render
 	 * @param tex texture of entity being drawn <<<< likely being replaced
 	 * @param enemy enemy to draw
 	 */
-	public void renderEntityLivingNPCEnemy(Texture tex, EntityLivingNPCEnemy enemy)
+	public void renderEntityNPCEnemy(Texture tex, EntityNPCEnemy enemy)
 	{
 		GL11.glColor4f(1, 1, 1, 1);
 		double x = (int)enemy.x;
@@ -107,7 +107,7 @@ public class RenderEntities extends Render
 	 * @param tex texture of entity being drawn <<<< likely being replaced
 	 * @param enemy enemy to draw
 	 */
-	public void renderEntityLivingNPC(Texture tex, EntityLivingNPC npc)
+	public void renderEntityNPC(Texture tex, EntityNPC npc)
 	{
 		GL11.glColor4f(1, 1, 1, 1);
 		double x = (int)npc.x;
@@ -136,8 +136,8 @@ public class RenderEntities extends Render
         double y = (int)projectile.getY();
         double ph = projectile.height;
 		double pw = projectile.width;
-		double tx = (double)((projectile.iconIndex / 16) * 16) / 256;
-	    double ty = (double)((projectile.iconIndex % 16) * 16) / 256;
+		double tx = (double)(projectile.iconX * 16) / 256;
+	    double ty = (double)(projectile.iconY * 16) / 256;
 		double tw = tx + ((double)projectile.blockWidth  / 16);
 		double th = ty + ((double)projectile.blockHeight / 16);
 		PROJECTILES.bind();
@@ -161,7 +161,7 @@ public class RenderEntities extends Render
 	        double y = world.itemsList.get(i).y;
 			double w = world.itemsList.get(i).width;
 			double h = world.itemsList.get(i).height;
-			textures[world.itemsList.get(i).stack.getItemID()].bind(); 
+			textures[world.itemsList.get(i).getStack().getItemID()].bind(); 
 	        t.startDrawingQuads();
 	        t.addVertexWithUV(x, y + h, 0, 0, 1);
 	        t.addVertexWithUV(x + w, y + h, 0, 1, 1);

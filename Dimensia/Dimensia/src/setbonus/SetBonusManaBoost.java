@@ -1,6 +1,6 @@
 package setbonus;
 
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 
 /**
  * SetBonusManaBoost extends SetBonus to increase a player's maximum mana without increasing their intellect. 
@@ -20,12 +20,12 @@ public class SetBonusManaBoost extends SetBonus
 		super(power);
 	}
 	
-	public void apply(EntityLivingPlayer player) 
+	public void apply(EntityPlayer player) 
 	{
 		player.maxMana += power;
 	}
 
-	public void remove(EntityLivingPlayer player) 
+	public void remove(EntityPlayer player) 
 	{
 		player.maxHealth -= power;
 	}

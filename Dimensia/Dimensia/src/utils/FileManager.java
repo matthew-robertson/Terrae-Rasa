@@ -23,7 +23,7 @@ import world.WorldGenSky;
 import world.WorldHell;
 import world.WorldSky;
 
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 import enums.EnumDifficulty;
 import enums.EnumWorldSize;
 
@@ -145,11 +145,11 @@ public class FileManager
 	 * @param difficulty The difficulty settings (EnumDifficulty) of the player being created
 	 * @return The new player created, or in the case of a failure - null;
 	 */
-	public EntityLivingPlayer generateAndSavePlayer(String name, EnumDifficulty difficulty)
+	public EntityPlayer generateAndSavePlayer(String name, EnumDifficulty difficulty)
 	{
 		try 
 		{
-			EntityLivingPlayer player = generateNewEntityLivingPlayer(name, difficulty);
+			EntityPlayer player = generateNewEntityPlayer(name, difficulty);
 			savePlayer(player);
 			return player;
 		}
@@ -161,14 +161,14 @@ public class FileManager
 	}
 	
 	/**
-	 * Generates a new EntityLivingPlayer with filler x, y positions
+	 * Generates a new EntityPlayer with filler x, y positions
 	 * @param name the name of the player to be generated.
 	 * @param difficulty the difficulty setting (EnumDifficulty) of the player to be generated
-	 * @return a newly generated EntityLivingPlayer with given attributes 
+	 * @return a newly generated EntityPlayer with given attributes 
 	 */
-	private EntityLivingPlayer generateNewEntityLivingPlayer(String name, EnumDifficulty difficulty)
+	private EntityPlayer generateNewEntityPlayer(String name, EnumDifficulty difficulty)
 	{
-		return new EntityLivingPlayer(name, difficulty);
+		return new EntityPlayer(name, difficulty);
 	}
 	
 	/**
@@ -177,7 +177,7 @@ public class FileManager
 	 * @throws IOException Indicates the saving operation has failed
 	 * @throws FileNotFoundException Indicates the desired directory (file) is not found on the filepath
 	 */
-	public void savePlayer(EntityLivingPlayer player) 
+	public void savePlayer(EntityPlayer player) 
 			throws FileNotFoundException, IOException
 	{
 		verifyDirectoriesExist();
@@ -390,16 +390,16 @@ public class FileManager
 	/**
 	 * Loads the specified player from the ~/Player Saves/ Directory
 	 * @param name the name of the player to load
-	 * @return the EntityLivingPlayer loaded
+	 * @return the EntityPlayer loaded
 	 * @throws IOException Indicates the saving operation has failed
-	 * @throws ClassNotFoundException Indicates the EntityLivingPlayer class does not exist with the correct version
+	 * @throws ClassNotFoundException Indicates the EntityPlayer class does not exist with the correct version
 	 */
-	public EntityLivingPlayer loadPlayer(String name) 
+	public EntityPlayer loadPlayer(String name) 
 			throws IOException, ClassNotFoundException
 	{
 		String fileName = BASE_PATH + "/Player Saves/" + name + ".dat";
 		ObjectInputStream ois = new ObjectInputStream(new DataInputStream(new GZIPInputStream(new FileInputStream(fileName)))); //Open an input stream
-		EntityLivingPlayer player = (EntityLivingPlayer)ois.readObject(); //Load the object
+		EntityPlayer player = (EntityPlayer)ois.readObject(); //Load the object
 	    System.out.println("Player loaded from: " + fileName);
 		ois.close();
 		player.reconstructPlayerFromFile();

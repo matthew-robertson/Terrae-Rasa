@@ -7,7 +7,7 @@ import org.lwjgl.opengl.GL11;
 
 import client.Dimensia;
 
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 
 import utils.ActionbarItem;
 import utils.MathHelper;
@@ -17,7 +17,7 @@ import world.World;
 
 public class RenderWorld extends Render
 {
-	public void renderToolSwing(World world, EntityLivingPlayer player)
+	public void renderToolSwing(World world, EntityPlayer player)
 	{
 		//The following conditions indicate that a tool swing should not be rendered:
 		//(1)There is nothing being held; (2): there isnt a tool swing; (3): The player is holding a spell; 

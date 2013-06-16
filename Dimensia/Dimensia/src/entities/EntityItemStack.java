@@ -1,11 +1,10 @@
 package entities;
 
-import utils.ItemStack;
-import world.World;
 import items.Item;
 import items.ItemArmor;
 import items.ItemTool;
-import blocks.Block;
+import utils.ItemStack;
+import world.World;
 
 /**
  * <code>EntityItemStack extends EntityLiving</code> and <code>implements Serializable</code>
@@ -19,10 +18,12 @@ import blocks.Block;
  * @version     1.0
  * @since       1.0
  */
-public class EntityItemStack extends EntityLiving
+public class EntityItemStack extends Entity
 {
 	private static final long serialVersionUID = 1L;
 	private double fallSpeed;
+	private int ticksBeforePickup;
+	private ItemStack stack;
 	
 	public EntityItemStack(double x, double y, ItemStack stack)
 	{
@@ -51,69 +52,47 @@ public class EntityItemStack extends EntityLiving
 		this.x = x;
 		this.y = y;
 		fallSpeed = 1.8f; 
-		maxHealth = 1;
-		health = 1;
 		blockWidth = (double)(width) / 6;
 		blockHeight = (double)(height) / 6;
 		ticksBeforePickup = 20;
-		this.stack = stack;
+		this.setStack(stack);
 	}
 	
 	/**
-	 * Overrides EntityLiving's applyGravity because itemstacks cant jump. Moves the itemstack down if applicable.
+	 * Overrides EntityLiving's applyGravity because ItemStacks can't jump. Moves the itemstack down if applicable instead.
 	 */
 	public void applyGravity(World world)
 	{
 		if(!isOnGround(world)) //if the entity is in the air, make them fall
 		{
-			moveEntityDown(world);			
+			moveEntityDown(world, fallSpeed);			
 		}		
+	}	
+	
+	/**
+	 * Gets whether or not the EntityItemStack can be picked up. 
+	 * @return true if it can be picked up, otherwise false
+	 */
+	public boolean canBePickedUp()
+	{
+		return ticksBeforePickup <= 0;
 	}
 	
 	/**
-	 * Overrides EntityLiving's moveEntityDown because EntityItemStack shouldnt typically behave as though it's alive.
+	 * Updates the EntityItemStack, decreasing time before it can be picked up if applicable.
 	 */
-	public void moveEntityDown(World world) 	 
-	{		
-		int offset = (int) Math.ceil((y % 6 == 0) ? blockHeight : (blockHeight + 1)); 
-		
-		if((int)((y + fallSpeed) / 6) + offset + 1 > world.getHeight() - 1) //bounds check
-		{
-			y = world.getHeight() * 6 - height + 6;
-			return;
-		}
-		
-		Block[] blocks = new Block[(int) Math.ceil(blockWidth + ((x % 6 == 0) ? 0 : 1))]; //blocks to check
-		boolean flag = true;
-		
-		for(int i = 0; i < blocks.length; i++) //get blocks to check
-		{
-			blocks[i] = world.getBlock((x / 6) + i, ((y + fallSpeed) / 6) + offset); 
-		}		
-
-		for(int i = 0; i < blocks.length; i++)
-		{
-			if(blocks[i].getIsSolid()) //hittest has failed
-			{
-				flag = false;
-				break;
-			}
-			else
-			{
-				flag = true;
-			}
-		}
-		
-		if(flag && y + fallSpeed < world.getHeight() * 6) //Normal Gravity
-		{
-			y += fallSpeed;
-		}
-		else if(y % 6 != 0) //Near ground partial gravity 
-		{
-			y += (6 - (y % 6));
-		}		
+	public void update()
+	{
+		ticksBeforePickup--;
 	}
 	
-	public int ticksBeforePickup;
-	public ItemStack stack;
+	public ItemStack getStack() 
+	{
+		return stack;
+	}
+
+	public void setStack(ItemStack stack) 
+	{
+		this.stack = stack;
+	}
 }

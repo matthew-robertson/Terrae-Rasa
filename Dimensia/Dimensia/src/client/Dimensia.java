@@ -14,7 +14,7 @@ import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.PixelFormat;
 
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 
 import render.GuiMainMenu;
 import render.Render;
@@ -306,9 +306,9 @@ public class Dimensia
 	}
 	
 	/**
-	 * Calls the startGame(World, EntityLivingPlayer) method of the GameEngine.
+	 * Calls the startGame(World, EntityPlayer) method of the GameEngine.
 	 */
-	public static void startGame(World world, EntityLivingPlayer player)
+	public static void startGame(World world, EntityPlayer player)
 	{
 		dimensia.gameEngine.startGame(world, player);
 	}

@@ -1,6 +1,6 @@
 package items;
 
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 import world.World;
 
 public class ItemPotionMana extends Item
@@ -13,7 +13,7 @@ public class ItemPotionMana extends Item
 		manaRestored = m;
 	}
 	
-	public void onRightClick(World world, EntityLivingPlayer player)
+	public void onRightClick(World world, EntityPlayer player)
 	{
 		boolean success = player.restoreMana(world, manaRestored, true);
 

@@ -1,6 +1,6 @@
 package setbonus;
 
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 
 /**
  * SetBonusKnockback extends SetBonus to provide changes to a player's knockback ability. This allows an item to increase the player's
@@ -19,12 +19,12 @@ public class SetBonusKnockback extends SetBonus
 		super(power);
 	}
 
-	public void apply(EntityLivingPlayer player) 
+	public void apply(EntityPlayer player) 
 	{
 		player.knockbackModifier *= (1 + power);
 	}
 
-	public void remove(EntityLivingPlayer player) 
+	public void remove(EntityPlayer player) 
 	{
 		player.knockbackModifier /= (1 + power);
 	}	

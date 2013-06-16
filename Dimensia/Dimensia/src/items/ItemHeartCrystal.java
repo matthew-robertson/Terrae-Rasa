@@ -1,6 +1,6 @@
 package items;
 
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 import world.World;
 
 public class ItemHeartCrystal extends Item
@@ -14,7 +14,7 @@ public class ItemHeartCrystal extends Item
 		HEALTH_INCREASE = 20;
 	}
 	
-	public void onRightClick(World world, EntityLivingPlayer player)
+	public void onRightClick(World world, EntityPlayer player)
 	{
 		boolean success = player.boostMaxHealth(HEALTH_INCREASE);
 		

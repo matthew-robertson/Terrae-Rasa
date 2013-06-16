@@ -1,6 +1,6 @@
 package setbonus;
 
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 
 /**
  * SetBonusDamageMelee extends SetBonus to provide changes to a player's melee damage modifier (melee damage type). This allows an item 
@@ -19,12 +19,12 @@ public class SetBonusDamageMelee extends SetBonus
 		super(power);
 	}
 
-	public void apply(EntityLivingPlayer player) 
+	public void apply(EntityPlayer player) 
 	{
 		player.meleeDamageModifier *= (1 + power);
 	}
 
-	public void remove(EntityLivingPlayer player) 
+	public void remove(EntityPlayer player) 
 	{
 		player.meleeDamageModifier /= (1 + power);
 	}

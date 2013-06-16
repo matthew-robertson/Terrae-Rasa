@@ -1,6 +1,6 @@
 package setbonus;
 
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 /**
  * SetBonusStamina extends SetBonus to increase the player's stamina by a given amount. This is a fixed amount, indicated
  * by the power value. 1 Power = +1 stamina (etc) 
@@ -18,12 +18,12 @@ public class SetBonusStamina extends SetBonus
 		super(power);
 	}
 
-	public void apply(EntityLivingPlayer player) 
+	public void apply(EntityPlayer player) 
 	{
 		player.stamina += power;
 	}
 
-	public void remove(EntityLivingPlayer player) 
+	public void remove(EntityPlayer player) 
 	{
 		player.stamina -= power;
 	}

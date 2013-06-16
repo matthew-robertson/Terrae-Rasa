@@ -5,7 +5,7 @@ import java.awt.Font;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 
 
 import utils.FileManager;
@@ -104,7 +104,7 @@ public class GuiResizableTextUncentered
 	/**
 	 * This is a special extension, used for the inventory. This saves and quits to the main menu
 	 */
-	public void saveAndQuit(World world, EntityLivingPlayer player)
+	public void saveAndQuit(World world, EntityPlayer player)
 	{
 		new FileManager().saveAndQuitGame();
 	}

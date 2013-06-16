@@ -15,7 +15,7 @@ import java.util.Hashtable;
 
 import spells.Spell;
 
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 
 import world.World;
 
@@ -31,7 +31,7 @@ import blocks.Block;
  * 
  * <br><br>
  * 
- * V1.1: All changes to the armour inventory should go through {@link #setArmorInventoryStack(EntityLivingPlayer, ItemStack, int)} now. 
+ * V1.1: All changes to the armour inventory should go through {@link #setArmorInventoryStack(EntityPlayer, ItemStack, int)} now. 
  * This is to ensure that player stats get updated appropriately.
  * 
  * <br><br>
@@ -222,7 +222,7 @@ public class InventoryPlayer
 	 * @param stack Stack to pick up
 	 * @return whatever's left, or null for a successful operation
 	 */
-	public ItemStack pickUpItemStack(World world, EntityLivingPlayer player, ItemStack stack)
+	public ItemStack pickUpItemStack(World world, EntityPlayer player, ItemStack stack)
 	{
 		int slot;
 		int size = stack.getStackSize();
@@ -330,7 +330,7 @@ public class InventoryPlayer
 	 * @param stack Stack to pick up
 	 * @return whatever's left, or null for a successful operation
 	 */
-	public ItemStack pickUpArmorItemStack(World world, EntityLivingPlayer player, ItemStack stack)
+	public ItemStack pickUpArmorItemStack(World world, EntityPlayer player, ItemStack stack)
 	{
 		Item item = (ItemArmor)(Item.itemsList[stack.getItemID()]);
 		player.onArmorChange();
@@ -394,7 +394,7 @@ public class InventoryPlayer
 	 * @param stack Stack to pick up
 	 * @return whatever's left, or null for a successful operation
 	 */
-	public ItemStack pickUpQuiverItemStack(World world, EntityLivingPlayer player, ItemStack stack)
+	public ItemStack pickUpQuiverItemStack(World world, EntityPlayer player, ItemStack stack)
 	{
 		int slot;
 		int size = stack.getStackSize();
@@ -461,7 +461,7 @@ public class InventoryPlayer
 	 * @param stack stack to try to remove (including # to remove)
 	 * @return success of the removal
 	 */
-	public boolean removeItemsFromInventory(World world, EntityLivingPlayer player, ItemStack stack)
+	public boolean removeItemsFromInventory(World world, EntityPlayer player, ItemStack stack)
 	{
 		int quantity = stack.getStackSize();
 		boolean[] nullSlots = new boolean[mainInventory.length];
@@ -540,7 +540,7 @@ public class InventoryPlayer
 	 * Removes an entire stack of the mainInventory[].
 	 * @param index index in mainInventory[] to remove
 	 */
-	public void removeEntireStackFromInventory(World world, EntityLivingPlayer player, int index)
+	public void removeEntireStackFromInventory(World world, EntityPlayer player, int index)
 	{
 		player.onInventoryChange();
 		inventoryTotals.put(mainInventory[index].getItemName(), inventoryTotals.get(mainInventory[index].getItemName()) - mainInventory[index].getStackSize()); 
@@ -553,7 +553,7 @@ public class InventoryPlayer
 	 * @param index where to place the stack in mainInventory[]
 	 * @return success of the operation
 	 */
-	public boolean putItemStackInSlot(World world, EntityLivingPlayer player, ItemStack stack, int index)
+	public boolean putItemStackInSlot(World world, EntityPlayer player, ItemStack stack, int index)
 	{
 		player.onInventoryChange();
 
@@ -578,7 +578,7 @@ public class InventoryPlayer
 	 * @param index where to combine stacks in mainInventory[]
 	 * @return success of operation
 	 */
-	public boolean combineItemStacksInSlot(World world, EntityLivingPlayer player, ItemStack stack, int index)
+	public boolean combineItemStacksInSlot(World world, EntityPlayer player, ItemStack stack, int index)
 	{
 		player.onInventoryChange();
 		if(mainInventory[index] == null || mainInventory[index].getItemID() != stack.getItemID())
@@ -600,7 +600,7 @@ public class InventoryPlayer
 	 * @param index where to place the stack in armorInventory[]
 	 * @return success of the operation
 	 */
-	public boolean setArmorInventoryStack(EntityLivingPlayer player, ItemStack stack, int index)
+	public boolean setArmorInventoryStack(EntityPlayer player, ItemStack stack, int index)
 	{
 		if(stack == null)
 		{
@@ -738,7 +738,7 @@ public class InventoryPlayer
 	 * Iterates through the armorInventory[], destroying the first item with a saving relic
 	 * attribute (to prevent death).
 	 */
-	public void removeSavingRelic(EntityLivingPlayer player)
+	public void removeSavingRelic(EntityPlayer player)
 	{
 		//TODO: Fix w/ angel's reprieve
 		for(int i = 0; i < armorInventory.length; i++)
@@ -830,7 +830,7 @@ public class InventoryPlayer
 	 * @param index where to combine stacks in quiver[]
 	 * @return success of operation
 	 */
-	public boolean combineItemStacksInQuiverSlot(World world, EntityLivingPlayer player, ItemStack stack, int index)
+	public boolean combineItemStacksInQuiverSlot(World world, EntityPlayer player, ItemStack stack, int index)
 	{
 		player.onInventoryChange();
 		if(quiver[index] == null || quiver[index].getItemID() != stack.getItemID())

@@ -11,6 +11,12 @@ public class Vector2F
 		this.y = y;
 	}
 	
+	public Vector2F(Vector2F v)
+	{
+		this.x = v.x;
+		this.y = v.y;
+	}
+	
 	public Vector2F multiplyScalar(float f){
 		return new Vector2F(x * f, y * f);
 	}

@@ -1,12 +1,12 @@
 package setbonus;
 
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 
 /**
  * ISetBonus defines the methods a SetBonus must implement. Version 1.0 includes definitions for the following methods:
  * <ul>
- * <li> {@link #apply(EntityLivingPlayer)} </li>
- * <li> {@link #remove(EntityLivingPlayer)} </li>
+ * <li> {@link #apply(EntityPlayer)} </li>
+ * <li> {@link #remove(EntityPlayer)} </li>
  * </ul>
  * @author      Alec Sobeck
  * @author      Matthew Robertson
@@ -15,7 +15,7 @@ import entities.EntityLivingPlayer;
  */
 public interface ISetBonus 
 {	
-	public abstract void apply(EntityLivingPlayer player);
+	public abstract void apply(EntityPlayer player);
 	
-	public abstract void remove(EntityLivingPlayer player);
+	public abstract void remove(EntityPlayer player);
 }

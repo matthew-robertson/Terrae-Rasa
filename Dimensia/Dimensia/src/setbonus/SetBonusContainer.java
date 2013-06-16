@@ -3,7 +3,7 @@ package setbonus;
 import java.io.Serializable;
 import java.util.Vector;
 
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 
 /**
  * A set bonus container holds an array of set bonuses for further use. This is useful when 
@@ -73,7 +73,7 @@ public class SetBonusContainer
 	 * Applies all the SetBonuses in the SetBonusContainer to the player
 	 * @param player the player to apply the SetBonuses to
 	 */
-	public void applyAll(EntityLivingPlayer player)
+	public void applyAll(EntityPlayer player)
 	{
 		for(SetBonus bonus : bonuses)
 		{
@@ -85,7 +85,7 @@ public class SetBonusContainer
 	 * Removes all the SetBonuses in the SetBonusContainer from the player
 	 * @param player the player to remove the SetBonuses from
 	 */
-	public void removeAll(EntityLivingPlayer player)
+	public void removeAll(EntityPlayer player)
 	{
 		for(SetBonus bonus : bonuses)
 		{

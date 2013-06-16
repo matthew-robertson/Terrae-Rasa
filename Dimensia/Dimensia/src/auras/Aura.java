@@ -3,19 +3,19 @@ package auras;
 import java.io.Serializable;
 import java.util.Random;
 
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 
 /**
  * Auras are event listeners for the player. They react to certain events and will do something if appropriate. Aura.java implements 
  * all the methods required by IAura but they do not do anything. To provide customized event functionality, the different 
  * event methods should be overriden. Version 1.0 of Aura includes the following event methods:
  * <ul>
- * <li>{@link #onDamageDone(EntityLivingPlayer)}</li>
- * <li>{@link #onDamageTaken(EntityLivingPlayer)}</li>
- * <li>{@link #onDeath(EntityLivingPlayer)}</li>
- * <li>{@link #onHeal(EntityLivingPlayer)}</li>
- * <li>{@link #onPercentageHealth(EntityLivingPlayer)}</li>
- * <li>{@link #onStatusEffectGained(EntityLivingPlayer)}</li>
+ * <li>{@link #onDamageDone(EntityPlayer)}</li>
+ * <li>{@link #onDamageTaken(EntityPlayer)}</li>
+ * <li>{@link #onDeath(EntityPlayer)}</li>
+ * <li>{@link #onHeal(EntityPlayer)}</li>
+ * <li>{@link #onPercentageHealth(EntityPlayer)}</li>
+ * <li>{@link #onStatusEffectGained(EntityPlayer)}</li>
  * </ul>
  * @author      Alec Sobeck
  * @author      Matthew Robertson
@@ -54,30 +54,30 @@ public abstract class Aura
 		this.id = System.nanoTime();
 	}
 	
-	public void update(EntityLivingPlayer player)
+	public void update(EntityPlayer player)
 	{
 		remainingCooldown--;
 	}
 
-	public void onDamageDone(EntityLivingPlayer player)
+	public void onDamageDone(EntityPlayer player)
 	{
 	}
 
-	public void onDamageTaken(EntityLivingPlayer player)
+	public void onDamageTaken(EntityPlayer player)
 	{
 		onPercentageHealth(player);
 	}
 	
-	public void onHeal(EntityLivingPlayer player)
+	public void onHeal(EntityPlayer player)
 	{
 		onPercentageHealth(player);
 	}
 	
-	public void onPercentageHealth(EntityLivingPlayer player)
+	public void onPercentageHealth(EntityPlayer player)
 	{
 	}
 
-	public void onDeath(EntityLivingPlayer player)
+	public void onDeath(EntityPlayer player)
 	{
 	}
 	

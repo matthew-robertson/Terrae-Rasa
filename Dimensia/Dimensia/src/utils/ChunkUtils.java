@@ -4,13 +4,13 @@ import io.Chunk;
 
 import org.lwjgl.opengl.Display;
 
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 
 import world.World;
 
 /**
  * A basic utility class to help with miscellaneous chunk operations. Currently supports getting the
- * chunks near the player, which will be rendered in the given frame, in the method {@link #getRequiredChunks(World, EntityLivingPlayer)}.
+ * chunks near the player, which will be rendered in the given frame, in the method {@link #getRequiredChunks(World, EntityPlayer)}.
  *
  * @author      Alec Sobeck
  * @author      Matthew Robertson
@@ -25,7 +25,7 @@ public class ChunkUtils
 	 * @param player the player object to get chunks around
 	 * @return the chunks that will be rendered
 	 */
-	public static Chunk[] getRequiredChunks(World world, EntityLivingPlayer player)
+	public static Chunk[] getRequiredChunks(World world, EntityPlayer player)
 	{
 		Chunk[] chunks;
 		final int width = (int)((double)(Display.getWidth() / 6) / 1.85);;

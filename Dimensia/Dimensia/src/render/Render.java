@@ -8,7 +8,7 @@ import java.awt.Font;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 
 import utils.MathHelper;
 import utils.Texture;
@@ -120,7 +120,7 @@ public class Render
 	 * This is due to the large amount of math required. Subsequent camera adjustments (per rendered frame) can be made 
 	 * much cheaper using {@link #adjustToLastCameraPosition()}.
 	 */
-	protected void adjustCamera(World world, EntityLivingPlayer player) 
+	protected void adjustCamera(World world, EntityPlayer player) 
 	{
 		GL11.glLoadIdentity();// + seems to be on ----> this side of the Y axis, it behaves quite wierdly when comparing along the X axis however
 		final int width = (int) (Display.getWidth() / 2) + 2;

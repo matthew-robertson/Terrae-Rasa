@@ -1,6 +1,6 @@
 package setbonus;
 
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 
 /**
  * SetBonusDodge extends SetBonus to increase the player's dodge chance by a given amount. Dodge is increased based on 
@@ -19,12 +19,12 @@ public class SetBonusDodge extends SetBonus
 		super(power);
 	}
 
-	public void apply(EntityLivingPlayer player) 
+	public void apply(EntityPlayer player) 
 	{
 		player.dodgeChance += power;
 	}
 
-	public void remove(EntityLivingPlayer player) 
+	public void remove(EntityPlayer player) 
 	{
 		player.dodgeChance -= power;
 	}

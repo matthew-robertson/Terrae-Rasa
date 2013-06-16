@@ -1,6 +1,6 @@
 package setbonus;
 
-import entities.EntityLivingPlayer;
+import entities.EntityPlayer;
 
 /**
  * SetBonusDamageAll extends SetBonus to provide changes to a player's damage modifier (all types). This allows an item to increase 
@@ -19,12 +19,12 @@ public class SetBonusDamageAll extends SetBonus
 		super(power);
 	}
 
-	public void apply(EntityLivingPlayer player) 
+	public void apply(EntityPlayer player) 
 	{
 		player.allDamageModifier *= (1 + power);
 	}
 
-	public void remove(EntityLivingPlayer player) 
+	public void remove(EntityPlayer player) 
 	{
 		player.allDamageModifier /= (1 + power);
 	}
