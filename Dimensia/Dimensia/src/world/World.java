@@ -1022,7 +1022,7 @@ public class World
 				damageDone = (int) (damageDone * player.allDamageModifier * player.meleeDamageModifier);
 				//CURRENTLY DAMAGE DONE IS ALWAYS MELEE
 				entityList.get(i).damageEntity(this, damageDone, flag, true, true);
-				player.inflictedDamageToMonster();
+				player.inflictedDamageToMonster(this);
 				//knockback
 				/****
 				 * ENTITIES NEED STUNNED BRIEFLY AFTER KNOCKBACK

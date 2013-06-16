@@ -73,6 +73,10 @@ public enum EnumArmor
 		this.bonuses = bonuses;
 	}
 	
+	/**
+	 * Gets all the different tiers of armor from EnumArmor
+	 * @return all the tiers of EnumArmor
+	 */
 	public static EnumArmor[] getTiers()
 	{
 		EnumArmor[] tiers = new EnumArmor[armorTiers.size()];

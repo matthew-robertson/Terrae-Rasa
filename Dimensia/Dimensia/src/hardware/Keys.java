@@ -45,7 +45,7 @@ public class Keys
 	public static void universalKeyboard(World world, EntityPlayer player, Settings settings, Keybinds keybinds)
 	{
 		//Check for the (left) shift modifier (this may be useful in other parts of the program)
-				lshiftDown = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT);
+		lshiftDown = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT);
 				
 	}
 	
@@ -141,7 +141,7 @@ public class Keys
 		
 		if(Dimensia.initInDebugMode)
 		{
-	        //Debug inputs
+			//Debug inputs
 			if(Keyboard.isKeyDown(Keyboard.KEY_W)) 
 			{
 				player.y -= 7;
@@ -152,7 +152,8 @@ public class Keys
 	        } 
 	        if (Keyboard.isKeyDown(Keyboard.KEY_F))
 			{
-				//player.launchProjectile(world, player.x, player.y, Item.snowball);
+	        	player.damageEntity(world, 5, false, false, false);
+	        	//player.launchProjectile(world, player.x, player.y, Item.snowball);
 				/*EntityProjectile.woodenArrow.clone().setXLocAndYLoc(world.player.x, world.player.y).setDirection(count));
 				count++;
 				if (count == 360) count = 0;*/
@@ -186,6 +187,7 @@ public class Keys
 	        }   
 	        if(!Keyboard.isKeyDown(Keyboard.KEY_L))
 	        {
+	        	
 	        }
 	        
 			//End debug inputs\             

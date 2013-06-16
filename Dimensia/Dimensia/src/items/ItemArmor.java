@@ -158,18 +158,27 @@ public class ItemArmor extends Item
 		return stamina;
 	}
 	
+	/**
+	 * Converts all the set bonuses for this piece of armour, then armour set bonuses, then auras into a string 
+	 * array. Useful for tooltips and visualization.
+	 * @return this armour piece's SetBonuses, tier bonuses, and auras as a String[]
+	 */
 	public String[] getStringBonuses()
 	{
 		String[] setBonuses = armorType.getSetBonusesAsStringArray();
-		String[] allBonuses = new String[bonuses.length + setBonuses.length];
+		String[] allBonuses = new String[bonuses.length + setBonuses.length + auras.length];
 		int i = 0;
 		for(i = 0; i < setBonuses.length; i++)
 		{
 			allBonuses[i] = setBonuses[i].toString();
 		}
-		for( ; i < setBonuses.length + bonuses.length; i++)
+		for(i = 0; i < bonuses.length; i++)
 		{
-			allBonuses[i] = bonuses[i - setBonuses.length].toString();
+			allBonuses[setBonuses.length + i] = bonuses[i].toString();
+		}
+		for(i = 0; i < auras.length; i++)
+		{
+			allBonuses[bonuses.length + setBonuses.length + i] = auras[i].toString();
 		}
 		return allBonuses;
 	}

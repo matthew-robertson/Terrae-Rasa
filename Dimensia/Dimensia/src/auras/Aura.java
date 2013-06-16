@@ -3,6 +3,8 @@ package auras;
 import java.io.Serializable;
 import java.util.Random;
 
+import world.World;
+
 import entities.EntityPlayer;
 
 /**
@@ -22,7 +24,7 @@ import entities.EntityPlayer;
  * @version     1.0
  * @since       1.0
  */
-public abstract class Aura 
+public class Aura 
 		implements IAura, Serializable
 {
 	private static final long serialVersionUID = 1L;
@@ -54,30 +56,30 @@ public abstract class Aura
 		this.id = System.nanoTime();
 	}
 	
-	public void update(EntityPlayer player)
+	public void update(World world, EntityPlayer player)
 	{
 		remainingCooldown--;
 	}
 
-	public void onDamageDone(EntityPlayer player)
+	public void onDamageDone(World world, EntityPlayer player)
 	{
 	}
 
-	public void onDamageTaken(EntityPlayer player)
+	public void onDamageTaken(World world, EntityPlayer player)
 	{
-		onPercentageHealth(player);
+		onPercentageHealth(world, player);
 	}
 	
-	public void onHeal(EntityPlayer player)
+	public void onHeal(World world, EntityPlayer player)
 	{
-		onPercentageHealth(player);
+		onPercentageHealth(world, player);
 	}
 	
-	public void onPercentageHealth(EntityPlayer player)
+	public void onPercentageHealth(World world, EntityPlayer player)
 	{
 	}
 
-	public void onDeath(EntityPlayer player)
+	public void onDeath(World world, EntityPlayer player)
 	{
 	}
 	
@@ -88,5 +90,13 @@ public abstract class Aura
 	public final long getID()
 	{
 		return id;
+	}
+	
+	/**
+	 * Overrides Object.toString() to accurately describe this aura in text form.
+	 */
+	public String toString()
+	{
+		return "Aura Base Class";
 	}
 }

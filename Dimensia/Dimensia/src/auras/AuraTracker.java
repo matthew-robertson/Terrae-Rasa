@@ -3,6 +3,7 @@ package auras;
 import java.io.Serializable;
 
 import utils.InventoryPlayer;
+import world.World;
 import entities.EntityPlayer;
 
 /**
@@ -55,7 +56,7 @@ public class AuraTracker
 	 * Updates all Auras, in all the different slots AuraContainers.
 	 * @param player the player to whom this AuraTracker belongs.
 	 */
-	public void update(EntityPlayer player)
+	public void update(World world, EntityPlayer player)
 	{
 		for(int i = 0; i < aurasByPiece.length; i++)
 		{
@@ -63,14 +64,14 @@ public class AuraTracker
 			{
 				for(Aura aura : aurasByPiece[i].getAll())
 				{
-					aura.update(player);
+					aura.update(world, player);
 				}
 			}
 		}
 	}
 	
 	
-	public void onDamageDone(EntityPlayer player) 
+	public void onDamageDone(World world, EntityPlayer player) 
 	{
 		for(int i = 0; i < aurasByPiece.length; i++)
 		{
@@ -78,29 +79,14 @@ public class AuraTracker
 			{
 				for(Aura aura : aurasByPiece[i].getAll())
 				{
-					aura.onDamageDone(player);
-				}
-			}
-		}
-	}
-	
-
-	public void onDamageTaken(EntityPlayer player) 
-	{
-		for(int i = 0; i < aurasByPiece.length; i++)
-		{
-			if(aurasByPiece[i] != null)
-			{
-				for(Aura aura : aurasByPiece[i].getAll())
-				{
-					aura.onDamageTaken(player);
+					aura.onDamageDone(world, player);
 				}
 			}
 		}
 	}
 	
 
-	public void onHeal(EntityPlayer player) 
+	public void onDamageTaken(World world, EntityPlayer player) 
 	{
 		for(int i = 0; i < aurasByPiece.length; i++)
 		{
@@ -108,14 +94,14 @@ public class AuraTracker
 			{
 				for(Aura aura : aurasByPiece[i].getAll())
 				{
-					aura.onHeal(player);
+					aura.onDamageTaken(world, player);
 				}
 			}
 		}
 	}
 	
 
-	public void onPercentageHealth(EntityPlayer player) 
+	public void onHeal(World world, EntityPlayer player) 
 	{
 		for(int i = 0; i < aurasByPiece.length; i++)
 		{
@@ -123,13 +109,28 @@ public class AuraTracker
 			{
 				for(Aura aura : aurasByPiece[i].getAll())
 				{
-					aura.onPercentageHealth(player);
+					aura.onHeal(world, player);
+				}
+			}
+		}
+	}
+	
+
+	public void onPercentageHealth(World world, EntityPlayer player) 
+	{
+		for(int i = 0; i < aurasByPiece.length; i++)
+		{
+			if(aurasByPiece[i] != null)
+			{
+				for(Aura aura : aurasByPiece[i].getAll())
+				{
+					aura.onPercentageHealth(world, player);
 				}
 			}
 		}
 	}
 
-	public void onDeath(EntityPlayer player) 
+	public void onDeath(World world, EntityPlayer player) 
 	{
 		for(int i = 0; i < aurasByPiece.length; i++)
 		{
@@ -137,7 +138,7 @@ public class AuraTracker
 			{
 				for(Aura aura : aurasByPiece[i].getAll())
 				{
-					aura.onDeath(player);
+					aura.onDeath(world, player);
 				}
 			}
 		}

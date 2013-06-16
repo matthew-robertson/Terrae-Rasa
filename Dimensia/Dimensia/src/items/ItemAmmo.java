@@ -14,6 +14,7 @@ public class ItemAmmo extends Item
 	
 	public ItemAmmo setProjectile(EntityProjectile projectile){
 		this.projectile = projectile;
+		this.damage = projectile.damage;
 		return this;
 	}
 	

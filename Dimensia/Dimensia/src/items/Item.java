@@ -11,6 +11,7 @@ import setbonus.SetBonusStrength;
 import utils.ActionbarItem;
 import auras.Aura;
 import auras.AuraHeavensReprieve;
+import auras.AuraSmartHeal;
 import entities.EntityProjectile;
 import enums.EnumArmor;
 import enums.EnumItemQuality;
@@ -209,7 +210,14 @@ public class Item extends ActionbarItem
 	 */
 	public String[] getStats()
 	{
-		return new String[] { };
+		if(damage > 0)
+		{
+			return new String[] { "Damage: " + damage };
+		}
+		else
+		{
+			return new String[] { };
+		}
 	}
 		
 	public static final Item[] itemsList = new Item[spellIndex];
@@ -311,6 +319,9 @@ public class Item extends ActionbarItem
 	public static Item guardianAmulet = new ItemArmorAccessory(137).setBonuses(new SetBonus[]{ 
 			new SetBonusDefense(6), 
 	}).setIconPosition(15, 6).setName("Amulet of the Guardian").setExtraTooltipInformation("This amulet contains great defensive power.");	
+	public static Item stole = new ItemArmorAccessory(138).setAuras(new Aura[]{ 
+			new AuraSmartHeal(30, 50, 0.5, false)
+	}).setIconPosition(15, 7).setName("Stole").setExtraTooltipInformation("This stole radiates holy energy.");	
 	
 	
 	public static Item copperCoin = new ItemCoin(200).setIconPosition(0, 0).setName("Copper Coin");

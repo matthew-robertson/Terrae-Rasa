@@ -136,6 +136,7 @@ public class RenderMenu extends Render
 			if(volumeSlider.inBounds(x, y))
 			{
 				volumeSlider.onClick(x, y);
+				settings.volume = volumeSlider.getValue();
 			}
 		}
 		else

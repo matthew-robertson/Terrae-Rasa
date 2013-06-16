@@ -84,9 +84,9 @@ public class GuiSlideBar extends GuiComponent
 	}
 	
 	/**
-	 * Returns a double value representing how far over to the right the slide bar is. 0.0F represents fully left (0%)
-	 * while 1.0F represents fully right (100%)
-	 * @return a double value from 0.0F to 1.0F, indicating the % value of the slide bar
+	 * Returns a double value representing how far over to the right the slide bar is. 0.0 represents fully left (0%)
+	 * while 1.0 represents fully right (100%)
+	 * @return a double value from 0.0 to 1.0, indicating the % value of the slide bar
 	 */
 	public double getValue()
 	{

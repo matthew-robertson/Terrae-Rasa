@@ -250,13 +250,13 @@ public class EntityPlayer extends EntityLiving
 		checkForCombatStatus();
 		checkAndUpdateStatusEffects(world);
 		applyGravity(world); //Apply Gravity to the player (and jumping)
-		applyHealthRegen();
+		applyHealthRegen(world);
 		applyManaRegen();
 		applySpecialRegen();
 		checkForNearbyBlocks(world);	
 		verifyChestRange();
 		updateCooldowns();
-		auraTracker.update(this);
+		auraTracker.update(world, this);
 	}
 	
 	/**
@@ -340,7 +340,7 @@ public class EntityPlayer extends EntityLiving
 						);
 				damageAfterArmor = dealDamageToAbsorbs(damageAfterArmor);
 				health -= damageAfterArmor;
-				auraTracker.onDamageTaken(this);
+				auraTracker.onDamageTaken(world, this);
 				if(renderDamage)
 				{
 					String message = (damageAfterArmor == 0) ? "Absorb" : ""+(int)damageAfterArmor;
@@ -350,7 +350,7 @@ public class EntityPlayer extends EntityLiving
 			else
 			{
 				health -= dealDamageToAbsorbs(damage);
-				auraTracker.onDamageTaken(this);
+				auraTracker.onDamageTaken(world, this);
 				if(renderDamage)
 				{
 					world.addTemporaryText(""+(int)damage, (int)x - 2, (int)y - 3, 20, EnumColor.RED);
@@ -439,7 +439,7 @@ public class EntityPlayer extends EntityLiving
 						);
 				damageAfterArmor = dealDamageToAbsorbs(damageAfterArmor);
 				health -= damageAfterArmor; 
-				auraTracker.onDamageTaken(this);
+				auraTracker.onDamageTaken(world, this);
 				//Show world text if applicable
 				if(showWorldText)
 				{
@@ -478,7 +478,7 @@ public class EntityPlayer extends EntityLiving
 			{
 				health = maxHealth;
 			}
-			auraTracker.onHeal(this);
+			auraTracker.onHeal(world, this);
 			return true;
 		}
 		return false;
@@ -513,8 +513,12 @@ public class EntityPlayer extends EntityLiving
 	/**
 	 * Applies health regen that scales over time, until reaching the maximum of (11 HP/sec)
 	 */
-	private void applyHealthRegen()
+	private void applyHealthRegen(World world)
 	{
+		if(health < maxHealth)
+		{
+			auraTracker.onHeal(world, this);
+		}
 		if(!isInCombat)
 		{
 			double amountHealed = (ticksOfHealthRegen / 1800f < 0.55f) ? (ticksOfHealthRegen / 1800f) : 0.55f;
@@ -543,7 +547,7 @@ public class EntityPlayer extends EntityLiving
 	 */
 	public void onDeath(World world)
 	{	
-		auraTracker.onDeath(this);
+		auraTracker.onDeath(world, this);
 		
 		//If the player is still dead, then trigger the respawn code
 		if(health <= 0)
@@ -1167,8 +1171,17 @@ public class EntityPlayer extends EntityLiving
 	 * If the player deals damage to a monster or something else this should be called. This will cause
 	 * auras to fire their onDamageDone() events.
 	 */
-	public void inflictedDamageToMonster() 
+	public void inflictedDamageToMonster(World world) 
 	{
-		auraTracker.onDamageDone(this);
+		auraTracker.onDamageDone(world, this);
+	}
+
+	/**
+	 * Gets the player's health percentage, from 0.0-1.0, where 0.0 indicates 0% and 1.0 indicates 100%
+	 * @return the player's health percent as a double between 0.0 and 1.0
+	 */
+	public double getHealthPercent() 
+	{
+		return health / maxHealth;
 	}
 }

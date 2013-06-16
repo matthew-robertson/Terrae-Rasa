@@ -356,6 +356,7 @@ public class GameEngine
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.magicalCloud));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.berserkersEssence));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.guardianAmulet));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.stole));
 			
 			
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldSword));
