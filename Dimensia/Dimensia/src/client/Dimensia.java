@@ -312,5 +312,10 @@ public class Dimensia
 	{
 		dimensia.gameEngine.startGame(world, player);
 	}
+	
+	public static final String getOSName()
+	{
+		return osName;
+	}
 }
 

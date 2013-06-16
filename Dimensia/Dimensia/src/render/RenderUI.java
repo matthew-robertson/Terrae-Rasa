@@ -31,6 +31,7 @@ import utils.Recipe;
 import world.World;
 import blocks.Block;
 import blocks.BlockChest;
+import client.Dimensia;
 import client.Settings;
 import entities.EntityItemStack;
 import entities.EntityPlayer;
@@ -126,7 +127,10 @@ public class RenderUI extends Render
 			}			
 			if(!settings.menuOpen)
 			{
+				//System.out.println(Mouse.getX() + " " + Mouse.getY());
+				
 				mouse(world, player);
+				
 				attemptToRenderItemTooltip(world, player);
 			}
 		}	
@@ -468,7 +472,15 @@ public class RenderUI extends Render
 				setBonusesList.add(line);
 				for(int i = 1; i < setBonuses.length; i++)
 				{
-					line = "                " + setBonuses[i];
+					if(Dimensia.getOSName().startsWith("win"))
+					{
+						line = "                       " + setBonuses[i];
+					}
+					else
+					{
+						line = "                " + setBonuses[i];
+					}
+				
 					setBonusesList.add(line);
 				}
 			}
@@ -849,9 +861,12 @@ public class RenderUI extends Render
 			return;
 		}		
 		
+		int x = MathHelper.getCorrectMouseXPosition();
+		int y = MathHelper.getCorrectMouseYPosition();		
+		
 		try 
 		{
-			//Band-aid fix for mouse clicks
+			//Band-aid fix for mouse clicks. Get the position before calling this though of it'll break on windows.
 			Mouse.destroy(); 
 			Mouse.create();
 		} 	
@@ -862,11 +877,11 @@ public class RenderUI extends Render
 		
 		if(Keys.lshiftDown)
 		{
-			mouseClickShiftModifier(world, player);
+			mouseClickShiftModifier(world, player, x, y);
 		}
 		else
 		{
-			mouseClickNoModifier(world, player);
+			mouseClickNoModifier(world, player, x, y);
 		}		
 	}
 	
@@ -876,10 +891,8 @@ public class RenderUI extends Render
 	 * @param world the world in use
 	 * @param player the player in use
 	 */
-	private void mouseClickNoModifier(World world, EntityPlayer player)
+	private void mouseClickNoModifier(World world, EntityPlayer player, int x, int y)
 	{
-		int x = MathHelper.getCorrectMouseXPosition();
-		int y = MathHelper.getCorrectMouseYPosition();		
 		shouldDropItem = true;
 		
 		for(int i = 0; i < player.inventory.getMainInventoryLength(); i++) //Inventory
@@ -1029,11 +1042,8 @@ public class RenderUI extends Render
 	 * @param world the world in use
 	 * @param player the player in use
 	 */
-	private void mouseClickShiftModifier(World world, EntityPlayer player)
+	private void mouseClickShiftModifier(World world, EntityPlayer player, int x, int y)
 	{
-		int x = MathHelper.getCorrectMouseXPosition();
-		int y = MathHelper.getCorrectMouseYPosition();		
-		
 		for(int i = 0; i < player.inventory.getMainInventoryLength(); i++) //Inventory
 		{
 			int size = 20;
