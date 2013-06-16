@@ -939,16 +939,21 @@ public class EntityPlayer extends EntityLiving
 	 * @param item = Item to be used to launch projectile (to determine what projectile is needed)
 	 */
 	public void launchProjectileWeapon(World world, double mouseX, double mouseY, ItemRanged item){
-		if (ticksSinceLastCast > item.getCooldownTicks()){
-			ItemStack[] ammo = item.getAmmoAsArray();
-			for (int i = 0; i < ammo.length; i++){			
-				if (inventory.doesPartialStackExist(ammo[i]) != -1){
-					ItemAmmo ammunition = (ItemAmmo) Item.itemsList[ammo[i].getItemID()];
+		if (ticksSinceLastCast > item.getCooldownTicks())
+		{
+			for (int i = 0; i < inventory.getQuiverLength(); i++)
+			{			
+				if(inventory.getQuiverStack(i) != null)
+				{	
+					ItemAmmo ammunition = (ItemAmmo) Item.itemsList[inventory.getQuiverStack(i).getItemID()];
+					
 					int angle = MathHelper.angleMousePlayer(mouseX, mouseY, x, y) - 90;
-					if (angle < 0){
+					if (angle < 0)
+					{
 						angle += 360;
 					}
-					if (isFacingRight){
+					if (isFacingRight)
+					{
 						world.addEntityToProjectileList(new EntityProjectile(ammunition.getProjectile()).setDrop(new ItemStack(ammunition)).setXLocAndYLoc(x, y)
 								.setDirection(angle).setDamage((ammunition.getProjectile().getDamage() + item.getDamage())));
 					}
@@ -956,8 +961,9 @@ public class EntityPlayer extends EntityLiving
 						world.addEntityToProjectileList(new EntityProjectile(ammunition.getProjectile()).setDrop(new ItemStack(ammunition)).setXLocAndYLoc(x, y)
 								.setDirection(angle).setDamage((ammunition.getProjectile().getDamage() + item.getDamage())));
 					}
-					inventory.removeItemsFromInventoryStack(1, inventory.doesPartialStackExist(ammo[i]));
+					inventory.removeItemsFromQuiverStack(1, i);
 					ticksSinceLastCast = 0;
+					break;
 				}
 			}
 		}

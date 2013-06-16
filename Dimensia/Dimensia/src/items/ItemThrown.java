@@ -1,23 +1,22 @@
 package items;
 
-
-public class ItemRanged extends Item
+public class ItemThrown extends Item
 {
 	protected int cooldownTicks;
 	
-	protected ItemRanged(int i, int d) {
+	protected ItemThrown(int i, int d) 
+	{
 		super(i);
-		maxStackSize = 1;
 		damage = d;
 		cooldownTicks = 5;
-	}	
-	
-	public ItemRanged setCooldownTicks(int i){
+	}
+
+	public ItemThrown setCooldownTicks(int i){
 		cooldownTicks = i;
 		return this;
 	}
 		
-	public ItemRanged setdamage(int d){
+	public ItemThrown setdamage(int d){
 		damage = d;
 		return this;
 	}

@@ -854,4 +854,26 @@ public class InventoryPlayer
 			quiver[index].setStackSize(newStackSize);
 		}
 	}
+	
+	/**
+	 * Removes items from the quiver[] at the specified index
+	 * @param howMany how many items to remove
+	 * @param index slot in quiver[]
+	 * @return whether the operation succeeded or not (fails due to not enough items)
+	 */
+	public boolean removeItemsFromQuiverStack(int howMany, int index)
+	{
+		if(howMany < quiver[index].getStackSize())
+		{
+			quiver[index].removeFromStack(howMany);
+			return true;
+		}
+		else if(howMany == quiver[index].getStackSize())
+		{
+			quiver[index].removeFromStack(howMany);
+			quiver[index] = null;
+			return true;
+		}
+		return false;
+	}
 }

@@ -201,9 +201,23 @@ public class RecipeManager
 		new ItemStack(Item.goldIngot, 12), new ItemStack(Item.silverIngot, 1)
 	});	
 	
-	Recipe woodenArrow = new Recipe(this, new ItemStack(Item.woodenArrow, 4), Block.craftingTable, new ItemStack[] {
+	Recipe woodenBow = new Recipe(this, new ItemStack(Item.woodenBow), Block.craftingTable, new ItemStack[] {
+		new ItemStack(Block.plank, 10)
+	});
+	
+	Recipe woodenArrow = new Recipe(this, new ItemStack(Item.woodenArrow, 5), Block.none, new ItemStack[] {
 		new ItemStack(Block.plank, 5)
 	});
+	Recipe bronzeArrow = new Recipe(this, new ItemStack(Item.bronzeArrow, 5), Block.craftingTable, new ItemStack[] {
+		new ItemStack(Block.plank, 5), new ItemStack(Item.bronzeIngot)
+	});
+	Recipe ironArrow = new Recipe(this, new ItemStack(Item.ironArrow, 5), Block.craftingTable, new ItemStack[] {
+		new ItemStack(Block.plank, 5), new ItemStack(Item.ironIngot)
+	});
+	Recipe silverArrow = new Recipe(this, new ItemStack(Item.silverArrow, 5), Block.craftingTable, new ItemStack[] {
+		new ItemStack(Block.plank, 5), new ItemStack(Item.silverIngot)
+	});
+	
 	Recipe snowBlock = new Recipe(this, new ItemStack(Block.snow, 1), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.snowball, 5)
 	});

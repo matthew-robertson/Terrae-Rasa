@@ -13,8 +13,16 @@ public class Vector2F
 	
 	public Vector2F(Vector2F v)
 	{
-		this.x = v.x;
-		this.y = v.y;
+		if(v == null)
+		{
+			x = 0;
+			y = 0;
+		}
+		else
+		{
+			this.x = v.x;
+			this.y = v.y;
+		}
 	}
 	
 	public Vector2F multiplyScalar(float f){

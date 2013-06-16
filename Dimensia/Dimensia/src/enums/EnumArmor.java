@@ -136,4 +136,14 @@ public enum EnumArmor
 		bonusVect.copyInto(bonus);
 		return bonus;
 	}
+	
+	public String[] getSetBonusesAsStringArray()
+	{
+		String[] values = new String[bonuses.length];
+		for(int i = 0; i < values.length; i++)
+		{
+			values[i] = "(" + bonuses[i].getPiecesRequiredToActivate() + "): " + bonuses[i].toString();
+		}		
+		return values;
+	}
 }

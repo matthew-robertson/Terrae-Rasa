@@ -464,26 +464,13 @@ public class RenderUI extends Render
 			List<String> setBonusesList = new ArrayList<String>(0);
 			if(setBonuses.length > 0)
 			{
-				line = "Set Bonuses: ";
-				length = 0;			
-				
-				for(int i = 0; i < setBonuses.length; i++)
-				{
-					int width = (int) (0.5F * xScale * plainTooltip.getWidth(words[i]));
-					
-					if(length + width + spaceLength < tooltipWidth)
-					{
-						length += width + spaceLength;
-						line += setBonuses[i] + " ";					
-					}
-					else
-					{
-						renderLines.add(line);
-						line = setBonuses[i] + " ";
-						length = width + spaceLength;
-					}				
-				}
+				line = "Bonuses: " + setBonuses[0]; 
 				setBonusesList.add(line);
+				for(int i = 1; i < setBonuses.length; i++)
+				{
+					line = "                " + setBonuses[i];
+					setBonusesList.add(line);
+				}
 			}
 			
 			//If there's just a title, crop the tooltip

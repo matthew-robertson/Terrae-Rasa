@@ -296,7 +296,11 @@ public class GameEngine
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.chest, 100));
 
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.ironChest, 100));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.snowball, 16));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.woodenBow));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.woodenArrow, 200));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.bronzeArrow, 200));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ironArrow, 200));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.silverArrow, 200));
 						
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.healthPotion1, 100));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.healthPotion2, 100));

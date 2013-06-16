@@ -160,12 +160,18 @@ public class ItemArmor extends Item
 	
 	public String[] getStringBonuses()
 	{
-		String[] strBonuses = new String[bonuses.length];
-		for(int i = 0; i < strBonuses.length; i++)
+		String[] setBonuses = armorType.getSetBonusesAsStringArray();
+		String[] allBonuses = new String[bonuses.length + setBonuses.length];
+		int i = 0;
+		for(i = 0; i < setBonuses.length; i++)
 		{
-			strBonuses[i] = bonuses[i].toString();
+			allBonuses[i] = setBonuses[i].toString();
 		}
-		return strBonuses;
+		for( ; i < setBonuses.length + bonuses.length; i++)
+		{
+			allBonuses[i] = bonuses[i - setBonuses.length].toString();
+		}
+		return allBonuses;
 	}
 	
 	/**

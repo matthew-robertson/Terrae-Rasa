@@ -4,10 +4,6 @@ import utils.ItemStack;
 import utils.MathHelper;
 import world.World;
 
-/*
- * m - requires mp
- * b - requires bow
- */
 public class EntityProjectile extends EntityParticle 
 {
 	private static final long serialVersionUID = 1L;
