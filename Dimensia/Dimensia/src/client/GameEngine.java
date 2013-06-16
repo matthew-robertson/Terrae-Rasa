@@ -21,6 +21,7 @@ import utils.LightUtils;
 import world.World;
 import world.WorldHell;
 import world.WorldSky;
+import audio.SoundEngine;
 import blocks.Block;
 import entities.EntityPlayer;
 import enums.EnumDifficulty;
@@ -54,13 +55,13 @@ public class GameEngine
 							   RENDER_MODE_WORLD_SKY  = 3;
 	/** The currently selected RENDER_MODE_WORLD value, detailing what world to update, load, and render.*/
 	private int renderMode;
-	//public SoundManager soundManager;
 	public GuiMainMenu mainMenu;
 	public World world;
 	public WorldHell worldHell;
 	public WorldSky worldSky;
 	public EntityPlayer player;
 	public Settings settings;
+	public SoundEngine soundEngine;
 	public RenderMenu renderMenu;
 	/** The number of game ticks per second - this will always be 20 */
 	public static final int TICKS_PER_SECOND = 20;
@@ -112,13 +113,20 @@ public class GameEngine
 		        {
 		        	Keys.universalKeyboard(world, player, settings, settings.keybinds);
 		        	
+		        	//If the music is already playing,set the volume to whatever the settings say it is
+		        	if (soundEngine.getCurrentMusic() != null){
+		        		soundEngine.setVolume((float) settings.volume);
+		        		//System.out.println("Settings: " + settings.volume + " Music: " + soundEngine.getVolume());
+		        	}
 		        	if(settings.menuOpen) //Ingame pause menu - distribute keyboard/mouse input appropriately
 		        	{ 
+		        		soundEngine.setCurrentMusic("Main Music", (float) settings.volume);
 		        		renderMenu.mouse(settings);
 		        		renderMenu.keyboard(settings);
 		        	}
 		        	else if(!Dimensia.isMainMenuOpen) //Handle game inputs if the main menu isnt open (aka the game is being played)
 		        	{
+		        		soundEngine.setCurrentMusic("Pause Music", (float) settings.volume);
 		        		Keys.keyboard(world, player, settings, settings.keybinds);	            
 		        		MouseInput.mouse(world, player);
 		        				        			
@@ -143,7 +151,7 @@ public class GameEngine
 					}
 		        	 
 		        	next_game_tick += SKIP_TICKS;
-		            loops++;
+ 		            loops++;
 		        }
 		        
 		        //Make sure the game loop doesn't fall very far behind and have to accelerate the 
@@ -161,6 +169,7 @@ public class GameEngine
 		        
 		        if(Dimensia.isMainMenuOpen) //if the main menu is open, render that, otherwise render the game
 		        {
+		        	soundEngine.setCurrentMusic("Placeholder Music", (float) settings.volume);
 		        	mainMenu.render();
 			    }
 		        else
@@ -210,7 +219,8 @@ public class GameEngine
 			//Save the settings
 		    try 
 		    {
-				saveSettings();
+				soundEngine.destroy();
+		    	saveSettings();
 			}
 		    catch (FileNotFoundException e) 
 		    {
@@ -247,6 +257,7 @@ public class GameEngine
 	 */
 	public void init()
 	{
+		soundEngine = new SoundEngine();
 		mainMenu = new GuiMainMenu();
 		renderMenu = new RenderMenu(settings);
 		Display.setVSyncEnabled(settings.vsyncEnabled);
@@ -285,7 +296,7 @@ public class GameEngine
 			Dimensia.isMainMenuOpen = false;
 			FileManager fileManager = new FileManager();
 			world = fileManager.generateNewWorld("World", 1200, 800, EnumDifficulty.EASY);//EnumWorldSize.LARGE.getWidth(), EnumWorldSize.LARGE.getHeight());
-			player = fileManager.generateAndSavePlayer("!!", EnumDifficulty.NORMAL);//new EntityPlayer("Test player", EnumDifficulty.NORMAL);
+			player = fileManager.generateAndSavePlayer("!!", EnumDifficulty.NORMAL);//new EntityLivingPlayer("Test player", EnumDifficulty.NORMAL);
 			world.addPlayerToWorld(player);
 			world.assessForAverageSky();
 			LightUtils utils = new LightUtils();
@@ -296,12 +307,7 @@ public class GameEngine
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.chest, 100));
 
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.ironChest, 100));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.woodenBow));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.woodenArrow, 200));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.bronzeArrow, 200));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ironArrow, 200));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.silverArrow, 200));
-						
+			
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.healthPotion1, 100));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.healthPotion2, 100));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.manaPotion1, 100));
