@@ -68,6 +68,10 @@ public class EntityLiving extends Entity
 	public double health;
 	public List<StatusEffectAbsorb> absorbs;
 	
+	public String jumpSound;
+	public String deathSound;
+	public String hitSound;
+	
 	/**
 	 * Overrides Entity's constructor, and constructs a new EntityLiving. Initializes combat and life
 	 * related variables in addition to the variables from Entity.
@@ -105,6 +109,9 @@ public class EntityLiving extends Entity
 		x = 0;
 		y = 0;	
 		setStunned(false);
+		jumpSound = "Player Jump";
+		deathSound = "Player Death";		
+		hitSound = "Generic Hit";
 	}
 	
 	/**
@@ -139,6 +146,10 @@ public class EntityLiving extends Entity
 		this.mana = entity.mana;
 		this.defense = entity.defense;
 		this.health = entity.health;		
+		
+		this.deathSound = entity.deathSound;
+		this.jumpSound = entity.jumpSound;
+		this.hitSound = entity.hitSound;
 	}
 		
 	/**
@@ -197,6 +208,7 @@ public class EntityLiving extends Entity
 						);
 				damageAfterArmor = dealDamageToAbsorbs(damageAfterArmor);
 				health -= damageAfterArmor; 
+				world.soundEngine.playSoundEffect(hitSound);
 				//Show world text if applicable
 				if(showWorldText)
 				{
@@ -256,6 +268,7 @@ public class EntityLiving extends Entity
 	 */
 	public void onDeath(World world)
 	{		
+		world.soundEngine.playSoundEffect(deathSound);
 	}	
 			
 	/**
@@ -414,6 +427,35 @@ public class EntityLiving extends Entity
 			return true;
 		}
 		return false;
+	}
+	
+	/**
+	 * Sees if it's possible to jump. If so then the jump will be performed
+	 */
+	public void tryToJumpAgain(World world, EntityPlayer player)
+	{
+		if(canJumpAgain)// If the entity can jump, let them
+		{
+			isJumping = true;
+			upwardJumpCounter = 0;
+			canJumpAgain = false;
+			
+			if (this != player){	
+				double distance = MathHelper.distanceBetweenTwoPoints(this.x, this.y, player.x, player.y) / (12);
+				double percentageVolume = 0;
+				if (distance > 80){
+					percentageVolume = 0;
+				}
+				if (percentageVolume < 0.001){
+					percentageVolume = 0;
+				}
+				System.out.println("Derp!" + percentageVolume + " Distance: " + distance);
+				//world.soundEngine.playSoundEffect(jumpSound, percentageVolume);
+			}
+			else {
+				world.soundEngine.playSoundEffect(jumpSound);
+			}
+		}	
 	}
 	
 	/**

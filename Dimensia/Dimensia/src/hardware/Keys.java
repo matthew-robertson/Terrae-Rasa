@@ -106,7 +106,7 @@ public class Keys
         }
         if(Keyboard.isKeyDown(Keyboard.KEY_SPACE)) //Jump
         {
-        	player.tryToJumpAgain();
+        	player.tryToJumpAgain(world, player);
         }
         
         final int[] actionKeyValues = 

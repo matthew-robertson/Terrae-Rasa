@@ -44,7 +44,7 @@ public class EntityNPC extends EntityLiving
 		speech = new String[10];
 		wanderLeft = 0;		
 		wanderRight = 0;		
-		alert = false;				
+		alert = false;	
 	}
 	
 	/**
@@ -74,13 +74,13 @@ public class EntityNPC extends EntityLiving
 	 * @param world - current world
 	 * @param target - entity to chase/retreat from
 	 */
-	public void applyAI(World world, EntityPlayer target){
+	public void applyAI(World world, EntityPlayer player, EntityPlayer target){
 		if(!isStunned()){
 			if (alert){
-				AIManager.AIChaseAndRetreat(world, this, target, true );
+				AIManager.AIChaseAndRetreat(world, player, this, target, true );
 			}
 			else {
-				AIManager.AIWander(world, this);
+				AIManager.AIWander(world, player, this);
 			}
 		}
 		

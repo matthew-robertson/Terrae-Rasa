@@ -31,6 +31,7 @@ import utils.MetaDataHelper;
 import utils.SpawnManager;
 import utils.Vector2F;
 import utils.WorldText;
+import audio.SoundEngine;
 import blocks.Block;
 import blocks.BlockChest;
 import blocks.BlockGrass;
@@ -95,6 +96,7 @@ public class World
 	public List<EntityNPC> npcList;
 	public List<EntityProjectile> projectileList;
 	public SpawnManager manager;
+	public SoundEngine soundEngine;
 	
 	private int[] generatedHeightMap;
 	private int averageSkyHeight;
@@ -551,7 +553,7 @@ public class World
 				npcList.remove(i);
 				continue;
 			}
-			npcList.get(i).applyAI(this, player);
+			npcList.get(i).applyAI(this, player, player);
 			
 			if(npcList.get(i).inBounds(player.x, player.y, player.width, player.height)){
 				npcList.get(i).onPlayerNear();
@@ -590,7 +592,7 @@ public class World
 			}
 			entityList.get(i).invincibilityTicks--;
 			//System.out.println(entityList.get(i).invincibilityTicks);
-			entityList.get(i).applyAI(this, player); //otherwise apply AI
+			entityList.get(i).applyAI(this, player, player); //otherwise apply AI
 		}
 	}
 	
@@ -2035,6 +2037,11 @@ public class World
         }
 	}
 	
+	public void initSoundEngine(SoundEngine engine){
+		if (soundEngine == null){
+			this.soundEngine = engine;
+		}
+	}
 
 	/** 
 	 * Launches a projectile

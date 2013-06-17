@@ -192,6 +192,9 @@ public class EntityPlayer extends EntityLiving
 			possibleRecipesByBlock.put(block.getName(), new Recipe[] { });
 		}
 		auraTracker = new AuraTracker();
+		
+		jumpSound = "Player Jump";
+		deathSound = "Player Death";
 	}
 	
 	public EntityPlayer(EntityPlayer entity)
@@ -439,6 +442,7 @@ public class EntityPlayer extends EntityLiving
 						);
 				damageAfterArmor = dealDamageToAbsorbs(damageAfterArmor);
 				health -= damageAfterArmor; 
+				world.soundEngine.playSoundEffect(hitSound);
 				auraTracker.onDamageTaken(world, this);
 				//Show world text if applicable
 				if(showWorldText)
@@ -554,6 +558,7 @@ public class EntityPlayer extends EntityLiving
 		{
 			//this is where things would be dropped if that was added.
 			health = maxHealth;
+			world.soundEngine.playSoundEffect(deathSound);
 			world.spawnPlayer(this);
 		}
 	}

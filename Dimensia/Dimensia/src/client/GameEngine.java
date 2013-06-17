@@ -97,7 +97,7 @@ public class GameEngine
 		try
 		{
 			//Variables for the gameloop cap (20 times / second)
-	        
+	        world.initSoundEngine(soundEngine);
 			final int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
 			final int MAX_FRAMESKIP = 5;
 			long next_game_tick = System.currentTimeMillis();
@@ -118,15 +118,16 @@ public class GameEngine
 		        		soundEngine.setVolume((float) settings.volume);
 		        		//System.out.println("Settings: " + settings.volume + " Music: " + soundEngine.getVolume());
 		        	}
+		        	
 		        	if(settings.menuOpen) //Ingame pause menu - distribute keyboard/mouse input appropriately
 		        	{ 
-		        		soundEngine.setCurrentMusic("Main Music", (float) settings.volume);
+		        		soundEngine.setCurrentMusic("Main Music");
 		        		renderMenu.mouse(settings);
 		        		renderMenu.keyboard(settings);
 		        	}
 		        	else if(!Dimensia.isMainMenuOpen) //Handle game inputs if the main menu isnt open (aka the game is being played)
 		        	{
-		        		soundEngine.setCurrentMusic("Pause Music", (float) settings.volume);
+		        		soundEngine.setCurrentMusic("Pause Music");
 		        		Keys.keyboard(world, player, settings, settings.keybinds);	            
 		        		MouseInput.mouse(world, player);
 		        				        			
@@ -169,7 +170,7 @@ public class GameEngine
 		        
 		        if(Dimensia.isMainMenuOpen) //if the main menu is open, render that, otherwise render the game
 		        {
-		        	soundEngine.setCurrentMusic("Placeholder Music", (float) settings.volume);
+		        	soundEngine.setCurrentMusic("Placeholder Music");
 		        	mainMenu.render();
 			    }
 		        else
@@ -257,7 +258,7 @@ public class GameEngine
 	 */
 	public void init()
 	{
-		soundEngine = new SoundEngine();
+		soundEngine = new SoundEngine(settings);
 		mainMenu = new GuiMainMenu();
 		renderMenu = new RenderMenu(settings);
 		Display.setVSyncEnabled(settings.vsyncEnabled);

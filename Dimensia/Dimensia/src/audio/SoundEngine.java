@@ -4,13 +4,13 @@ import java.io.IOException;
 import java.util.Hashtable;
 
 import org.lwjgl.openal.AL;
-import audio.Song;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.openal.Audio;
 import org.newdawn.slick.openal.AudioLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
 import client.Dimensia;
+import client.Settings;
 
 public class SoundEngine{
 	
@@ -19,9 +19,11 @@ public class SoundEngine{
 	
 	protected Song currentMusic;
 	protected Song oldMusic;
+	protected Settings settings;
 	
-	public SoundEngine(){
+	public SoundEngine(Settings settings){
 		initializeAudio();
+		this.settings = settings;
 	}
 	
 	public void initializeAudio(){
@@ -78,7 +80,7 @@ public class SoundEngine{
 	 * Plays the current music at the given volume.
 	 * @param gain - volume to play at. Typically, but not always the settings volume.
 	 */
-	public void playCurrentMusic(float gain){
+	public void playCurrentMusic(){
 		if (this.currentMusic != this.oldMusic){
 			//currentMusic.setPosition(currentMusic.getSavedPosition());
 			currentMusic.loop();
@@ -92,21 +94,7 @@ public class SoundEngine{
 	 */
 	public void playSoundEffect(String s){
 		if (soundDictionary.containsKey(s)){
-			soundDictionary.get(s).playAsSoundEffect(1f, 1f, false);
-		}
-		else {
-			System.out.println("This.... should never happen. Please initialize your sounds before playing them");
-		}
-	}
-	
-	/**
-	 * Play a given sound effect at the given volume
-	 * @param s - key used to locate the sound
-	 * @param gain - volume to use. Typically, but not always, the settings volume.
-	 */
-	public void playSoundEffect(String s, float gain){
-		if (soundDictionary.containsKey(s)){
-			soundDictionary.get(s).playAsSoundEffect(1, gain, false);
+			soundDictionary.get(s).playAsSoundEffect(1f, (float) settings.volume, false);
 		}
 		else {
 			System.out.println("This.... should never happen. Please initialize your sounds before playing them");
@@ -119,9 +107,24 @@ public class SoundEngine{
 	 * @param pitch - pitch at which to play said effect
 	 * @param gain - volume to use for the effect. Typically the volume given by settings
 	 */
-	public void playSoundEffect(String s, float pitch, float gain){
+	public void playSoundEffect(String s, double percentage){
 		if (soundDictionary.containsKey(s)){
-			soundDictionary.get(s).playAsSoundEffect(pitch, gain, false);
+			soundDictionary.get(s).playAsSoundEffect(1f, (float) (settings.volume * percentage), false);
+		}
+		else {
+			System.out.println("This.... should never happen. Please initialize your sounds before playing them");
+		}
+	}
+	
+	/**
+	 * Play a soundEffect, given a locator string, a pitch, and a gain.
+	 * @param s - the key used to locate the effect
+	 * @param pitch - pitch at which to play said effect
+	 * @param gain - volume to use for the effect. Typically the volume given by settings
+	 */
+	public void playSoundEffect(String s, float pitch){
+		if (soundDictionary.containsKey(s)){
+			soundDictionary.get(s).playAsSoundEffect(pitch, (float) settings.volume, false);
 		}
 		else {
 			System.out.println("This.... should never happen. Please initialize your sounds before playing them");
@@ -138,20 +141,14 @@ public class SoundEngine{
 	/**
 	 * setters
 	 */
-	
 	public void setCurrentMusic(String music){
-		this.currentMusic = musicDictionary.get(music);
-		playCurrentMusic(1f);
-	}
-	
-	public void setCurrentMusic(String music, float gain){
 		if (currentMusic != null && currentMusic != musicDictionary.get(music)){
 			currentMusic.fade(100, 0, true);
 			musicDictionary.get(currentMusic.getName()).savePosition();
 		}	
 		
 		this.currentMusic = musicDictionary.get(music);
-		playCurrentMusic(gain);			
+		playCurrentMusic();			
 	}
 	
 	public void setVolume(float f){
