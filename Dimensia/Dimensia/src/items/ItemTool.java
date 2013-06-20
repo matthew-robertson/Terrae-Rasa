@@ -10,8 +10,10 @@ public class ItemTool extends Item
 	//Render size - ortho (1/2 pixel)
 	public double size;
 	public double swingSpeed;
+	public String swingSound;
+	public String hitSound;
 		
-	protected ItemTool(int i)
+	protected ItemTool(int i, String hit)
 	{
 		super(i);
 		damageDone = 1;
@@ -20,6 +22,7 @@ public class ItemTool extends Item
 		setYBounds(new double[] { 1F/16, 1F/16 ,  4F/16, 16F/16, 13F/16 });		
 		size = 20;
 		swingSpeed = 1.0D;
+		hitSound = hit;
 	}
 	
 	/**

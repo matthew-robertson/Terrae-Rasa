@@ -5,5 +5,8 @@
 	<classpathentry kind="lib" path="jinput.jar"/>
 	<classpathentry kind="lib" path="lwjgl_util.jar"/>
 	<classpathentry kind="lib" path="lwjgl.jar"/>
+	<classpathentry kind="lib" path="C:/Slick2d/lib/jogg-0.0.7.jar"/>
+	<classpathentry kind="lib" path="C:/Slick2d/lib/jorbis-0.0.15.jar"/>
+	<classpathentry kind="lib" path="C:/Slick2d/lib/slick.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

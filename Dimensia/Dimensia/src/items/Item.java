@@ -64,6 +64,7 @@ public class Item extends ActionbarItem
 	protected int durability;
 	protected boolean isContainer;
 	protected int toolType;
+	protected String onUseSound;
 	
 	/**
 	 * Constructs a new <code>Item</code> that will be stored in the <code>itemsList[]</code> at the index 
@@ -85,6 +86,7 @@ public class Item extends ActionbarItem
 		damage = 0;
 		material = EnumToolMaterial.FIST;
 		itemQuality = EnumItemQuality.COMMON;
+		onUseSound = "New Item";
 		
 		if(itemsList[id] != null)
 		{
@@ -107,6 +109,7 @@ public class Item extends ActionbarItem
 		this.durability = item.durability;
 		this.isContainer = item.isContainer;
 		this.toolType = item.toolType;
+		this.onUseSound = item.onUseSound;
 	}
 	
 	protected Item setContainerItem(boolean flag)

@@ -102,6 +102,7 @@ public class EntityPlayer extends EntityLiving
 	private int ticksInCombat;
 	private int ticksOfHealthRegen;
 	private boolean isInCombat;
+	protected boolean isMining;
 	private boolean isReloaded;
 	private int ticksreq;
 	private int sx;
@@ -138,6 +139,7 @@ public class EntityPlayer extends EntityLiving
 		stamina = 0;
 		specialEnergy = 100;
 		isJumping = false;
+		isMining = false;
 		setMovementSpeedModifier(1.0f);		
 		setBaseSpeed(5.0f);
 		width = 12;
@@ -220,6 +222,7 @@ public class EntityPlayer extends EntityLiving
 		viewedChestX = 0;
 		viewedChestY = 0;
 		isViewingChest = false;
+		isMining = false;
 		inventory.initializeInventoryTotals(isReloaded);
 		craftingManager = new CraftingManager();
 		inventoryChanged = true;	
@@ -804,36 +807,41 @@ public class EntityPlayer extends EntityLiving
 			}
 			double distance = MathHelper.distanceBetweenTwoPoints((MathHelper.getCorrectMouseXPosition() + Render.getCameraX()), (MathHelper.getCorrectMouseYPosition() + Render.getCameraY()), (this.x + ((isFacingRight) ? 9 : 3)), (this.y + 9));
 				      
-			if(distance <= material.getDistance() && material.getToolTier() >= world.getBlock(mx, my).getBlockTier()) //If the block is within range
-			{ 	
-				if(ticksreq == 0 || sx != mx || sy != my) //the mouse has moved or they arent mining anything
-				{				
-					sx = mx; //save the co-ords
-					sy = my;
-					ticksreq = (int) (world.getBlock(mx, my).getBlockHardness() / material.getStrength()) + 1; //Determine how long to break
-				}	
-				else if(ticksreq == 1 && Mouse.isButtonDown(0)) //If the block should break
-				{
-					if(world.getBlock(mx, my) == Block.cactus) 
+			if(distance <= material.getDistance()){
+				isMining = true;
+				if (material.getToolTier() >= world.getBlock(mx, my).getBlockTier()) //If the block is within range
+					{ 	
+					if(ticksreq == 0 || world.getBlock(mx, my) != world.getBlock(sx, sy)) //the mouse has moved or they arent mining anything
+					{				
+						sx = mx; //save the co-ords
+						sy = my;
+						ticksreq = (int) (world.getBlock(mx, my).getBlockHardness() / material.getStrength()) + 1; //Determine how long to break
+						
+					}	
+					else if(ticksreq == 1 && Mouse.isButtonDown(0)) //If the block should break
 					{
-						world.breakCactus(this, mx, my);
-					}
-					else if(world.getBlock(mx, my) == Block.tree)
+						isMining = false;
+						if(world.getBlock(mx, my) == Block.cactus) 
+						{
+							world.breakCactus(this, mx, my);
+						}
+						else if(world.getBlock(mx, my) == Block.tree)
+						{
+							world.breakTree(this, mx, my);					
+						}
+						world.breakBlock(this, mx, my);
+						
+						//Overwrite snow/flowers/etc...
+						if (world.getBlock(mx, my-1).getIsOveridable() == true && world.getBlock(mx, my-1) != Block.air)
+						{
+							world.breakBlock(this, mx, my-1);
+						}
+					}		
+					else if (Mouse.isButtonDown(0)) //mining is in progress, decrease remaining time.
 					{
-						world.breakTree(this, mx, my);					
-					}
-					world.breakBlock(this, mx, my);
-					
-					//Overwrite snow/flowers/etc...
-					if (world.getBlock(mx, my-1).getIsOveridable() == true && world.getBlock(mx, my-1) != Block.air)
-					{
-						world.breakBlock(this, mx, my-1);
-					}
-				}		
-				else if (Mouse.isButtonDown(0)) //mining is in progress, decrease remaining time.
-				{
-					ticksreq--;			
-				}	
+						ticksreq--;			
+					}	
+				}
 			}
 		}		
 	}	
@@ -877,6 +885,14 @@ public class EntityPlayer extends EntityLiving
 	public final EnumDifficulty getDifficulty()
 	{
 		return difficulty;
+	}
+	
+	/**
+	 * Gets whether or not the player is currently mining a block
+	 * @return whether or not the player is currently mining
+	 */
+	public boolean getIsMining(){
+		return isMining;
 	}
 	
 	/**
@@ -1161,7 +1177,6 @@ public class EntityPlayer extends EntityLiving
 	{
 		isSwingingRight = swingRight;
 		hasSwungTool = true;
-		
 		if(swingRight)
 		{
 			rotateAngle = leftSwingBound;			

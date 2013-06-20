@@ -3,22 +3,18 @@ package hardware;
 import items.Item;
 import items.ItemMagic;
 import items.ItemRanged;
-
-
+import items.ItemTool;
 
 import org.lwjgl.input.Mouse;
 
-import entities.EntityPlayer;
-
 import render.Render;
 import spells.Spell;
-
 import utils.ActionbarItem;
 import utils.MathHelper;
 import world.World;
-
 import blocks.Block;
 import blocks.BlockChest;
+import entities.EntityPlayer;
 
 public class MouseInput 
 {	
@@ -38,16 +34,21 @@ public class MouseInput
 		{			
 			if(!player.isInventoryOpen)
 			{
-				if(!player.isSwingingTool()) //If the player isn't swinging a tool, start swinging
+				int selectedItemID = player.inventory.getMainInventoryStack(active).getItemID();
+				Item item = Item.itemsList[selectedItemID];
+				if(!player.isSwingingTool() && item instanceof ItemTool) //If the player isn't swinging a tool, start swinging
 				{
+					ItemTool tool = (ItemTool) item;
 					player.startSwingingTool(player.isFacingRight);
+					if (player.getIsMining()){
+						world.soundEngine.playSoundEffect(tool.hitSound);
+					}
+					//world.soundEngine.playSoundEffect(tool.swingSound);					
 				}	
 				
-				//Attempt to launch a projectile
-				int selectedItemID = player.inventory.getMainInventoryStack(active).getItemID();
+				//Attempt to launch a projectile				
 				if(selectedItemID >= ActionbarItem.itemIndex && selectedItemID < ActionbarItem.spellIndex)
 				{
-					Item item = Item.itemsList[selectedItemID];
 					if (item instanceof ItemMagic)
 					{
 						ItemMagic spell = (ItemMagic) item;

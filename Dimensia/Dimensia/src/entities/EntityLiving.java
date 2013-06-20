@@ -449,7 +449,7 @@ public class EntityLiving extends Entity
 				if (percentageVolume < 0.001){
 					percentageVolume = 0;
 				}
-				System.out.println("Derp!" + percentageVolume + " Distance: " + distance);
+				//System.out.println("Derp!" + percentageVolume + " Distance: " + distance);
 				//world.soundEngine.playSoundEffect(jumpSound, percentageVolume);
 			}
 			else {

@@ -42,7 +42,8 @@ public class SoundEngine{
 		soundDictionary.put("Menu Button Press", this.loadSound("/Sound/MenuSelect.ogg"));
 		soundDictionary.put("Player Jump", this.loadSound("/Sound/Jump.ogg"));
 		soundDictionary.put("New Item", this.loadSound("/Sound/NewItemCraft.ogg"));
-	
+		soundDictionary.put("Axe Hit", this.loadSound("/Sound/Axe.ogg"));
+		soundDictionary.put("Pick Hit", this.loadSound("/Sound/Pick.ogg"));
 	}
 	
 	/**
