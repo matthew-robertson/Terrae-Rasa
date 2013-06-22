@@ -28,7 +28,7 @@ public class DungeonGenCave extends WorldGen{
 		}
 		
 		System.gc();
-		verifyAirExists(world);
+		verifyAirExists(world, 0, world.getWidth(), 0, world.getHeight());
 		world.assessForAverageSky();
 		System.gc();
 		

@@ -12,14 +12,18 @@ public class WorldGen{
 	protected int count;
 	
 	/**
-	 * Ensures that the world is not solid or null
-	 * @param world - current world
+	 * Ensures that there are not null blocks in the world
+	 * @param world - the world to check
+	 * @param x - x-value to begin checking at
+	 * @param w - width of the area
+	 * @param y - y-value to begin checking at
+	 * @param h - depth of the are
 	 */
-	protected void verifyAirExists(World world)
+	protected void verifyAirExists(World world, int x, int w, int y, int h)
 	{
-		for(int i = 0; i < world.getWidth(); i++)
+		for(int i = x; i < (x + w); i++)
 		{
-			for(int j = 0; j < world.getHeight(); j++)
+			for(int j = y; j < ( y + h); j++)
 			{
 				if(world.getBlockGenerate(i, j) == null)
 				{
@@ -52,8 +56,12 @@ public class WorldGen{
 	}	
 	
 	/**
-	 * Compares each cell to the cells around it, determining if it should be empty or solid 
-	 * @param world - current world
+	 * Compares each cell to the cells around it, determining if it should be empty or solid
+	 * @param world - the World to generate within
+	 * @param x - inital x-Value of the area
+	 * @param w - how wide the area is
+	 * @param y - how deep the area begins
+	 * @param h - how tall the area is (y + h yields final height)
 	 */
 	protected void cellauto(World world, int x, int w, int y, int h){
 		int solid = 0, choice = 0;

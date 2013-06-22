@@ -57,7 +57,7 @@ public class CallableGenerateWorld implements Callable<World>
 	 */
 	public World generateNewWorld(String universeName, int w, int h, EnumDifficulty difficulty)
 	{
-		return new WorldGenEarth().generate(new World(universeName, w, h, difficulty));
+		return new WorldGenEarth().generate(new World(universeName, w, h, difficulty), 0, w, 0, h);
 	}
 	
 	/**

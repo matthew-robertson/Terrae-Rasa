@@ -49,28 +49,28 @@ public class WorldGenEarth extends WorldGen
 	 * <li>Ores	 
 	 * <li>Biome Specific Generation 
 	 */
-	public World generate(World world) 
+	public World generate(World world, int xLoc, int width, int yLoc, int depth) 
 	{
 		System.gc();
 		Block[] placeableOres = {Block.tin, Block.copper, Block.iron, Block.coal, Block.silver, Block.gold, Block.diamond};
 		Biome[] biomes = generateBiomes(world);
 		assignBiomes(world, biomes);
 		count = 0;
-		generateBase(world); //Create the stone base for the world
-		generateStone(world); //Create a basic shape for stone
-		generateDirt(world);
+		generateBase(world, xLoc, width, yLoc, depth); //Create the stone base for the world
+		generateStone(world, xLoc, width, yLoc, depth); //Create a basic shape for stone
+		generateDirt(world, xLoc, width, yLoc, depth);
 		System.gc();		
-		caves(world, 1, world.getWidth() - 1, 445, world.getHeight() - 445, 179);
-		cellauto(world, 1, world.getWidth() - 2, 200, world.getHeight() - 206);
-		cellauto(world, 1, world.getWidth() - 2, 200, world.getHeight() - 206);
-		cellauto(world, 1, world.getWidth() - 2, 200, world.getHeight() - 206);
-		stoneinter(world);
-		cellauto(world, 1, world.getWidth() - 2, 0, world.getHeight() - 2);
-		ores(world, 1, world.getWidth() - 4, 1, world.getHeight() - 11, placeableOres);
+		caves(world, xLoc + 1, (xLoc + width) - 1, yLoc + 445, (yLoc + depth) - 445, 179);
+		cellauto(world, xLoc + 1, (xLoc + width) - 2, yLoc, (yLoc + depth) - 206);
+		cellauto(world, xLoc + 1, (xLoc + width) - 2, yLoc, (yLoc + depth) - 206);
+		cellauto(world, xLoc + 1, (xLoc + width) - 2, yLoc, (yLoc + depth) - 206);
+		stoneinter(world, xLoc, width, yLoc, depth);
+		cellauto(world, xLoc + 1, (xLoc + width) - 2, yLoc, (yLoc + depth) - 2);
+		ores(world, xLoc + 1, (xLoc + width) - 4, yLoc + 1, (yLoc + depth) - 11, placeableOres);
 		System.gc();
 				
 		Biome biome;
-		world.placeGrass(0, world.getWidth(), 0, 460);
+		world.placeGrass(xLoc, (xLoc + width), yLoc, 460);
 				
 		for(int i = 0; i < world.getTotalBiomes(); i++){
 			biome = biomes[i];			
@@ -87,17 +87,16 @@ public class WorldGenEarth extends WorldGen
 			}
 		}
 		
-		for(int j = world.getHeight() - 1; j > 0; j--){ //go through the the y-axis of the world
-			for(int k = 1; k < world.getWidth() - 1; k++){ //x-axis
+		for(int j = (yLoc + depth) - 1; j > yLoc; j--){ //go through the the y-axis of the world
+			for(int k = xLoc + 1; k < (xLoc + width) - 1; k++){ //x-axis
 				if (world.getBlockGenerate(k,j).isSolid){
 					world.getBlockGenerate(k, j).setBitMap(world.updateBlockBitMap(k, j)); //set the appropriate texture
-				}
-				
+				}				
 			}
 		}
 		
 		System.gc();
-		verifyAirExists(world);
+		verifyAirExists(world, xLoc, (xLoc + width), yLoc, (yLoc + depth));
 		world.assessForAverageSky();
 		System.gc();
 		return world;
@@ -223,10 +222,14 @@ public class WorldGenEarth extends WorldGen
 	/**
 	 * Generates a large lump of adminium and stone at the bottom of the world, for the world's base
 	 * @param world - current world
+	 * @param x - x-position to begin placing
+	 * @param w - width of the area
+	 * @param y - y-postion to begin placing
+	 * @param h - depth of the area
 	 */
-	private void generateBase(World world){
-		for(int i = 0; i < world.getWidth(); i++){
-			for(int k = 0; k < (int)(world.getHeight()); k++){
+	private void generateBase(World world, int x, int w, int y, int h){
+		for(int i = x; i < (x + w); i++){
+			for(int k = y; k < (y + h); k++){
 				if (k >= world.getHeight() - 10){ //In the bottom ten layers
 					world.setBlockGenerate(Block.adminium, i, k); //Place adminium
 				}
@@ -240,11 +243,19 @@ public class WorldGenEarth extends WorldGen
 		}
 	}	
 	
-	private void generateStone(World world)
+	/**
+	 * generate a stone layer for the world
+	 * @param world - current world
+	 * @param x - x-position to begin placing
+	 * @param w - width of the area
+	 * @param y - y-position to begin placing
+	 * @param h - depth of the area
+	 */
+	private void generateStone(World world, int x, int w, int y, int h)
 	{
 		int stone = 0, amount = 0;	
-		for(int i = world.getHeight()-10; i > 50; i--){
-			for(int k = 8; k < world.getWidth(); k++){
+		for(int i = (y + h) - 10; i > y + 50; i--){
+			for(int k = x + 8; k < (x + w); k++){
 				if (i > (int)(world.getHeight()/3*2)){ //If current cell is in the bottom third of the map
 					stone = (int)(Math.random()*3+1); //Chance of spawning rock is 1 in 2
 				}
@@ -269,11 +280,15 @@ public class WorldGenEarth extends WorldGen
 	/**
 	 * Creates a surface of dirt for the world
 	 * @param world - current world
+	 * @param x - x-position to begin placing
+	 * @param w - width of the area
+	 * @param y - y-position to begin placing
+	 * @param h - depth of the area
 	 */
-	private void generateDirt(World world){
+	private void generateDirt(World world, int x, int w, int y, int h){
 		int dirt = 0, amount = 0;		
-		for(int i = world.getHeight() - 10; i > 50; i--){ //go through the the y-axis of the world
-			for(int k = 0; k < world.getWidth(); k++){ //x-axis			
+		for(int i = (y + h) - 10; i > y + 50; i--){ //go through the the y-axis of the world
+			for(int k = x; k < (x + w); k++){ //x-axis			
 				dirt = (int)(Math.random() * 6 + 1); //select whether dirt is being placed
 				amount = (int)(Math.random() * 4 + 1); //Select how much dirt is being placed on either side
 				if (world.getBlockGenerate(k, i + 1).getID() == Block.stone.getID()){ //If the block beneath is stone
@@ -296,12 +311,16 @@ public class WorldGenEarth extends WorldGen
 	
 	/**
 	 * Creates a base of stone ontop of the stone and adminium of the base. Is later covered by dirt
-	 * @param world - current world
+	 * @param world - current worl
+	 * @param x - x-position to begin placing
+	 * @param w - width of the area
+	 * @param y - y-position to begin placing
+	 * @param h - depth of the area
 	 */
-	private void stoneinter (World world){
+	 private void stoneinter (World world, int x, int w, int y, int h){
 		int choice = 0;
-		for (int i = world.getHeight() - 10; i > 1; i--){ //Go through the height
-			for (int j = 1; j < world.getWidth() - 1; j++){ //go through the width
+		for (int i = (y + h) - 10; i > y + 1; i--){ //Go through the height
+			for (int j = x + 1; j < (x + w) - 1; j++){ //go through the width
 				if (world.getBlockGenerate(j, i-1).getID() != Block.air.getID() && world.getBlockGenerate(j, i-2).getID() != Block.air.getID() && world.getBlockGenerate(j, i-3).getID() != Block.air.getID()){
 					choice = (int)(Math.random()*100+1);
 					if (choice <= 80) 
