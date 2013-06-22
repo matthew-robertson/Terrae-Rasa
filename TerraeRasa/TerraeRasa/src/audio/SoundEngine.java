@@ -44,6 +44,10 @@ public class SoundEngine{
 		soundDictionary.put("New Item", this.loadSound("/Sound/NewItemCraft.ogg"));
 		soundDictionary.put("Axe Hit", this.loadSound("/Sound/Axe.ogg"));
 		soundDictionary.put("Pick Hit", this.loadSound("/Sound/Pick.ogg"));
+		soundDictionary.put("Sword Hit", this.loadSound("/Sound/Sword.ogg"));
+		soundDictionary.put("Potion Drink 1", this.loadSound("/Sound/PotionDrink.ogg"));
+		soundDictionary.put("Potion Drink 2", this.loadSound("/Sound/PotionDrinkAlt.ogg"));
+		
 	}
 	
 	/**
