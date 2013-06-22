@@ -168,11 +168,6 @@ public class Item extends ActionbarItem
 		return this;
 	}
 	
-	public Item setOnUseSound(String s){
-		onUseSound = s;
-		return this;
-	}
-	
 	/**
 	 * Overrides ActionbarItem.setIconPosition(int, int) to make Item declarations cleaner
 	 */
@@ -354,9 +349,9 @@ public class Item extends ActionbarItem
 	
 	public static Item heartCrystal = new ItemHeartCrystal(340).setIconPosition(7, 0).setName("Heart Crystal");
 	public static Item manaCrystal = new ItemManaCrystal(341).setIconPosition(6, 0).setName("Mana Crystal");
-	public static Item manaPotion1 = new ItemPotionMana(342, 75).setOnUseSound("Potion Drink 2").setIconPosition(7, 1).setName("Minor Mana Potion");
+	public static Item manaPotion1 = new ItemPotionMana(342, 75).setIconPosition(7, 1).setName("Minor Mana Potion");
 	public static Item manaPotion2 = new ItemPotionMana(343, 150).setIconPosition(7, 1).setName("Mana Potion");
-	public static Item healthPotion1 = new ItemPotionHealth(344, 75).setOnUseSound("Potion Drink 1").setIconPosition(6, 1).setName("Minor Healing Potion");
+	public static Item healthPotion1 = new ItemPotionHealth(344, 75).setIconPosition(6, 1).setName("Minor Healing Potion");
 	public static Item healthPotion2 = new ItemPotionHealth(345, 150).setIconPosition(6, 1).setName("Healing Potion");
 	public static Item manaStar = new ItemPotionMana(346, 25).setIconPosition(12, 3).setName("Mana Star");
 		

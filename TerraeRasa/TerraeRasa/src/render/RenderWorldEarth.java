@@ -18,8 +18,8 @@ public class RenderWorldEarth extends RenderWorld
 
 	    renderSkyBackgroundScene(); //Renders the background image thing		
 		adjustCamera(world, player); //Adjusts the camera before rendering the world		
-		//renderBlocks.renderBackwall(world, player);
-				
+		
+		renderBlocks.renderBackwall(world, player);
 		renderBlocks.render(world, player);	
 		renderEntities.renderWorldEntityList(world);
 		renderEntities.renderWorldProjectileList(world);

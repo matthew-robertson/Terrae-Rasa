@@ -14,14 +14,14 @@ public class ActionbarItem
 	public final static int blockIndex = 0;
 	public final static int itemIndex = 2048;
 	public final static int spellIndex = 4096 + 2048;
-	public int iconX;
-	public int iconY;
+	public double iconX;
+	public double iconY;
 	public int id;
 	protected String name;
 	public String extraTooltipInformation;
 	protected int maxStackSize;
-	public int iconOverrideX;
-	public int iconOverrideY;
+	public double iconOverrideX;
+	public double iconOverrideY;
 	public boolean iconOverriden;
 	/**Corresponds to values from Render like TEXTURE_SHEET_TERRAIN_EARTH, to determine the inventory icon for a specific block.*/
 	public int associatedTextureSheet;
@@ -143,7 +143,7 @@ public class ActionbarItem
 	 * the sprite is in. 
 	 * @return the X position of the texture on a specific sprite sheet
 	 */
-	public int getIconX()
+	public double  getIconX()
 	{
 		return iconX;
 	}
@@ -153,7 +153,7 @@ public class ActionbarItem
 	 * the sprite is in. 
 	 * @return the Y position of the texture on a specific sprite sheet
 	 */
-	public int getIconY()
+	public double  getIconY()
 	{
 		return iconY;
 	}

@@ -170,8 +170,8 @@ public class TextureLoader
 		        {
 		        	w = (int)list[i].textureWidth;
 			        h = (int)list[i].textureHeight;
-			        x = list[i].iconOverrideX * 16;
-			        y = list[i].iconOverrideY * 16;
+			        x = (int) (list[i].iconOverrideX * 16);
+			        y = (int) (list[i].iconOverrideY * 16);
 			        bufferStore[i] = itemSheet.getSubimage(x, y, w, h);
 		        	
 		        }
@@ -179,8 +179,8 @@ public class TextureLoader
 		        {
 			        w = (int)list[i].textureWidth;
 			        h = (int)list[i].textureHeight;
-			        x = list[i].iconOverrideX * 16;
-			        y = list[i].iconOverrideY * 16;
+			        x = (int) (list[i].iconOverrideX * 16);
+			        y = (int) (list[i].iconOverrideY * 16);
 			        bufferStore[i] = blockSheet.getSubimage(x, y, w, h);
 		        }
 	        }
@@ -188,8 +188,8 @@ public class TextureLoader
 	        {
 		        w = (int)list[i].textureWidth;
 		        h = (int)list[i].textureHeight;
-		        x = list[i].iconX * 16;
-		        y = list[i].iconY * 16;
+		        x = (int) (list[i].iconX * 16);
+		        y = (int) (list[i].iconY * 16);
 		        bufferStore[i] = blockSheet.getSubimage(x, y, w, h);
 	        }
 	        
@@ -227,8 +227,8 @@ public class TextureLoader
 	        
 	        int w = 16;
 	        int h = 16;
-	        int x = list1[i].iconX * 16;
-	        int y = list1[i].iconY * 16;
+	        int x = (int) (list1[i].iconX * 16);
+	        int y = (int) (list1[i].iconY * 16);
 	        
 	        bufferStore[i] = itemSheet.getSubimage(x, y, w, h);
 	        
@@ -264,8 +264,8 @@ public class TextureLoader
 	        
 	        int w = 16;
 	        int h = 16;
-	        int x = list2[i].iconX * 16;
-	        int y = list2[i].iconY * 16;
+	        int x = (int) (list2[i].iconX * 16);
+	        int y = (int) (list2[i].iconY * 16);
 	        
 	        bufferStore[i] = itemSheet.getSubimage(x, y, w, h);
 	        

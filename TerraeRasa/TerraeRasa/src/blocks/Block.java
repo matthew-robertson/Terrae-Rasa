@@ -79,9 +79,9 @@ public class Block extends ActionbarItem
 	protected char tileMap;
 	protected int bitMap;
 	/** The render width of a texture (in the world) */
-	public int blockWidth; 
+	public double blockWidth; 
 	/** The render height of a texture (in the world) */
-	public int blockHeight; 
+	public double blockHeight; 
 	/** The pixel width of a Block's texture (on a spritesheet) */
 	public double textureWidth; 
 	/** The pixel height of a Block's texture (on a spritesheet) */
@@ -368,6 +368,13 @@ public class Block extends ActionbarItem
 		return this;
 	}
 
+	protected Block setIconIndex(double x, double y) 
+	{
+		iconY = y;
+		iconX = x;
+		return this;
+	}
+
 	protected Block setTileMap(char c) {
 		tileMap = c;
 		return this;
@@ -398,12 +405,12 @@ public class Block extends ActionbarItem
 		return passable;
 	}
 
-	public int getBlockWidth()
+	public double getBlockWidth()
 	{
 		return blockWidth;
 	}
 
-	public int getBlockHeight() 
+	public double getBlockHeight() 
 	{
 		return blockHeight;
 	}

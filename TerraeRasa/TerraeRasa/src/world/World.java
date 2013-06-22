@@ -1098,7 +1098,7 @@ public class World
 				BlockChest chest = ((BlockChest)(getBlock(mx, my)));
 				if(chest.metaData != 1)
 				{
-					int[][] metadata = MetaDataHelper.getMetaDataArray(getBlock(mx, my).blockWidth / 6, getBlock(mx, my).blockHeight / 6); //metadata used by the block of size (x,y)
+					int[][] metadata = MetaDataHelper.getMetaDataArray((int)(getBlock(mx, my).blockWidth / 6), (int)(getBlock(mx, my).blockHeight / 6)); //metadata used by the block of size (x,y)
 					int metaWidth = metadata.length; 
 					int metaHeight = metadata[0].length;	
 					int x1 = 0;
@@ -1137,7 +1137,7 @@ public class World
 			ItemStack stack = getBlock(mx, my).getDroppedItem(); //the item dropped by the block
 			if(stack != null)
 			{			
-				int[][] metadata = MetaDataHelper.getMetaDataArray(getBlock(mx, my).blockWidth / 6, getBlock(mx, my).blockHeight / 6); //metadata used by the block of size (x,y)
+				int[][] metadata = MetaDataHelper.getMetaDataArray((int)(getBlock(mx, my).blockWidth / 6), (int)(getBlock(mx, my).blockHeight / 6)); //metadata used by the block of size (x,y)
 				int metaWidth = metadata.length; //width of the metadata
 				int metaHeight = metadata[0].length; //height of the metadata
 	
@@ -1189,9 +1189,9 @@ public class World
 	{
 		if(block.hasMetaData) //if the block is large
 		{
-			int blockWidth = block.getBlockWidth() / 6;
-			int blockHeight = block.getBlockHeight() / 6;
-			int[][] metadata = MetaDataHelper.getMetaDataArray(blockWidth, blockHeight);
+			double blockWidth = block.getBlockWidth() / 6;
+			double blockHeight = block.getBlockHeight() / 6;
+			int[][] metadata = MetaDataHelper.getMetaDataArray((int)blockWidth, (int)blockHeight);
 			
 			for(int i = 0; i < blockWidth; i++) //is it possible to place the block?
 			{
