@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Main-Class: launcher.Launcher
+Created-By: Alec Sobeck, Matthew Robertson
+Class-Path: launcher.jar
