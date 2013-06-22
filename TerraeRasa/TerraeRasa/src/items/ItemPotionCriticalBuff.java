@@ -15,5 +15,6 @@ public class ItemPotionCriticalBuff extends ItemPotion
 	{
 		player.registerStatusEffect(new StatusEffectCriticalBuff(durationSeconds, tier, power, ticksBetweenEffect));
 		player.inventory.removeItemsFromInventoryStack(1, player.selectedSlot);
+		world.soundEngine.playSoundEffect(onUseSound);
 	}
 }

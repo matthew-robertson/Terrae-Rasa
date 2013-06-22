@@ -9,9 +9,11 @@ import setbonus.SetBonusIntellect;
 import setbonus.SetBonusSpeed;
 import setbonus.SetBonusStrength;
 import utils.ActionbarItem;
+import world.World;
 import auras.Aura;
 import auras.AuraHeavensReprieve;
 import auras.AuraSmartHeal;
+import entities.EntityPlayer;
 import entities.EntityProjectile;
 import enums.EnumArmor;
 import enums.EnumItemQuality;
@@ -222,7 +224,7 @@ public class Item extends ActionbarItem
 			return new String[] { };
 		}
 	}
-		
+			
 	public static final Item[] itemsList = new Item[spellIndex];
 	/** Item Declarations **/	
 

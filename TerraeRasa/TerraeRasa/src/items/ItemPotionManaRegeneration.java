@@ -15,5 +15,6 @@ public class ItemPotionManaRegeneration extends ItemPotion
 	{
 		player.registerStatusEffect(new StatusEffectManaRegeneration(durationSeconds, tier, power, ticksBetweenEffect));
 		player.inventory.removeItemsFromInventoryStack(1, player.selectedSlot);
+		world.soundEngine.playSoundEffect(onUseSound);
 	}
 }

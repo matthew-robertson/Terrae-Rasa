@@ -22,6 +22,7 @@ public class ItemPotionHealth extends Item
 			{
 				player.inventory.removeItemsFromInventoryStack(1, player.selectedSlot);
 				player.putOnCooldown(id, 60);
+				world.soundEngine.playSoundEffect(onUseSound);
 			}
 		}
 	}

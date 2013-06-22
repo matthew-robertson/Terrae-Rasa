@@ -15,5 +15,6 @@ public class ItemPotionDamageBuff extends ItemPotion
 	{
 		player.registerStatusEffect(new StatusEffectDamageBuff(durationSeconds, tier, power, ticksBetweenEffect));
 		player.inventory.removeItemsFromInventoryStack(1, player.selectedSlot);
+		world.soundEngine.playSoundEffect(onUseSound);
 	}
 }

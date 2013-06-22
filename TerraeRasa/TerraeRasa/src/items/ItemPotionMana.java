@@ -20,6 +20,7 @@ public class ItemPotionMana extends Item
 		if(success)
 		{
 			player.inventory.removeItemsFromInventoryStack(1, player.selectedSlot);
+			world.soundEngine.playSoundEffect(onUseSound);
 		}
 	}
 	

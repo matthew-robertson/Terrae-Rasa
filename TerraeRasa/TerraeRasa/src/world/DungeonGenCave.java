@@ -11,12 +11,12 @@ import blocks.Block;
  */
 public class DungeonGenCave extends WorldGen{
 	
-	public World generate(World world){
-		genBase(world);
-		caves(world, 3, world.getWidth() - 6, 3, world.getHeight() - 6, 160);
-		cellauto(world, 3, world.getWidth() - 6, 3, world.getHeight() - 6);
-		cellauto(world, 3, world.getWidth() - 6, 3, world.getHeight() - 6);
-		cellauto(world, 3, world.getWidth() - 6, 3, world.getHeight() - 6);
+	public World generate(World world, int xLoc, int width, int yLoc, int depth){
+		genBase(world, xLoc, width, yLoc, depth);
+		caves(world, xLoc + 3, (xLoc + width)- 6, yLoc + 3, (yLoc + depth) - 6, 160);
+		cellauto(world, xLoc + 3, (xLoc + width)- 6, yLoc + 3, (yLoc + depth) - 6);
+		cellauto(world, xLoc + 3, (xLoc + width)- 6, yLoc + 3, (yLoc + depth) - 6);
+		cellauto(world, xLoc + 3, (xLoc + width)- 6, yLoc + 3, (yLoc + depth) - 6);
 		
 		for(int j = world.getHeight() - 1; j > 0; j--){ //go through the the y-axis of the world
 			for(int k = 1; k < world.getWidth() - 1; k++){ //x-axis
@@ -28,16 +28,25 @@ public class DungeonGenCave extends WorldGen{
 		}
 		
 		System.gc();
-		verifyAirExists(world, 0, world.getWidth(), 0, world.getHeight());
+		verifyAirExists(world, xLoc, (xLoc + width), yLoc, (yLoc + depth));
 		world.assessForAverageSky();
 		System.gc();
 		
 		return world;
 	}
 	
-	private World genBase(World world){
-		for (int i = 0; i < world.getWidth(); i++){
-			for (int j = 0; j < world.getHeight() - 1; j++){
+	/**
+	 * Generates a shell for the dungeon
+	 * @param world - current world
+	 * @param x - x-position to begin placing
+	 * @param w - width of the area
+	 * @param y - y-position to begin placing
+	 * @param h - depth of the area
+	 * @return
+	 */
+	private World genBase(World world, int x, int w, int y, int h){
+		for (int i = x; i < (x + w); i++){
+			for (int j = y; j < (y + h) - 1; j++){
 				if (i == 0 || i == world.getWidth() - 1 || j == 0 || j == world.getWidth() - 1){
 					world.setBlockGenerate(Block.adminium, i, j);
 				}

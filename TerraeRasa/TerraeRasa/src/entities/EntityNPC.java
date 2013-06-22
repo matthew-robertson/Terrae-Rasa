@@ -197,40 +197,44 @@ public class EntityNPC extends EntityLiving
 	public boolean isJumpPossibleAndNeeded(World world, boolean direction, boolean up){
 		int start = isJumpRequired(world, direction, up);
 		if (start != -1){
-			int maxBlockHeight = 0;
-			int blockHeight = 0;
+			int maxBlockSpace = 0;
+			int blockSpace = 0;
 			//If checking the right side
 			if (direction){
+				maxBlockSpace = 0;
+				blockSpace = 0;
 				//Check all the blocks in a line up to the maximum jump height + the npc's block height
 				for (int i = start; i < (getUpwardJumpHeight() + height) / 6; i++){
 					 if (!world.getBlockGenerate((int)(x + width) / 6, (int)(y + height) / 6 - 1 - i).getIsSolid()){
-						 blockHeight++;
-						 if (blockHeight > maxBlockHeight){
-							 maxBlockHeight = blockHeight;
+						 blockSpace++;
+						 if (blockSpace > maxBlockSpace){
+							 maxBlockSpace = blockSpace;
 						 }
 					 }
 					 else{
-						 blockHeight = 0;
+						 blockSpace = 0;
 					 }
-					 if (maxBlockHeight >= blockHeight){
+					 if (maxBlockSpace >= blockHeight){
 						  return true;
 					 }
 				}
 			}
 			//if checking the left side
 			else if (!direction){
+				maxBlockSpace = 0;
+				blockSpace = 0;
 				//Check all the blocks in a line up to the maximum jump height + the npc's block height
-				for (int i = start; i < (getUpwardJumpHeight() + height / 6); i++){
+				for (int i = start; i < (getUpwardJumpHeight() + height) / 6; i++){
 					 if (!world.getBlockGenerate((int)(x) / 6 - 1, (int)(y + height) / 6 - 1 - i).getIsSolid()){
-						 blockHeight++;
-						 if (blockHeight > maxBlockHeight){
-							 maxBlockHeight = blockHeight;
+						 blockSpace++;
+						 if (blockSpace > maxBlockSpace){
+							 maxBlockSpace = blockSpace;
 						 }
 					 }
 					 else{
-						 blockHeight = 0;
+						 blockSpace = 0;
 					 }
-					 if (maxBlockHeight >= blockHeight){
+					 if (maxBlockSpace >= blockHeight){
 						 return true;
 					 }
 				}

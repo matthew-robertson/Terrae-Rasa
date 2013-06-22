@@ -15,5 +15,6 @@ public class ItemPotionSwiftness extends ItemPotion
 	{
 		player.registerStatusEffect(new StatusEffectSwiftness(durationSeconds, tier, power, ticksBetweenEffect));
 		player.inventory.removeItemsFromInventoryStack(1, player.selectedSlot);
+		world.soundEngine.playSoundEffect(onUseSound);
 	}
 }

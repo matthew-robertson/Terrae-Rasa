@@ -15,5 +15,6 @@ public class ItemPotionDodge extends ItemPotion
 	{
 		player.registerStatusEffect(new StatusEffectDodgeBuff(durationSeconds, tier, power, ticksBetweenEffect));
 		player.inventory.removeItemsFromInventoryStack(1, player.selectedSlot);
+		world.soundEngine.playSoundEffect(onUseSound);
 	}
 }

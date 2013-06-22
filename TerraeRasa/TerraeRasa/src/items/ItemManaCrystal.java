@@ -21,6 +21,7 @@ public class ItemManaCrystal extends Item
 		if(success)
 		{
 			player.inventory.removeEntireStackFromInventory(world, player, player.selectedSlot);
+			world.soundEngine.playSoundEffect(onUseSound);
 		}		
 	}
 }
