@@ -1,4 +1,0 @@
-Manifest-Version: 1.0
-Main-Class: net.dimensia.launcher.Main
-Created-By: Alec Sobeck, Matthew Robertson
-Class-Path: Dimensia_Launcher.jar 

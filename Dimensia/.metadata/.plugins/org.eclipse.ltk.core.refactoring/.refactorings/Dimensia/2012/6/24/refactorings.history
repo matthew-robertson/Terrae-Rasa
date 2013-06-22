@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">
-<refactoring comment="Copy element &apos;MANIFEST.MF&apos; to &apos;Dimensia Server&apos;&#x0D;&#x0A;- Original project: &apos;Dimensia&apos;&#x0D;&#x0A;- Destination element: &apos;Dimensia Server&apos;&#x0D;&#x0A;- Original element: &apos;MANIFEST.MF&apos;" description="Copy file" destination="=Dimensia Server" element1="MANIFEST.MF" files="1" flags="589830" folders="0" id="org.eclipse.jdt.ui.copy" policy="org.eclipse.jdt.ui.copyResources" stamp="1339293624958" units="0" version="1.0"/>
-</session>

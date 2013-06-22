@@ -1,9 +1,0 @@
-package net.dimensia.src;
-
-public class ItemPotion extends Item
-{
-	public ItemPotion(int i)
-	{
-		super(i);
-	}
-}

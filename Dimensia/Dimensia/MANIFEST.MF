@@ -1,4 +1,0 @@
-Manifest-Version: 1.0
-Main-Class: net.dimensia.client.Dimensia
-Created-By: Alec Sobeck, Matthew Robertson
-Class-Path: lwjgl.jar slick.jar jinput.jar lwjgl_util.jar Dimensia.jar 
