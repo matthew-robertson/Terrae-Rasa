@@ -4,6 +4,8 @@ import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.Image;
+import java.awt.Toolkit;
 
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
@@ -101,13 +103,15 @@ public class TerraeRasa
 			terraeRasaCanvas.setPreferredSize(new Dimension(width, height));
 			
 			terraeRasaFrame = new Frame(WINDOW_TITLE);
+			final Image icon = Toolkit.getDefaultToolkit().getImage(TerraeRasa.class.getResource("/Resources/icon.png"));
+			terraeRasaFrame.setIconImage(icon);
 			terraeRasaFrame.setBackground(Color.black);
 			terraeRasaFrame.setLayout(new BorderLayout());
 			terraeRasaFrame.add(terraeRasaCanvas, "Center");
 			terraeRasaFrame.pack();
 			terraeRasaFrame.setLocationRelativeTo(null);
 			terraeRasaFrame.setVisible(true);
-	
+		
 			//Opengl display
 			Display.setParent(terraeRasaCanvas); //The display is inside an awtCanvas to allow for resizing
 	        Display.setTitle(WINDOW_TITLE); //sets the title of the window
