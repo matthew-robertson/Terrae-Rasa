@@ -139,6 +139,17 @@ public class Chunk
 	}
 	
 	/**
+	 * Gets the backwall at position (x,y) of the chunk, NOT the world 
+	 * @param x the x position of the block requested
+	 * @param y the y position of the block requested
+	 * @return the block at the specified position, which should never be null
+	 */
+	public final Block getBackWall(int x, int y)
+	{
+		return backWalls[x][y];
+	}
+	
+	/**
 	 * Gets the currently calculated light value for the block at position (x,y) in the chunk. A value of
 	 * 1.0F is full darkness, 0.0F is full light (this reversal is an optimization for rendering)
 	 * @param x a value from 0 to ChunkWidth, to retrieve from the light[][]
@@ -158,6 +169,17 @@ public class Chunk
 	public final boolean getChanged()
 	{
 		return wasChanged;
+	}
+	
+	/**
+	 * Replaces the current block at backWalls[x][y] with the given Block parameter.
+	 * @param block the new Block for position (x,y)
+	 * @param x a value from 0 to ChunkWidth	
+	 * @param y a value from 0 to ChunkHeight
+	 */
+	public synchronized void setBackWall(Block block, int x, int y)
+	{
+		backWalls[x][y] = block.clone();
 	}
 	
 	/**

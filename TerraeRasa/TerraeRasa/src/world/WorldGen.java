@@ -29,6 +29,10 @@ public class WorldGen{
 				{
 					world.setBlockGenerate(Block.air, i, j);
 				}
+				if(world.getBackWallGenerate(i, j) == null)
+				{
+					world.setBackWallGenerate(Block.backAir, i, j);
+				}
 			}
 		}
 	}

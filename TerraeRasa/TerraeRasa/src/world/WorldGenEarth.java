@@ -238,7 +238,7 @@ public class WorldGenEarth extends WorldGen
 				}
 				else{
 					world.setBlockGenerate(Block.air, i, k); //place air
-				}				
+				}			
 			}
 		}
 	}	
@@ -304,6 +304,7 @@ public class WorldGenEarth extends WorldGen
 						}
 					}					
 				}
+				
 				
 			}
 		}

@@ -1680,6 +1680,59 @@ public class World
 		}
 		return Block.air;
 	}
+	
+	/**
+	 * Sets the block at the specified (x,y). This method is safe, as all Exceptions are handled in this method. Additionally,
+	 * the (modular) division is performed automatically. The primary intention is that this method is used to generate the world, 
+	 * so it MUST be safe, otherwise code will become very dangerous. Chunks are generated if there is non chunk present at that
+	 * position.
+	 * @param block the block that the specified (x,y) will be set to
+	 * @param x the block's x location in the new world map
+	 * @param y the block's y location in the new world map
+	 */
+	public void setBackWallGenerate(Block block, int x, int y)
+	{
+		try
+		{ //Ensure the chunk exists
+			if(getChunks().get(""+(x / Chunk.getChunkWidth())) == null)
+			{
+				registerChunk(new Chunk(Biome.forest, (int)(x / Chunk.getChunkWidth()), height), (int)(x / Chunk.getChunkWidth()));
+			}
+		}
+		catch(Exception e) 
+		{
+			e.printStackTrace();
+		}
+		
+		try 
+		{ //Set the block
+			chunks.get(""+(x / Chunk.getChunkWidth())).setBackWall(block, x % Chunk.getChunkWidth(), y);
+		}
+		catch(Exception e) 
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Gets the block at the specified (x,y). This method is safe, as all Exceptions are handled in this method. Additionally, 
+	 * the (modular) division is performed automatically. The primary intention is that this method is used to generate the 
+	 * world, so it MUST be safe, otherwise that code will become dangerous. 
+	 * @param x the block's x location in the new world map
+	 * @param y the block's y location in the new world map
+	 * @return the block at the location specified, or null if there isnt one.
+	 */
+	public Block getBackWallGenerate(int x, int y)
+	{
+		try
+		{
+			return getChunks().get(""+x / Chunk.getChunkWidth()).getBackWall(x % Chunk.getChunkWidth(), y);
+		}
+		catch (Exception e)
+		{
+		}
+		return Block.backAir;
+	}
 		
 	/**
 	 * Sets the block at the specified (x,y). This method is safe, as all Exceptions are handled in this method. Additionally,
