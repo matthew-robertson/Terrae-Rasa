@@ -59,6 +59,7 @@ public class WorldGenEarth extends WorldGen
 		generateBase(world, xLoc, width, yLoc, depth); //Create the stone base for the world
 		generateStone(world, xLoc, width, yLoc, depth); //Create a basic shape for stone
 		generateDirt(world, xLoc, width, yLoc, depth);
+		backWalls(world, xLoc, width, yLoc, depth);
 		System.gc();		
 		caves(world, xLoc + 1, (xLoc + width) - 1, yLoc + 445, (yLoc + depth) - 445, 179);
 		cellauto(world, xLoc + 1, (xLoc + width) - 2, yLoc, (yLoc + depth) - 206);
@@ -366,6 +367,19 @@ public class WorldGenEarth extends WorldGen
 		}
 		
 		System.out.println("[WorldGenEarth]: World biomes assigned to chunks");
+	}
+	
+	public void backWalls(World world, int x, int w, int y, int h){
+		for (int i = x; i < (x + w); i++){
+			for (int j = y; j < (y + h); j++){
+				if (world.getBlock(i, j).isSolid){
+					for (int k = j; k < (y + h); k++){
+						world.setBackWallGenerate(Block.backDirt, i, k);
+					}
+					break;
+				}				
+			}
+		}
 	}
 	
 	/**

@@ -47,13 +47,18 @@ public class WorldGen{
 	 * @param emptyChance - the number to use for determining whether to place a hole or not (random number between 1 and emptyChance, empties cell on 50 or less)
 	 */
 	protected void caves(World world, int x, int w, int y, int h, int emptyChance){
-		int empty = 0;
+		int emptyB = 0, emptyW = 0;
 		for (int i = (y + h) - 8; i > y; i--){ //Go through the height
 			for (int j = x; j < (x + w); j++){ //go through the width
-				empty = (int)(Math.random()*emptyChance + 1); //Select if the cell should be emptied
-				if (empty <= 50){ //If the number is beneath the cutoff
+				emptyB = (int)(Math.random()*emptyChance + 1); //Select if the cell should be emptied
+				emptyW = (int)(Math.random()*emptyChance + 1); //Select if the cell should be emptied
+				if (emptyB <= 50){ //If the number is beneath the cutoff
 					world.setBlockGenerate(Block.air, j, i); //Empty the cell
 					world.setBlockGenerate(Block.air, j+1, i);						
+				}
+				if (emptyW <= 40){
+					world.setBackWallGenerate(Block.backAir, j, i);
+					world.setBackWallGenerate(Block.backAir, j + 1, i);
 				}
 			}
 		}			
@@ -68,15 +73,17 @@ public class WorldGen{
 	 * @param h - how tall the area is (y + h yields final height)
 	 */
 	protected void cellauto(World world, int x, int w, int y, int h){
-		int solid = 0, choice = 0;
+		int solid = 0, solidW = 0, choice = 0;
 		count ++;
 		for (int i = (y + h) - 1; i > y + 1; i--){ //Go through the height
 			for (int j = x + 1; j < w - 1; j++){ //go through the width
 				solid = 0; //Reset the solid counter
+				solidW = 0;
 				//Figure out how many solid blocks there are in a 3x3 area
 				for(int k = i - 1; k <= i + 1; k++){ //Height
 					for(int l = j - 1; l <= j + 1; l++){ //Width
 						if (world.getBlockGenerate(l, k).getID() != Block.air.getID()) solid++; //If the block is solid, add to the count
+						if (world.getBackWallGenerate(l, k).getID() != Block.backAir.getID()) solidW++;
 					}
 				}					
 				if (solid >= 5 || (solid == 0 && count <= 2)){ //if there is 5 or more walls or if there are 0 walls and it is the first 1 iterations
@@ -112,6 +119,41 @@ public class WorldGen{
 				}
 				else{ //If there are less than 5 walls
 					world.setBlockGenerate(Block.air, j, i); //Empty the cell
+				}
+				
+				if (solidW >= 5 || (solidW == 0 && count <= 2)){ //if there is 5 or more walls or if there are 0 walls and it is the first 1 iterations
+					if (world.getBackWallGenerate(j, i).getID() == Block.backAir.getID()){ //If the cell is currently empty
+						choice = (int)(Math.random() * 100 + 1); //select which block
+						if (i > (int)(world.getHeight() / 3 * 2)){	//If the current cell is in the bottom third of the map							
+							if (choice < 75){ //75% chance of stone
+								world.setBackWallGenerate(Block.backStone, j, i); //Fill cell with stone
+							}
+							else{ //25% chance of dirt
+								world.setBackWallGenerate(Block.backDirt, j, i); //Fill cell with dirt
+							}
+						}
+						else{ //If the current cell is in the top two thirds
+							if (world.getBackWallGenerate(j, i-1).getID() == Block.backAir.getID()){
+								if (choice < 80){ //80% chance of dirt
+									world.setBackWallGenerate(Block.backDirt, j, i); //Fill cell with dirt
+								}
+								else{ //20% Chance of stone
+									world.setBackWallGenerate(Block.backStone, j, i); //Fill cell with stone
+								}
+							}
+							else{
+								if (choice < 30){ //30% chance of dirt
+									world.setBackWallGenerate(Block.backDirt, j, i); //Fill cell with dirt
+								}
+								else{ //70% Chance of stone
+									world.setBackWallGenerate(Block.backStone, j, i); //Fill cell with stone
+								}
+							}
+						}						
+					}
+				}
+				else{ //If there are less than 5 walls
+					world.setBackWallGenerate(Block.backAir, j, i); //Empty the cell
 				}
 			}
 		}

@@ -660,7 +660,7 @@ public class Block extends ActionbarItem
 			.setBlockHardness(40.0f).setIconIndex(11, 1).setBlockType(2);
 
 	// Backwalls
-	public static Block backAir = new BlockBackWall(128)
+	public static Block backAir = new BlockBackWall(128).setIsSolid(false)
 			.setName("backwall air");
 	public static Block backDirt = new BlockBackWall(129).setIconIndex(0, 18)
 			.setName("backwall dirt");
