@@ -1565,7 +1565,16 @@ public class RenderUI extends Render
 		{
 			if(player.inventory.getQuiverStack(i) == null) 
 			{
-				continue;
+				int size = 16;
+				int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + (-7 * (size + 4)) + 2);
+				int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - (i * (size + 4)) - (size + 24f));
+				icons[7].bind();
+				t.startDrawingQuads(); 
+				t.addVertexWithUV(x, y + size, 0, 0, 1);
+				t.addVertexWithUV(x + size, y + size, 0, 1, 1);
+				t.addVertexWithUV(x + size, y, 0, 1, 0);
+				t.addVertexWithUV(x, y, 0, 0, 0);
+				t.draw();
 			}
 			else
 			{
@@ -1593,11 +1602,25 @@ public class RenderUI extends Render
 		}
 		armorOffset += 2;
 		
+		
+		
 		for(int i = 0; i < player.inventory.getArmorInventoryLength(); i++) //Armor Inventory
 		{
 			if(player.inventory.getArmorInventoryStack(i) == null) 
 			{	
-				continue;			
+				if(i < 6)
+				{
+					size = 16;
+					int x = (int) (getCameraX() + (Display.getWidth() * 0.5f) - ((size + 6) * (1.5f + (i / 5))) + 2);
+					int y = getCameraY() + armorOffset + ((i % 5) * (size + 6));
+					icons[i].bind();
+					t.startDrawingQuads();					
+					t.addVertexWithUV(x, y + size, 0, 0, 1);
+					t.addVertexWithUV(x + size, y + size, 0, 1, 1);
+					t.addVertexWithUV(x + size, y, 0, 1, 0);
+					t.addVertexWithUV(x, y, 0, 0, 0);
+					t.draw();
+				}
 			}
 			else
 			{					
@@ -1612,7 +1635,8 @@ public class RenderUI extends Render
 				t.addVertexWithUV(x, y, 0, 0, 0);
 				t.draw();
 			}
-		}			if(player.inventory.getTrashStack(0) != null) //Garbage Slot 
+		}			
+		if(player.inventory.getTrashStack(0) != null) //Garbage Slot 
 		{
 			textures[player.inventory.getTrashStack(0).getItemID()].bind();
 			t.startDrawingQuads(); 

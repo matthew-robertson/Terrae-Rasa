@@ -130,6 +130,51 @@ public class TextureLoader
         return texture;
     }
        
+    public Texture[] getIcons()
+    {
+    	int[][] coordBySlot = 
+			{ 
+				{ 1 * 16, 6 * 16, 16, 16 }, //Helm
+				{ 1 * 16, 7 * 16, 16, 16 }, //Body
+				{ 0 * 16, 7 * 16, 16, 16 }, //Belt
+				{ 1 * 16, 8 * 16, 16, 16 }, //Pants
+				{ 1 * 16, 9 * 16, 16, 16 }, //Boots
+				{ 0 * 16, 6 * 16, 16, 16 }, //Gloves
+				{ 0 * 16, 9 * 16, 16, 16 }, //Ring
+				{ 0 * 16, 5 * 16, 16, 16 } //Quiver
+			};
+    	Texture[] textures = new Texture[coordBySlot.length];
+    	
+    	int srcPixelFormat;
+    	int textureID;
+    	BufferedImage iconsSheet = loadImage("Resources/icons.png");
+    	
+    	 for(int i = 0; i < textures.length; i++) //Terrain Textures
+         {  	
+ 	        textureID = createTextureID();
+ 	        textures[i] = new Texture(textureID);
+ 	        glBindTexture(GL11.GL_TEXTURE_2D, textureID);
+            BufferedImage img = iconsSheet.getSubimage(coordBySlot[i][0], coordBySlot[i][1], coordBySlot[i][2], coordBySlot[i][3]);
+ 	        if (img.getColorModel().hasAlpha()) 
+ 	        {
+ 	            srcPixelFormat = GL_RGBA;
+ 	        } 
+ 	        else
+ 	        {
+ 	            srcPixelFormat = GL_RGB;
+ 	        }
+ 	        
+ 	        ByteBuffer textureBuffer = convertImageData(img, textures[i]);
+ 	        
+	        glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+	    	glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+ 	        glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, get2Fold(img.getWidth()), get2Fold(img.getHeight()), 0, 
+ 	        		srcPixelFormat, GL_UNSIGNED_BYTE, textureBuffer);		        
+         } 	
+ 	
+    	return textures;
+    }
+    
     /**
      * Loads textures for all items and Blocks
      */

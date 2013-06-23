@@ -35,38 +35,40 @@ public class MouseInput
 			if(!player.isInventoryOpen)
 			{
 				int selectedItemID = player.inventory.getMainInventoryStack(active).getItemID();
-				Item item = Item.itemsList[selectedItemID];
-				if(!player.isSwingingTool() && item instanceof ItemTool) //If the player isn't swinging a tool, start swinging
+				if(selectedItemID < ActionbarItem.spellIndex)
 				{
-					ItemTool tool = (ItemTool) item;
-					player.startSwingingTool(player.isFacingRight);
-					if (player.getIsMining()){
-						world.soundEngine.playSoundEffect(tool.hitSound);
-					}
-					//world.soundEngine.playSoundEffect(tool.swingSound);					
-				}	
-				
-				//Attempt to launch a projectile				
-				if(selectedItemID >= ActionbarItem.itemIndex && selectedItemID < ActionbarItem.spellIndex)
-				{
-					if (item instanceof ItemMagic)
+					Item item = Item.itemsList[selectedItemID];
+					if(!player.isSwingingTool() && item instanceof ItemTool) //If the player isn't swinging a tool, start swinging
 					{
-						ItemMagic spell = (ItemMagic) item;
-						player.launchProjectileMagic(world, 
-								(double)(Render.getCameraX() + MathHelper.getCorrectMouseXPosition()), 
-								(double)(Render.getCameraY() + MathHelper.getCorrectMouseYPosition()), 
-								spell);
+						ItemTool tool = (ItemTool) item;
+						player.startSwingingTool(player.isFacingRight);
+						if (player.getIsMining()){
+							world.soundEngine.playSoundEffect(tool.hitSound);
+						}
+						//world.soundEngine.playSoundEffect(tool.swingSound);					
 					}
-					else if (item instanceof ItemRanged)
+					//Attempt to launch a projectile				
+					if(selectedItemID >= ActionbarItem.itemIndex)
 					{
-						ItemRanged weapon = (ItemRanged) item;
-						player.launchProjectileWeapon(world, 
-								(double)(Render.getCameraX() + MathHelper.getCorrectMouseXPosition()), 
-								(double)(Render.getCameraY() + MathHelper.getCorrectMouseYPosition()), 
-								weapon);
+						if (item instanceof ItemMagic)
+						{
+							ItemMagic spell = (ItemMagic) item;
+							player.launchProjectileMagic(world, 
+									(double)(Render.getCameraX() + MathHelper.getCorrectMouseXPosition()), 
+									(double)(Render.getCameraY() + MathHelper.getCorrectMouseYPosition()), 
+									spell);
+						}
+						else if (item instanceof ItemRanged)
+						{
+							ItemRanged weapon = (ItemRanged) item;
+							player.launchProjectileWeapon(world, 
+									(double)(Render.getCameraX() + MathHelper.getCorrectMouseXPosition()), 
+									(double)(Render.getCameraY() + MathHelper.getCorrectMouseYPosition()), 
+									weapon);
+						}
+						//Try to mine a block
+						player.breakBlock(world, mouseBX, mouseBY, Item.itemsList[player.inventory.getMainInventoryStack(active).getItemID()]); 
 					}
-					//Try to mine a block
-					player.breakBlock(world, mouseBX, mouseBY, Item.itemsList[player.inventory.getMainInventoryStack(active).getItemID()]); 
 				}
 			}
 		}

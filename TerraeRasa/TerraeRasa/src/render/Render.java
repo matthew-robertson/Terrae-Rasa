@@ -49,7 +49,7 @@ public class Render
 	public final static int ITEMS_PER_ROW =  ICONS_SHEET_WIDTH / 16;
 	public final static int ITEMS_PER_COLUMN = ICONS_SHEET_HEIGHT / 16;
 	
-	
+	public static Texture[] icons;
 	
 	public static Texture zombie;
 	public static Texture goblin;
@@ -184,6 +184,8 @@ public class Render
 		actionbarSlot = loader.getTexture("Resources/player_actionbar_slot.png");
 		actionbarOutline = loader.getTexture("Resources/player_actionbar_outline.png");
 		tooltipBackground = loader.getTexture("Resources/tooltip_background.png");
+		
+		icons = loader.getIcons();
 		
 		//
 		zombie_test_animation = new Animation(loader.getTexture("Resources/test_animation.png"), 
