@@ -91,8 +91,9 @@ public class WeatherSnow extends Weather
 			if(isInBlock(world, snow[i].x, snow[i].y)) //if the particle hits something, add snow and reset the particle
 			{
 				//so this is currently being put on hold, but eventually this should be converted to work for anything.
-				if(getBlockAtPosition(world, snow[i].x, snow[i].y) instanceof BlockGrass && snow[i].x > 0 && snow[i].y > 0)
+				if(getBlockAtPosition(world, snow[i].x, snow[i].y).isSolid && snow[i].x > 0 && snow[i].y > 0)
 				{
+					
 					//Adding snow cover
 					if(world.getBlockGenerate(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)snow[i].x / 6), 
 							MathHelper.returnIntegerInWorldMapBounds_Y(world, (int)((snow[i].y - 6) / 6))).getID() == Block.air.getID())
@@ -101,9 +102,12 @@ public class WeatherSnow extends Weather
 								MathHelper.returnIntegerInWorldMapBounds_X(world, (int)snow[i].x / 6), 
 								MathHelper.returnIntegerInWorldMapBounds_Y(world, (int)((snow[i].y - 6) / 6)));						
 					}
+					
+					Block block = world.getBlockGenerate(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)snow[i].x / 6),
+							MathHelper.returnIntegerInWorldMapBounds_Y(world, (int)((snow[i].y - 6) / 6) + 1));
+					
 					//Converting grass to snowy-grass:
-					if (world.getBlockGenerate(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)snow[i].x / 6),
-							MathHelper.returnIntegerInWorldMapBounds_Y(world, (int)((snow[i].y - 6) / 6) + 1)).getID() == Block.grass.getID())
+					if (block.getID() == Block.grass.getID() && block.getBitMap() < 16)
 					{
 						world.getBlockGenerate(MathHelper.returnIntegerInWorldMapBounds_X(world,
 								(int)snow[i].x / 6), 

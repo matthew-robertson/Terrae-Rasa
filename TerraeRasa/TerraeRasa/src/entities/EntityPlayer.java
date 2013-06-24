@@ -849,7 +849,7 @@ public class EntityPlayer extends EntityLiving
 						ticksreq = (int) (world.getBlock(mx, my).getBlockHardness() / material.getStrength()) + 1; //Determine how long to break
 						
 					}	
-					else if(ticksreq == 1 && Mouse.isButtonDown(0)) //If the block should break
+					else if(ticksreq == 1 && Mouse.isButtonDown(0) && world.getBlock(mx,  my).getIsMineable()) //If the block should break
 					{
 						isMining = false;
 						if(world.getBlock(mx, my) == Block.cactus) 

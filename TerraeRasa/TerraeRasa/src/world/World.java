@@ -661,7 +661,6 @@ public class World
 		}
 		
 		if (!getBlockGenerate(x, y - 1).isOveridable && !(getBlockGenerate(x, y - 1) instanceof BlockPillar)){
-			//System.out.println(getBlockGenerate(x, y-1).getID());
 			bit = 0;					
 		}
 		

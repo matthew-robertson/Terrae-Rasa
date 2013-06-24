@@ -93,6 +93,7 @@ public class Block extends ActionbarItem
 	protected boolean breakable;
 	protected double hardness;
 	protected boolean passable;
+	protected boolean isMineable;
 	public boolean isSolid;
 	protected int hRange;
 	protected int lRange;
@@ -146,6 +147,7 @@ public class Block extends ActionbarItem
 		minimumDropAmount = 1;
 		isOveridable = false;
 		isSolid = true;
+		isMineable = true;
 		extraTooltipInformation = "";
 		iconX = 0;
 		iconY = 0;
@@ -202,6 +204,7 @@ public class Block extends ActionbarItem
 		this.passable = block.passable;
 		this.isSolid = block.isSolid;
 		this.hRange = block.hRange;
+		this.isMineable = block.isMineable;
 		this.lRange = block.lRange;
 	}
 
@@ -331,6 +334,11 @@ public class Block extends ActionbarItem
 		return this;
 	}
 
+	public Block setIsMineable(boolean b){
+		isMineable = b;
+		return this;
+	}
+	
 	public Block setBitMap(int i) 
 	{
 		bitMap = i;
@@ -398,6 +406,10 @@ public class Block extends ActionbarItem
 	public EnumBlockMaterial getMaterial()
 	{
 		return material;
+	}
+	
+	public boolean getIsMineable(){
+		return isMineable;
 	}
 
 	public boolean getPassable() 
@@ -586,7 +598,7 @@ public class Block extends ActionbarItem
 			.setBlockHardness(0.0f)
 			.overrideItemIcon(5, 0, Render.TEXTURE_SHEET_ITEMS)
 			.setIconIndex(0, 0).setPassable(true).setIsSolid(false);
-	public static Block adminium = new Block(49).setName("Adminium")
+	public static Block adminium = new Block(49).setName("Adminium").setIsMineable(false)
 			.setBlockHardness(8000.0f).setIconIndex(0, 1);
 	public static Block plank = new Block(50).setName("Plank").setTileMap('g')
 			.setBlockHardness(30.0f).setIconIndex(0, 17).setBlockType(2);
