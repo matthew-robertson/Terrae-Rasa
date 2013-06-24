@@ -1,11 +1,13 @@
 package utils;
 
 import items.Item;
+import items.ItemGem;
 
 import java.io.Serializable;
 
+import setbonus.SetBonus;
 import spells.Spell;
-
+import auras.Aura;
 import blocks.Block;
 
 /**
@@ -22,9 +24,11 @@ import blocks.Block;
  * <br><br>
  * Additional methods of interest are {@link #addToStack(int)} and {@link #removeFromStack(int)} 
  * which can add to or remove from the Itemstacks's current stack size. 
+ * <br>
+ * Version 1.1 adds GemSocket Support
  * @author      Alec Sobeck
  * @author      Matthew Robertson
- * @version     1.0
+ * @version     1.1
  * @since       1.0
  */
 public class ItemStack 
@@ -35,7 +39,10 @@ public class ItemStack
 	private int stackSize;
 	private int maxStackSize;
 	private int itemID;
-	//private ItemGem[] sockets = { (ItemGem) Item.gemDefense1 };
+	private GemSocket[] gemSockets;
+	private String renderedName;
+	private SetBonus[] bonuses;
+	private Aura[] auras;
 	
 	public ItemStack(ActionbarItem item)
 	{
@@ -43,6 +50,14 @@ public class ItemStack
 		maxStackSize = item.maxStackSize;
 		stackSize = 1;
 		itemName = item.name;
+		gemSockets = new GemSocket[item.getTotalSockets()];
+		for(int i = 0; i < gemSockets.length; i++)
+		{
+			gemSockets[i] = new GemSocket();
+		}
+		bonuses = new SetBonus[0];
+		auras = new Aura[0];
+		renderedName = itemName;
 	}
 	
 	public ItemStack(ActionbarItem item, int stackSize)
@@ -55,6 +70,14 @@ public class ItemStack
 			stackSize = maxStackSize;
 		}
 		itemName = item.name;
+		gemSockets = new GemSocket[item.getTotalSockets()];
+		for(int i = 0; i < gemSockets.length; i++)
+		{
+			gemSockets[i] = new GemSocket();
+		}	
+		bonuses = new SetBonus[0];
+		auras = new Aura[0];
+		renderedName = itemName;
 	}
 		
 	public ItemStack(int id, int stackSize)
@@ -66,17 +89,27 @@ public class ItemStack
 		{
 			itemName = Block.blocksList[id].name;
 			maxStackSize = Block.blocksList[id].maxStackSize;
+			gemSockets = new GemSocket[Block.blocksList[id].getTotalSockets()];
 		}
 		else if(itemID >= ActionbarItem.itemIndex && itemID < ActionbarItem.spellIndex)
 		{
 			itemName = Item.itemsList[id].name;
 			maxStackSize = Item.itemsList[id].maxStackSize;			
+			gemSockets = new GemSocket[Item.itemsList[id].getTotalSockets()];
 		}		
 		else
 		{
 			itemName = Spell.spellList[id].name;
 			maxStackSize = Spell.spellList[id].maxStackSize;
+			gemSockets = new GemSocket[Spell.spellList[id].getTotalSockets()];
 		}
+		for(int i = 0; i < gemSockets.length; i++)
+		{
+			gemSockets[i] = new GemSocket();
+		}
+		bonuses = new SetBonus[0];
+		auras = new Aura[0];
+		renderedName = itemName;
 	}
 	
 	public ItemStack(int id)
@@ -88,17 +121,27 @@ public class ItemStack
 		{
 			itemName = Block.blocksList[id].name;
 			maxStackSize = Block.blocksList[id].maxStackSize;
+			gemSockets = new GemSocket[Block.blocksList[id].getTotalSockets()];
 		}
 		else if(itemID >= ActionbarItem.itemIndex && itemID < ActionbarItem.spellIndex)
 		{
 			itemName = Item.itemsList[id].name;
-			maxStackSize = Item.itemsList[id].maxStackSize;			
+			maxStackSize = Item.itemsList[id].maxStackSize;		
+			gemSockets = new GemSocket[Item.itemsList[id].getTotalSockets()];
 		}		
 		else
 		{
 			itemName = Spell.spellList[id].name;
 			maxStackSize = Spell.spellList[id].maxStackSize;
+			gemSockets = new GemSocket[Spell.spellList[id].getTotalSockets()];
 		}
+		for(int i = 0; i < gemSockets.length; i++)
+		{
+			gemSockets[i] = new GemSocket();
+		}
+		bonuses = new SetBonus[0];
+		auras = new Aura[0];
+		renderedName = itemName;
 	}
 	
 	public ItemStack(ItemStack stack)
@@ -107,6 +150,10 @@ public class ItemStack
 		this.stackSize = stack.getStackSize();
 		this.itemID = stack.getItemID();
 		this.maxStackSize = stack.getMaxStackSize();
+		this.gemSockets = stack.getGemSockets();
+		this.bonuses = stack.getBonuses();
+		this.auras = stack.getAuras();
+		this.renderedName = stack.getRenderedName();
 	}
 	
 	/**
@@ -176,5 +223,118 @@ public class ItemStack
 	public final int getItemID()
 	{
 		return new Integer(itemID);
+	}
+
+	/**
+	 * Gets all the GemSockets for this ItemStack
+	 * @return all the GemSockets for this ItemStack
+	 */
+	public GemSocket[] getGemSockets()
+	{
+		return gemSockets;
+	}
+	
+	/**
+	 * Gets the GemSocket for this ItemStack at the given index
+	 * @param index the index of the GemSocket
+	 * @return the GemSocket at the specified index
+	 */
+	public GemSocket getSocket(int index)
+	{
+		return gemSockets[index];
+	}
+	
+	/**
+	 * Sockets the specified gem to the specified index. This will overwrite previous
+	 * gems.
+	 * @param gem the ItemGem to socket
+	 * @param index the index to socket the gem at
+	 */
+	public void socketGem(ItemGem gem, int index)
+	{
+		gemSockets[index].socket(gem);
+	}
+	
+	/**
+	 * Indicates if the ItemStack has any gem sockets
+	 * @return true if the ItemStack has 1 or more gem sockets; otherwise false
+	 */
+	public boolean hasSockets()
+	{
+		return gemSockets.length > 0;
+	}
+	
+	/**
+	 * Gives this ItemStack some specific SetBonuses.
+	 * @param bonuses the bonuses to give this ItemStack
+	 */
+	public void setBonuses(SetBonus[] bonuses)
+	{
+		this.bonuses = bonuses;
+	}
+	
+	/**
+	 * Gives this Itemstack some specific auras.
+	 * @param auras the auras to give this ItemStack
+	 */
+	public void setAuras(Aura[] auras)
+	{
+		this.auras = auras;
+	}
+
+	/**
+	 * Sets the rendered name of this ItemStack, which is what will be displayed in the tooltip
+	 * @param name the name to be displayed in the tooltip
+	 */
+	public void setRenderedName(String name)
+	{
+		this.renderedName = name;
+	}
+	
+	/**
+	 * Gets any special SetBonuses assigned to this specific ItemStack
+	 * @return any SetBonuses assigned to this ItemStack
+	 */
+	public SetBonus[] getBonuses()
+	{
+		return bonuses;
+	}
+	
+	/**
+	 * Gets any special Auras for this specific ItemStack
+	 * @return any Auras assigned to this specific ItemStack
+	 */
+	public Aura[] getAuras()
+	{
+		return auras;
+	}
+	
+	/**
+	 * Gets the rendered name for this ItemStack, which will be used in the UI
+	 * @return the renderedName of this ItemStack
+	 */
+	public String getRenderedName()
+	{
+		return renderedName;
+	}
+
+	/**
+	 * Converts all the set bonuses and then auras into a string 
+	 * array. Useful for tooltips and visualization.
+	 * @return this ItemStack's SetBonuses, and Auras as a String[]
+	 */
+	public String[] getStringBonuses()
+	{
+		String[] allBonuses = new String[bonuses.length + auras.length];
+		int i = 0;
+		for(i = 0; i < bonuses.length; i++)
+		{
+			allBonuses[i] = bonuses[i].toString();
+		}
+		for(i = 0; i < auras.length; i++)
+		{
+			allBonuses[bonuses.length + i] = auras[i].toString();
+		}
+		return allBonuses;
 	}
 }

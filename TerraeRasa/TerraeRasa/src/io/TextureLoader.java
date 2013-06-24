@@ -141,7 +141,8 @@ public class TextureLoader
 				{ 1 * 16, 9 * 16, 16, 16 }, //Boots
 				{ 0 * 16, 6 * 16, 16, 16 }, //Gloves
 				{ 0 * 16, 9 * 16, 16, 16 }, //Ring
-				{ 0 * 16, 5 * 16, 16, 16 } //Quiver
+				{ 0 * 16, 5 * 16, 16, 16 }, //Quiver
+				{ 1 * 16, 4 * 16, 16, 16 } //Gem Socket
 			};
     	Texture[] textures = new Texture[coordBySlot.length];
     	

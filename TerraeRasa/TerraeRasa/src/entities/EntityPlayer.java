@@ -12,6 +12,7 @@ import items.ItemToolPickaxe;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Vector;
 
 import org.lwjgl.input.Mouse;
 
@@ -21,11 +22,13 @@ import setbonus.SetBonusContainer;
 import setbonus.SetBonusFactory;
 import utils.Cooldown;
 import utils.CraftingManager;
+import utils.GemSocket;
 import utils.InventoryPlayer;
 import utils.ItemStack;
 import utils.MathHelper;
 import utils.Recipe;
 import world.World;
+import auras.Aura;
 import auras.AuraContainer;
 import auras.AuraTracker;
 import blocks.Block;
@@ -703,15 +706,49 @@ public class EntityPlayer extends EntityLiving
 	 * should be constant for a given piece of armour to allow for easy removing.
 	 * @param armor the piece of armour being equipped
 	 */
-	public void applySingleArmorItem(ItemArmor armor, int index)
+	public void applySingleArmorItem(ItemArmor armor, ItemStack stack, int index)
 	{
 		SetBonus[] bonuses = armor.getBonuses();		
 		for(SetBonus bonus : bonuses)
 		{
 			bonus.apply(this);
 		}		
+		Vector<Aura> auras = new Vector<Aura>();
+		for(GemSocket socket : stack.getGemSockets())
+		{
+			if(socket.getGem() != null)
+			{
+				for(SetBonus bonus : socket.getGem().getBonuses())
+				{
+					if(bonus != null)
+					{
+						bonus.apply(this);
+					}
+				}
+				for(Aura aura : socket.getGem().getAuras())
+				{
+					if(aura != null)
+					{
+						auras.add(aura);
+					}
+				}
+			}
+		}
+		for(SetBonus bonus : stack.getBonuses())
+		{
+			bonus.apply(this);
+		}
 		
-		auraTracker.setAurasByPiece(new AuraContainer(armor.getAuras()), index);
+		for(Aura aura : armor.getAuras())
+		{
+			auras.add(aura);
+		}		
+		for(Aura aura : stack.getAuras())
+		{
+			auras.add(aura);
+		}
+		
+		auraTracker.setAurasByPiece(new AuraContainer(auras), index);			
 		
 		defense += armor.getDefense();
 		dexterity += armor.getDexterity();
@@ -727,13 +764,30 @@ public class EntityPlayer extends EntityLiving
 	 * change.
 	 * @param armor the piece of armour being removed
 	 */
-	public void removeSingleArmorItem(ItemArmor armor, int index)
+	public void removeSingleArmorItem(ItemArmor armor, ItemStack stack, int index)
 	{
 		SetBonus[] bonuses = armor.getBonuses();		
 		for(SetBonus bonus : bonuses)
 		{
 			bonus.remove(this);
 		}		
+		for(GemSocket socket : stack.getGemSockets())
+		{
+			if(socket.getGem() != null)
+			{
+				for(SetBonus bonus : socket.getGem().getBonuses())
+				{
+					if(bonus != null)
+					{
+						bonus.remove(this);
+					}
+				}
+			}
+		}
+		for(SetBonus bonus : stack.getBonuses())
+		{
+			bonus.remove(this);
+		}
 		
 		auraTracker.setAurasByPiece(null, index);
 		
@@ -760,23 +814,6 @@ public class EntityPlayer extends EntityLiving
 		currentBonuses.applyAll(this);
 	}
 
-
-	/**
-	 * Updates aura bonus data. Unused auras are removed and new ones are applied. The new auras are 
-	 * stored in the player's instance to be removed later.
-	 */
-	private void refreshSetAuras()
-	{
-		if(currentBonuses != null)
-		{
-			currentBonuses.removeAll(this);
-			currentBonuses = null;
-		}
-		currentBonuses = SetBonusFactory.getSetBonuses(inventory);
-		currentBonuses.applyAll(this);
-	}
-
-	
 	/**
 	 * Function called when the player is mining a block
 	 * @param mx x position in worldmap array, of the block being mined

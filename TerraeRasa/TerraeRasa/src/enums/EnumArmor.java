@@ -4,7 +4,9 @@ import java.util.EnumSet;
 import java.util.Vector;
 
 import setbonus.SetBonus;
+import setbonus.SetBonusCriticalStrike;
 import setbonus.SetBonusDefense;
+import setbonus.SetBonusSpeed;
 
 /**
  * EnumArmor defines the armour values given by a specific grade of equipment. These values are 
@@ -22,25 +24,33 @@ public enum EnumArmor
 {
 	NOTHING(0, 0, 0, 0, 0, 0, new SetBonus[]{ }),
 	COPPER(2, 3, 2, 1, 1, 1, new SetBonus[]{
-			new SetBonusDefense(1).setPiecesRequiredToActivate(3)
+			new SetBonusDefense(1).setPiecesRequiredToActivate(3),
+			new SetBonusDefense(1).setPiecesRequiredToActivate(6)
 		}),
 	BRONZE(2, 4, 3, 1, 1, 1, new SetBonus[]{ 
 			new SetBonusDefense(1).setPiecesRequiredToActivate(2), 
-			new SetBonusDefense(1).setPiecesRequiredToActivate(4)
+			new SetBonusDefense(1).setPiecesRequiredToActivate(4),
+			new SetBonusDefense(1).setPiecesRequiredToActivate(6)
 		}),
 	IRON(3, 5, 4, 2, 2, 2, new SetBonus[]{ 
-			new SetBonusDefense(1).setPiecesRequiredToActivate(2), 
-			new SetBonusDefense(2).setPiecesRequiredToActivate(4)
+			new SetBonusDefense(1).setPiecesRequiredToActivate(2),
+			new SetBonusDefense(1).setPiecesRequiredToActivate(4),
+			new SetBonusDefense(2).setPiecesRequiredToActivate(6)
 		}),
 	SILVER(4, 6, 5, 3, 3, 3, new SetBonus[]{ 
 			new SetBonusDefense(1).setPiecesRequiredToActivate(2),
-			new SetBonusDefense(1).setPiecesRequiredToActivate(3),
 			new SetBonusDefense(2).setPiecesRequiredToActivate(4),
+			new SetBonusDefense(2).setPiecesRequiredToActivate(6),
 		}),
 	GOLD(5, 7, 5, 4, 4, 4, new SetBonus[]{ 
-			new SetBonusDefense(1).setPiecesRequiredToActivate(2),
-			new SetBonusDefense(2).setPiecesRequiredToActivate(3),
-			new SetBonusDefense(2).setPiecesRequiredToActivate(4)
+			new SetBonusDefense(2).setPiecesRequiredToActivate(2),
+			new SetBonusDefense(3).setPiecesRequiredToActivate(4),
+			new SetBonusSpeed(0.1).setPiecesRequiredToActivate(6)
+		}),
+	TIER6(7, 9, 7, 5, 5, 5, new SetBonus[]{ 
+			new SetBonusDefense(4).setPiecesRequiredToActivate(2),
+			new SetBonusCriticalStrike(0.1).setPiecesRequiredToActivate(4),
+			new SetBonusSpeed(0.4).setPiecesRequiredToActivate(6)
 		});
 
 	private final int helmDefense;

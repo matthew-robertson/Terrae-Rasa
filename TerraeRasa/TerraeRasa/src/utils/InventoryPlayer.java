@@ -226,13 +226,8 @@ public class InventoryPlayer
 	{
 		int slot;
 		int size = stack.getStackSize();
-		try		
-		{
-			player.onInventoryChange();
-		}
-		catch (Exception e)	//Try/catch- fixing lazy programming for many years!
-		{	
-		}
+		
+		player.onInventoryChange();		
 		
 		if((slot = doesPartialStackExist(stack)) != -1) //Is there already a partial stack of the item?
 		{
@@ -261,7 +256,8 @@ public class InventoryPlayer
 			for(int i = 0; i < size; )
 			{
 				slot = getFirstEmptySlot(); //Get first empty slot
-				if(slot == -1) break;
+				if(slot == -1)
+					break;
 				else
 				{
 					if(size > stack.getMaxStackSize()) //Is there more than a stack of the item? if so loop again
@@ -274,7 +270,7 @@ public class InventoryPlayer
 					}
 					else //If not, put what's left of the stack in the inventory and return
 					{
-						mainInventory[slot] = new ItemStack(stack.getItemID(), stack.getStackSize());
+						mainInventory[slot] = new ItemStack(stack);
 						mainInventory[slot].setStackSize(size);
 						inventoryTotals.put(mainInventory[slot].getItemName(), inventoryTotals.get(mainInventory[slot].getItemName()) + size);
 						size = 0;
@@ -337,52 +333,52 @@ public class InventoryPlayer
 		
 		if(item instanceof ItemArmorHelmet && armorInventory[0] == null)
 		{
-			setArmorInventoryStack(player, stack, 0);
+			setArmorInventoryStack(player, stack, armorInventory[0], 0);
 			return null;			
 		}
 		else if(item instanceof ItemArmorBody && armorInventory[1] == null)
 		{
-			setArmorInventoryStack(player, stack, 1);
+			setArmorInventoryStack(player, stack, armorInventory[1], 1);
 			return null;
 		}
 		else if(item instanceof ItemArmorBelt && armorInventory[2] == null)
 		{
-			setArmorInventoryStack(player, stack, 2);
+			setArmorInventoryStack(player, stack, armorInventory[2], 2);
 			return null;
 		}
 		else if(item instanceof ItemArmorPants && armorInventory[3] == null)
 		{
-			setArmorInventoryStack(player, stack, 3);
+			setArmorInventoryStack(player, stack, armorInventory[3], 3);
 			return null;
 		}
 		else if(item instanceof ItemArmorBoots && armorInventory[4] == null)
 		{
-			setArmorInventoryStack(player, stack, 4);
+			setArmorInventoryStack(player, stack, armorInventory[4], 4);
 			return null;
 		}
 		else if(item instanceof ItemArmorGloves && armorInventory[5] == null)
 		{
-			setArmorInventoryStack(player, stack, 5);
+			setArmorInventoryStack(player, stack, armorInventory[5], 5);
 			return null;
 		}
 		else if(item instanceof ItemArmorAccessory && armorInventory[6] == null)
 		{
-			setArmorInventoryStack(player, stack, 6);
+			setArmorInventoryStack(player, stack, armorInventory[6], 6);
 			return null;
 		}
 		else if(item instanceof ItemArmorAccessory && armorInventory[7] == null)
 		{
-			setArmorInventoryStack(player, stack, 7);
+			setArmorInventoryStack(player, stack, armorInventory[7], 7);
 			return null;
 		}
 		else if(item instanceof ItemArmorAccessory && armorInventory[8] == null)
 		{
-			setArmorInventoryStack(player, stack, 8);
+			setArmorInventoryStack(player, stack, armorInventory[8], 8);
 			return null;			
 		}
 		else if(item instanceof ItemArmorAccessory && armorInventory[9] == null)
 		{
-			setArmorInventoryStack(player, stack, 9);
+			setArmorInventoryStack(player, stack, armorInventory[9], 9);
 			return null;
 		}
 		
@@ -600,22 +596,26 @@ public class InventoryPlayer
 	 * @param index where to place the stack in armorInventory[]
 	 * @return success of the operation
 	 */
-	public boolean setArmorInventoryStack(EntityPlayer player, ItemStack stack, int index)
+	public boolean setArmorInventoryStack(EntityPlayer player, ItemStack newStack, ItemStack oldStack, int index)
 	{
-		if(stack == null)
+		if(newStack == null)
 		{
 			//If a piece of armor is being removed, then ensure its stats are appropriately neutralized
 			if(armorInventory[index] != null)
 			{
-				player.removeSingleArmorItem((ItemArmor)(Item.itemsList[armorInventory[index].getItemID()]), index);
+				player.removeSingleArmorItem((ItemArmor)(Item.itemsList[armorInventory[index].getItemID()]), oldStack, index);
 			}
 			armorInventory[index] = null;
 		}
 		else
 		{
+			if(armorInventory[index] != null)
+			{
+				player.removeSingleArmorItem((ItemArmor)(Item.itemsList[armorInventory[index].getItemID()]), oldStack, index);
+			}
 			//Apply a newly added armour piece's stats
-			player.applySingleArmorItem((ItemArmor)(Item.itemsList[stack.getItemID()]), index);
-			armorInventory[index] = new ItemStack(stack);
+			player.applySingleArmorItem((ItemArmor)(Item.itemsList[newStack.getItemID()]), newStack, index);
+			armorInventory[index] = new ItemStack(newStack);
 		}
 		return true;
 	}
@@ -747,7 +747,7 @@ public class InventoryPlayer
 			{
 				if(((ItemArmor)(Item.itemsList[armorInventory[i].getItemID()])).getIsSavingRelic())
 				{
-					setArmorInventoryStack(player, null, i);
+					setArmorInventoryStack(player, null, armorInventory[i], i);
 					return;
 				}
 			}

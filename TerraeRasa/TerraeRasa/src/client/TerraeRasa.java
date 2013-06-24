@@ -3,10 +3,13 @@ package client;
 import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
@@ -47,6 +50,7 @@ public class TerraeRasa
 	private final static String MAC_BASE_PATH = new StringBuilder().append("/Users/").append(System.getProperty("user.name")).append("/Library/Application").append(" Support/terraerasa").toString();
 	private final static String LINUX_BASE_PATH = new StringBuilder().append("/home/").append(System.getProperty("user.name")).append("/terraerasa").toString();
 	private static String basePath;
+	public static boolean needsResized;
 	
 	/**
 	 * Creates a new instance of the container for all game objects, and a new GameEngine. 
@@ -124,7 +128,15 @@ public class TerraeRasa
 	        initGL(); //Initialize the generic 2D opengl settings
 	    	resizeWindow(); //To remain consistent, resize the window to use slightly different calculations immediately
 	    	
-			
+	    	Component myComponent = terraeRasaFrame;
+			myComponent.addComponentListener(new ComponentAdapter() //JFrame listener for a window resize event
+			{
+			    @Override
+			    public void componentResized(ComponentEvent e)
+			    {
+		    		needsResized = true; //Flags the window for recalculations on the next game update
+			    }
+			});
 		}
 		catch (Exception e)
 		{

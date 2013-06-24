@@ -32,6 +32,7 @@ public class ItemArmor extends Item
 		armorType = EnumArmor.NOTHING;
 		bonuses = new SetBonus[0];
 		auras = new Aura[0];
+		totalSockets = 0;
 	}
 	
 	protected ItemArmor setArmorType(EnumArmor type)
@@ -219,5 +220,11 @@ public class ItemArmor extends Item
 			strings[i] = stats.get(i);
 		}
 		return strings;
+	}
+	
+	protected ItemArmor setTotalSockets(int total)
+	{
+		this.totalSockets = total;
+		return this;
 	}
 }

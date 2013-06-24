@@ -1004,7 +1004,7 @@ public class World
 					( scaled_points[i].y * Math.cos(angle));
 		}
 		
-		
+		//System.out.println("Start = " + System.currentTimeMillis());
 		for(int i = 0; i < entityList.size(); i++)
 		{
 			double entity_x = entityList.get(i).x + entityList.get(i).width;
@@ -1014,7 +1014,6 @@ public class World
 			{
 				if(entityList.get(i).isImmuneToDamage())
 				{
-					//System.out.println("Immune>>Damage not done");
 					continue;
 				}				
 				
@@ -1061,7 +1060,8 @@ public class World
 				
 			}
 		}
-
+	//	System.out.println("End = " + System.currentTimeMillis());
+		
 		player.updateSwing();
 	}
 	

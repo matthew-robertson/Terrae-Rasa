@@ -10,10 +10,12 @@ import items.ItemArmorBoots;
 import items.ItemArmorGloves;
 import items.ItemArmorHelmet;
 import items.ItemArmorPants;
+import items.ItemGem;
 
 import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Mouse;
@@ -77,7 +79,11 @@ public class RenderUI extends Render
 {
 	private TrueTypeFont boldTooltip = new TrueTypeFont(((new Font("times", Font.BOLD, 24)).deriveFont(16.0f)), true);
 	private TrueTypeFont plainTooltip = new TrueTypeFont(((new Font("times", Font.PLAIN, 24)).deriveFont(16.0f)), true);
-			
+	private boolean isSocketWindowOpen;
+	private boolean socketItemEquipped;
+	private int socketItemIndex;
+	private ItemStack socketedItem;
+	
 	//Variables for the item picked up by the mouse:
 	private boolean shouldDropItem;
 	private int mouseItemSize; //How big it is
@@ -120,22 +126,29 @@ public class RenderUI extends Render
 		renderHeartsAndMana(world, player); //The hearts and mana	
 		if(player.isInventoryOpen)
 		{
+			if(player.isViewingChest)
+			{
+				isSocketWindowOpen = false;
+			}
+			
 			renderInventory(world, player); //The full inventory if it's open
 			if(player.isViewingChest) //Chest(s) if they're being viewed
-			{
+			{ 
 				renderChest(world, player);
 			}			
 			if(!settings.menuOpen)
 			{
-				//System.out.println(Mouse.getX() + " " + Mouse.getY());
-				
 				mouse(world, player);
-				
+				if(isSocketWindowOpen)
+				{
+					renderSocketsMenu(world, player);
+				}
 				attemptToRenderItemTooltip(world, player);
 			}
 		}	
 		else
 		{
+			closeSocketWindow();
 			renderActionBar(world, player);	//The actionbar if the inventory is closed
 		}		
 		renderStatusEffects(player);		
@@ -147,14 +160,173 @@ public class RenderUI extends Render
 	}
 
 	/**
+	 * Closes the socket window if needed.
+	 */
+	public void closeSocketWindow()
+	{
+		isSocketWindowOpen = false;
+	}
+	
+	/**
 	 * Updates all mouse events on call. Including: chests, the mainInventory, the garbage, 
 	 * and the recipe scroller 
 	 */
 	private void mouse(World world, EntityPlayer player)
 	{
-		mouseEventInventory(world, player);	
+		mouseEventLeftClick(world, player);	
+		mouseEventRightClick(world, player);
 	}
 	
+	/**
+	 * Renders the sockets menu for a given item.
+	 * @param world
+	 * @param player
+	 */
+	private void renderSocketsMenu(World world, EntityPlayer player)
+	{
+		int size = 20;
+		int tooltipWidth = 8 * 20;
+		int tooltipHeight = 5 * 20;
+		int frameX = (int) (Display.getWidth() * 0.25) - (4 * size); 
+		int frameY = (int) (Display.getHeight() * 0.5) - (4 * size) - 26; 
+		
+		ItemStack stack = socketedItem;
+		EnumItemQuality quality = EnumItemQuality.COMMON;			
+		String itemName = socketedItem.getRenderedName();
+		String[] stats = { };        
+		if(stack.getItemID() >= Item.itemIndex && stack.getItemID() < ActionbarItem.spellIndex)
+		{
+			quality = (Item.itemsList[stack.getItemID()]).itemQuality;
+			stats = Item.itemsList[stack.getItemID()].getStats();
+		}
+		
+		//% of total text size to render, in this case sacale to 1/2 size.
+		float xScale = 0.5F;
+		//Arbitrary padding to make things look nicer
+		final int PADDING = 5;		
+		
+		//Find out how long does the tooltip actually has to be
+		double requiredHeight = boldTooltip.getHeight(itemName) + 				
+				(boldTooltip.getHeight(itemName) * 0.75 * stats.length) 
+				+ 30;
+		
+		tooltipHeight = (int) requiredHeight;
+		frameX += getCameraX();
+		frameY += getCameraY();		
+		frameY -= tooltipHeight;
+		
+		tooltipBackground.bind();			
+		GL11.glColor4f(1, 1, 1, 0.8f); 
+		t.startDrawingQuads();
+		t.addVertexWithUV(frameX, frameY + tooltipHeight, 0, 0, 1);
+		t.addVertexWithUV(frameX + tooltipWidth, frameY + tooltipHeight, 0, 1, 1);
+		t.addVertexWithUV(frameX + tooltipWidth, frameY, 0, 1, 0);
+		t.addVertexWithUV(frameX, frameY, 0, 0, 0);
+		t.draw();
+		
+		GL11.glColor4d(quality.r, quality.g, quality.b, 1.0);
+		
+		//Title
+		float yOffset = frameY + boldTooltip.getHeight(itemName);
+		boldTooltip.drawString(frameX + PADDING, yOffset, itemName, xScale , -1, TrueTypeFont.ALIGN_LEFT); 
+		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+		
+		//Stats
+		for(int i = 0; i < stats.length; i++)
+		{
+			boldTooltip.drawString(frameX + PADDING, 
+					yOffset + PADDING*(1 + i) + (((tooltipHeight) - (tooltipHeight - boldTooltip.getHeight(itemName))) * 0.5f * (1+i)), 
+					stats[i],
+					xScale,
+					-1, 
+					TrueTypeFont.ALIGN_LEFT); 
+		}			
+		
+		yOffset = yOffset + PADDING * (stats.length) + 
+				(((tooltipHeight) - (tooltipHeight - boldTooltip.getHeight(itemName))) * 0.5f * (stats.length));
+		
+		int numberOfSockets = stack.getGemSockets().length;
+		
+		icons[8].bind(); //Gem Socket Icon
+		GL11.glColor4f(1, 1, 1, 1); 
+		for(int i = 0; i < numberOfSockets; i++)
+		{
+			size = 30;			
+			double offsetByTotal = (numberOfSockets == 1) ? 65 : (numberOfSockets == 2) ? 47.5 : (numberOfSockets == 3) ? 30 : 10;
+			double xoff = offsetByTotal + (i * (size + 7.5));
+			int yoff = (int) yOffset;			
+			t.startDrawingQuads();
+			t.addVertexWithUV(frameX + xoff, yoff + size, 0, 0, 1);
+			t.addVertexWithUV(frameX + xoff + size, yoff + size, 0, 1, 1);
+			t.addVertexWithUV(frameX + xoff + size, yoff, 0, 1, 0);
+			t.addVertexWithUV(frameX + xoff, yoff, 0, 0, 0);
+			t.draw();
+		}
+		
+		for(int i = 0; i < numberOfSockets; i++)
+		{
+			if(stack.getGemSockets()[i].getGem() != null)
+			{
+				size = 24;				
+				double offsetByTotal = (numberOfSockets == 1) ? 68 : (numberOfSockets == 2) ? 50.5 : (numberOfSockets == 3) ? 33 : 13;
+				double xoff = offsetByTotal + (i * (size + 6 + 7.5));
+				int yoff = (int) yOffset + 3;
+				textures[stack.getGemSockets()[i].getGem().id].bind();
+				t.startDrawingQuads();
+				t.addVertexWithUV(frameX + xoff, yoff + size, 0, 0, 1);
+				t.addVertexWithUV(frameX + xoff + size, yoff + size, 0, 1, 1);
+				t.addVertexWithUV(frameX + xoff + size, yoff, 0, 1, 0);
+				t.addVertexWithUV(frameX + xoff, yoff, 0, 0, 0);
+				t.draw();
+			}
+		}	
+	}
+	
+	/**
+	 * Does something appropriate if the user right clicks with the inventory open. The functionality of this is limited.
+	 * @param world
+	 * @param player
+	 */
+	private void mouseEventRightClick(World world, EntityPlayer player)
+	{
+		//If the mouse isnt down, there's really no reason to run the rest of this function
+		if(!Mouse.isButtonDown(1)) 
+		{
+			return;
+		}		
+		
+		int x = MathHelper.getCorrectMouseXPosition();
+		int y = MathHelper.getCorrectMouseYPosition();		
+		
+		try 
+		{
+			//Band-aid fix for mouse clicks. Get the position before calling this though of it'll break on windows.
+			Mouse.destroy(); 
+			Mouse.create();
+		} 	
+		catch (LWJGLException e)
+		{
+			e.printStackTrace();
+		}
+		
+		if(Keys.lshiftDown)
+		{
+			boolean[] equipped = { false };
+			ItemStack clickedItem = getClickedStack(world, player, x, y, equipped);
+			socketItemEquipped = equipped[0];
+			if(clickedItem != null && clickedItem.hasSockets())
+			{					
+				isSocketWindowOpen = true;
+				player.clearViewedChest();
+				socketedItem = clickedItem;
+			}
+			else
+			{
+				closeSocketWindow();
+			}
+		}
+	}
+		
 	/**
 	 * Renders the status effects afflicting or benefiting the player, including their remaining time in seconds.
 	 * @param player the player in use currently
@@ -254,11 +426,8 @@ public class RenderUI extends Render
 	 * Will return null if nothing appropriate is found.
 	 * @return an appropriate ItemStack to render, or null if none is found
 	 */
-	private ItemStack getTooltipStack(World world, EntityPlayer player)
-	{
-		int x = MathHelper.getCorrectMouseXPosition();
-		int y = MathHelper.getCorrectMouseYPosition();	
-		
+	private ItemStack getTooltipStack(World world, EntityPlayer player, int x, int y)
+	{		
 		//Inventory
 		for(int i = 0; i < player.inventory.getMainInventoryLength(); i++) 
 		{
@@ -371,6 +540,174 @@ public class RenderUI extends Render
 			}
 		}
 		
+		//Socketed gems		
+		if(isSocketWindowOpen)
+		{
+			int tooltipHeight = 100;
+			int frameX = (int) (Display.getWidth() * 0.25) - 80;  
+			int frameY = (int) (Display.getHeight() * 0.5) - 106; 
+			
+			ItemStack stack = socketedItem;
+			String itemName = socketedItem.getItemName();
+			String[] stats = { };        
+			if(stack.getItemID() >= Item.itemIndex && stack.getItemID() < ActionbarItem.spellIndex)
+			{
+				stats = Item.itemsList[stack.getItemID()].getStats();
+			}
+			
+			final int PADDING = 5;					
+			tooltipHeight = (int) (boldTooltip.getHeight(itemName) + (boldTooltip.getHeight(itemName) * 0.75 * stats.length) + 30);
+			
+			frameY -= tooltipHeight;			
+			
+			float yOffset = frameY + boldTooltip.getHeight(itemName) + PADDING * (stats.length) + 
+					(((tooltipHeight) - (tooltipHeight - boldTooltip.getHeight(itemName))) * 0.5f * (stats.length));
+			
+			int numberOfSockets = stack.getGemSockets().length;
+			
+			for(int i = 0; i < numberOfSockets; i++)
+			{
+				size = 30;
+				double offsetByTotal = (numberOfSockets == 1) ? 65 : (numberOfSockets == 2) ? 47.5 : (numberOfSockets == 3) ? 30 : 10;
+				double xOffset = frameX + offsetByTotal + (i * (size + 7.5));
+				
+				if(y > yOffset && y < yOffset + size && x > xOffset && x < xOffset + size)
+				{
+					if(stack.getGemSockets()[i].getGem() != null)
+					{
+						return new ItemStack(stack.getGemSockets()[i].getGem());
+					}
+				}
+			}
+		}
+		
+		return null;
+	}	
+	
+	/**
+	 * Checks to see if a mouse click is over something in one of the player's inventories.
+	 * This will return null if nothing appropriate is found.
+	 * @return the ItemStack the player is clicking on, or null if none is selected
+	 */
+	private ItemStack getClickedStack(World world, EntityPlayer player, int x, int y, boolean[] equipped)
+	{		
+		//Inventory
+		for(int i = 0; i < player.inventory.getMainInventoryLength(); i++) 
+		{
+			int size = 20;
+			int x1 = (int) ((Display.getWidth() * 0.25f) + (((i % 12) - 6) * (size)));
+			int y1 = (int) ((Display.getHeight() * 0.5f) - ((i / 12) * (size)) - (size + 22f));
+			
+			if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
+			{
+				equipped[0] = false;
+				return player.inventory.getMainInventoryStack(i);
+			}		
+		}
+		
+		//Quiver
+		for(int i = 0; i < player.inventory.getQuiverLength(); i++) 
+		{
+			int size = 20;
+			int x1 = (int) ((Display.getWidth() * 0.25f) + (-7 * size));
+			int y1 = (int) ((Display.getHeight() * 0.5f) - (i * size) - (size + 22f));
+			
+			if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
+			{
+				equipped[0] = true;
+				return player.inventory.getQuiverStack(i);
+			}		
+		}
+		
+		//Armour and Accessories
+		int armorOffset = 80;
+		int size = 20;
+		if(armorOffset + (9 * (size + 1)) > Display.getHeight() * 0.5F)
+		{
+			armorOffset = (int) ((Display.getHeight() * 0.5F) - ((9 * (size + 1))));
+		}
+		for(int i = 0; i < player.inventory.getArmorInventoryLength(); i++) //Armour and Accessories
+		{
+			int x1 = (int) ((Display.getWidth() * 0.5f) - ((size + 2) * (1.5 + (i / 5))));
+			int y1 = armorOffset + ((i % 5) * (size + 2));	
+			
+			if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
+			{
+				equipped[0] = true; 
+				socketItemIndex = i;
+				return player.inventory.getArmorInventoryStack(i);
+			}			
+		}
+		
+		size = 20;
+		int x1 = (int)(Display.getWidth() * 0.25f) - (6 * 20); 
+		int y1 = (int)(Display.getHeight() * 0.5f) - (6 * 20);
+		
+		//Garbage
+		if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) 
+		{
+			equipped[0] = false;
+			return player.inventory.getTrashStack(0);
+		}			
+		
+		//Middle Recipe Slot:
+		size = 24;
+		x1 = (int) (Display.getWidth() * 0.25f) - 13;
+		y1 = 8; 
+	
+		if(x > x1 && x < x1 + size && y > y1 && y < y1 + size && player.getAllPossibleRecipes().length > 0) //Middle
+		{
+			equipped[0] = false;
+			return player.getAllPossibleRecipes()[player.selectedRecipe].getResult();
+		}
+				
+		if(player.isViewingChest)
+		{
+			//Get the initial block the player is viewing
+			BlockChest chest = (BlockChest)world.getBlock(player.viewedChestX, player.viewedChestY);
+			
+			if(chest.metaData != 1) //Make sure its metadata is 1 (otherwise it doesnt technically exist)
+			{
+				//Get the metadata for the block's size
+				int[][] metadata = MetaDataHelper.getMetaDataArray((int)(world.getBlock(player.viewedChestX, player.viewedChestY).blockWidth / 6), (int)(world.getBlock(player.viewedChestX, player.viewedChestY).blockHeight / 6)); //metadata used by the block of size (x,y)
+				int metaWidth = metadata.length; 
+				int metaHeight = metadata[0].length;	
+				x1 = 0;
+				y1 = 0;				
+				
+				//Loop until a the current chest's metadata value is found
+				//This provides the offset to find the 'real' chest, with the actual items in it
+				for(int i = 0; i < metaWidth; i++) 
+				{
+					for(int j = 0; j < metaHeight; j++)
+					{
+						if(metadata[i][j] == world.getBlock(player.viewedChestX - x1, player.viewedChestY - y1).metaData)
+						{
+							x1 = i; 
+							y1 = j;
+							break;
+						}
+					}
+				}			
+				
+				//Update the chest
+				chest = (BlockChest)(world.getBlock(player.viewedChestX - x1, player.viewedChestY - y1));
+			}	
+			
+			int totalRows = chest.getInventorySize() / 5;
+			for(int i = 0; i < chest.getInventorySize(); i++) //for each ItemStack in the chest
+			{
+				size = 20;
+				x1 = (int) ((Display.getWidth() * 0.25f) + ((((i % totalRows) - (totalRows / 2)) * (size))));
+				y1 = (int) ((Display.getHeight() * 0.5f) - ((4 + (i / totalRows)) * (size)) - (size + 22f));
+				
+				if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
+				{
+					equipped[0] = false;
+					return chest.getItemStack(i);
+				}		
+			}
+		}
 		return null;
 	}	
 	
@@ -383,20 +720,24 @@ public class RenderUI extends Render
 	{
 		if(player.isInventoryOpen && mouseItem == null)
 		{
-			ItemStack stack = getTooltipStack(world, player);
+			int x = MathHelper.getCorrectMouseXPosition();
+			int y = MathHelper.getCorrectMouseYPosition();	
+
+			ItemStack stack = getTooltipStack(world, player, x, y);
 			if(stack == null)
 			{
 				return;
 			}
 
 			EnumItemQuality quality;			
-			String itemName = stack.getItemName();
+			String itemName = stack.getRenderedName();
 
 			String[] stats = { };
 			String fulltooltip = ""; 
 			//"A weak copper pick, which provides the ability to mine basic low level blocks. This is a long tooltip.";
-	        String[] setBonuses = { };
-			String cooldown = "";
+	        String[] setBonuses;
+			Vector<String> bonusesVector = new Vector<String>();
+	        String cooldown = "";
 	        
 			if(stack.getItemID() >= Item.itemIndex && stack.getItemID() < ActionbarItem.spellIndex)
 			{
@@ -405,7 +746,11 @@ public class RenderUI extends Render
 				stats = Item.itemsList[stack.getItemID()].getStats();
 				if(Item.itemsList[stack.getItemID()] instanceof ItemArmor)
 				{
-					setBonuses = ((ItemArmor)(Item.itemsList[stack.getItemID()])).getStringBonuses();
+					String[] bonuses = ((ItemArmor)(Item.itemsList[stack.getItemID()])).getStringBonuses();
+					for(String bonus : bonuses)
+					{
+						bonusesVector.add(bonus);
+					}
 				}
 			}
 			else if (stack.getItemID() < Item.itemIndex)
@@ -418,6 +763,15 @@ public class RenderUI extends Render
 				quality = EnumItemQuality.COMMON;
 				fulltooltip = Spell.spellList[stack.getItemID()].extraTooltipInformation;
 			}
+			
+			String[] bonuses = stack.getStringBonuses();
+			for(String bonus : bonuses)
+			{
+				bonusesVector.add(bonus);
+			}
+			
+			setBonuses = new String[bonusesVector.size()];
+			bonusesVector.copyInto(setBonuses);
 			
 			if(player.isOnCooldown(stack.getItemID()))
 			{
@@ -494,7 +848,7 @@ public class RenderUI extends Render
 			//Ensure the tooltip won't go off the right side of the screen
 			if(frameX + tooltipWidth > Display.getWidth() * 0.5)
 			{
-				frameX = (int) (Display.getWidth() * 0.5 - tooltipWidth);
+				frameX = (int) (Display.getWidth() * 0.5 - tooltipWidth - 20);
 			}
 			//Ensure the tooltip doesnt go off the left side of the screen
 			if(frameX < 0)
@@ -509,12 +863,13 @@ public class RenderUI extends Render
 					((plainTooltip.getHeight(itemName)) * 0.5f * (stats.length)) + 
 					((boldTooltip.getHeight(itemName)) * 0.5f * (setBonusesList.size())) + 
 					((plainTooltip.getHeight(itemName)) * 0.7f * (renderLines.size())) + 
-					((!cooldown.equals("")) ? plainTooltip.getHeight(cooldown) * 0.5f + 5: 0);
+					((!cooldown.equals("")) ? plainTooltip.getHeight(cooldown) * 0.5f + 5: 0) + 
+					((stack.hasSockets()) ? 35 : 0);
 			int tooltipHeight = (int) requiredHeight;
 			//Make sure the tooltip doesnt go off the bottom
 			if(frameY + tooltipHeight > Display.getHeight() * 0.5)
 			{
-				frameY = (int) (Display.getHeight() * 0.5 - tooltipHeight);
+				frameY = (int) (Display.getHeight() * 0.5 - tooltipHeight - 20);
 			}
 			//Ensure the tooltip doesnt go off the top of the screen
 			if(frameY < 0)
@@ -528,14 +883,14 @@ public class RenderUI extends Render
 			tooltipBackground.bind();			
 			//Background
 			t.startDrawingQuads();
-	        t.setColorRGBA_F(1, 1, 1, 1);
+			GL11.glColor4f(1, 1, 1, 0.8f); //the slots are partially transparent full colour
 			t.addVertexWithUV(frameX, frameY + tooltipHeight, 0, 0, 1);
 			t.addVertexWithUV(frameX + tooltipWidth, frameY + tooltipHeight, 0, 1, 1);
 			t.addVertexWithUV(frameX + tooltipWidth, frameY, 0, 1, 0);
 			t.addVertexWithUV(frameX, frameY, 0, 0, 0);
 			t.draw();
 			
-			GL11.glColor4d(quality.r, quality.g, quality.b, 1.0F);
+			GL11.glColor4d(quality.r, quality.g, quality.b, 1.0);
 			
 			//Title
 			//double xOffset = frameX + ((tooltipWidth) * 0.95f) * 0.5f;
@@ -600,7 +955,44 @@ public class RenderUI extends Render
 					-1,
 					TrueTypeFont.ALIGN_LEFT); 			
 		
-			
+			if(stack.hasSockets())
+			{
+				//Sockets 
+				int numberOfSockets = stack.getGemSockets().length;
+				icons[8].bind(); //Gem Socket Icon
+				GL11.glColor4f(1, 1, 1, 1); 
+				for(int i = 0; i < numberOfSockets; i++)
+				{
+					int size = 30;			
+					double offsetByTotal = (numberOfSockets == 1) ? 65 : (numberOfSockets == 2) ? 47.5 : (numberOfSockets == 3) ? 30 : 10;
+					double xoff = offsetByTotal + (i * (size + 7.5));
+					int yoff = (int) yOffset;			
+					t.startDrawingQuads();
+					t.addVertexWithUV(frameX + xoff, yoff + size, 0, 0, 1);
+					t.addVertexWithUV(frameX + xoff + size, yoff + size, 0, 1, 1);
+					t.addVertexWithUV(frameX + xoff + size, yoff, 0, 1, 0);
+					t.addVertexWithUV(frameX + xoff, yoff, 0, 0, 0);
+					t.draw();
+				}
+				
+				for(int i = 0; i < numberOfSockets; i++)
+				{
+					if(stack.getGemSockets()[i].getGem() != null)
+					{
+						int size = 24;				
+						double offsetByTotal = (numberOfSockets == 1) ? 68 : (numberOfSockets == 2) ? 50.5 : (numberOfSockets == 3) ? 33 : 13;
+						double xoff = offsetByTotal + (i * (size + 6 + 7.5));
+						int yoff = (int) yOffset + 3;
+						textures[stack.getGemSockets()[i].getGem().id].bind();
+						t.startDrawingQuads();
+						t.addVertexWithUV(frameX + xoff, yoff + size, 0, 0, 1);
+						t.addVertexWithUV(frameX + xoff + size, yoff + size, 0, 1, 1);
+						t.addVertexWithUV(frameX + xoff + size, yoff, 0, 1, 0);
+						t.addVertexWithUV(frameX + xoff, yoff, 0, 0, 0);
+						t.draw();
+					}
+				}
+			}
 		}
 	}
 	
@@ -628,7 +1020,7 @@ public class RenderUI extends Render
 		else if(whichInventory == 2) //Armor Inventory
 		{
 			mouseItem = player.inventory.getArmorInventoryStack(index);
-			player.inventory.setArmorInventoryStack(player, null, index);
+			player.inventory.setArmorInventoryStack(player, null, player.inventory.getArmorInventoryStack(index), index);
 		}
 		else if(whichInventory == 3) //Trash
 		{
@@ -737,13 +1129,13 @@ public class RenderUI extends Render
 				
 				if(player.inventory.getArmorInventoryStack(index) == null) //There's nothing there, so the mouse doesnt have to pickup something
 				{
-					player.inventory.setArmorInventoryStack(player, mouseItem, index);
+					player.inventory.setArmorInventoryStack(player, mouseItem, player.inventory.getArmorInventoryStack(index), index);
 					mouseItem = null;
 				}
 				else //If there is an item there, swap that slot's item and the mouse's item.
 				{
 					ItemStack stack = player.inventory.getArmorInventoryStack(index);
-					player.inventory.setArmorInventoryStack(player, mouseItem, index);
+					player.inventory.setArmorInventoryStack(player, mouseItem, player.inventory.getArmorInventoryStack(index), index);
 					mouseItem = stack;
 				}
 			}
@@ -853,7 +1245,7 @@ public class RenderUI extends Render
 	/**
 	 * Handles Mouse Events for everything in the inventory.
 	 */
-	private void mouseEventInventory(World world, EntityPlayer player)
+	private void mouseEventLeftClick(World world, EntityPlayer player)
 	{
 		//If the mouse isnt down, there's really no reason to run the rest of this function
 		if(!Mouse.isButtonDown(0)) 
@@ -1029,6 +1421,59 @@ public class RenderUI extends Render
 			chestMouseEvents(world, player, x, y);
 		}
 		
+		//Socket a gem, if possible.
+		if(isSocketWindowOpen && mouseItem != null)
+		{
+			if(mouseItem.getItemID() < ActionbarItem.spellIndex && 
+				mouseItem.getItemID() >= ActionbarItem.blockIndex && 
+				Item.itemsList[mouseItem.getItemID()] instanceof ItemGem)
+			{
+				int tooltipHeight = 100;
+				int frameX = (int) (Display.getWidth() * 0.25) - 80;  
+				int frameY = (int) (Display.getHeight() * 0.5) - 106; 
+				
+				ItemStack stack = socketedItem;
+				String itemName = socketedItem.getItemName();
+				String[] stats = { };        
+				if(stack.getItemID() >= Item.itemIndex && stack.getItemID() < ActionbarItem.spellIndex)
+				{
+					stats = Item.itemsList[stack.getItemID()].getStats();
+				}
+				
+				frameY -= (int) (boldTooltip.getHeight(itemName) + (boldTooltip.getHeight(itemName) * 0.75 * stats.length) + 30);							
+				float yOffset = frameY + boldTooltip.getHeight(itemName) + 5 * (stats.length) + 
+						(((tooltipHeight) - (tooltipHeight - boldTooltip.getHeight(itemName))) * 0.5f * (stats.length));
+				
+				int numberOfSockets = stack.getGemSockets().length;
+				for(int i = 0; i < numberOfSockets; i++)
+				{
+					size = 30;
+					double offsetByTotal = (numberOfSockets == 1) ? 65 : (numberOfSockets == 2) ? 47.5 : (numberOfSockets == 3) ? 30 : 10;
+					double xOffset = frameX + offsetByTotal + (i * (size + 7.5));
+					if(y > yOffset && y < yOffset + size && x > xOffset && x < xOffset + size)
+					{	
+						if(socketItemEquipped)
+						{
+							player.inventory.setArmorInventoryStack(player, null, socketedItem, socketItemIndex);
+						}
+						stack.getGemSockets()[i].socket((ItemGem)Item.itemsList[mouseItem.getItemID()]);
+						if(socketItemEquipped)
+						{
+							player.inventory.setArmorInventoryStack(player, socketedItem, null, socketItemIndex);
+						}
+					
+						mouseItem.removeFromStack(1);
+						if(mouseItem.getStackSize() <= 0)
+						{
+							mouseItem = null;
+						}
+						shouldDropItem = false;
+					}
+				}
+			}
+		}	
+		
+		
 		//if the player didnt click something, drop their mouseitem
 		if(shouldDropItem)
 		{
@@ -1036,6 +1481,7 @@ public class RenderUI extends Render
 		}
 	}
 	
+
 	/**
 	 * Handles mouse interaction with the inventory, and other stuff, given that the shift modifier is applied. This will
 	 * change the behaviour of certain clicks and cause stuff to be moved around, not picked up, most of the time.
@@ -1105,8 +1551,9 @@ public class RenderUI extends Render
 			if(x > x1 && x < x1 + size && y > y1 && y < y1 + size && player.inventory.getArmorInventoryStack(i) != null) 
 			{
 				player.inventory.setArmorInventoryStack(player, player.inventory.pickUpItemStack(world, 
-						player, 
-						player.inventory.getArmorInventoryStack(i)), 
+							player, 
+							player.inventory.getArmorInventoryStack(i)),
+						player.inventory.getArmorInventoryStack(i),
 						i);
 				player.onArmorChange();
 			}			
@@ -1174,6 +1621,7 @@ public class RenderUI extends Render
 		}
 	}
 	
+	
 	/**
 	 * Adjusts the currently selected recipe in the slider. Requires a function to prevent bounds errors.
 	 */
@@ -1189,6 +1637,7 @@ public class RenderUI extends Render
 			player.selectedRecipe = player.getAllPossibleRecipes().length - 1;
 		}
 	}
+	
 	
 	/**
 	 * Crafts the recipe in the selected slot of the recipe slider and sets the mouseItem 
@@ -1237,6 +1686,7 @@ public class RenderUI extends Render
 			mouseItem = new ItemStack(whatToCraft.getResult()); //THIS IS VERY IMPORTANT
 		}
 	}
+	
 	
 	/**
 	 * Draws the hearts and mana the player has, size adjusted for damaged life/mana
@@ -1346,6 +1796,7 @@ public class RenderUI extends Render
 		
 	}
 
+	
 	/**
 	 * Renders the actionbar (only if the inventory is closed)
 	 */
@@ -1429,6 +1880,7 @@ public class RenderUI extends Render
 		}		
 	}
 	
+
 	/**
 	 * Renders the full inventory - recipes, armour, all 40 slots, coins, ammo...
 	 */
@@ -1514,6 +1966,7 @@ public class RenderUI extends Render
 		renderScrollableCraftingRecipeWheel(world, player);
 	}		
 
+	
 	/**
 	 * Fills all the inventory frames rendered with items if the slot isnt null
 	 */
@@ -1693,6 +2146,7 @@ public class RenderUI extends Render
 	
 		GL11.glColor4f(1, 1, 1, 1);
 	}
+	
 	
 	/**
 	 * Renders the crafting 'wheel' that lists all possible recipes when near the appropriate furniture.
@@ -1907,6 +2361,7 @@ public class RenderUI extends Render
 		}
 	}	
 	
+	
 	/**
 	 * Renders all (constanty visible) text
 	 */
@@ -1955,6 +2410,7 @@ public class RenderUI extends Render
 		}
 	}
 	
+	
 	/**
 	 * Picks up an item from the specified chest to the mouse's temporary 'itemstack'. 
 	 * This function is by itself not very safe. Don't call it without ensuring that the 
@@ -1974,6 +2430,7 @@ public class RenderUI extends Render
 		mouseItem = chest.getItemStack(index);
 		chest.removeItemStack(index);
 	}
+	
 	
 	/**
 	 * Handles chest mouse events, based on the chest's attachment. This function is relatively long
@@ -2040,6 +2497,7 @@ public class RenderUI extends Render
 				
 		}		
 	}
+	
 	
 	/**
 	 * Renders the selected chest(s), based on the chest's attachment. This function is relatively long

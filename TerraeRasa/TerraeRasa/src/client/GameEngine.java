@@ -65,7 +65,6 @@ public class GameEngine
 	public RenderMenu renderMenu;
 	/** The number of game ticks per second - this will always be 20 */
 	public static final int TICKS_PER_SECOND = 20;
-	private boolean needsResized;
 	
 	/**
 	 * Creates a new instance of GameEngine. This includes setting the renderMode to RENDER_MODE_WORLD_EARTH
@@ -74,7 +73,6 @@ public class GameEngine
 	public GameEngine()
 	{
 		renderMode = RENDER_MODE_WORLD_EARTH;
-		needsResized = true;
 		try 
 		{
 			loadSettings();
@@ -147,10 +145,10 @@ public class GameEngine
 		        		}
 		        	}
 		        	
-					if(needsResized || TerraeRasa.width < 640 || TerraeRasa.height < 400) //If the window needs resized, resize it
+					if(TerraeRasa.needsResized || TerraeRasa.width < 640 || TerraeRasa.height < 400) //If the window needs resized, resize it
 					{
 						TerraeRasa.terraeRasa.resizeWindow();
-						needsResized = false;
+						TerraeRasa.needsResized = false;
 					}
 		        	 
 		        	next_game_tick += SKIP_TICKS;
@@ -381,12 +379,15 @@ public class GameEngine
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.copperAxe));
 			
 			
-//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.silverHelmet));
-//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.silverBody));
-//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.silverPants));
-//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.silverGloves));
-//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.silverBoots));
-//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.silverBelt));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.t6Helmet));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.t6Body));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.t6Pants));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.t6Gloves));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.t6Boots));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.t6Belt));
+			
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.gemSmartheal1, 40));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.gemDefense1, 40));
 			
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ironHelmet));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ironBody));
@@ -395,12 +396,12 @@ public class GameEngine
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ironBoots));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ironBelt));
 			
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.bronzeHelmet));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.bronzeBody));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.bronzePants));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.bronzeGloves));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.bronzeBoots));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.bronzeBelt));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.bronzeHelmet));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.bronzeBody));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.bronzePants));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.bronzeGloves));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.bronzeBoots));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.bronzeBelt));
 			
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.copperHelmet));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.copperBody));

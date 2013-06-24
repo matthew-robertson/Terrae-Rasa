@@ -328,6 +328,13 @@ public class Item extends ActionbarItem
 			new AuraSmartHeal(30, 50, 0.5, false)
 	}).setIconPosition(15, 7).setName("Stole").setExtraTooltipInformation("This stole radiates holy energy.");	
 	
+	public static Item t6Helmet = new ItemArmorHelmet(139).setArmorType(EnumArmor.TIER6).setTotalSockets(1).setIntellect(5).setStamina(10).setStrength(5).setDexterity(5).setIconPosition(20, 0).setName("TIER6 Helmet").setItemQuality(EnumItemQuality.RARE);
+	public static Item t6Body = new ItemArmorBody(140).setArmorType(EnumArmor.TIER6).setTotalSockets(2).setIntellect(5).setStamina(10).setStrength(5).setDexterity(5).setIconPosition(20, 1).setName("TIER6 Body").setItemQuality(EnumItemQuality.RARE);
+	public static Item t6Pants = new ItemArmorPants(141).setArmorType(EnumArmor.TIER6).setTotalSockets(3).setIntellect(5).setStamina(10).setStrength(5).setDexterity(5).setIconPosition(20, 2).setName("TIER6 Legguards").setItemQuality(EnumItemQuality.RARE);	
+	public static Item t6Boots = new ItemArmorBoots(142).setArmorType(EnumArmor.TIER6).setTotalSockets(4).setIntellect(5).setStamina(10).setStrength(5).setDexterity(5).setIconPosition(20, 3).setName("TIER6 Boots");
+	public static Item t6Gloves = new ItemArmorGloves(143).setArmorType(EnumArmor.TIER6).setTotalSockets(4).setIntellect(5).setStamina(10).setStrength(5).setDexterity(5).setIconPosition(20, 4).setName("TIER6 Gloves");
+	public static Item t6Belt = new ItemArmorBelt(144).setArmorType(EnumArmor.TIER6).setTotalSockets(4).setIntellect(5).setStamina(10).setStrength(5).setDexterity(5).setIconPosition(20, 5).setName("TIER6 Belt");
+	
 	
 	public static Item copperCoin = new ItemCoin(200).setIconPosition(0, 0).setName("Copper Coin");
 	public static Item silverCoin = new ItemCoin(201).setIconPosition(0, 0).setName("Silver Coin");
@@ -397,5 +404,12 @@ public class Item extends ActionbarItem
 	public static Item absorbPotion1 = new ItemPotionAbsorb(395, 30, 1, 50, 1).setIconPosition(9, 1).setName("Minor Absorb Potion");
 	public static Item absorbPotion2 = new ItemPotionAbsorb(396, 30, 1, 100, 1).setIconPosition(9, 1).setName("Absorb Potion");
 	
-	//public static Item gemDefense1 = new ItemGem(500).setIconPosition(0, 0).setName("Gem of Stoneskin 1");
+	public static Item gemDefense1 = new ItemGem(500).setBonuses(new SetBonus[] { 
+			new SetBonusDefense(2)
+	}).setIconPosition(0, 0).setName("Gem of Stoneskin 1");
+	
+	public static Item gemSmartheal1 = new ItemGem(501).setAuras(new Aura[] { 
+			new AuraSmartHeal(5, 600.0, 0.95, false)
+	}).setIconPosition(0, 0).setName("Gem of Teh Awesome 1");
+	
 }

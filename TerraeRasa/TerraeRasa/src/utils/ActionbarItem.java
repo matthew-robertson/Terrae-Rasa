@@ -25,25 +25,8 @@ public class ActionbarItem
 	public boolean iconOverriden;
 	/**Corresponds to values from Render like TEXTURE_SHEET_TERRAIN_EARTH, to determine the inventory icon for a specific block.*/
 	public int associatedTextureSheet;
-	//private Socket[] sockets = { new Socket() };
+	protected int totalSockets;
 	
-	protected ActionbarItem setSockets(/*Socket[] sockets*/)
-	{
-//		this.sockets = sockets;
-		return this;
-	}
-	
-//	public Socket[] getSockets()
-//	{
-//		Socket[] copy = new Socket[sockets.length];
-//		for(int i = 0; i < copy.length; i++)
-//		{
-//			copy[i] = new Socket(sockets[i]);
-//		}
-//		return copy;
-//	}
-	
-
 	/**
 	 * This constructor should not be used. It assigns an ActionbarItem without a proper ID which is dangerous. It is implemented 
 	 * for special cases such as air blocks.
@@ -59,6 +42,7 @@ public class ActionbarItem
 		iconOverrideX = 0;
 		iconOverrideY = 0;
 		iconOverriden = false;
+		totalSockets = 0;
 		associatedTextureSheet = Render.TEXTURE_SHEET_ITEMS;
 	}
 	
@@ -79,6 +63,7 @@ public class ActionbarItem
 		iconOverriden = false;
 		iconOverrideX = 0;
 		iconOverrideY = 0;
+		totalSockets = 0;
 		associatedTextureSheet = Render.TEXTURE_SHEET_ITEMS;
 	}
 	
@@ -99,6 +84,7 @@ public class ActionbarItem
 		this.iconOverrideY = item.iconOverrideY;
 		this.iconOverriden = item.iconOverriden;
 		this.associatedTextureSheet = item.associatedTextureSheet;
+		this.totalSockets = item.totalSockets;
 	}	
 	
 	/**
@@ -156,6 +142,26 @@ public class ActionbarItem
 	public double  getIconY()
 	{
 		return iconY;
+	}
+	
+	/**
+	 * Sets the number of sockets for this actionbar item.
+	 * @param number the number of sockets
+	 * @return a reference to this object
+	 */
+	protected ActionbarItem setTotalSockets(int number)
+	{
+		this.totalSockets = number;
+		return this;
+	}
+	
+	/**
+	 * Gets the number of sockets for this actionbar item. By default this is 0.
+	 * @return the number of sockets for this actionbar item
+	 */
+	public int getTotalSockets()
+	{
+		return totalSockets;
 	}
 	
 	/**
