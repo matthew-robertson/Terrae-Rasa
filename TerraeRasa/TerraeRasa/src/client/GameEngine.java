@@ -302,8 +302,8 @@ public class GameEngine
 		{
 			TerraeRasa.isMainMenuOpen = false;
 			FileManager fileManager = new FileManager();
-			world = fileManager.generateNewWorld("World", 1200, 800, EnumWorldDifficulty.NORMAL);//EnumWorldSize.LARGE.getWidth(), EnumWorldSize.LARGE.getHeight());
-			player = fileManager.generateAndSavePlayer("!!", EnumPlayerDifficulty.HARDCORE);//new EntityLivingPlayer("Test player", EnumDifficulty.NORMAL);
+			world = fileManager.generateNewWorld("World", 1200, 800, EnumWorldDifficulty.INSANE);//EnumWorldSize.LARGE.getWidth(), EnumWorldSize.LARGE.getHeight());
+			player = fileManager.generateAndSavePlayer("!!", EnumPlayerDifficulty.HARD);//new EntityLivingPlayer("Test player", EnumDifficulty.NORMAL);
 			world.addPlayerToWorld(player);
 			world.assessForAverageSky();
 			LightUtils utils = new LightUtils();

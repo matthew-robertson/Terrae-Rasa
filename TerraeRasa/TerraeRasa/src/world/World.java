@@ -714,7 +714,11 @@ public class World
 		{
 			if(player.inBounds(entityList.get(i).x, entityList.get(i).y, entityList.get(i).width, entityList.get(i).height))
 			{ //If the player is in bounds of the monster, damage them
-				player.damageEntity(this, entityList.get(i).damageDone, ((Math.random() < entityList.get(i).criticalStrikeChance) ? true : false), true, true);
+				player.damageEntity(this, 
+						(int)(entityList.get(i).damageDone * difficulty.getDamageModifier()),
+						((Math.random() < entityList.get(i).criticalStrikeChance) ? true : false), 
+						true, 
+						true);
 			}
 		}
 	}
@@ -731,7 +735,7 @@ public class World
 					if(entityList.get(j).inBounds(projectileList.get(i).x, projectileList.get(i).y, projectileList.get(i).width, projectileList.get(i).height))
 					{ //If the projectile is in bounds of the monster, damage them
 						entityList.get(j).damageEntity(this, 
-								projectileList.get(i).damage, 
+								(int)(projectileList.get(i).damage), 
 								((Math.random() < projectileList.get(i).criticalStrikeChance) ? true : false), 
 								true,
 								true);
@@ -742,7 +746,7 @@ public class World
 				if(player.inBounds(projectileList.get(i).x, projectileList.get(i).y, projectileList.get(i).width, projectileList.get(i).height))
 				{ //If the projectile is in bounds of the player, damage them
 					player.damageEntity(this, 
-							projectileList.get(i).damage, 
+							(int)(projectileList.get(i).damage * difficulty.getDamageModifier()), 
 							((Math.random() < projectileList.get(i).criticalStrikeChance) ? true : false), 
 							true, 
 							true);
