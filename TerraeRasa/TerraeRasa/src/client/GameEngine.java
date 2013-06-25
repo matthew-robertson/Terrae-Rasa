@@ -115,7 +115,7 @@ public class GameEngine
 		        	
 		        	//If the music is already playing,set the volume to whatever the settings say it is
 		        	if (soundEngine.getCurrentMusic() != null){
-		        		soundEngine.setVolume((float) settings.volume);
+		        		soundEngine.setVolume((float) settings.musicVolume);
 		        		//System.out.println("Settings: " + settings.volume + " Music: " + soundEngine.getVolume());
 		        	}
 		        	

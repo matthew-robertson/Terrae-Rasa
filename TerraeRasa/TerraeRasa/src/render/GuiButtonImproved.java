@@ -89,26 +89,19 @@ public class GuiButtonImproved extends GuiComponent
 		t.startDrawingQuads();
 		
 		double width = Display.getWidth() * this.width * 0.5F;
-		double height = Display.getHeight() * this.height * 0.5F;
+		double height = 530 * this.height * 0.5F;
 		double x = Display.getWidth() * this.x * 0.5F;
 		double y = Display.getHeight() * this.y * 0.5F;
-		
-		//if(width < (trueTypeFont.getWidth(values[buttonIndex]) / 2))
-		//{
-		//	width = trueTypeFont.getWidth(values[buttonIndex]) / 2;
-		//}
-		
+				
 	    t.addVertexWithUV(x, y + height, 0, 0, 1);
 	    t.addVertexWithUV(x + width, y + height, 0, 1, 1);
 	    t.addVertexWithUV(x + width, y, 0, 1, 0);
 	    t.addVertexWithUV(x, y, 0, 0, 0);		
-		t.draw();
-		
+		t.draw();		
 		
 		//Text:
 		float xOffset = (float) (x + width/2 * 0.95f);//trueTypeFont.getWidth(values[buttonIndex]) / 2;
-		float yOffset = (float) (y + height - (height - trueTypeFont.getHeight(values[buttonIndex])) / 2);
-			
+		float yOffset = (float) (y + height - (height - trueTypeFont.getHeight(values[buttonIndex])) / 2);			
 		trueTypeFont.drawString(xOffset, yOffset, values[buttonIndex], 0.7f, -1, TrueTypeFont.ALIGN_CENTER); //Render the Text	
 	}
 	

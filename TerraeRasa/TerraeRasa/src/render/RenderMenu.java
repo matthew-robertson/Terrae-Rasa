@@ -29,7 +29,8 @@ public class RenderMenu extends Render
 	private GuiTitle optionsTitle;
 	private GuiButtonImproved graphicsButton;
 	private GuiButtonImproved keybindsButton;
-	private GuiSlideBar volumeSlider;
+	private GuiSlideBar musicVolumeSlider;
+	private GuiSlideBar soundVolumeSlider;
 	private GuiButtonImproved autosaveButton;
 	
 	private GuiTitle keybindsTitle;
@@ -40,18 +41,20 @@ public class RenderMenu extends Render
 	
 	public RenderMenu(Settings settings)
 	{
-		mainMenuTitle = new GuiTitle("Pause Menu", 0.2F, 0.05F, 0.6F, 0.1F);
-		optionsButton = new GuiButtonImproved(new String[] { "Options" }, 0.3F, 0.275F, 0.4F, 0.1F);
-		saveAndQuitButton = new GuiButtonImproved(new String[] { "Save And Quit" }, 0.3F, 0.425F, 0.4F, 0.1F);
+		mainMenuTitle = new GuiTitle("Pause Menu", 0.2, 0.05, 0.6, 0.1);
+		optionsButton = new GuiButtonImproved(new String[] { "Options" }, 0.3, 0.275, 0.4, 0.1);
+		saveAndQuitButton = new GuiButtonImproved(new String[] { "Save And Quit" }, 0.3, 0.425, 0.4, 0.1);
 		
 		//Options Part of the menu
-		optionsTitle = new GuiTitle("Options", 0.2F, 0.05F, 0.6F, 0.1F);
-		graphicsButton = new GuiButtonImproved(new String[] { "Graphics" }, 0.125F, 0.25F, 0.3F, 0.1F);
-		keybindsButton = new GuiButtonImproved(new String[] { "Controls" }, 0.575F, 0.25F, 0.3F, 0.1F);
+		optionsTitle = new GuiTitle("Options", 0.2, 0.05, 0.6, 0.1);
+		musicVolumeSlider = new GuiSlideBar("Music Volume: ", settings.musicVolume, 0.075, 0.2, 0.4, 0.1);		
+		soundVolumeSlider = new GuiSlideBar("Sound Volume: ", settings.soundVolume, 0.525, 0.2, 0.4, 0.1);		
 		autosaveButton = new GuiButtonImproved(new String[] { 
 				"Autosave off", "Autosave 3 Minutes", "Autosave 5 Minutes", "Autosave 10 Minutes", "Autosave 30 Minutes"
-			}, 0.3F, 0.4F, 0.4F, 0.1F );
-		volumeSlider = new GuiSlideBar("Volume: ", 1.0F, 0.3F, 0.55F, 0.4F, 0.1F);		
+			}, 0.325, 0.35, 0.35, 0.1 );
+		graphicsButton = new GuiButtonImproved(new String[] { "Graphics" }, 0.15, 0.50, 0.3, 0.1);
+		keybindsButton = new GuiButtonImproved(new String[] { "Controls" }, 0.55, 0.50, 0.3, 0.1);
+		
 	
 		//Graphics
 		graphicsTitle = new GuiTitle("Graphic Options", 0.2F, 0.05F, 0.6F, 0.1F);
@@ -132,10 +135,15 @@ public class RenderMenu extends Render
 			{
 				isControlsMenuOpen = true;
 			}
-			if(volumeSlider.inBounds(x, y))
+			if(musicVolumeSlider.inBounds(x, y))
 			{
-				volumeSlider.onClick(x, y);
-				settings.volume = volumeSlider.getValue();
+				musicVolumeSlider.onClick(x, y);
+				settings.musicVolume = musicVolumeSlider.getValue();
+			}
+			if(soundVolumeSlider.inBounds(x, y))
+			{
+				soundVolumeSlider.onClick(x, y);
+				settings.soundVolume = soundVolumeSlider.getValue();
 			}
 		}
 		else
@@ -193,7 +201,8 @@ public class RenderMenu extends Render
 			graphicsButton.draw();
 			keybindsButton.draw();
 			autosaveButton.draw();
-			volumeSlider.draw();
+			musicVolumeSlider.draw();
+			soundVolumeSlider.draw();
 		}
 		else
 		{

@@ -37,6 +37,7 @@ import client.Settings;
 import client.TerraeRasa;
 import entities.EntityItemStack;
 import entities.EntityPlayer;
+import enums.EnumColor;
 import enums.EnumItemQuality;
 
 /**
@@ -734,10 +735,10 @@ public class RenderUI extends Render
 
 			String[] stats = { };
 			String fulltooltip = ""; 
-			//"A weak copper pick, which provides the ability to mine basic low level blocks. This is a long tooltip.";
 	        String[] setBonuses;
 			Vector<String> bonusesVector = new Vector<String>();
 	        String cooldown = "";
+	        boolean[] activeSetBonuses = { };
 	        
 			if(stack.getItemID() >= Item.itemIndex && stack.getItemID() < ActionbarItem.spellIndex)
 			{
@@ -751,6 +752,7 @@ public class RenderUI extends Render
 					{
 						bonusesVector.add(bonus);
 					}
+					activeSetBonuses = ((ItemArmor)(Item.itemsList[stack.getItemID()])).getArmorType().getBonusesActivated(player);
 				}
 			}
 			else if (stack.getItemID() < Item.itemIndex)
@@ -893,11 +895,10 @@ public class RenderUI extends Render
 			GL11.glColor4d(quality.r, quality.g, quality.b, 1.0);
 			
 			//Title
-			//double xOffset = frameX + ((tooltipWidth) * 0.95f) * 0.5f;
 			float yOffset = frameY + boldTooltip.getHeight(itemName);
 			boldTooltip.drawString(frameX + PADDING, yOffset, itemName, xScale , -1, TrueTypeFont.ALIGN_LEFT); 
 			
-			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+			GL11.glColor4d(EnumColor.LIME_GREEN.COLOR[0], EnumColor.LIME_GREEN.COLOR[1], EnumColor.LIME_GREEN.COLOR[2], 1.0);
 			
 			//Stats
 			for(int i = 0; i < stats.length; i++)
@@ -910,7 +911,7 @@ public class RenderUI extends Render
 						TrueTypeFont.ALIGN_LEFT); 
 			}			
 			
-			GL11.glColor4f(0.0F, 1.0F, 0.0F, 1.0F);
+			GL11.glColor4d(EnumColor.WHITE.COLOR[0], EnumColor.WHITE.COLOR[1], EnumColor.WHITE.COLOR[2], 1.0);
 			
 			//Render the set bonuses
 			yOffset = yOffset + PADDING * (stats.length) + 
@@ -918,6 +919,15 @@ public class RenderUI extends Render
 			
 			for(int i = 0; i < setBonusesList.size(); i++)
 			{
+				if(i < activeSetBonuses.length && !activeSetBonuses[i])
+				{
+					GL11.glColor4d(EnumColor.GRAY.COLOR[0], EnumColor.GRAY.COLOR[1], EnumColor.GRAY.COLOR[2], 1.0);
+				}
+				else
+				{
+					GL11.glColor4d(EnumColor.WHITE.COLOR[0], EnumColor.WHITE.COLOR[1], EnumColor.WHITE.COLOR[2], 1.0);
+				}
+				
 				boldTooltip.drawString(frameX + PADDING, 
 						yOffset + PADDING*(1 + i) + (((tooltipHeight) - (tooltipHeight - boldTooltip.getHeight(itemName))) * 0.5f * (1+i)), 
 						setBonusesList.get(i),

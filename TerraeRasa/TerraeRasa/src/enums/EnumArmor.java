@@ -1,12 +1,18 @@
 package enums;
 
+import items.Item;
+import items.ItemArmor;
+
 import java.util.EnumSet;
 import java.util.Vector;
+
+import entities.EntityPlayer;
 
 import setbonus.SetBonus;
 import setbonus.SetBonusCriticalStrike;
 import setbonus.SetBonusDefense;
 import setbonus.SetBonusSpeed;
+import utils.ItemStack;
 
 /**
  * EnumArmor defines the armour values given by a specific grade of equipment. These values are 
@@ -151,6 +157,12 @@ public enum EnumArmor
 		return bonus;
 	}
 	
+	/**
+	 * Gets all the SetBonuses for this armour tier in a nicely formatted array of the following general
+	 * form: <br>
+	 * (2): BONUS_NAME
+	 * @return the SetBonuses for this armour tier in a well formatted way
+	 */
 	public String[] getSetBonusesAsStringArray()
 	{
 		String[] values = new String[bonuses.length];
@@ -159,5 +171,39 @@ public enum EnumArmor
 			values[i] = "(" + bonuses[i].getPiecesRequiredToActivate() + "): " + bonuses[i].toString();
 		}		
 		return values;
+	}
+	
+	/**
+	 * Gets a boolean[] representing what SetBonuses from this tier are active. If a bonus is active then
+	 * the player has enough pieces equipped for this to be the case and that index of the array will be true.
+	 * The boolean[] provided by this is in the same order as the {@link #getSetBonusesAsStringArray()} method
+	 * provides.
+	 * @return a boolean[] indicating which bonuses from this tier are active
+	 */
+	public boolean[] getBonusesActivated(EntityPlayer player)
+	{
+		boolean[] activeBonuses = new boolean[bonuses.length];
+		
+		//Count the pieces of that tier active
+		int piecesEquipped = 0;
+		for(ItemStack stack: player.inventory.getArmorInventory())
+		{
+			if(stack != null && ((ItemArmor)(Item.itemsList[stack.getItemID()])).getArmorType() == this)
+			{
+				piecesEquipped++;
+			}
+		}		
+		for(int i = 0; i < bonuses.length; i++)
+		{	
+			if(bonuses[i].getPiecesRequiredToActivate() <= piecesEquipped)
+			{
+				activeBonuses[i] = true;
+			}
+			else
+			{
+				activeBonuses[i] = false;
+			}
+		}		
+		return activeBonuses;
 	}
 }

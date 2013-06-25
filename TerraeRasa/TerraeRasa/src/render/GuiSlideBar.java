@@ -104,7 +104,7 @@ public class GuiSlideBar extends GuiComponent
 		renderTexture.bind();
 		
 		double width = Display.getWidth() * this.width * 0.5F;
-		double height = Display.getHeight() * this.height * 0.5F;
+		double height = 530 * this.height * 0.5F;
 		double x = Display.getWidth() * this.x * 0.5F;
 		double y = Display.getHeight() * this.y * 0.5F;
 		

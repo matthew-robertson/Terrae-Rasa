@@ -1,16 +1,21 @@
 package utils;
 
+import java.io.Serializable;
+
 import items.ItemGem;
 
 /**
- * A GemSocket is a small helper class to hold an ItemGem.
+ * A GemSocket is a small helper class to hold an ItemGem. Socketting a new gem will remove
+ * the old one.
  * @author      Alec Sobeck
  * @author      Matthew Robertson
  * @version     1.1
  * @since       1.0
  */
 public class GemSocket
+		implements Serializable
 {
+	private static final long serialVersionUID = 1L;
 	private ItemGem gem;
 	
 	/**

@@ -98,7 +98,7 @@ public class SoundEngine{
 	 */
 	public void playSoundEffect(String s){
 		if (soundDictionary.containsKey(s)){
-			soundDictionary.get(s).playAsSoundEffect(1f, (float) settings.volume, false);
+			soundDictionary.get(s).playAsSoundEffect(1f, (float) settings.soundVolume, false);
 		}
 		else {
 			System.out.println("This.... should never happen. Please initialize your sounds before playing them");
@@ -113,7 +113,7 @@ public class SoundEngine{
 	 */
 	public void playSoundEffect(String s, double percentage){
 		if (soundDictionary.containsKey(s)){
-			soundDictionary.get(s).playAsSoundEffect(1f, (float) (settings.volume * percentage), false);
+			soundDictionary.get(s).playAsSoundEffect(1f, (float) (settings.soundVolume * percentage), false);
 		}
 		else {
 			System.out.println("This.... should never happen. Please initialize your sounds before playing them");
@@ -128,7 +128,7 @@ public class SoundEngine{
 	 */
 	public void playSoundEffect(String s, float pitch){
 		if (soundDictionary.containsKey(s)){
-			soundDictionary.get(s).playAsSoundEffect(pitch, (float) settings.volume, false);
+			soundDictionary.get(s).playAsSoundEffect(pitch, (float) settings.soundVolume, false);
 		}
 		else {
 			System.out.println("This.... should never happen. Please initialize your sounds before playing them");
