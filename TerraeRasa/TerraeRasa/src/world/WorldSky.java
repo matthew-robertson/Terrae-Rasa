@@ -1,6 +1,6 @@
 package world;
 
-import enums.EnumDifficulty;
+import enums.EnumWorldDifficulty;
 
 /**
  * Extends World, which is currently the overworld and not a true base class. 
@@ -8,14 +8,12 @@ import enums.EnumDifficulty;
  */
 public class WorldSky extends World
 {
-	private static final long serialVersionUID = 1L;
-
 	public WorldSky()
 	{
 		super();
 	}
 	
-	public WorldSky(String name, int width, int height, EnumDifficulty difficulty)
+	public WorldSky(String name, int width, int height, EnumWorldDifficulty difficulty)
 	{
 		super(name, width, height, difficulty);
 	}

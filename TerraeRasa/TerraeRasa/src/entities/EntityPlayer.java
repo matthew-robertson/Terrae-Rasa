@@ -12,6 +12,7 @@ import items.ItemToolPickaxe;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Random;
 import java.util.Vector;
 
 import org.lwjgl.input.Mouse;
@@ -27,14 +28,16 @@ import utils.InventoryPlayer;
 import utils.ItemStack;
 import utils.MathHelper;
 import utils.Recipe;
+import utils.Vector2F;
 import world.World;
 import auras.Aura;
 import auras.AuraContainer;
 import auras.AuraTracker;
 import blocks.Block;
 import blocks.BlockLight;
+import client.TerraeRasa;
 import enums.EnumColor;
-import enums.EnumDifficulty;
+import enums.EnumPlayerDifficulty;
 import enums.EnumToolMaterial;
 
 /**
@@ -114,7 +117,7 @@ public class EntityPlayer extends EntityLiving
 	private final String playerName;
 	private boolean inventoryChanged;
 
-	private final EnumDifficulty difficulty;
+	private final EnumPlayerDifficulty difficulty;
 	
 	private final int MAXIMUM_BASE_MANA;
 	private final int MAXIMUM_BASE_HEALTH;
@@ -126,7 +129,9 @@ public class EntityPlayer extends EntityLiving
 	private Dictionary<String, Recipe[]> possibleRecipesByBlock;
 	private SetBonusContainer currentBonuses; 
 	private AuraTracker auraTracker;
-
+	
+	/** A flag indicating if the player has been forever defeated. If they have, they will not be saved to disk.*/
+	public boolean defeated;
 	
 	/**
 	 * Constructs a new instance of EntityPlayer with default settings, inventory (includes 3 basic tools),
@@ -135,7 +140,7 @@ public class EntityPlayer extends EntityLiving
 	 * @param name the player's name
 	 * @param difficulty the difficulty setting the player has selected (EnumDifficulty)
 	 */
-	public EntityPlayer(String name, EnumDifficulty difficulty)
+	public EntityPlayer(String name, EnumPlayerDifficulty difficulty)
 	{
 		super();		
 		stamina = 0;
@@ -173,6 +178,7 @@ public class EntityPlayer extends EntityLiving
 		MAXIMUM_BASE_MANA = 200;
 		viewedChestX = 0;
 		viewedChestY = 0;
+		defeated = false;
 		isImmuneToCrits = false;
 		craftingManager = new CraftingManager();
 		inventoryChanged = true;	
@@ -456,7 +462,7 @@ public class EntityPlayer extends EntityLiving
 				}
 			}	
 			
-			isInCombat = true;
+			putInCombat();
 		}
 		
 		if(isDead()) //if the player has died
@@ -466,7 +472,14 @@ public class EntityPlayer extends EntityLiving
 		}		
 	}
 	
-	
+	/**
+	 * Puts the player in combat.
+	 */
+	public void putInCombat()
+	{
+		isInCombat = true;
+		ticksOfHealthRegen = 0;
+	}
 	
 	/**
 	 * Heals the player, and displays green WorldText if applicable.
@@ -560,10 +573,66 @@ public class EntityPlayer extends EntityLiving
 		//If the player is still dead, then trigger the respawn code
 		if(health <= 0)
 		{
-			//this is where things would be dropped if that was added.
-			health = maxHealth;
-			world.soundEngine.playSoundEffect(deathSound);
-			world.spawnPlayer(this);
+			triggerDifficultyEffect(world);
+		}
+	}
+	
+	/**
+	 * Triggers an effect appropriate to the player difficulty.
+	 * @param world the world the player is in
+	 */
+	private void triggerDifficultyEffect(World world)
+	{
+		if(difficulty == EnumPlayerDifficulty.HARD)
+		{
+			dropAll(world);
+		}
+		else if(difficulty == EnumPlayerDifficulty.HARDCORE)
+		{
+			defeated = true;	
+			return;
+		}
+		health = maxHealth;
+		world.soundEngine.playSoundEffect(deathSound);
+		world.spawnPlayer(this);	
+	}
+	
+	/**
+	 * Drops all the player's inventory.
+	 * @param world the world the player is in
+	 */
+	private void dropAll(World world)
+	{
+		Random random = new Random();
+		for(int i = 0; i < inventory.getMainInventoryLength(); i++)
+		{
+			if(inventory.getMainInventoryStack(i) != null)
+			{
+				world.addItemStackToItemList((EntityItemStack)new EntityItemStack(x, 
+						y - 15, 
+						inventory.getMainInventoryStack(i)).setVelocity(new Vector2F((random.nextFloat() * 8) - 4, random.nextFloat() * 8)));
+				inventory.removeEntireStackFromInventory(world, this, i);
+			}
+		}
+		for(int i = 0; i < inventory.getArmorInventoryLength(); i++)
+		{
+			if(inventory.getArmorInventoryStack(i) != null)
+			{
+				world.addItemStackToItemList((EntityItemStack)new EntityItemStack(x, 
+						y - 15, 
+						inventory.getArmorInventoryStack(i)).setVelocity(new Vector2F((random.nextFloat() * 8) - 4, random.nextFloat() * 8)));
+				inventory.setArmorInventoryStack(this, null, inventory.getArmorInventoryStack(i), i);			
+			}
+		}
+		for(int i = 0; i < inventory.getQuiverLength(); i++)
+		{
+			if(inventory.getQuiverStack(i) != null)
+			{
+				world.addItemStackToItemList((EntityItemStack)new EntityItemStack(x, 
+						y - 15, 
+						inventory.getQuiverStack(i)).setVelocity(new Vector2F((random.nextFloat() * 8) - 4, random.nextFloat() * 8)));
+				inventory.setQuiverStack(null, i);			
+			}
 		}
 	}
 	
@@ -920,7 +989,7 @@ public class EntityPlayer extends EntityLiving
 	 * Gets the player's difficulty setting. This field is final, and unchanging
 	 * @return the player's difficulty setting
 	 */
-	public final EnumDifficulty getDifficulty()
+	public final EnumPlayerDifficulty getDifficulty()
 	{
 		return difficulty;
 	}

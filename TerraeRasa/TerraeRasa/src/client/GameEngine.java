@@ -24,7 +24,8 @@ import world.WorldSky;
 import audio.SoundEngine;
 import blocks.Block;
 import entities.EntityPlayer;
-import enums.EnumDifficulty;
+import enums.EnumPlayerDifficulty;
+import enums.EnumWorldDifficulty;
 
 /**
  * <code>GameEngine</code> is the class responsible for running the main game loop, and other core features of multiple worlds.
@@ -111,6 +112,11 @@ public class GameEngine
 		        loops = 0;
 		        while(System.currentTimeMillis() > next_game_tick && loops < MAX_FRAMESKIP) //Update the game 20 times/second 
 		        {
+		        	if(player != null && player.defeated)
+		        	{
+		        		hardcoreDeath();
+		        	}
+		        	
 		        	Keys.universalKeyboard(world, player, settings, settings.keybinds);
 		        	
 		        	//If the music is already playing,set the volume to whatever the settings say it is
@@ -296,8 +302,8 @@ public class GameEngine
 		{
 			TerraeRasa.isMainMenuOpen = false;
 			FileManager fileManager = new FileManager();
-			world = fileManager.generateNewWorld("World", 1200, 800, EnumDifficulty.EASY);//EnumWorldSize.LARGE.getWidth(), EnumWorldSize.LARGE.getHeight());
-			player = fileManager.generateAndSavePlayer("!!", EnumDifficulty.NORMAL);//new EntityLivingPlayer("Test player", EnumDifficulty.NORMAL);
+			world = fileManager.generateNewWorld("World", 1200, 800, EnumWorldDifficulty.NORMAL);//EnumWorldSize.LARGE.getWidth(), EnumWorldSize.LARGE.getHeight());
+			player = fileManager.generateAndSavePlayer("!!", EnumPlayerDifficulty.HARDCORE);//new EntityLivingPlayer("Test player", EnumDifficulty.NORMAL);
 			world.addPlayerToWorld(player);
 			world.assessForAverageSky();
 			LightUtils utils = new LightUtils();
@@ -426,6 +432,26 @@ public class GameEngine
 	}
 	
 	/**
+	 * Initiates a hardcore death - which deletes the player and exits to the main menu. For now.
+	 */
+	public void hardcoreDeath()
+	{
+		//Delete the player
+		FileManager manager = new FileManager();
+		manager.deletefile("/Player Saves/" + player.getName());
+		this.player = null;
+		//Save the world
+		if(renderMode == RENDER_MODE_WORLD_EARTH)
+		{
+			world.saveRemainingWorld();
+		}
+		//Reset to the main menu
+		TerraeRasa.resetMainMenu();
+		TerraeRasa.isMainMenuOpen = true; //Sets menu open
+		System.out.println("Game Over.");
+	}
+	
+	/**
 	 * Gets the world object currently in use by the game. This will be null if the main menu is open or something breaks.
 	 * @return the world object for the current game, which may be null if on the main menu
 	 */
@@ -490,9 +516,12 @@ public class GameEngine
 	public void closeGameToMenu() 
 			throws FileNotFoundException, IOException
 	{
-		FileManager manager = new FileManager();
-		manager.savePlayer(player);
-	
+		if(!player.defeated)
+		{
+			FileManager manager = new FileManager();
+			manager.savePlayer(player);
+		}
+		
 		if(renderMode == RENDER_MODE_WORLD_EARTH)
 		{
 			world.saveRemainingWorld();

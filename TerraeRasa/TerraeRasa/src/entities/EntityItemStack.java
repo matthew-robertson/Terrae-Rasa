@@ -3,8 +3,8 @@ package entities;
 import items.Item;
 import items.ItemArmor;
 import items.ItemTool;
+import utils.ActionbarItem;
 import utils.ItemStack;
-import world.World;
 
 /**
  * <code>EntityItemStack extends EntityLiving</code> and <code>implements Serializable</code>
@@ -18,20 +18,23 @@ import world.World;
  * @version     1.0
  * @since       1.0
  */
-public class EntityItemStack extends Entity
+public class EntityItemStack extends EntityParticle
 {
 	private static final long serialVersionUID = 1L;
-	private double fallSpeed;
 	private int ticksBeforePickup;
 	private ItemStack stack;
 	
 	public EntityItemStack(double x, double y, ItemStack stack)
 	{
-		super();
-		if(stack.getItemID() < 2048) //Blocks are 6x6 render size
+		if(stack.getItemID() < ActionbarItem.itemIndex) //Blocks are 6x6 render size
 		{
 			width = 6;
 			height = 6;
+		}
+		else if(stack.getItemID() >= ActionbarItem.spellIndex)
+		{
+			width = 16;
+			height = 16;
 		}
 		else if(Item.itemsList[stack.getItemID()] instanceof ItemTool) //Tools are 16x16 render size
 		{
@@ -47,28 +50,16 @@ public class EntityItemStack extends Entity
 		{
 			width = 10;
 			height = 10;
-		}
+		}	
 		
 		this.x = x;
 		this.y = y;
-		fallSpeed = 1.8f; 
 		blockWidth = (double)(width) / 6;
 		blockHeight = (double)(height) / 6;
 		ticksBeforePickup = 20;
 		this.setStack(stack);
 	}
-	
-	/**
-	 * Overrides EntityLiving's applyGravity because ItemStacks can't jump. Moves the itemstack down if applicable instead.
-	 */
-	public void applyGravity(World world)
-	{
-		if(!isOnGround(world)) //if the entity is in the air, make them fall
-		{
-			moveEntityDown(world, fallSpeed);			
-		}		
-	}	
-	
+		
 	/**
 	 * Gets whether or not the EntityItemStack can be picked up. 
 	 * @return true if it can be picked up, otherwise false

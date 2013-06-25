@@ -11,7 +11,8 @@ import org.lwjgl.opengl.GL11;
 import utils.FileManager;
 import utils.MathHelper;
 import client.TerraeRasa;
-import enums.EnumDifficulty;
+import enums.EnumPlayerDifficulty;
+import enums.EnumWorldDifficulty;
 import enums.EnumWorldSize;
 
 /**
@@ -326,7 +327,7 @@ public class GuiMainMenu extends Render
 		}
 		if(buttonPushed == 23) //Create World
 		{
-			fileManager.generateAndSaveWorld(worldName.getText(), EnumWorldSize.getSize(worldSize.getValue()), EnumDifficulty.getDifficulty(worldMode.getValue()));
+			fileManager.generateAndSaveWorld(worldName.getText(), EnumWorldSize.getSize(worldSize.getValue()), EnumWorldDifficulty.getDifficulty(worldMode.getValue()));
 			generateWorldMenu();
 			isCreatingWorld = false;
 			onMenuOpen();
@@ -352,7 +353,7 @@ public class GuiMainMenu extends Render
 		}
 		if(buttonPushed == 28) //Create Character
 		{
-			fileManager.generateAndSavePlayer(characterName.getText(), EnumDifficulty.getDifficulty(characterMode.getValue()));
+			fileManager.generateAndSavePlayer(characterName.getText(), EnumPlayerDifficulty.getDifficulty(characterMode.getValue()));
 			generatePlayerMenu();
 			isCreatingCharacter = false;
 			onMenuOpen();

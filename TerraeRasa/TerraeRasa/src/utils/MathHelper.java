@@ -281,6 +281,19 @@ public class MathHelper
 	}	
 	
 	/**
+	 * Gets Vf given Vi, a, and t
+	 * @param Vi the initial upward velocity before gravity began applying
+	 * @param a the acceleration of the object
+	 * @param timeTicks the time in game ticks the object has been accelerating
+	 * @return Vf given Vi, a, and t
+	 */	
+	public static double getVf(double Vi, double a, double timeTicks)
+	{
+		//Vf = Vi + at
+		return Vi + a * (timeTicks / GameEngine.TICKS_PER_SECOND);
+	}	
+	
+	/**
 	 * Determines the fall damage based on an exponential curve. generally death is certain after 40 blocks of falling
 	 * @return the fall damage for the given distance fallen
 	 */

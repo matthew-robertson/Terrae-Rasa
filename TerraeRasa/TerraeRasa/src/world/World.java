@@ -43,8 +43,8 @@ import entities.EntityNPCEnemy;
 import entities.EntityPlayer;
 import entities.EntityProjectile;
 import enums.EnumColor;
-import enums.EnumDifficulty;
 import enums.EnumEventType;
+import enums.EnumWorldDifficulty;
 
 /**
  * <code>World implements Serializable</code> <br>
@@ -105,7 +105,7 @@ public class World
 	private int chunkHeight;
 	private ChunkManager chunkManager;
 	private boolean weatherFinished;
-	private EnumDifficulty difficulty;
+	private EnumWorldDifficulty difficulty;
 	private final Random random = new Random();
 	protected String worldName;
 	private long worldTime;
@@ -144,7 +144,7 @@ public class World
 	 * @param height the height of the world, in blocks
 	 * @param difficulty the difficulty (EnumDifficulty) of the world
 	 */
-	public World(String universeName, int width, int height, EnumDifficulty difficulty)
+	public World(String universeName, int width, int height, EnumWorldDifficulty difficulty)
 	{
 		setChunks(new ConcurrentHashMap<String, Chunk>(10));
 		this.width = width;
@@ -264,7 +264,7 @@ public class World
 		generatedHeightMap = (int[])ois.readObject();
 		worldTime = Long.valueOf((ois.readObject()).toString()).longValue();
 		totalBiomes = Integer.valueOf((ois.readObject()).toString()).intValue();
-		difficulty = (EnumDifficulty)ois.readObject();
+		difficulty = (EnumWorldDifficulty)ois.readObject();
 		itemsList = (ArrayList<EntityItemStack>)ois.readObject();
 		
 		System.out.println("Loaded And Applied World Data");
@@ -508,7 +508,7 @@ public class World
 	{
 		for(int i = 0; i < itemsList.size(); i++)
 		{
-			itemsList.get(i).applyGravity(this);
+			itemsList.get(i).move(this);
 		}		
 	}
 	
@@ -1898,7 +1898,7 @@ public class World
 		return worldTime;
 	}
 	
-	public EnumDifficulty getDifficulty()
+	public EnumWorldDifficulty getDifficulty()
 	{
 		return difficulty;
 	}

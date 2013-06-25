@@ -4,13 +4,12 @@ import items.Item;
 import java.util.Random;
 import java.util.Vector;
 
-
 import render.Render;
-
 import utils.ItemStack;
 import utils.MonsterDrop;
 import utils.Texture;
-
+import world.World;
+import enums.EnumDamageSource;
 import enums.EnumDamageType;
 import enums.EnumMonsterType;
 
@@ -49,7 +48,7 @@ public class EntityNPCEnemy extends EntityNPC
 	protected MonsterDrop[] possibleDrops;
 	protected int monsterId;
 	public int damageDone;
-	protected EnumDamageType damageType;
+	protected EnumDamageSource damageType;
 	protected EnumMonsterType monsterType;
 	public boolean isBoss;
 	
@@ -67,7 +66,7 @@ public class EntityNPCEnemy extends EntityNPC
 		name = s;
 		damageDone = 0;
 		monsterId = i;
-		damageType = EnumDamageType.MELEE;
+		damageType = EnumDamageSource.MELEE;
 		monsterType = EnumMonsterType.GROUNDED;
 		blockWidth = 2;
 		blockHeight = 3;
@@ -105,7 +104,7 @@ public class EntityNPCEnemy extends EntityNPC
 		this.isBoss = entity.isBoss;
 	}
 
-	protected EntityNPCEnemy setDamageType(EnumDamageType type)
+	protected EntityNPCEnemy setDamageType(EnumDamageSource type)
 	{
 		damageType = type;
 		return this;

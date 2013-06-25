@@ -10,8 +10,7 @@ import java.util.zip.GZIPOutputStream;
 
 import world.World;
 import world.WorldGenEarth;
-
-import enums.EnumDifficulty;
+import enums.EnumWorldDifficulty;
 import enums.EnumWorldSize;
 
 
@@ -23,7 +22,7 @@ import enums.EnumWorldSize;
  */
 public class CallableGenerateWorld implements Callable<World>
 {
-	public CallableGenerateWorld(String basepath, String worldName, EnumWorldSize worldSize, EnumDifficulty difficulty)
+	public CallableGenerateWorld(String basepath, String worldName, EnumWorldSize worldSize, EnumWorldDifficulty difficulty)
 	{
 		BASE_PATH = basepath;
 		WORLD_NAME = worldName;
@@ -55,7 +54,7 @@ public class CallableGenerateWorld implements Callable<World>
 	 * @param difficulty the difficulty setting of the world (easy, medium, hardcore)
 	 * @return the newly created world
 	 */
-	public World generateNewWorld(String universeName, int w, int h, EnumDifficulty difficulty)
+	public World generateNewWorld(String universeName, int w, int h, EnumWorldDifficulty difficulty)
 	{
 		return new WorldGenEarth().generate(new World(universeName, w, h, difficulty), 0, w, 0, h);
 	}
@@ -104,7 +103,7 @@ public class CallableGenerateWorld implements Callable<World>
 	}
 	
 	private final EnumWorldSize WORLD_SIZE;
-	private final EnumDifficulty WORLD_DIFFICULTY;
+	private final EnumWorldDifficulty WORLD_DIFFICULTY;
 	private final String BASE_PATH;
 	private final String WORLD_NAME;
 }

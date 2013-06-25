@@ -22,7 +22,8 @@ import world.WorldSky;
 import client.Settings;
 import client.TerraeRasa;
 import entities.EntityPlayer;
-import enums.EnumDifficulty;
+import enums.EnumPlayerDifficulty;
+import enums.EnumWorldDifficulty;
 import enums.EnumWorldSize;
 
 
@@ -42,7 +43,7 @@ public class FileManager
 	 * @param difficulty the Enum used to indicate the world's difficulty
 	 * @return the newly generated world or in case of failure, null
 	 */
-	public World generateAndSaveWorld(String name, EnumWorldSize worldSize, EnumDifficulty difficulty)
+	public World generateAndSaveWorld(String name, EnumWorldSize worldSize, EnumWorldDifficulty difficulty)
 	{
 		World world = generateNewWorld(name, worldSize.getWidth(), worldSize.getHeight(), difficulty);
 		world.saveRemainingWorld();
@@ -56,7 +57,7 @@ public class FileManager
 	 * @param difficulty the Enum used to indicate the WorldHell's difficulty
 	 * @return the newly generated WorldHell or in case of failure, null
 	 */
-	public WorldHell generateAndSaveWorldHell(String name, EnumWorldSize worldSize, EnumDifficulty difficulty)
+	public WorldHell generateAndSaveWorldHell(String name, EnumWorldSize worldSize, EnumWorldDifficulty difficulty)
 	{
 		WorldHell worldHell = generateNewWorldHell(name, worldSize.getWidth(), worldSize.getHeight(), difficulty);
 		worldHell.saveRemainingWorld();
@@ -70,7 +71,7 @@ public class FileManager
 	 * @param difficulty the Enum used to indicate the WorldSky's difficulty
 	 * @return the newly generated WorldSky or in case of failure, null
 	 */
-	public WorldSky generateAndSaveWorldSky(String name, EnumWorldSize worldSize, EnumDifficulty difficulty)
+	public WorldSky generateAndSaveWorldSky(String name, EnumWorldSize worldSize, EnumWorldDifficulty difficulty)
 	{
 		WorldSky worldSky = generateNewWorldSky(name, worldSize.getWidth(), worldSize.getHeight(), difficulty);
 		worldSky.saveRemainingWorld();
@@ -100,7 +101,7 @@ public class FileManager
 	 * @param difficulty the difficulty setting of the world (easy, medium, hardcore)
 	 * @return the newly created world
 	 */
-	public World generateNewWorld(String name, int w, int h, EnumDifficulty difficulty)
+	public World generateNewWorld(String name, int w, int h, EnumWorldDifficulty difficulty)
 	{
 		World world = new WorldGenEarth().generate(new World(name, w, h, difficulty), 0, w, 0, h);
 	//LightingEngine.applySunlight(world);
@@ -115,7 +116,7 @@ public class FileManager
 	 * @param difficulty the difficulty setting of the WorldHell (easy, medium, hardcore)
 	 * @return the newly created WorldHell
 	 */
-	public WorldHell generateNewWorldHell(String name, int w, int h, EnumDifficulty difficulty)
+	public WorldHell generateNewWorldHell(String name, int w, int h, EnumWorldDifficulty difficulty)
 	{
 		WorldHell worldHell = (WorldHell) new WorldGenHell().generate(new WorldHell(name, w, h, difficulty), 0, w, 0, h);
 	//	LightingEngine.applySunlight(worldHell);
@@ -130,7 +131,7 @@ public class FileManager
 	 * @param difficulty the difficulty setting of the WorldSky (easy, medium, hardcore)
 	 * @return the newly created WorldSky
 	 */
-	public WorldSky generateNewWorldSky(String name, int w, int h, EnumDifficulty difficulty)
+	public WorldSky generateNewWorldSky(String name, int w, int h, EnumWorldDifficulty difficulty)
 	{
 		WorldSky world = (WorldSky) new WorldGenSky().generate(new World(name, w, h, difficulty), 0, w, 0, h);
 	//	LightingEngine.applySunlight(world);
@@ -143,7 +144,7 @@ public class FileManager
 	 * @param difficulty The difficulty settings (EnumDifficulty) of the player being created
 	 * @return The new player created, or in the case of a failure - null;
 	 */
-	public EntityPlayer generateAndSavePlayer(String name, EnumDifficulty difficulty)
+	public EntityPlayer generateAndSavePlayer(String name, EnumPlayerDifficulty difficulty)
 	{
 		try 
 		{
@@ -164,7 +165,7 @@ public class FileManager
 	 * @param difficulty the difficulty setting (EnumDifficulty) of the player to be generated
 	 * @return a newly generated EntityPlayer with given attributes 
 	 */
-	private EntityPlayer generateNewEntityPlayer(String name, EnumDifficulty difficulty)
+	private EntityPlayer generateNewEntityPlayer(String name, EnumPlayerDifficulty difficulty)
 	{
 		return new EntityPlayer(name, difficulty);
 	}
