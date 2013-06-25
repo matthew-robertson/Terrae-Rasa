@@ -59,7 +59,7 @@ public class SoundEngine{
 			return new Song(TerraeRasa.getBasePath() + "/Resources/Audio" + url, name);
 		}catch(SlickException e){
 			System.out.println("Failed to load at: " + TerraeRasa.getBasePath() + url);
-			System.out.println("I really hope you are Matt or Alec. If not, please let them know.");
+			System.out.println("Please either reinstall or let Alec or Matt know about this issue.");
 			return null;
 		}
 	}
@@ -75,7 +75,7 @@ public class SoundEngine{
 			return AudioLoader.getAudio("OGG", ResourceLoader.getResourceAsStream(TerraeRasa.getBasePath() + "/Resources/Audio" + url));
 		}catch(IOException e){
 			System.out.println("Failed to load at: " + TerraeRasa.getBasePath() + url);
-			System.out.println("I really hope you are Matt or Alec. If not, please let them know.");
+			System.out.println("Please either reinstall or let Alec or Matt know about this issue.");
 			return null;
 		}
 	}
@@ -97,26 +97,29 @@ public class SoundEngine{
 	 * @param s - key used to locate the sound
 	 */
 	public void playSoundEffect(String s){
-		if (soundDictionary.containsKey(s)){
-			soundDictionary.get(s).playAsSoundEffect(1f, (float) settings.soundVolume, false);
-		}
-		else {
-			System.out.println("This.... should never happen. Please initialize your sounds before playing them");
+		if (settings.soundVolume >= 0.01){
+			if (soundDictionary.containsKey(s)){
+				soundDictionary.get(s).playAsSoundEffect(1f, (float) settings.soundVolume, false);
+			}
+			else {
+				System.out.println("This.... should never happen. Please initialize your sounds before playing them");
+			}
 		}
 	}
 	
 	/**
 	 * Play a soundEffect, given a locator string, a pitch, and a gain.
 	 * @param s - the key used to locate the effect
-	 * @param pitch - pitch at which to play said effect
-	 * @param gain - volume to use for the effect. Typically the volume given by settings
+	 * @param perentage - scales the sounds volume based off the settings
 	 */
 	public void playSoundEffect(String s, double percentage){
-		if (soundDictionary.containsKey(s)){
-			soundDictionary.get(s).playAsSoundEffect(1f, (float) (settings.soundVolume * percentage), false);
-		}
-		else {
-			System.out.println("This.... should never happen. Please initialize your sounds before playing them");
+		if (settings.soundVolume >= 0.01){
+			if(soundDictionary.containsKey(s)){
+				soundDictionary.get(s).playAsSoundEffect(1f, (float) (settings.soundVolume * percentage), false);
+			}
+			else {
+				System.out.println("This.... should never happen. Please initialize your sounds before playing them");
+			}
 		}
 	}
 	
@@ -124,14 +127,15 @@ public class SoundEngine{
 	 * Play a soundEffect, given a locator string, a pitch, and a gain.
 	 * @param s - the key used to locate the effect
 	 * @param pitch - pitch at which to play said effect
-	 * @param gain - volume to use for the effect. Typically the volume given by settings
 	 */
 	public void playSoundEffect(String s, float pitch){
-		if (soundDictionary.containsKey(s)){
-			soundDictionary.get(s).playAsSoundEffect(pitch, (float) settings.soundVolume, false);
-		}
-		else {
-			System.out.println("This.... should never happen. Please initialize your sounds before playing them");
+		if (settings.soundVolume >= 0.01){ 
+			if (soundDictionary.containsKey(s)){
+				soundDictionary.get(s).playAsSoundEffect(pitch, (float) settings.soundVolume, false);
+			}
+			else {
+				System.out.println("This.... should never happen. Please initialize your sounds before playing them");
+			}
 		}
 	}
 	
@@ -156,7 +160,13 @@ public class SoundEngine{
 	}
 	
 	public void setVolume(float f){
-		currentMusic.setVolume(f);
+				
+		if (settings.musicVolume < 0.01){
+			currentMusic.setVolume(0);
+		}
+		else{
+			currentMusic.setVolume(f);
+		}
 	}
 	
 	/**
