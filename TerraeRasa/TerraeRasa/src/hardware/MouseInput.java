@@ -25,11 +25,14 @@ public class MouseInput
 		if(player.isStunned())
 		{
 			return;
-		}
-		
+		}		
 		int active = player.selectedSlot;
 		int mouseBX = ((Render.getCameraX() + MathHelper.getCorrectMouseXPosition()) / 6);
 		int mouseBY = ((Render.getCameraY() + MathHelper.getCorrectMouseYPosition()) / 6);
+		
+		if (!Mouse.isButtonDown(0)){
+			player.setIsMining(false);
+		}
 		if(Mouse.isButtonDown(0) && player.inventory.getMainInventoryStack(active) != null) //Left Mouse Down && Actionbar slot isnt empty
 		{			
 			if(!player.isInventoryOpen)
