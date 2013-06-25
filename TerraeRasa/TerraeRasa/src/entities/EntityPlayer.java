@@ -458,7 +458,7 @@ public class EntityPlayer extends EntityLiving
 				if(showWorldText)
 				{
 					String message = (damageAfterArmor == 0) ? "Absorb" : ""+(int)damageAfterArmor;
-					world.addTemporaryText(message, (int)x - 2, (int)y - 3, 20, (damageAfterArmor == 0) ? EnumColor.WHITE : EnumColor.CRITICAL); //add temperary text to be rendered, for the damage done
+					world.addTemporaryText(message, (int)x - 2, (int)y - 3, 20, (damageAfterArmor == 0) ? EnumColor.WHITE : EnumColor.RED); 
 				}
 			}	
 			
