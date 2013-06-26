@@ -319,5 +319,21 @@ public class RecipeManager
 		new ItemStack(Block.plank, 10)
 	});	
 	
+	//Block to backwall conversions
+	Recipe backDirt = new Recipe(this, new ItemStack(Block.backDirt, 4), Block.none, new ItemStack[] {
+		new ItemStack(Block.dirt)
+	});
+	Recipe backStone = new Recipe(this, new ItemStack(Block.backStone, 4), Block.none, new ItemStack[] {
+		new ItemStack(Block.stone)
+	});
+	
+	//Backwall to block conversions
+	Recipe dirt = new Recipe(this, new ItemStack(Block.dirt), Block.none, new ItemStack[] {
+		new ItemStack(Block.backDirt, 4)
+	});
+	Recipe stone = new Recipe(this, new ItemStack(Block.stone), Block.none, new ItemStack[] {
+		new ItemStack(Block.backStone, 4)
+	});
+	
 
 }

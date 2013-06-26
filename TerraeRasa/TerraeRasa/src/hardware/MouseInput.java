@@ -31,7 +31,7 @@ public class MouseInput
 		int mouseBX = ((Render.getCameraX() + MathHelper.getCorrectMouseXPosition()) / 6);
 		int mouseBY = ((Render.getCameraY() + MathHelper.getCorrectMouseYPosition()) / 6);
 		
-		if (!Mouse.isButtonDown(0)){
+		if (!Mouse.isButtonDown(0) && !Mouse.isButtonDown(1)){
 			player.setIsMining(false);
 		}
 		if(Mouse.isButtonDown(0) && player.inventory.getMainInventoryStack(active) != null) //Left Mouse Down && Actionbar slot isnt empty
@@ -48,8 +48,7 @@ public class MouseInput
 						player.startSwingingTool(player.isFacingRight);
 						if (player.getIsMining()){
 							world.soundEngine.playSoundEffect(tool.hitSound);
-						}
-						//world.soundEngine.playSoundEffect(tool.swingSound);					
+						}				
 					}
 					//Attempt to launch a projectile				
 					if(selectedItemID >= ActionbarItem.itemIndex)
@@ -96,8 +95,10 @@ public class MouseInput
 			
 			if(player.inventory.getMainInventoryStack(active) != null)
 			{
+				int selectedItemID = player.inventory.getMainInventoryStack(active).getItemID();	
+				
 				//If player is holding a block
-				if (!player.isInventoryOpen && player.inventory.getMainInventoryStack(active).getItemID() < ActionbarItem.itemIndex) 
+				if (!player.isInventoryOpen && selectedItemID < ActionbarItem.itemIndex) 
 				{
 					mouseBX = (int) ((double)(Render.getCameraX() + MathHelper.getCorrectMouseXPosition()) / 6);
 					mouseBY = (int) ((double)(Render.getCameraY() + MathHelper.getCorrectMouseYPosition()) / 6);				
@@ -109,7 +110,7 @@ public class MouseInput
 					
 					if(d <= player.getMaximumBlockPlaceDistance()) //if the click was close enough to place a block, try to place one
 					{
-						if (Block.blocksList[player.inventory.getMainInventoryStack(active).getItemID()].clone() instanceof BlockBackWall){
+						if (Block.blocksList[selectedItemID].clone() instanceof BlockBackWall){
 							world.placeBackWall(player, mouseBX, mouseBY, Block.blocksList[player.inventory.getMainInventoryStack(active).getItemID()].clone());
 						}
 						else {
@@ -135,6 +136,20 @@ public class MouseInput
 						mouseLock = true;
 					}
 				}
+				if (selectedItemID < ActionbarItem.spellIndex){
+					Item item = Item.itemsList[selectedItemID];
+					if(!player.isSwingingTool() && item instanceof ItemTool) //If the player isn't swinging a tool, start swinging
+					{
+						ItemTool tool = (ItemTool) item;
+						player.startSwingingTool(player.isFacingRight);
+						if (player.getIsMining()){
+							world.soundEngine.playSoundEffect(tool.hitSound);
+						}				
+					}
+					//Mine the backwall
+					player.breakBackBlock(world, mouseBX, mouseBY, Item.itemsList[player.inventory.getMainInventoryStack(active).getItemID()]);
+				}
+				
 			}
 		}		
 		else

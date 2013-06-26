@@ -954,6 +954,67 @@ public class EntityPlayer extends EntityLiving
 	}	
 	
 	/**
+	 * Function called when the player is mining a back wall block
+	 * @param mx x position in worldmap array, of the block being mined
+	 * @param my y position in the worldmap array, of the block being mined
+	 * @param item the tool mining the block
+	 */
+	public void breakBackBlock (World world, int mx, int my, Item item)
+	{
+		if (world.getBackBlock(mx, my).getID() != Block.backAir.getID()){
+			if (((item instanceof ItemToolPickaxe && world.getBackBlock(mx, my).getBlockType() == 1) 
+			  || (item instanceof ItemToolAxe && world.getBackBlock(mx, my).getBlockType() == 2) 
+			  || (item instanceof ItemToolHammer && world.getBackBlock(mx, my).getBlockType() == 3) 
+		      || world.getBackBlock(mx, my).getBlockType() == 0) && Mouse.isButtonDown(1))
+			{ //If the right-mouse button is pressed && they have the correct tool to mine
+				EnumToolMaterial material;
+				if (item instanceof ItemTool)
+				{
+					material = item.getToolMaterial();
+				}
+				else
+				{
+					material = EnumToolMaterial.FIST;
+				}
+				double distance = MathHelper.distanceBetweenTwoPoints((MathHelper.getCorrectMouseXPosition() + Render.getCameraX()), (MathHelper.getCorrectMouseYPosition() + Render.getCameraY()), (this.x + ((isFacingRight) ? 9 : 3)), (this.y + 9));
+					      
+				if(distance <= material.getDistance() && (!world.getBackBlock(mx, my-1).isSolid ||
+						!world.getBackBlock(mx, my+1).isSolid || !world.getBackBlock(mx - 1, my).isSolid ||
+						!world.getBackBlock(mx + 1, my).isSolid)){
+					if (material.getToolTier() >= world.getBackBlock(mx, my).getBlockTier()) //If the block is within range and at an edge
+						{ 	
+						if(ticksreq == 0 || world.getBackBlock(mx, my) != world.getBackBlock(sx, sy)) //the mouse has moved or they arent mining anything
+						{				
+							isMining = false;
+							sx = mx; //save the co-ords
+							sy = my;
+							ticksreq = (int) (world.getBackBlock(mx, my).getBlockHardness() / material.getStrength()) + 1; //Determine how long to break
+							
+						}	
+						else if(ticksreq == 1 && Mouse.isButtonDown(1) && world.getBackBlock(mx,  my).getIsMineable()) //If the block should break
+						{
+							isMining = false;
+							
+							world.breakBackBlock(this, mx, my);
+							
+							//Overwrite snow/flowers/etc...
+							if (world.getBackBlock(mx, my-1).getIsOveridable() == true && world.getBackBlock(mx, my-1) != Block.air)
+							{
+								world.breakBlock(this, mx, my-1);
+							}
+						}		
+						else if (Mouse.isButtonDown(1)) //mining is in progress, decrease remaining time.
+						{
+							isMining = true;
+							ticksreq--;			
+						}	
+					}
+				}
+			}
+		}
+	}	
+	
+	/**
 	 * Increases the maximum health of the player
 	 * @param increase the amount to increase maxHealth
 	 * @return success of the operation

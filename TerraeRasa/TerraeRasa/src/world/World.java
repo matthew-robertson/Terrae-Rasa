@@ -1189,15 +1189,12 @@ public class World
 	 */
 	private void handleBackBlockBreakEvent(EntityPlayer player, int mx, int my)
 	{
-		ItemStack stack = getBlock(mx, my).getDroppedItem();
+		ItemStack stack = getBackBlock(mx, my).getDroppedItem();
 		if(stack != null) //if there's an item to drop, add it to the list of dropped items
 		{
 			addItemStackToItemList(new EntityItemStack((mx * 6) - 1, (my * 6) - 2, stack));
 		}
-		else
-		{
-			setBackBlock(Block.backAir, mx, my); //replace it with air
-		}
+		setBackBlock(Block.backAir, mx, my); //replace it with air
 	}
 	
 	/**
