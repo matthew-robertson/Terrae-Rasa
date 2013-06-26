@@ -1183,6 +1183,24 @@ public class World
 	}
 	
 	/**
+	 * Handles block break events, based on what the block is
+	 * @param mx x position in the 'world map'
+	 * @param my y position in the 'world map'
+	 */
+	private void handleBackBlockBreakEvent(EntityPlayer player, int mx, int my)
+	{
+		ItemStack stack = getBlock(mx, my).getDroppedItem();
+		if(stack != null) //if there's an item to drop, add it to the list of dropped items
+		{
+			addItemStackToItemList(new EntityItemStack((mx * 6) - 1, (my * 6) - 2, stack));
+		}
+		else
+		{
+			setBackBlock(Block.backAir, mx, my); //replace it with air
+		}
+	}
+	
+	/**
 	 * Handles player block placement
 	 * @param mx x position in worldmap array, of the block being placed
 	 * @param my y position in the worldmap array, of the block being placed
@@ -1293,6 +1311,22 @@ public class World
 	
 		
 		
+	}
+	
+	/**
+	 * Handles player back wall placement
+	 * @param mx x position in worldmap array, of the block being placed
+	 * @param my y position in the worldmap array, of the block being placed
+	 * @param block the block to be placed
+	 */
+	public void placeBackWall(EntityPlayer player, int mx, int my, Block block)
+	{
+		if ((getBackBlock(mx, my).getIsOveridable() == true || getBackBlock(mx, my).getID() == Block.backAir.getID()) && 
+			(getBackBlock(mx-1, my).getIsSolid() || getBackBlock(mx, my-1).getIsSolid() || getBackBlock(mx, my+1).getIsSolid() || getBackBlock(mx+1, my).getIsSolid())) //can the block be placed
+		{
+			player.inventory.removeItemsFromInventory(this, player, new ItemStack(block, 1)); //remove the items from inventory		
+			setBackBlock(block, mx, my); //place it	
+		}
 	}
 	
 	/**
@@ -1423,6 +1457,17 @@ public class World
 	}
 	
 	/**
+	 * Provides access to handlBackBlockBreakEvent() because that method is private and has a bizzare name, that's hard to both find and
+	 * remember
+	 * @param x the x position of the block to break (in the 'world map')
+	 * @param y the y position of the block to break (in the 'world map')
+	 */
+	public void breakBackBlock(EntityPlayer player, int x, int y)
+	{
+		handleBackBlockBreakEvent(player, x, y);
+	}
+	
+	/**
 	 * Provides access to handlBlockBreakEvent() because that method is private and has a bizzare name, that's hard to both find and
 	 * remember
 	 * @param x the x position of the block to break (in the 'world map')
@@ -1452,6 +1497,27 @@ public class World
 	{
 		return height;
 	}
+	
+	/**
+	 * Gets the back wall at the specified (x,y). Useful for easily getting a back wall at the specified location; Terrible for mass usage,
+	 * such as in rendering.
+	 * @param x the block's x location in the new world map
+	 * @param y the block's y location in the new world map
+	 * @return the block at the location specified (this should never be null)
+	 */
+	public Block getBackBlock(int x, int y)
+	{
+		try
+		{
+			return getChunks().get(""+(x / Chunk.getChunkWidth())).getBackWall(x % Chunk.getChunkWidth(), (y));
+
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			return null;
+		}
+	}
 
 	/**
 	 * Gets the block at the specified (x,y). Useful for easily getting a block at the specified location; Terrible for mass usage,
@@ -1471,6 +1537,26 @@ public class World
 		{
 			e.printStackTrace();
 			return null;
+		}
+	}
+	
+	/**
+	 * Sets the back wall at the specified (x,y). Useful for easily setting a back wall at the specified location; Terrible for mass usage.
+	 * This version of the method does not check if the chunk is actually loaded, therefore it may sometimes fail for bizarre or very, very
+	 * far away requests. It will however, simply catch that Exception, should it occur.
+	 * @param block the block that the specified (x,y) will be set to
+	 * @param x the block's x location in the new world map
+	 * @param y the block's y location in the new world map
+	 */
+	public void setBackBlock(Block block, int x, int y)
+	{
+		try
+		{
+			getChunks().get(""+x / Chunk.getChunkWidth()).setBackWall(block, x % Chunk.getChunkWidth(), y);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
 		}
 	}
 		

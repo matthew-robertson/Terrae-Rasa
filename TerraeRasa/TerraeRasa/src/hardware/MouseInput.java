@@ -13,6 +13,7 @@ import utils.ActionbarItem;
 import utils.MathHelper;
 import world.World;
 import blocks.Block;
+import blocks.BlockBackWall;
 import blocks.BlockChest;
 import entities.EntityPlayer;
 
@@ -108,7 +109,12 @@ public class MouseInput
 					
 					if(d <= player.getMaximumBlockPlaceDistance()) //if the click was close enough to place a block, try to place one
 					{
-						world.placeBlock(player, mouseBX, mouseBY, Block.blocksList[player.inventory.getMainInventoryStack(active).getItemID()].clone());
+						if (Block.blocksList[player.inventory.getMainInventoryStack(active).getItemID()].clone() instanceof BlockBackWall){
+							world.placeBackWall(player, mouseBX, mouseBY, Block.blocksList[player.inventory.getMainInventoryStack(active).getItemID()].clone());
+						}
+						else {
+							world.placeBlock(player, mouseBX, mouseBY, Block.blocksList[player.inventory.getMainInventoryStack(active).getItemID()].clone());
+						}
 					}
 				}
 				else if(player.inventory.getMainInventoryStack(active) != null && !player.isInventoryOpen && 
