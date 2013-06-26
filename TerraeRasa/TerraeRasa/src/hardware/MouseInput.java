@@ -42,6 +42,9 @@ public class MouseInput
 				if(selectedItemID < ActionbarItem.spellIndex)
 				{
 					Item item = Item.itemsList[selectedItemID];
+					//Try to mine a block
+					player.breakBlock(world, mouseBX, mouseBY, Item.itemsList[player.inventory.getMainInventoryStack(active).getItemID()]);
+					
 					if(!player.isSwingingTool() && item instanceof ItemTool) //If the player isn't swinging a tool, start swinging
 					{
 						ItemTool tool = (ItemTool) item;
@@ -68,9 +71,7 @@ public class MouseInput
 									(double)(Render.getCameraX() + MathHelper.getCorrectMouseXPosition()), 
 									(double)(Render.getCameraY() + MathHelper.getCorrectMouseYPosition()), 
 									weapon);
-						}
-						//Try to mine a block
-						player.breakBlock(world, mouseBX, mouseBY, Item.itemsList[player.inventory.getMainInventoryStack(active).getItemID()]); 
+						}						 
 					}
 				}
 			}
@@ -136,8 +137,12 @@ public class MouseInput
 						mouseLock = true;
 					}
 				}
-				if (selectedItemID < ActionbarItem.spellIndex){
+				if (player.inventory.getMainInventoryStack(active) != null && selectedItemID < ActionbarItem.spellIndex){
 					Item item = Item.itemsList[selectedItemID];
+					
+					//Mine the backwall
+					player.breakBackBlock(world, mouseBX, mouseBY, Item.itemsList[player.inventory.getMainInventoryStack(active).getItemID()]);
+					
 					if(!player.isSwingingTool() && item instanceof ItemTool) //If the player isn't swinging a tool, start swinging
 					{
 						ItemTool tool = (ItemTool) item;
@@ -145,9 +150,7 @@ public class MouseInput
 						if (player.getIsMining()){
 							world.soundEngine.playSoundEffect(tool.hitSound);
 						}				
-					}
-					//Mine the backwall
-					player.breakBackBlock(world, mouseBX, mouseBY, Item.itemsList[player.inventory.getMainInventoryStack(active).getItemID()]);
+					}					
 				}
 				
 			}
