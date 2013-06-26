@@ -517,14 +517,17 @@ public class World
 	 */
 	private void performPlayerItemHittests(EntityPlayer player)
 	{
+		final double PLAYER_X_CENTER = player.x + (player.width / 2);
+		final double PLAYER_Y_CENTER = player.y + (player.height / 2);
+		
 		for(int i = 0; i < itemsList.size(); i++)
 		{
 			double distance = MathHelper.distanceBetweenTwoPoints(itemsList.get(i).x + (itemsList.get(i).width / 2), 
 					itemsList.get(i).y + (itemsList.get(i).height / 2),
-					player.x + (player.width / 2), 
-					player.y + (player.height / 2));
+					PLAYER_X_CENTER, 
+					PLAYER_Y_CENTER);
 			//Check if the itemstack is near the player and able to be picked up
-			if(distance <= itemsList.get(i).width * 1.75 && itemsList.get(i).canBePickedUp()) 
+			if(distance <= itemsList.get(i).width * 2 && itemsList.get(i).canBePickedUp()) 
 			{
 				ItemStack stack = player.inventory.pickUpItemStack(this, player, itemsList.get(i).getStack()); //if so try to pick it up
 				

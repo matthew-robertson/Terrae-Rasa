@@ -6,6 +6,6 @@ public enum EnumDamageSource
 	RANGE(),
 	MAGIC(),
 	FALL(),
-	ENVIRONMENT(), //Lava, fire, etc
+	ENVIRONMENT(), 
 	UNDEFINED();
 }

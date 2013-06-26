@@ -77,8 +77,9 @@ public class EntityPlayer extends EntityLiving
 	private static final long serialVersionUID = 2L;
 	private final static int HEALTH_FROM_STAMINA = 10;
 	private final static int MANA_FROM_INTELLECT = 10;
-	private static final double leftSwingBound = MathHelper.degreeToRadian(-120);
-	private static final double rightSwingBound = MathHelper.degreeToRadian(40);
+	/** This value apparently has to be negative. */
+	private static final double leftSwingBound = MathHelper.degreeToRadian(-135); 
+	private static final double rightSwingBound = MathHelper.degreeToRadian(55);
 	public int viewedChestX;
 	public int viewedChestY;
 	public boolean isViewingChest;	

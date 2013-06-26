@@ -33,7 +33,7 @@ public class CraftingManager
 	private static final Block[] craftingBlocks = 
 	{ 
 		Block.craftingTable,
-		Block.furnace
+		Block.furnace,
 	};
 	
 	/**
