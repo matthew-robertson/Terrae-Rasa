@@ -374,8 +374,8 @@ public class Item extends ActionbarItem
 	public static Item healingHerb2 = new Item(348).setIconPosition(0, 0).setName("Healing Herb");
 	public static Item magicHerb1 = new Item(349).setIconPosition(0, 0).setName("Minor Magic Herb");
 	public static Item magicHerb2 = new Item(350).setIconPosition(0, 0).setName("Magic Herb");
-	public static Item vialEmpty = new Item(351).setIconPosition(0, 0).setName("Empty Vial");
-	public static Item vialOfWater = new Item(352).setIconPosition(0, 0).setName("Vial of Water");
+	public static Item vialEmpty = new Item(351).setIconPosition(8, 1).setName("Empty Vial");
+	public static Item vialOfWater = new Item(352).setIconPosition(8, 2).setName("Vial of Water");
 	
 	public static Item regenerationPotion1 = new ItemPotionRegeneration(359, 90, 1, 4, 40).setIconPosition(9, 1).setName("Minor Regen Potion");
 	public static Item regenerationPotion2 = new ItemPotionRegeneration(360, 90, 2, 8, 40).setIconPosition(9, 2).setName("Regen Potion");

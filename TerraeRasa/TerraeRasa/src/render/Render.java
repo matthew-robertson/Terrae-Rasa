@@ -4,17 +4,14 @@ import io.TextureLoader;
 
 import java.awt.Font;
 
-
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
-import entities.EntityPlayer;
-
-import ui.RenderUI;
 import utils.MathHelper;
 import utils.Texture;
 import utils.TextureCoords;
 import world.World;
+import entities.EntityPlayer;
 
 /**
  * Defines the base class for anything that draws something to screen in this application. Provides methods to appropriately 
