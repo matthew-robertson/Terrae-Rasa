@@ -291,7 +291,6 @@ public class FileManager
 		try
 		{
 			TerraeRasa.terraeRasa.gameEngine.closeGameToMenu();
-			TerraeRasa.isMainMenuOpen = true; //Sets menu open
 			System.out.println("Save and quit successful");
 		}
 		catch (Exception e)

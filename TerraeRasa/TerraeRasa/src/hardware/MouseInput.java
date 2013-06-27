@@ -32,6 +32,15 @@ public class MouseInput
 		int mouseBX = ((Render.getCameraX() + MathHelper.getCorrectMouseXPosition()) / 6);
 		int mouseBY = ((Render.getCameraY() + MathHelper.getCorrectMouseYPosition()) / 6);
 		
+		if(Mouse.isButtonDown(0))
+		{
+			Block frontBlock = world.getBlock(mouseBX, mouseBY);
+			Block backBlock = world.getBackBlock(mouseBX, mouseBY);
+			
+			System.out.println("(" + mouseBX + "," + mouseBY + "): " + frontBlock.getName() + " | " + backBlock.getName());
+			System.out.println("(" + mouseBX + "," + mouseBY + "): " + frontBlock.getID() + " | " + backBlock.getID());
+		}
+		
 		if (!Mouse.isButtonDown(0) && !Mouse.isButtonDown(1)){
 			player.setIsMining(false);
 		}

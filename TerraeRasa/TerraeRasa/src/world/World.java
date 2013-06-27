@@ -241,7 +241,7 @@ public class World
 			throws FileNotFoundException, IOException, ClassNotFoundException
 	{
 		//Open an input stream for the file
-		ObjectInputStream ois = new ObjectInputStream(new DataInputStream(new GZIPInputStream(new FileInputStream(BASE_PATH + "/World Saves/" + worldName + "/" + dir + "/worlddata.dat")))); 
+		ObjectInputStream ois = new ObjectInputStream(new DataInputStream(new GZIPInputStream(new FileInputStream(BASE_PATH + "/World Saves/" + universeName + "/" + dir + "/worlddata.dat")))); 
 		
 		/**
 		Variables are loaded in the following order:
@@ -266,6 +266,7 @@ public class World
 		averageSkyHeight = Integer.valueOf((ois.readObject()).toString()).intValue();
 		generatedHeightMap = (int[])ois.readObject();
 		worldTime = Long.valueOf((ois.readObject()).toString()).longValue();
+		worldName = String.valueOf(ois.readObject()).toString();
 		totalBiomes = Integer.valueOf((ois.readObject()).toString()).intValue();
 		difficulty = (EnumWorldDifficulty)ois.readObject();
 		itemsList = (ArrayList<EntityItemStack>)ois.readObject();
@@ -1508,7 +1509,7 @@ public class World
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+	//		e.printStackTrace();
 			return null;
 		}
 	}
@@ -1934,6 +1935,15 @@ public class World
 	{
 		saveAllRemainingChunks();
 		chunkManager.saveWorldData(this);
+	}
+	
+	/**
+	 * Returns true if there are one or more chunks left in the world, or false otherwise.
+	 * @return true if chunks are left, otherwise false
+	 */
+	public boolean hasChunksLeft()
+	{
+		return chunks.size() > 0;
 	}
 	
 	/**

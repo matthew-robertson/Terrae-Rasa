@@ -152,7 +152,7 @@ public class SoundEngine{
 	public void setCurrentMusic(String music){
 		if (currentMusic != null && currentMusic != musicDictionary.get(music)){
 			currentMusic.fade(100, 0, true);
-			musicDictionary.get(currentMusic.getName()).savePosition();
+			musicDictionary.get(music).savePosition();
 		}	
 		
 		this.currentMusic = musicDictionary.get(music);

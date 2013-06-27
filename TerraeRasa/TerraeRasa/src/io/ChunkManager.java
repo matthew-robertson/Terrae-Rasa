@@ -297,6 +297,7 @@ public class ChunkManager
 			s.writeObject(world.getAverageSkyHeight());
 			s.writeObject(world.getGeneratedHeightMap());
 			s.writeObject(world.getWorldTime());
+			s.writeObject(world.getWorldName());
 			s.writeObject(world.getTotalBiomes());
 			s.writeObject(world.getDifficulty());
 			
