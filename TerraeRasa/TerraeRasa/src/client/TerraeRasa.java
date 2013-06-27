@@ -16,7 +16,6 @@ import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.PixelFormat;
 
-import render.GuiMainMenu;
 import render.Render;
 import world.World;
 import entities.EntityPlayer;
@@ -47,7 +46,7 @@ public class TerraeRasa
 	private static String basePath;
 	public static boolean done;
 	public static boolean isMainMenuOpen;
-	public static boolean initInDebugMode = true;
+	public static boolean initInDebugMode;
 	public static TerraeRasa terraeRasa;
 	public final GameEngine gameEngine;
 	
@@ -69,9 +68,21 @@ public class TerraeRasa
 	{		
 		osName = System.getProperty("os.name").toLowerCase();
 		
-		for(String string : args)
+		try
 		{
-			System.out.println("ARGS: " + string);
+			System.out.println(args[0]);
+			if(args[0].equals("no-debug"))
+			{
+				initInDebugMode = false;
+			}
+			else
+			{
+				initInDebugMode = true;			
+			}
+		}
+		catch (ArrayIndexOutOfBoundsException e) 
+		{
+			initInDebugMode = true;
 		}
 		
 		//Load the OpenGL libraries for rendering later on

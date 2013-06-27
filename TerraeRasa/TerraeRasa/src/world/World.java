@@ -903,7 +903,6 @@ public class World
 			}
 			catch(Exception e)
 			{
-				//e.printStackTrace();
 			}
 		}
 		

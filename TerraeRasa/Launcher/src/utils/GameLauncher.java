@@ -43,7 +43,7 @@ public class GameLauncher {
 	 */
 	private static void startWindows() throws IOException
 	{
-		Process process = Runtime.getRuntime().exec("java -jar " + OperatingSystemHelper.getBasePath() + "/bin/terraerasa.jar");
+		Process process = Runtime.getRuntime().exec("java -jar " + OperatingSystemHelper.getBasePath() + "/bin/terraerasa.jar \"no-debug\"");
 	}
 	
 	/**
@@ -52,7 +52,7 @@ public class GameLauncher {
 	 */
 	private static void startMac() throws IOException
 	{
-		String applescriptCommand = "do shell script \"" + new StringBuilder().append("java -jar /Users/" + System.getProperty("user.name") + "/Library/Application").append((char)(92)).append((char)(92)).append(" Support/terraerasa/bin/terraerasa.jar").toString() + "\" \n";
+		String applescriptCommand = "do shell script \"" + new StringBuilder().append("java -jar /Users/" + System.getProperty("user.name") + "/Library/Application").append((char)(92)).append((char)(92)).append(" Support/terraerasa/bin/terraerasa.jar \"no-debug\"").toString() + "\" \n";
 		String[] args1 = { "osascript", "-e", applescriptCommand };
 		Process process = Runtime.getRuntime().exec(args1);
 	}
@@ -62,7 +62,7 @@ public class GameLauncher {
 	 */
 	private static void startLinux()
 	{
-		executeLinuxCommand("java -jar " + OperatingSystemHelper.getBasePath() + "/bin/terraerasa.jar");
+		executeLinuxCommand("java -jar " + OperatingSystemHelper.getBasePath() + "/bin/terraerasa.jar \"no-debug\"");
 	}
 	
 	/**

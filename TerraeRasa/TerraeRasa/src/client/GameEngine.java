@@ -94,7 +94,7 @@ public class GameEngine
 		try
 		{
 			//Variables for the gameloop cap (20 times / second)
-	        world.initSoundEngine(soundEngine);
+	        
 			final int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
 			final int MAX_FRAMESKIP = 5;
 			long next_game_tick = System.currentTimeMillis();
@@ -243,6 +243,7 @@ public class GameEngine
 			throw new RuntimeException("World already exists!");
 		}
 		this.world = world;
+		this.world.initSoundEngine(soundEngine);
 		this.player = player;
 		world.addPlayerToWorld(player);
 		TerraeRasa.isMainMenuOpen = false;
@@ -275,7 +276,6 @@ public class GameEngine
 		this.settings = fileManager.loadSettings();
 	}
 	
-	
 	/**
 	 * Saves the Settings for the entire game to disk, this is called before exiting the run method.
 	 * @throws IOException Indicates the saving operation has failed
@@ -298,6 +298,7 @@ public class GameEngine
 			TerraeRasa.isMainMenuOpen = false;
 			FileManager fileManager = new FileManager();
 			world = fileManager.generateNewWorld("World", 1200, 800, EnumWorldDifficulty.NORMAL);//EnumWorldSize.LARGE.getWidth(), EnumWorldSize.LARGE.getHeight());
+			world.initSoundEngine(soundEngine);
 			player = fileManager.generateAndSavePlayer("!!", EnumPlayerDifficulty.HARD);//new EntityLivingPlayer("Test player", EnumDifficulty.NORMAL);
 			world.addPlayerToWorld(player);
 			world.assessForAverageSky();
