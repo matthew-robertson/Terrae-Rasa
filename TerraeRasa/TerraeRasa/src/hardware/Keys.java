@@ -3,11 +3,14 @@ package hardware;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 
+import utils.Damage;
 import world.World;
 import client.Keybinds;
 import client.Settings;
 import client.TerraeRasa;
 import entities.EntityPlayer;
+import enums.EnumDamageSource;
+import enums.EnumDamageType;
 
 /**
  * <code>Keys</code> is responsible for handling most keyboard input within the application. Keyboard input
@@ -150,7 +153,7 @@ public class Keys
 	        } 
 	        if (Keyboard.isKeyDown(Keyboard.KEY_F))
 			{
-	        	player.damageEntity(world, 5, false, false, false);
+	        	player.damage(world, new Damage(10.0, new EnumDamageType[] { EnumDamageType.NONE }, EnumDamageSource.UNDEFINED), false);
 	        	//player.launchProjectile(world, player.x, player.y, Item.snowball);
 				/*EntityProjectile.woodenArrow.clone().setXLocAndYLoc(world.player.x, world.player.y).setDirection(count));
 				count++;

@@ -1,5 +1,6 @@
 package auras;
 
+import utils.Damage;
 import world.World;
 import entities.EntityPlayer;
 
@@ -21,13 +22,15 @@ import entities.EntityPlayer;
  */
 public interface IAura 
 {
-	public abstract void onDamageDone(World world, EntityPlayer player); 
+	public abstract void onDamageDone(World world, EntityPlayer player, Damage damage); 
 
-	public abstract void onDamageTaken(World world, EntityPlayer player); 
+	public abstract void onDamageTaken(World world, EntityPlayer player, Damage damage); 
 
 	public abstract void onHeal(World world, EntityPlayer player);
 
 	public abstract void onPercentageHealth(World world, EntityPlayer player); 
 
 	public abstract void onDeath(World world, EntityPlayer player); 
+	
+	public abstract void onTick(World world, EntityPlayer player);
 }

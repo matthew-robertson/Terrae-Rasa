@@ -393,6 +393,10 @@ public class GameEngine
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.t6Gloves));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.t6Boots));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.t6Belt));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ankh));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.divineCross));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.woodenBow));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.woodenArrow, 50));
 			
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.gemSmartheal1, 40));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.gemDefense1, 40));

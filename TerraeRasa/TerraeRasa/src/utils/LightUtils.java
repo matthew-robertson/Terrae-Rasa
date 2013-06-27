@@ -13,7 +13,7 @@ import blocks.BlockLight;
 
 public class LightUtils 
 {
-	private final double LIGHT_BLOCK_DISSIPATES = 0.15F;
+	private final double LIGHT_BLOCK_DISSIPATES = 0.075;
 	private final int DIFFUSE_LIGHT_CHECK_RADIUS = 20;
 
 	public void applyLightSource(World world, int xSource, int ySource, final int radius, final double strength)

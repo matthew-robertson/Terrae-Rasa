@@ -23,6 +23,7 @@ import setbonus.SetBonusContainer;
 import setbonus.SetBonusFactory;
 import utils.Cooldown;
 import utils.CraftingManager;
+import utils.Damage;
 import utils.GemSocket;
 import utils.InventoryPlayer;
 import utils.ItemStack;
@@ -35,8 +36,9 @@ import auras.AuraContainer;
 import auras.AuraTracker;
 import blocks.Block;
 import blocks.BlockLight;
-import client.TerraeRasa;
 import enums.EnumColor;
+import enums.EnumDamageSource;
+import enums.EnumDamageType;
 import enums.EnumPlayerDifficulty;
 import enums.EnumToolMaterial;
 
@@ -267,6 +269,11 @@ public class EntityPlayer extends EntityLiving
 		verifyChestRange();
 		updateCooldowns();
 		auraTracker.update(world, this);
+		auraTracker.onTick(world, this);
+		if(isDead())
+		{
+			onDeath(world);
+		}
 	}
 	
 	/**
@@ -337,49 +344,6 @@ public class EntityPlayer extends EntityLiving
 	}
 	
 	/**
-	 * Inflicts damage that does not trigger combat. This damage will not interrupt things like health regeneration 
-	 * which is dependent on whether or not combat is active. This damage cannot be critical, or dodged, can be 
-	 * affected by the players armor, but is unaffected by invincibility (including triggering it).
-	 * @param damage the damage inflicted
-	 * @param penetratesArmor whether or not the damage penetrates the player's armor points (defense)
-	 */
-	public void damageNonCombat(World world, int damage, boolean penetratesArmor, boolean renderDamage)
-	{
-		if(invincibilityTicks <= 0)
-		{
-			if(!penetratesArmor)
-			{
-				double damageAfterArmor = MathHelper.floorOne(
-						(damage * (1F - DEFENSE_REDUCTION_PERCENT * defense)) - (defense * DEFENSE_REDUCTION_FLAT)									
-						);
-				damageAfterArmor = dealDamageToAbsorbs(damageAfterArmor);
-				health -= damageAfterArmor;
-				auraTracker.onDamageTaken(world, this);
-				if(renderDamage)
-				{
-					String message = (damageAfterArmor == 0) ? "Absorb" : ""+(int)damageAfterArmor;
-					world.addTemporaryText(message, (int)x - 2, (int)y - 3, 20, (damageAfterArmor == 0) ? EnumColor.WHITE : EnumColor.RED);
-				}
-			}
-			else
-			{
-				health -= dealDamageToAbsorbs(damage);
-				auraTracker.onDamageTaken(world, this);
-				if(renderDamage)
-				{
-					world.addTemporaryText(""+(int)damage, (int)x - 2, (int)y - 3, 20, EnumColor.RED);
-				}
-			}
-			
-			if(isDead()) //check if the player has died
-			{
-				onDeath(world);
-				world.clearEntityList();
-			}	
-		}
-	}
-	
-	/**
 	 * Applies gravity or a jump upward, depending on if the entity is jumping
 	 */
 	public void applyGravity(World world) 
@@ -396,8 +360,12 @@ public class EntityPlayer extends EntityLiving
 				double fallDamage = MathHelper.getFallDamage(jumpSpeed, world.g, ticksFallen); 
 				if(fallDamage > 0)
 				{
-					//damage the player with non-combat defense affected damage
-					damageNonCombat(world, (int)fallDamage, true, true); 
+					damage(world, 
+							new Damage(fallDamage, 
+									new EnumDamageType[] { EnumDamageType.FALL }, 
+									EnumDamageSource.FALL).setIsDodgeable(false)
+									.setPenetratesArmor(true), 
+							true);
 				}
 			}
 			
@@ -419,18 +387,16 @@ public class EntityPlayer extends EntityLiving
 	
 	/**
 	 * Overrides the entity damage taken to account for different invincibility and death
-	 * @param d damage inflicted against the player
-	 * @param isCrit was the hit critical? (2x damage)
-	 * @param isDodgeable whether or not this damage can be dodged
+	 * @param world the world the player is currently in
+	 * @param damage the damage the player will take 
 	 * @param showWorldText true if the damage should be shown as world text, otherwise false
 	 */
-	public void damageEntity(World world, int d, boolean isCrit, boolean isDodgeable, boolean showWorldText)
+	public void damage(World world, Damage damage, boolean showWorldText)
 	{
 		if(invincibilityTicks <= 0) //If it's possible to take damage
 		{
-			double dodgeRoll = Math.random();
-			//Check if the damage was dodged
-			if(isDodgeable && dodgeRoll < dodgeChance || dodgeChance >= 1.0f) 
+			//Check if the damage can be dodged, then attempt a roll to see if it will be dodged
+			if(damage.isDodgeable() && (Math.random() < dodgeChance || dodgeChance >= 1.0f)) 
 			{
 				//Render world text for the dodge if applicable
 				if(showWorldText)
@@ -440,36 +406,50 @@ public class EntityPlayer extends EntityLiving
 			}
 			else 
 			{
+				//Trigger the onDamageTaken() effect of auras before calculating damage after armour and other
+				//effects
+				auraTracker.onDamageTaken(world, this, damage);
+				
+				double damageDone = damage.amount();
 				//Double the damage done if it was a critical hit
-				if(isCrit && !isImmuneToCrits)
+				if(damage.isCrit() && !isImmuneToCrits)
 				{
-					d *= 2;
+					damageDone *= 2;
 				}
+				
 				//The player will be invincible for 750 ms after hit
 				invincibilityTicks = 15; 
-				//Determine the damage after armour, with a floor of 1 damage and then apply absorbs
-				double damageAfterArmor = MathHelper.floorOne(
-						(d * (1F - DEFENSE_REDUCTION_PERCENT * defense)) - (defense * DEFENSE_REDUCTION_FLAT)									
+				
+				//Determine the damage after armour, with a floor of 1 damage. If the damage penetrates armour
+				//then this step is skipped
+				if(!damage.penetratesArmor())
+				{
+					damageDone = MathHelper.floorOne(
+						(damageDone * (1F - DEFENSE_REDUCTION_PERCENT * defense)) - (defense * DEFENSE_REDUCTION_FLAT)									
 						);
-				damageAfterArmor = dealDamageToAbsorbs(damageAfterArmor);
-				health -= damageAfterArmor; 
+				}
+				
+				//Apply absorbs if the damage is affected by them (IE it does not pierce them)
+				if(!damage.piercesAbsorbs())
+				{
+					damageDone = dealDamageToAbsorbs(damageDone);
+				}
+				
+				health -= damageDone; 
 				world.soundEngine.playSoundEffect(hitSound);
-				auraTracker.onDamageTaken(world, this);
 				//Show world text if applicable
 				if(showWorldText)
 				{
-					String message = (damageAfterArmor == 0) ? "Absorb" : ""+(int)damageAfterArmor;
-					world.addTemporaryText(message, (int)x - 2, (int)y - 3, 20, (damageAfterArmor == 0) ? EnumColor.WHITE : EnumColor.RED); 
+					String message = (damageDone == 0) ? "Absorb" : "" + (int)damageDone;
+					world.addTemporaryText(message, (int)x - 2, (int)y - 3, 20, (damageDone == 0) ? EnumColor.WHITE : EnumColor.RED); 
 				}
 			}	
-			
-			putInCombat();
-		}
-		
-		if(isDead()) //if the player has died
-		{
-			onDeath(world);
-			world.clearEntityList();
+
+			//Put the player in combat if the damage causes combat status
+			if(damage.causesCombatStatus())
+			{
+				putInCombat();
+			}
 		}		
 	}
 	
@@ -595,6 +575,8 @@ public class EntityPlayer extends EntityLiving
 		}
 		health = maxHealth;
 		world.soundEngine.playSoundEffect(deathSound);
+		clearStatusEffects();
+		world.clearEntityList();
 		world.spawnPlayer(this);	
 	}
 	
@@ -1119,7 +1101,7 @@ public class EntityPlayer extends EntityLiving
 				angle += 360;
 			}
 			world.addEntityToProjectileList(new EntityProjectile(item.getProjectile()).setXLocAndYLoc(x, y)
-					.setDirection(angle).setDamage(item.getProjectile().getDamage()));
+					.setDirection(angle).setDamage(item.getProjectile().getDamage() * rangeDamageModifier * allDamageModifier));
 			mana -= item.getManaReq();			
 		}
 		
@@ -1149,11 +1131,11 @@ public class EntityPlayer extends EntityLiving
 					if (isFacingRight)
 					{
 						world.addEntityToProjectileList(new EntityProjectile(ammunition.getProjectile()).setDrop(new ItemStack(ammunition)).setXLocAndYLoc(x, y)
-								.setDirection(angle).setDamage((ammunition.getProjectile().getDamage() + item.getDamage())));
+								.setDirection(angle).setDamage((ammunition.getProjectile().getDamage() + item.getDamage()) * rangeDamageModifier * allDamageModifier));
 					}
 					else{
 						world.addEntityToProjectileList(new EntityProjectile(ammunition.getProjectile()).setDrop(new ItemStack(ammunition)).setXLocAndYLoc(x, y)
-								.setDirection(angle).setDamage((ammunition.getProjectile().getDamage() + item.getDamage())));
+								.setDirection(angle).setDamage((ammunition.getProjectile().getDamage() + item.getDamage()) * rangeDamageModifier * allDamageModifier));
 					}
 					inventory.removeItemsFromQuiverStack(1, i);
 					ticksSinceLastCast = 0;
@@ -1360,9 +1342,9 @@ public class EntityPlayer extends EntityLiving
 	 * If the player deals damage to a monster or something else this should be called. This will cause
 	 * auras to fire their onDamageDone() events.
 	 */
-	public void inflictedDamageToMonster(World world) 
+	public void inflictedDamageToMonster(World world, Damage damage) 
 	{
-		auraTracker.onDamageDone(world, this);
+		auraTracker.onDamageDone(world, this, damage);
 	}
 
 	/**

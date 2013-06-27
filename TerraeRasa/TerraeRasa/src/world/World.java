@@ -24,6 +24,7 @@ import org.lwjgl.opengl.Display;
 import render.Render;
 import statuseffects.StatusEffectStun;
 import utils.ActionbarItem;
+import utils.Damage;
 import utils.ItemStack;
 import utils.LightUtils;
 import utils.MathHelper;
@@ -43,6 +44,8 @@ import entities.EntityNPCEnemy;
 import entities.EntityPlayer;
 import entities.EntityProjectile;
 import enums.EnumColor;
+import enums.EnumDamageSource;
+import enums.EnumDamageType;
 import enums.EnumEventType;
 import enums.EnumWorldDifficulty;
 
@@ -717,10 +720,11 @@ public class World
 		{
 			if(player.inBounds(entityList.get(i).x, entityList.get(i).y, entityList.get(i).width, entityList.get(i).height))
 			{ //If the player is in bounds of the monster, damage them
-				player.damageEntity(this, 
-						(int)(entityList.get(i).damageDone * difficulty.getDamageModifier()),
-						((Math.random() < entityList.get(i).criticalStrikeChance) ? true : false), 
-						true, 
+				player.damage(this, 
+						new Damage(entityList.get(i).damageDone * difficulty.getDamageModifier(),
+								new EnumDamageType[] { EnumDamageType.NONE }, 
+								EnumDamageSource.MELEE)
+								.setIsCrit(((Math.random() < entityList.get(i).criticalStrikeChance) ? true : false)), 
 						true);
 			}
 		}
@@ -737,10 +741,11 @@ public class World
 				{
 					if(entityList.get(j).inBounds(projectileList.get(i).x, projectileList.get(i).y, projectileList.get(i).width, projectileList.get(i).height))
 					{ //If the projectile is in bounds of the monster, damage them
-						entityList.get(j).damageEntity(this, 
-								(int)(projectileList.get(i).damage), 
-								((Math.random() < projectileList.get(i).criticalStrikeChance) ? true : false), 
-								true,
+						entityList.get(j).damage(this, 
+								new Damage(projectileList.get(i).damage, 
+										new EnumDamageType[] { EnumDamageType.NONE }, 
+										EnumDamageSource.RANGE)
+										.setIsCrit(((Math.random() < projectileList.get(i).criticalStrikeChance) ? true : false)), 
 								true);
 					}
 				}
@@ -748,10 +753,11 @@ public class World
 			if (projectileList.get(i).isHostile){
 				if(player.inBounds(projectileList.get(i).x, projectileList.get(i).y, projectileList.get(i).width, projectileList.get(i).height))
 				{ //If the projectile is in bounds of the player, damage them
-					player.damageEntity(this, 
-							(int)(projectileList.get(i).damage * difficulty.getDamageModifier()), 
-							((Math.random() < projectileList.get(i).criticalStrikeChance) ? true : false), 
-							true, 
+					player.damage(this, 
+							new Damage(projectileList.get(i).damage * difficulty.getDamageModifier(), 
+									new EnumDamageType[] { EnumDamageType.NONE }, 
+									EnumDamageSource.RANGE)
+									.setIsCrit(((Math.random() < projectileList.get(i).criticalStrikeChance) ? true : false)), 
 							true);
 				}
 			}
@@ -920,14 +926,7 @@ public class World
 				disableWeather();
 			}
 		}
-		
-		/*
-		for (ConcurrentHashMap.Entry<String, Chunk> entry : chunks.entrySet()) 
-		{
-		    System.out.println(entry.getValue().getBiome());
-		}
-		*/
-		
+	
 		for(ConcurrentHashMap.Entry<String, Chunk> entry: getChunks().entrySet())
 		{
 			Biome biome = entry.getValue().getBiome();			
@@ -970,8 +969,13 @@ public class World
 	  return c;
 	}
 	
-	private void performEnemyToolHittests(EntityPlayer player) //Work in progress, not yet fully implemented
+	/**
+	 * Performs a hittest between the player's tool and monsters. 
+	 * @param player
+	 */
+	private void performEnemyToolHittests(EntityPlayer player) 
 	{
+		//Conditions which indicate the player is not swinging or able to swing
 		if(player.inventory.getMainInventoryStack(player.selectedSlot) == null ||
 				player.inventory.getMainInventoryStack(player.selectedSlot).getItemID() >= ActionbarItem.spellIndex ||
 				!player.isSwingingTool() || 
@@ -981,27 +985,21 @@ public class World
 			return;
 		}
 		
-
 		ItemTool heldItem = ((ItemTool)(Item.itemsList[player.inventory.getMainInventoryStack(player.selectedSlot).getItemID()]));
-		
 		double size = heldItem.size;		     
 		double angle = player.getToolRotationAngle();		
 		double const_ = 9;
-				
 		double[] x_bounds = heldItem.xBounds;
 		double[] y_bounds = heldItem.yBounds;
-		
 		Vector2F[] scaled_points = new Vector2F[x_bounds.length];
-			
-		
 		for(int i = 0; i < scaled_points.length; i++)
 		{
 			scaled_points[i] = new Vector2F((float)(size * x_bounds[i]), (float)(size * ((float)y_bounds[i])) - (float)size );
 		}
-		
 		double[] x_points = new double[scaled_points.length];
 		double[] y_points = new double[scaled_points.length];
 		
+		//Rotate the points
 		for(int i = 0; i < scaled_points.length; i++)
 		{
 			x_points[i] =  player.x + const_ + (scaled_points[i].x * Math.cos(angle)) - 
@@ -1010,63 +1008,39 @@ public class World
 					( scaled_points[i].y * Math.cos(angle));
 		}
 		
-		//System.out.println("Start = " + System.currentTimeMillis());
 		for(int i = 0; i < entityList.size(); i++)
 		{
-			double entity_x = entityList.get(i).x + entityList.get(i).width;
-			double  entity_y = entityList.get(i).y + entityList.get(i).height;
-
-			if(pnpoly(scaled_points.length, x_points, y_points, entity_x, entity_y))
+			if(entityList.get(i).isImmuneToDamage())
 			{
-				if(entityList.get(i).isImmuneToDamage())
-				{
-					continue;
-				}				
+				continue;
+			}	
+			
+			if(pnpoly(scaled_points.length, 
+					x_points, y_points, 
+					entityList.get(i).x + entityList.get(i).width, 
+					entityList.get(i).y + entityList.get(i).height)
+			){	
+				Damage damage = new Damage(heldItem.getDamageDone() * player.allDamageModifier * player.meleeDamageModifier, 
+						new EnumDamageType[] { EnumDamageType.NONE },
+						EnumDamageSource.MELEE)
+						.setIsCrit(((Math.random() < player.criticalStrikeChance) ? true : false));
+				player.inflictedDamageToMonster(this, damage);
+				entityList.get(i).damage(this, damage, true);
 				
-				//entityList.get(i).inBounds((double)x_points[j], (double)y_points[j])
-				boolean flag = ((Math.random() < player.criticalStrikeChance) ? true : false);
-				int damageDone =((ItemTool) Item.itemsList[player.inventory.getMainInventoryStack(player.selectedSlot).getItemID()]).getDamageDone();
-				damageDone = (int) (damageDone * player.allDamageModifier * player.meleeDamageModifier);
-				//CURRENTLY DAMAGE DONE IS ALWAYS MELEE
-				entityList.get(i).damageEntity(this, damageDone, flag, true, true);
-				player.inflictedDamageToMonster(this);
-				//knockback
-				/****
-				 * ENTITIES NEED STUNNED BRIEFLY AFTER KNOCKBACK
-				 * 
-				 * 
-				 * 
-				 * 
-				 * 
-				 * 
-				 * 
-				 * 
-				 */
-				int knockBack = (int) (player.knockbackModifier * 6);
+				int knockBackValue = (int) (player.knockbackModifier * 12);
 				String direction = player.getDirectionOfQuadRelativeToEntityPosition(entityList.get(i).x, entityList.get(i).y, entityList.get(i).width, entityList.get(i).height);
 				
-				//System.out.println("@index=" + i + "!knock_back@time= || " + knockBack + " " + direction + " " + ((knockBack % 6 == 0) ? (knockBack / 6) : (knockBack / 6) + 1));
 				if(direction.equals("right"))
 				{
-					for(int k = 0; k < ((knockBack % 6 == 0) ? (knockBack / 6) : (knockBack / 6) + 1); k++)
-					{
-						entityList.get(i).moveEntityRight(this, knockBack);
-					}	
+					entityList.get(i).moveEntityRight(this, knockBackValue);	
 				}
-				else if(direction.equals("left"))
+				else
 				{
-					for(int k = 0; k < ((knockBack % 6 == 0) ? (knockBack / 6) : (knockBack / 6) + 1); k++)
-					{
-						entityList.get(i).moveEntityLeft(this, knockBack);
-					}
+					entityList.get(i).moveEntityLeft(this, knockBackValue);
 				}
-				
-
-				entityList.get(i).registerStatusEffect(new StatusEffectStun(0.4f, 1, 1, 1));
-				
+				entityList.get(i).registerStatusEffect(new StatusEffectStun(0.45, 1, 1, 1));
 			}
 		}
-	//	System.out.println("End = " + System.currentTimeMillis());
 		
 		player.updateSwing();
 	}

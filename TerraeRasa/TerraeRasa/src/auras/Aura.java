@@ -3,8 +3,8 @@ package auras;
 import java.io.Serializable;
 import java.util.Random;
 
+import utils.Damage;
 import world.World;
-
 import entities.EntityPlayer;
 
 /**
@@ -42,7 +42,7 @@ public class Aura
 	{
 		this.random = new Random();
 		this.remainingCooldown = 0;
-		this.activationChance = 1F;
+		this.activationChance = 1;
 		this.maxCooldown = 1;
 		this.id = System.nanoTime();
 	}
@@ -61,11 +61,11 @@ public class Aura
 		remainingCooldown--;
 	}
 
-	public void onDamageDone(World world, EntityPlayer player)
+	public void onDamageDone(World world, EntityPlayer player, Damage damage)
 	{
 	}
 
-	public void onDamageTaken(World world, EntityPlayer player)
+	public void onDamageTaken(World world, EntityPlayer player, Damage damage)
 	{
 		onPercentageHealth(world, player);
 	}
@@ -80,6 +80,10 @@ public class Aura
 	}
 
 	public void onDeath(World world, EntityPlayer player)
+	{
+	}
+	
+	public void onTick(World world, EntityPlayer player)
 	{
 	}
 	

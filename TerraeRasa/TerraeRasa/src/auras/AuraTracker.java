@@ -2,6 +2,7 @@ package auras;
 
 import java.io.Serializable;
 
+import utils.Damage;
 import utils.InventoryPlayer;
 import world.World;
 import entities.EntityPlayer;
@@ -71,7 +72,7 @@ public class AuraTracker
 	}
 	
 	
-	public void onDamageDone(World world, EntityPlayer player) 
+	public void onDamageDone(World world, EntityPlayer player, Damage damage) 
 	{
 		for(int i = 0; i < aurasByPiece.length; i++)
 		{
@@ -79,14 +80,14 @@ public class AuraTracker
 			{
 				for(Aura aura : aurasByPiece[i].getAll())
 				{
-					aura.onDamageDone(world, player);
+					aura.onDamageDone(world, player, damage);
 				}
 			}
 		}
 	}
 	
 
-	public void onDamageTaken(World world, EntityPlayer player) 
+	public void onDamageTaken(World world, EntityPlayer player, Damage damage) 
 	{
 		for(int i = 0; i < aurasByPiece.length; i++)
 		{
@@ -94,7 +95,7 @@ public class AuraTracker
 			{
 				for(Aura aura : aurasByPiece[i].getAll())
 				{
-					aura.onDamageTaken(world, player);
+					aura.onDamageTaken(world, player, damage);
 				}
 			}
 		}
@@ -139,6 +140,20 @@ public class AuraTracker
 				for(Aura aura : aurasByPiece[i].getAll())
 				{
 					aura.onDeath(world, player);
+				}
+			}
+		}
+	}
+
+	public void onTick(World world, EntityPlayer player) 
+	{
+		for(int i = 0; i < aurasByPiece.length; i++)
+		{
+			if(aurasByPiece[i] != null)
+			{
+				for(Aura aura : aurasByPiece[i].getAll())
+				{
+					aura.onTick(world, player);
 				}
 			}
 		}

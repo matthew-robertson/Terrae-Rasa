@@ -781,7 +781,7 @@ public class RenderUI extends Render
 			}
 			
 			//Variables to help determine where and how wide the frame/text will be, as well as text colour.
-			int tooltipWidth = 160;
+			int tooltipWidth = 185;
 			int frameX = MathHelper.getCorrectMouseXPosition() - 25; 
 			int frameY = MathHelper.getCorrectMouseYPosition() - 25;
 						

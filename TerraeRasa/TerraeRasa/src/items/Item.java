@@ -11,6 +11,7 @@ import setbonus.SetBonusStrength;
 import utils.ActionbarItem;
 import auras.Aura;
 import auras.AuraHeavensReprieve;
+import auras.AuraPeriodicModifier;
 import auras.AuraSmartHeal;
 import entities.EntityProjectile;
 import enums.EnumArmor;
@@ -312,9 +313,9 @@ public class Item extends ActionbarItem
 	public static Item talismanOfWinds = new ItemArmorAccessory(132).setBonuses(new SetBonus[]{ 
 			new SetBonusSpeed(0.1F)
 	}).setIconPosition(15, 3).setName("Talisman of Winds").setExtraTooltipInformation("May the winds of fortune always be at your back.");	
-	public static Item divineCross = new ItemArmorAccessory(133).setAuras(new Aura[]{ 
+	public static Item ankh = new ItemArmorAccessory(133).setAuras(new Aura[]{ 
 			new AuraHeavensReprieve()
-	}).setIconPosition(15, 1).setName("Divine Cross").setExtraTooltipInformation("This holy cross will destroy itself to save the wearer.");	
+	}).setIconPosition(14, 1).setName("Ankh").setExtraTooltipInformation("This relic will destroy itself to save the wearer.");	
 	public static Item goddessesTear = new ItemArmorAccessory(134).setBonuses(new SetBonus[]{ 
 			new SetBonusIntellect(8)
 	}).setIconPosition(15, 4).setName("Goddess' Tear").setExtraTooltipInformation("This tear contains immense magical power.");	
@@ -330,8 +331,12 @@ public class Item extends ActionbarItem
 	public static Item stole = new ItemArmorAccessory(138).setAuras(new Aura[]{ 
 			new AuraSmartHeal(30, 50, 0.5, false)
 	}).setIconPosition(15, 7).setName("Stole").setExtraTooltipInformation("This stole radiates holy energy.");	
+	public static Item divineCross = new ItemArmorAccessory(139).setAuras(new Aura[]{ 
+			new AuraPeriodicModifier(0.75)
+	}).setIconPosition(15, 1).setName("Divine Cross").setExtraTooltipInformation("The holy power of this cross protects its wearer.");	
 	
-	public static Item t6Helmet = new ItemArmorHelmet(139).setArmorType(EnumArmor.TIER6).setTotalSockets(1).setIntellect(5).setStamina(10).setStrength(5).setDexterity(5).setIconPosition(20, 0).setName("TIER6 Helmet").setItemQuality(EnumItemQuality.RARE);
+	
+	public static Item t6Helmet = new ItemArmorHelmet(145).setArmorType(EnumArmor.TIER6).setTotalSockets(1).setIntellect(5).setStamina(10).setStrength(5).setDexterity(5).setIconPosition(20, 0).setName("TIER6 Helmet").setItemQuality(EnumItemQuality.RARE);
 	public static Item t6Body = new ItemArmorBody(140).setArmorType(EnumArmor.TIER6).setTotalSockets(2).setIntellect(5).setStamina(10).setStrength(5).setDexterity(5).setIconPosition(20, 1).setName("TIER6 Body").setItemQuality(EnumItemQuality.RARE);
 	public static Item t6Pants = new ItemArmorPants(141).setArmorType(EnumArmor.TIER6).setTotalSockets(3).setIntellect(5).setStamina(10).setStrength(5).setDexterity(5).setIconPosition(20, 2).setName("TIER6 Legguards").setItemQuality(EnumItemQuality.RARE);	
 	public static Item t6Boots = new ItemArmorBoots(142).setArmorType(EnumArmor.TIER6).setTotalSockets(4).setIntellect(5).setStamina(10).setStrength(5).setDexterity(5).setIconPosition(20, 3).setName("TIER6 Boots");

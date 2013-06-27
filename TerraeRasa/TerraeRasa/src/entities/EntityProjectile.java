@@ -86,6 +86,16 @@ public class EntityProjectile extends EntityParticle
 		damage = d;
 		return this;
 	}
+	
+	/**
+	 * This version of setDamage accepts a double and casts it to an integer
+	 * @param d the damage done as a double
+	 * @return a reference to this object
+	 */
+	public EntityProjectile setDamage(double d){
+		damage = (int)d;
+		return this;
+	}
 
 	public EntityProjectile setDirection(int d){
 		direction = d;

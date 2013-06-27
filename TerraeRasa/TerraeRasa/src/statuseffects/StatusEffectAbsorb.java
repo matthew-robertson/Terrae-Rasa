@@ -90,4 +90,9 @@ public class StatusEffectAbsorb extends StatusEffect
 	{
 		remainingAbsorb = startAbsorbAmount;
 	}
+	
+	public String toString()
+	{
+		return "Absorbs " + (int)remainingAbsorb + " damage";
+	}	
 }

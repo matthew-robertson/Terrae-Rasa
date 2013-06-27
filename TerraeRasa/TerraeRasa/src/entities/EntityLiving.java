@@ -4,11 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import enums.EnumColor;
+import enums.EnumDamageSource;
+import enums.EnumDamageType;
 
 import blocks.Block;
 
 import statuseffects.StatusEffect;
 import statuseffects.StatusEffectAbsorb;
+import utils.Damage;
 import utils.MathHelper;
 import world.World;
 
@@ -171,58 +174,66 @@ public class EntityLiving extends Entity
 		}		
 		return newValue;
 	}
-	
+		
 	/**
-	 * Damages the entity for the specified amount
-	 * @param d the amount damage
-	 * @param isCrit was the hit critical? (2x damage)
-	 * @param isDodgeable whether or not the hit can be dodged
+	 * Overrides the entity damage taken to account for different invincibility and death
+	 * @param world the world the player is currently in
+	 * @param damage the damage the player will take 
 	 * @param showWorldText true if the damage should be shown as world text, otherwise false
 	 */
-	public void damageEntity(World world, int d, boolean isCrit, boolean isDodgeable, boolean showWorldText)
+	public void damage(World world, Damage damage, boolean showWorldText)
+	//World world, int d, boolean isCrit, boolean isDodgeable, boolean showWorldText)
 	{
-		if(invincibilityTicks <= 0) //Check if the entity can be damaged
-		{	
-			double dodgeRoll = Math.random();
-			//Check if the damage was dodged
-			if(isDodgeable && dodgeRoll < dodgeChance || dodgeChance >= 1.0f) //Is it a dodge
+		if(invincibilityTicks <= 0) //If it's possible to take damage
+		{
+			//Check if the damage can be dodged, then attempt a roll to see if it will be dodged
+			if(damage.isDodgeable() && (Math.random() < dodgeChance || dodgeChance >= 1.0f)) 
 			{
 				//Render world text for the dodge if applicable
 				if(showWorldText)
 				{
-					world.addTemporaryText("Dodge", (int)x - 2, (int)y - 3, 20, EnumColor.GREEN); //add temporary text to be rendered for the damage done
+					world.addTemporaryText("Dodge", (int)x - 2, (int)y - 3, 20, EnumColor.GREEN); 
 				}
 			}
-			else if(!isCrit) //Is it Normal Damage
+			else 
 			{
+				double damageDone = damage.amount();
 				//Double the damage done if it was a critical hit
-				if(isCrit && !isImmuneToCrits)
+				if(damage.isCrit() && !isImmuneToCrits)
 				{
-					d *= 2;
+					damageDone *= 2;
 				}
-				//Set the entity immune to damage for 250ms
+				
+				//The player will be invincible for 250 ms after hit
 				invincibilityTicks = 5; 
-				//Determine the damage after armour, with a floor of 1 damage and then apply absorbs
-				double damageAfterArmor = MathHelper.floorOne(
-						(d * (1F - DEFENSE_REDUCTION_PERCENT * defense)) - (defense * DEFENSE_REDUCTION_FLAT)					
+				
+				//Determine the damage after armour, with a floor of 1 damage. If the damage penetrates armour
+				//then this step is skipped
+				if(!damage.penetratesArmor())
+				{
+					damageDone = MathHelper.floorOne(
+						(damageDone * (1F - DEFENSE_REDUCTION_PERCENT * defense)) - (defense * DEFENSE_REDUCTION_FLAT)									
 						);
-				damageAfterArmor = dealDamageToAbsorbs(damageAfterArmor);
-				health -= damageAfterArmor; 
+				}
+				
+				//Apply absorbs if the damage is affected by them (IE it does not pierce them)
+				if(!damage.piercesAbsorbs())
+				{
+					damageDone = dealDamageToAbsorbs(damageDone);
+				}
+				
+				health -= damageDone; 
 				world.soundEngine.playSoundEffect(hitSound);
 				//Show world text if applicable
 				if(showWorldText)
 				{
-					String message = (damageAfterArmor == 0) ? "Absorb" : ""+(int)damageAfterArmor;
-					world.addTemporaryText(message, (int)x - 2, (int)y - 3, 20, (damageAfterArmor == 0) ? EnumColor.WHITE : EnumColor.RED); 
+					String message = (damageDone == 0) ? "Absorb" : ""+(int)damageDone;
+					world.addTemporaryText(message, (int)x - 2, (int)y - 3, 20, (damageDone == 0) ? EnumColor.WHITE : EnumColor.RED); 
 				}
-			}		
-		}
-		else //the entity can't be damaged, so reduce their invincibility
-		{
-			invincibilityTicks--;
+			}	
 		}
 		
-		if(isDead()) //is the entity has died, perform the appropriate action
+		if(isDead()) 
 		{
 			onDeath(world);
 		}		
@@ -384,7 +395,11 @@ public class EntityLiving extends Entity
 						ticksFallen); 
 				if(fallDamage > 0)
 				{
-					damageEntity(world, (int)fallDamage, ((Math.random() < 0.1f) ? true : false), false, true); //damage the entity
+					damage(world, 
+						new Damage(fallDamage, 
+								new EnumDamageType[] { EnumDamageType.FALL }, 
+								EnumDamageSource.FALL).setIsDodgeable(false), 
+						true);
 				}
 			}
 			
@@ -466,4 +481,16 @@ public class EntityLiving extends Entity
 	{
 		return invincibilityTicks > 0;
 	}	
+	
+	/**
+	 * Clears all statuseffects active on this entityliving
+	 */
+	public void clearStatusEffects()
+	{
+		for(StatusEffect effect : statusEffects)
+		{
+			effect.removeInitialEffect(this);
+		}
+		statusEffects.clear();
+	}
 }

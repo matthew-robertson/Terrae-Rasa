@@ -1,6 +1,9 @@
 package statuseffects;
 
 import entities.EntityLiving;
+import enums.EnumDamageSource;
+import enums.EnumDamageType;
+import utils.Damage;
 import world.World;
 
 public class StatusEffectPoison extends StatusEffect
@@ -19,7 +22,13 @@ public class StatusEffectPoison extends StatusEffect
 	{
 		if(ticksLeft % ticksBetweenEffect == 0)
 		{
-			entity.damageEntity(world, (int)power, false, false, false);
+			entity.damage(world, 
+					new Damage(power, 
+							new EnumDamageType[] { EnumDamageType.POISON }, 
+							EnumDamageSource.STATUS_EFFECT).setIsDodgeable(false).
+							setCausesCombatStatus(false).setIsPeriodic(true), 
+					false);
+
 		}
 		ticksLeft--;
 	}

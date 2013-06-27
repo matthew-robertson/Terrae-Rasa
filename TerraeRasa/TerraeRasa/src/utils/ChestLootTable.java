@@ -37,14 +37,14 @@ public class ChestLootTable
 		int totalWeight = 0;
 		for(int i = 0; i < possibleLoot.length; i++)
 		{
-			totalWeight += possibleLoot[i].probabilityWeight;
+			totalWeight += possibleLoot[i].getProbabilityWeight();
 		}
 		dropBounds = new double[possibleLoot.length];
 		
 		double buffer = 0.0D;
 		for(int i = 0; i < dropBounds.length; i++)
 		{
-			double probability = (double)possibleLoot[i].probabilityWeight / (double)totalWeight;
+			double probability = (double)possibleLoot[i].getProbabilityWeight() / (double)totalWeight;
 			dropBounds[i] = buffer + probability;
 			buffer += probability;
 		}
@@ -64,18 +64,18 @@ public class ChestLootTable
 			{
 				if(value < dropBounds[0])
 				{
-					return new ItemStack(possibleLoot[0].item.getItemID(), 
-							possibleLoot[0].minStackSize + 
-							((possibleLoot[0].stackSizeRange > 0) ? random.nextInt(possibleLoot[0].stackSizeRange) : 0));
+					return new ItemStack(possibleLoot[0].getItem().getItemID(), 
+							possibleLoot[0].getMinStackSize() + 
+							((possibleLoot[0].getStackSizeRange() > 0) ? random.nextInt(possibleLoot[0].getStackSizeRange()) : 0));
 				}
 			}			
 			if(value < dropBounds[i])
 			{
 				if(value > dropBounds[i - 1] && value < dropBounds[i])
 				{
-					return new ItemStack(possibleLoot[i].item.getItemID(), 
-							possibleLoot[i].minStackSize + 
-							((possibleLoot[i].stackSizeRange > 0) ? random.nextInt(possibleLoot[i].stackSizeRange) : 0));
+					return new ItemStack(possibleLoot[i].getItem().getItemID(), 
+							possibleLoot[i].getMinStackSize() + 
+							((possibleLoot[i].getStackSizeRange() > 0) ? random.nextInt(possibleLoot[i].getStackSizeRange()) : 0));
 				}
 			}
 		}

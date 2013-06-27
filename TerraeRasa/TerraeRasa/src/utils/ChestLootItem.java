@@ -15,11 +15,11 @@ package utils;
  */
 public class ChestLootItem 
 {
-	public ItemStack item;
-	public double probabilityWeight;
-	public int minStackSize;
-	public int maxStackSize; 
-	public int stackSizeRange;
+	private ItemStack item;
+	private double probabilityWeight;
+	private int minStackSize;
+	private int maxStackSize; 
+	private int stackSizeRange;
 	
 	/**
 	 * Constructs a new ChestLootItem with the given Itemstack and proabilityweight, as well as a minimum
@@ -29,11 +29,11 @@ public class ChestLootItem
 	 */
 	public ChestLootItem(ItemStack item, double probabilityWeight)
 	{
-		this.item = item;
-		this.probabilityWeight = probabilityWeight;
-		this.minStackSize = 1;
+		this.setItem(item);
+		this.setProbabilityWeight(probabilityWeight);
+		this.setMinStackSize(1);
 		this.maxStackSize = 1;
-		stackSizeRange = 0;
+		setStackSizeRange(0);
 	}
 	
 	/**
@@ -44,10 +44,50 @@ public class ChestLootItem
 	 */
 	public ChestLootItem(ItemStack item, double probabilityWeight, int minStackSize, int maxStackSize)
 	{
-		this.item = item;
-		this.probabilityWeight = probabilityWeight;
-		this.minStackSize = minStackSize;
+		this.setItem(item);
+		this.setProbabilityWeight(probabilityWeight);
+		this.setMinStackSize(minStackSize);
 		this.maxStackSize = maxStackSize;
-		stackSizeRange = maxStackSize - minStackSize; 
+		setStackSizeRange(maxStackSize - minStackSize); 
+	}
+
+	public double getProbabilityWeight() {
+		return probabilityWeight;
+	}
+
+	public void setProbabilityWeight(double probabilityWeight) {
+		this.probabilityWeight = probabilityWeight;
+	}
+
+	public ItemStack getItem() {
+		return item;
+	}
+
+	public void setItem(ItemStack item) {
+		this.item = item;
+	}
+
+	public int getMinStackSize() {
+		return minStackSize;
+	}
+
+	public void setMinStackSize(int minStackSize) {
+		this.minStackSize = minStackSize;
+	}
+
+	public int getStackSizeRange() {
+		return stackSizeRange;
+	}
+	
+	public void setMaxStackSize(int maxStackSize) {
+		this.maxStackSize = maxStackSize;
+	}
+
+	public int getMaxStackSize() {
+		return maxStackSize;
+	}
+
+	public void setStackSizeRange(int stackSizeRange) {
+		this.stackSizeRange = stackSizeRange;
 	}
 }
