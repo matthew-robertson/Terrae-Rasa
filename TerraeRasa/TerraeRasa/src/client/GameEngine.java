@@ -362,6 +362,8 @@ public class GameEngine
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.stole));
 			
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.glass, 40));
+
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.snowball, 100));
 			
 			
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldSword));

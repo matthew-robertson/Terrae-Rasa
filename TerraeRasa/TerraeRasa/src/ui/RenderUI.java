@@ -1,4 +1,4 @@
-package render;
+package ui;
 import hardware.Keys;
 import items.Item;
 import items.ItemAmmo;
@@ -22,6 +22,8 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
+import render.Render;
+import render.TrueTypeFont;
 import spells.Spell;
 import statuseffects.StatusEffect;
 import utils.ActionbarItem;
@@ -78,19 +80,19 @@ import enums.EnumItemQuality;
 
 public class RenderUI extends Render
 {
-	private TrueTypeFont boldTooltip = new TrueTypeFont(((new Font("times", Font.BOLD, 24)).deriveFont(16.0f)), true);
-	private TrueTypeFont plainTooltip = new TrueTypeFont(((new Font("times", Font.PLAIN, 24)).deriveFont(16.0f)), true);
-	private boolean isSocketWindowOpen;
-	private boolean socketItemEquipped;
-	private int socketItemIndex;
-	private ItemStack socketedItem;
+	private static TrueTypeFont boldTooltip = new TrueTypeFont(((new Font("times", Font.BOLD, 24)).deriveFont(16.0f)), true);
+	private static TrueTypeFont plainTooltip = new TrueTypeFont(((new Font("times", Font.PLAIN, 24)).deriveFont(16.0f)), true);
+	private static boolean isSocketWindowOpen;
+	private static boolean socketItemEquipped;
+	private static int socketItemIndex;
+	private static ItemStack socketedItem;
 	
 	//Variables for the item picked up by the mouse:
-	private boolean shouldDropItem;
-	private int mouseItemSize; //How big it is
-	private ItemStack mouseItem; //What it is
-	private int mouseXOffset; //How far it should be adjusted to avoid looking bad
-	private int mouseYOffset;	
+	private static boolean shouldDropItem;
+	private static int mouseItemSize; //How big it is
+	private static ItemStack mouseItem; //What it is
+	private static int mouseXOffset; //How far it should be adjusted to avoid looking bad
+	private static int mouseYOffset;	
 		
 	/**
 	 * Constructs a new instance of RenderUI. The constructor is only required to initialize the 'Save And Quit'
@@ -103,7 +105,6 @@ public class RenderUI extends Render
 		mouseItem = null; 
 		mouseXOffset = 0; 
 		mouseYOffset = 0;		
-		//saveAndQuit = new GuiResizableTextUncentered("Save And Quit", 0.4f, 0.45f, 0, 0, ALIGN.H_ALIGN_RIGHT, ALIGN.V_ALIGN_TOP);
 	}
 	
 	/**
@@ -120,7 +121,7 @@ public class RenderUI extends Render
 	 * <li>the garbage slot
 	 * <li>the recipe scroller
 	 */
-	public void render(World world, EntityPlayer player, Settings settings)
+	public static void render(World world, EntityPlayer player, Settings settings)
 	{		
 		GL11.glEnable(GL11.GL_BLEND);
 		
@@ -163,7 +164,7 @@ public class RenderUI extends Render
 	/**
 	 * Closes the socket window if needed.
 	 */
-	public void closeSocketWindow()
+	public static void closeSocketWindow()
 	{
 		isSocketWindowOpen = false;
 	}
@@ -172,7 +173,7 @@ public class RenderUI extends Render
 	 * Updates all mouse events on call. Including: chests, the mainInventory, the garbage, 
 	 * and the recipe scroller 
 	 */
-	private void mouse(World world, EntityPlayer player)
+	private static void mouse(World world, EntityPlayer player)
 	{
 		mouseEventLeftClick(world, player);	
 		mouseEventRightClick(world, player);
@@ -183,7 +184,7 @@ public class RenderUI extends Render
 	 * @param world
 	 * @param player
 	 */
-	private void renderSocketsMenu(World world, EntityPlayer player)
+	private static void renderSocketsMenu(World world, EntityPlayer player)
 	{
 		int size = 20;
 		int tooltipWidth = 8 * 20;
@@ -288,7 +289,7 @@ public class RenderUI extends Render
 	 * @param world
 	 * @param player
 	 */
-	private void mouseEventRightClick(World world, EntityPlayer player)
+	private static void mouseEventRightClick(World world, EntityPlayer player)
 	{
 		//If the mouse isnt down, there's really no reason to run the rest of this function
 		if(!Mouse.isButtonDown(1)) 
@@ -332,7 +333,7 @@ public class RenderUI extends Render
 	 * Renders the status effects afflicting or benefiting the player, including their remaining time in seconds.
 	 * @param player the player in use currently
 	 */
-	private void renderStatusEffects(EntityPlayer player)
+	private static void renderStatusEffects(EntityPlayer player)
 	{
 		//Get the status effects
 		List<StatusEffect> statusEffects = player.statusEffects;
@@ -427,7 +428,7 @@ public class RenderUI extends Render
 	 * Will return null if nothing appropriate is found.
 	 * @return an appropriate ItemStack to render, or null if none is found
 	 */
-	private ItemStack getTooltipStack(World world, EntityPlayer player, int x, int y)
+	private static ItemStack getTooltipStack(World world, EntityPlayer player, int x, int y)
 	{		
 		//Inventory
 		for(int i = 0; i < player.inventory.getMainInventoryLength(); i++) 
@@ -590,7 +591,7 @@ public class RenderUI extends Render
 	 * This will return null if nothing appropriate is found.
 	 * @return the ItemStack the player is clicking on, or null if none is selected
 	 */
-	private ItemStack getClickedStack(World world, EntityPlayer player, int x, int y, boolean[] equipped)
+	private static ItemStack getClickedStack(World world, EntityPlayer player, int x, int y, boolean[] equipped)
 	{		
 		//Inventory
 		for(int i = 0; i < player.inventory.getMainInventoryLength(); i++) 
@@ -717,7 +718,7 @@ public class RenderUI extends Render
 	 * the slider, armour, anything in the inventory, and anything in a chest. A tooltip includes 
 	 * name, stats, and extra information.
 	 */
-	private void attemptToRenderItemTooltip(World world, EntityPlayer player)
+	private static void attemptToRenderItemTooltip(World world, EntityPlayer player)
 	{
 		if(player.isInventoryOpen && mouseItem == null)
 		{
@@ -1015,7 +1016,7 @@ public class RenderUI extends Render
 	 * @param yOffset how far on the y-axis is the rendered mouse item adjusted
 	 * @param itemSize how big is the mouse item being rendered
 	 */
-	private void pickUpMouseItem(World world, EntityPlayer player, int whichInventory, int index, int xOffset, int yOffset, int itemSize)
+	private static void pickUpMouseItem(World world, EntityPlayer player, int whichInventory, int index, int xOffset, int yOffset, int itemSize)
 	{
 		shouldDropItem = false;
 		mouseItemSize = itemSize;
@@ -1049,7 +1050,7 @@ public class RenderUI extends Render
 	 * @param whichInventory the number value of the inventory the item is to be placed in. Main-1, Armor-2, Trash-3
 	 * @param index slot of the selected inventory to place the item.
 	 */
-	private void placeItemIntoInventory(World world, EntityPlayer player, int whichInventory, int index)
+	private static void placeItemIntoInventory(World world, EntityPlayer player, int whichInventory, int index)
 	{
 		shouldDropItem = false;
 		try
@@ -1207,7 +1208,7 @@ public class RenderUI extends Render
 	/**
 	 * Drops the mouseItem into the world
 	 */
-	private void dropMouseItem(World world, EntityPlayer player)
+	private static void dropMouseItem(World world, EntityPlayer player)
 	{
 		if(mouseItem != null)
 		{
@@ -1219,7 +1220,7 @@ public class RenderUI extends Render
 	/**
 	 * Renders the item the mouse is holding, should there be one.
 	 */
-	private void renderMouseItem()
+	private static void renderMouseItem()
 	{
 		if(mouseItem != null)
 		{
@@ -1255,7 +1256,7 @@ public class RenderUI extends Render
 	/**
 	 * Handles Mouse Events for everything in the inventory.
 	 */
-	private void mouseEventLeftClick(World world, EntityPlayer player)
+	private static void mouseEventLeftClick(World world, EntityPlayer player)
 	{
 		//If the mouse isnt down, there's really no reason to run the rest of this function
 		if(!Mouse.isButtonDown(0)) 
@@ -1293,7 +1294,7 @@ public class RenderUI extends Render
 	 * @param world the world in use
 	 * @param player the player in use
 	 */
-	private void mouseClickNoModifier(World world, EntityPlayer player, int x, int y)
+	private static void mouseClickNoModifier(World world, EntityPlayer player, int x, int y)
 	{
 		shouldDropItem = true;
 		
@@ -1498,7 +1499,7 @@ public class RenderUI extends Render
 	 * @param world the world in use
 	 * @param player the player in use
 	 */
-	private void mouseClickShiftModifier(World world, EntityPlayer player, int x, int y)
+	private static void mouseClickShiftModifier(World world, EntityPlayer player, int x, int y)
 	{
 		for(int i = 0; i < player.inventory.getMainInventoryLength(); i++) //Inventory
 		{
@@ -1635,7 +1636,7 @@ public class RenderUI extends Render
 	/**
 	 * Adjusts the currently selected recipe in the slider. Requires a function to prevent bounds errors.
 	 */
-	private void adjustSliderPosition(World world, EntityPlayer player, int adjustment)
+	private static void adjustSliderPosition(World world, EntityPlayer player, int adjustment)
 	{
 		player.selectedRecipe += adjustment;
 		if(player.selectedRecipe < 0) 
@@ -1658,7 +1659,7 @@ public class RenderUI extends Render
 	 * @param yoff how far to offset the rendering of the cursor item (Y)
 	 * @param size how big the image is (16)
 	 */
-	private void craftRecipe(World world, EntityPlayer player, int index, int xoff, int yoff, int size)
+	private static void craftRecipe(World world, EntityPlayer player, int index, int xoff, int yoff, int size)
 	{
 		if(player.getAllPossibleRecipes().length <= 0) 
 		{
@@ -1701,7 +1702,7 @@ public class RenderUI extends Render
 	/**
 	 * Draws the hearts and mana the player has, size adjusted for damaged life/mana
 	 */
-	private void renderHeartsAndMana(World world, EntityPlayer player)
+	private static void renderHeartsAndMana(World world, EntityPlayer player)
 	{		
 		// --- Start Health bar
 		//The background (black part)
@@ -1810,7 +1811,7 @@ public class RenderUI extends Render
 	/**
 	 * Renders the actionbar (only if the inventory is closed)
 	 */
-	private void renderActionBar(World world, EntityPlayer player) 
+	private static void renderActionBar(World world, EntityPlayer player) 
 	{		
 		GL11.glColor4f(1, 1, 1, 0.6f); //the slots are partially transparent full colour
 			
@@ -1894,7 +1895,7 @@ public class RenderUI extends Render
 	/**
 	 * Renders the full inventory - recipes, armour, all 40 slots, coins, ammo...
 	 */
-	private void renderInventory(World world, EntityPlayer player) 
+	private static void renderInventory(World world, EntityPlayer player) 
 	{
 		GL11.glColor4f(1, 1, 1, 0.6f);
 
@@ -1980,7 +1981,7 @@ public class RenderUI extends Render
 	/**
 	 * Fills all the inventory frames rendered with items if the slot isnt null
 	 */
-	private void populateInventorySlots(World world, EntityPlayer player) 
+	private static void populateInventorySlots(World world, EntityPlayer player) 
 	{
 		GL11.glColor4f(1, 1, 1, 1);
 		
@@ -2162,7 +2163,7 @@ public class RenderUI extends Render
 	 * Renders the crafting 'wheel' that lists all possible recipes when near the appropriate furniture.
 	 * 2 small images on either side that move it and one central image which can be crafted
 	 */
-	private void renderScrollableCraftingRecipeWheel(World world, EntityPlayer player)
+	private static void renderScrollableCraftingRecipeWheel(World world, EntityPlayer player)
 	{
 		actionbarSlot.bind();
 		GL11.glColor4f(1, 1, 1, 0.6f);
@@ -2375,7 +2376,7 @@ public class RenderUI extends Render
 	/**
 	 * Renders all (constanty visible) text
 	 */
-	private void renderText(World world, EntityPlayer player)
+	private static void renderText(World world, EntityPlayer player)
 	{
 		if(player.isInventoryOpen)
 		{
@@ -2431,7 +2432,7 @@ public class RenderUI extends Render
 	 * @param yOffset how far on the y-axis is the rendered mouse item adjusted
 	 * @param itemSize the size of the mouseItem being rendered
 	 */
-	private void pickUpMouseItemChest(BlockChest chest, int index, int xOffset, int yOffset, int itemSize)
+	private static void pickUpMouseItemChest(BlockChest chest, int index, int xOffset, int yOffset, int itemSize)
 	{
 		shouldDropItem = false;
 		mouseItemSize = itemSize;
@@ -2448,7 +2449,7 @@ public class RenderUI extends Render
 	 * @param x the x position of the mouse (not including getCameraX())
 	 * @param y the y position of the mouse (not including getCameraY())
 	 */
-	private void chestMouseEvents(World world, EntityPlayer player, int x, int y)
+	private static void chestMouseEvents(World world, EntityPlayer player, int x, int y)
 	{
 		//Get the initial block the player is viewing
 		BlockChest chest = (BlockChest)world.getBlock(player.viewedChestX, player.viewedChestY).clone();
@@ -2513,7 +2514,7 @@ public class RenderUI extends Render
 	 * Renders the selected chest(s), based on the chest's attachment. This function is relatively long
 	 * and tedious, due to there being multiple unique states a chest can have.
 	 */
-	private void renderChest(World world, EntityPlayer player)
+	private static void renderChest(World world, EntityPlayer player)
 	{
 		//Get the initial block the player is viewing
 		BlockChest chest = (BlockChest)world.getBlock(player.viewedChestX, player.viewedChestY).clone();

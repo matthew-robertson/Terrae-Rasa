@@ -4,6 +4,7 @@ import items.ItemAmmo;
 import items.ItemArmor;
 import items.ItemMagic;
 import items.ItemRanged;
+import items.ItemThrown;
 import items.ItemTool;
 import items.ItemToolAxe;
 import items.ItemToolHammer;
@@ -1142,6 +1143,35 @@ public class EntityPlayer extends EntityLiving
 					break;
 				}
 			}
+		}
+	}
+	
+	/**
+	 * Launch a player weapon projectile
+	 * @param world = current world
+	 * @param mouseX = x position to create the projectile at
+	 * @param mouseY = y position to create the projectile at
+	 * @param item = Item to be used to launch projectile (to determine what projectile is needed)
+	 */
+	public void launchProjectileThrown(World world, double mouseX, double mouseY, ItemThrown item, int index){
+		if (ticksSinceLastCast > item.getCooldownTicks())
+		{
+			int angle = MathHelper.angleMousePlayer(mouseX, mouseY, x, y) - 90;
+			if (angle < 0)
+			{
+				angle += 360;
+			}
+			if (isFacingRight)
+			{
+				world.addEntityToProjectileList(new EntityProjectile(item.getProjectile()).setDrop(new ItemStack(item)).setXLocAndYLoc(x, y)
+						.setDirection(angle).setDamage(item.getProjectile().getDamage() * rangeDamageModifier * allDamageModifier));
+			}
+			else{
+				world.addEntityToProjectileList(new EntityProjectile(item.getProjectile()).setDrop(new ItemStack(item)).setXLocAndYLoc(x, y)
+						.setDirection(angle).setDamage(item.getProjectile().getDamage() * rangeDamageModifier * allDamageModifier));
+			}
+			inventory.removeItemsFromInventoryStack(1, index);
+			ticksSinceLastCast = 0;
 		}
 	}
 	

@@ -104,7 +104,7 @@ public class EntityProjectile extends EntityParticle
 		return this;
 	}
 	
-	public EntityProjectile setIconIndex(int x, int y) {
+	public EntityProjectile setSpriteIndex(int x, int y) {
 		iconX = x;
 		iconY = y;
 		return this;

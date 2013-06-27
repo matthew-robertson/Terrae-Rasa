@@ -7,6 +7,7 @@ import client.Settings;
 
 import entities.EntityPlayer;
 
+import ui.RenderUI;
 import world.World;
 
 public class RenderWorldHell extends RenderWorld
@@ -36,7 +37,7 @@ public class RenderWorldHell extends RenderWorld
 		GL11.glAlphaFunc(GL11.GL_GREATER, 0.1f);
 		GL11.glEnable(GL11.GL_ALPHA_TEST); //cuts out blank junk in the background of text, etc	
 	
-		renderUI.render(world, player, settings);		
+		RenderUI.render(world, player, settings);		
 		
 		GL11.glDisable(GL11.GL_ALPHA_TEST);
 		GL11.glDisable(GL11.GL_BLEND);			

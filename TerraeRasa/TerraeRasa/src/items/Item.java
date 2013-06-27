@@ -353,14 +353,14 @@ public class Item extends ActionbarItem
 	public static Item diamondPillarEnd = new Item(206).setIconPosition(4,11).setName("Diamond P");
 	public static Item goldPillarEnd = new Item(207).setIconPosition(4,12).setName("Gold P");
 	
-	public static Item woodenArrow = new ItemAmmo(300).setProjectile(new EntityProjectile(7, 1, 1, 8f).setIconIndex(0, 1).setIsFriendly(true)).setIconPosition(5, 9).setName("Wooden Arrow");
-	public static Item bronzeArrow = new ItemAmmo(301).setProjectile(new EntityProjectile(10, 1, 1, 8f).setIconIndex(0, 2).setIsFriendly(true)).setIconPosition(5, 10).setName("Bronze Arrow");
-	public static Item ironArrow = new ItemAmmo(302).setProjectile(new EntityProjectile(13, 1, 1, 8f).setIconIndex(0, 3).setIsFriendly(true)).setIconPosition(5, 11).setName("Iron Arrow");
-	public static Item silverArrow = new ItemAmmo(303).setProjectile(new EntityProjectile(16, 1, 1, 8f).setIconIndex(0, 4).setIsFriendly(true)).setIconPosition(5, 12).setName("Silver Arrow");
+	public static Item woodenArrow = new ItemAmmo(300).setProjectile(new EntityProjectile(7, 1, 1, 8f).setSpriteIndex(0, 1).setIsFriendly(true)).setIconPosition(5, 9).setName("Wooden Arrow");
+	public static Item bronzeArrow = new ItemAmmo(301).setProjectile(new EntityProjectile(10, 1, 1, 8f).setSpriteIndex(0, 2).setIsFriendly(true)).setIconPosition(5, 10).setName("Bronze Arrow");
+	public static Item ironArrow = new ItemAmmo(302).setProjectile(new EntityProjectile(13, 1, 1, 8f).setSpriteIndex(0, 3).setIsFriendly(true)).setIconPosition(5, 11).setName("Iron Arrow");
+	public static Item silverArrow = new ItemAmmo(303).setProjectile(new EntityProjectile(16, 1, 1, 8f).setSpriteIndex(0, 4).setIsFriendly(true)).setIconPosition(5, 12).setName("Silver Arrow");
 		
 	public static Item woodenBow = new ItemRanged(310, 8).setCooldownTicks(10).setName("Wooden Bow").setIconPosition(16, 9);
 	
-	public static Item snowball = new ItemThrown(320, 5).setCooldownTicks(10).setName("Snow Ball").setIconPosition(14, 0);
+	public static Item snowball = new ItemThrown(320, 5).setProjectile(new EntityProjectile(5, 1, 1, 11f).setSpriteIndex(0, 0).setIsFriendly(true)).setCooldownTicks(10).setName("Snow Ball").setIconPosition(14, 0);
 	
 	public static Item heartCrystal = new ItemHeartCrystal(340).setIconPosition(7, 0).setName("Heart Crystal");
 	public static Item manaCrystal = new ItemManaCrystal(341).setIconPosition(6, 0).setName("Mana Crystal");

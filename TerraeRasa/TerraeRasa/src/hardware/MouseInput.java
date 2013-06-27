@@ -3,6 +3,7 @@ package hardware;
 import items.Item;
 import items.ItemMagic;
 import items.ItemRanged;
+import items.ItemThrown;
 import items.ItemTool;
 
 import org.lwjgl.input.Mouse;
@@ -71,7 +72,17 @@ public class MouseInput
 									(double)(Render.getCameraX() + MathHelper.getCorrectMouseXPosition()), 
 									(double)(Render.getCameraY() + MathHelper.getCorrectMouseYPosition()), 
 									weapon);
-						}						 
+						}	
+						else if(item instanceof ItemThrown)
+						{
+							ItemThrown weapon = (ItemThrown) item;
+							player.launchProjectileThrown(world, 
+									(double)(Render.getCameraX() + MathHelper.getCorrectMouseXPosition()), 
+									(double)(Render.getCameraY() + MathHelper.getCorrectMouseYPosition()), 
+									weapon,
+									player.selectedSlot);
+							
+						}
 					}
 				}
 			}

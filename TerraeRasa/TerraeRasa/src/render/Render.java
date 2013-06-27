@@ -10,6 +10,7 @@ import org.lwjgl.opengl.GL11;
 
 import entities.EntityPlayer;
 
+import ui.RenderUI;
 import utils.MathHelper;
 import utils.Texture;
 import utils.TextureCoords;
@@ -63,7 +64,6 @@ public class Render
 	public static Texture TERRAIN;
 	public static Texture TERRAIN_GROUND;
 	public static Texture PROJECTILES;
-	public static RenderUI renderUI;
 	public static RenderEntities renderEntities;
 	public static RenderBlocks renderBlocks;
 	public static RenderParticles renderParticles;
@@ -198,7 +198,6 @@ public class Render
 		//
 		
 		renderParticles = new RenderParticles();
-		renderUI = new RenderUI();
 		renderEntities = new RenderEntities();
 		renderBlocks = new RenderBlocks();
 	}	
