@@ -6,6 +6,15 @@ import enums.EnumDamageType;
 import utils.Damage;
 import world.World;
 
+/**
+ * StatusEffectBleed deals periodic damage to an entity. This damage is based on the power value, where 1 power is 1 damage 
+ * dealt every interval. StatusEffectBleed cannot be percentile based damage, is not able to be dodged, and will 
+ * not cause combat status.
+ * @author      Alec Sobeck
+ * @author      Matthew Robertson
+ * @version     1.0
+ * @since       1.0
+ */
 public class StatusEffectBleed extends StatusEffect 
 {
 	private static final long serialVersionUID = 1L;

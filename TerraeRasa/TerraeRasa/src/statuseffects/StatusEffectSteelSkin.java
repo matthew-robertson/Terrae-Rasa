@@ -2,6 +2,14 @@ package statuseffects;
 
 import entities.EntityLiving;
 
+/**
+ * StatusEffectSteelSkin increases an entity's defense by a given amount. This amount is a an additive flat point
+ * increase based on the statuseffect's power, where defense is increased by 1 for every point of power. 
+ * @author      Alec Sobeck
+ * @author      Matthew Robertson
+ * @version     1.0
+ * @since       1.0
+ */
 public class StatusEffectSteelSkin extends StatusEffect
 {
 	private static final long serialVersionUID = 1L;
@@ -25,6 +33,6 @@ public class StatusEffectSteelSkin extends StatusEffect
 	
 	public String toString()
 	{
-		return "Status_Effect_Steel_Skin";
+		return "Increases defense by " + (int)(power);
 	}
 }

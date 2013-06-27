@@ -2,10 +2,26 @@ package statuseffects;
 
 import entities.EntityLiving;
 
+/**
+ * StatusEffectFallHeight increases an entity's fall height by a given number of blocks. This amount is a an additive value
+ * increase based on the statuseffect's power, where the entity can fall 1 more block for every power unit. This effect has
+ * no actual cap, but in practice it can reach values where there is little extra benefit to the increased distance.
+ * @author      Alec Sobeck
+ * @author      Matthew Robertson
+ * @version     1.0
+ * @since       1.0
+ */
 public class StatusEffectFallHeight extends StatusEffect
 {
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * 
+	 * @param durationSeconds
+	 * @param tier
+	 * @param power increase in blocks 
+	 * @param ticksBetweenEffect
+	 */
 	public StatusEffectFallHeight(double durationSeconds, int tier, int power, int ticksBetweenEffect) 
 	{
 		super(durationSeconds, tier, power, ticksBetweenEffect);
@@ -16,16 +32,16 @@ public class StatusEffectFallHeight extends StatusEffect
 
 	public void applyInitialEffect(EntityLiving entity)
 	{	
-		entity.setMaxHeightFallenSafely(entity.getMaxHeightFallenSafely() + power);
+		entity.setMaxHeightFallenSafely(entity.getMaxHeightFallenSafely() + (6 * power));
 	}
 	
 	public void removeInitialEffect(EntityLiving entity)
 	{	
-		entity.setMaxHeightFallenSafely(entity.getMaxHeightFallenSafely() - power);
+		entity.setMaxHeightFallenSafely(entity.getMaxHeightFallenSafely() - (6 * power));
 	}
 	
 	public String toString()
 	{
-		return "Status_Effect_Fall_Height";
+		return "Increases fall height by " + (int)(power) + "blocks";
 	}
 }

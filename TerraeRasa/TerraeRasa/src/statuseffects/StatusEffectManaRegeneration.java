@@ -3,6 +3,15 @@ package statuseffects;
 import world.World;
 import entities.EntityLiving;
 
+/**
+ * StatusEffectManaRegeneration causes an entity to regenerate a given amount of mana every given number of seconds (measured
+ * in game ticks). 1 point of power is 1 point of regenerated mana. Unlike health regeneration, mana regeneration cannot be 
+ * percentage based.
+ * @author      Alec Sobeck
+ * @author      Matthew Robertson
+ * @version     1.0
+ * @since       1.0
+ */
 public class StatusEffectManaRegeneration extends StatusEffect
 {
 	private static final long serialVersionUID = 1L;

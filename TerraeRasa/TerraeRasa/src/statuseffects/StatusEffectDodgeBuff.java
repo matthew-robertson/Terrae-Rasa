@@ -2,6 +2,15 @@ package statuseffects;
 
 import entities.EntityLiving;
 
+/**
+ * StatusEffectDodgeBuff increases an entity's dodge chance by a given amount. This amount is an additive percentage 
+ * based on the statuseffect's power where 0.0 is no increase and 1.0 is a 100% increase. Amounts beyond 1.0 increase 
+ * beyond 100% linearly. 100% dodge is probably unhittable, though certain damage hits cannot be dodged.
+ * @author      Alec Sobeck
+ * @author      Matthew Robertson
+ * @version     1.0
+ * @since       1.0
+ */
 public class StatusEffectDodgeBuff extends StatusEffect
 {
 	private static final long serialVersionUID = 1L;
@@ -34,6 +43,6 @@ public class StatusEffectDodgeBuff extends StatusEffect
 	
 	public String toString()
 	{
-		return "Status_Effect_Dodge";
+		return "Increases dodge chance by " + (int)(power * 100) + "%";
 	}
 }

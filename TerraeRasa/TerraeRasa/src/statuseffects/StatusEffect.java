@@ -16,11 +16,13 @@ import world.World;
  * The apply and remove methods should directly counter each other to ensure that residual effects are
  * not remaining.
  *
- * @author alec
- *
+ * @author      Alec Sobeck
+ * @author      Matthew Robertson
+ * @version     1.0
+ * @since       1.0
  */
 public class StatusEffect 
-		implements Serializable
+		implements Serializable, IStatusEffect
 {
 	private static final long serialVersionUID = 1L;
 	public boolean reapplicationSkipsRemovalEffect;
@@ -70,11 +72,11 @@ public class StatusEffect
 		this.stacksIndependantly = effect.stacksIndependantly;
 	}
 	
-	public void applyInitialEffect(EntityLiving entity)
+	public void applyInitialEffect(World world, EntityLiving entity)
 	{	
 	}
 	
-	public void removeInitialEffect(EntityLiving entity)
+	public void removeInitialEffect(World world, EntityLiving entity)
 	{	
 	}
 	

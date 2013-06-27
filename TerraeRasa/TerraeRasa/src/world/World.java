@@ -1038,7 +1038,7 @@ public class World
 				{
 					entityList.get(i).moveEntityLeft(this, knockBackValue);
 				}
-				entityList.get(i).registerStatusEffect(new StatusEffectStun(0.45, 1, 1, 1));
+				entityList.get(i).registerStatusEffect(this, new StatusEffectStun(0.45, 1, 1, 1));
 			}
 		}
 		

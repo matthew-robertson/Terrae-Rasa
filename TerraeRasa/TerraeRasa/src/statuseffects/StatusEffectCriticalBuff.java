@@ -2,6 +2,15 @@ package statuseffects;
 
 import entities.EntityLiving;
 
+/**
+ * StatusEffectCriticalBuff increases an entity's critical strike chance by a given amount. This amount is an additive percentage 
+ * based on the statuseffect's power where 0.0 is no increase and 1.0 is a 100% increase. Amounts beyond 1.0 increase 
+ * beyond 100% linearly, though 100% critical strike chance generally means a hit will be a critical strike.
+ * @author      Alec Sobeck
+ * @author      Matthew Robertson
+ * @version     1.0
+ * @since       1.0
+ */
 public class StatusEffectCriticalBuff extends StatusEffect
 {
 	private static final long serialVersionUID = 1L;
@@ -34,6 +43,6 @@ public class StatusEffectCriticalBuff extends StatusEffect
 	
 	public String toString()
 	{
-		return "Status_Effect_Critical";
+		return "Increases crit by " + (int)(power * 100) + "%";
 	}
 }

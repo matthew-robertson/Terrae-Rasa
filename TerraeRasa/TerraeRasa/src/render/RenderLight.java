@@ -19,7 +19,7 @@ public class RenderLight extends Render
 	{
 		adjustCameraToLastPosition();
 		final int width = (int)(Display.getWidth() / 11.1);
-		final int height = (int)(Display.getHeight() / 11.1) + 2;
+		final int height = (int)(Display.getHeight() / 11.1) + 6;
 		int x = (int) ((player.x - (0.25f * Display.getWidth())) / 6);
 		int y = (int) ((player.y - (0.25f * Display.getHeight())) / 6);
 		if(y < 0) y = 0;

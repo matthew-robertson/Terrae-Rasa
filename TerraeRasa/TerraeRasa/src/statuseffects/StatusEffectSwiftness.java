@@ -2,6 +2,15 @@ package statuseffects;
 
 import entities.EntityLiving;
 
+/**
+ * StatusEffectSwiftness increases an entity's movement speed by a given amount. This amount is a multiplicative percentage 
+ * based on the statuseffect's power where 0.0 is no increase and 1.0 is a 100% increase. Amounts beyond 1.0 increase 
+ * beyond 100% linearly.
+ * @author      Alec Sobeck
+ * @author      Matthew Robertson
+ * @version     1.0
+ * @since       1.0
+ */
 public class StatusEffectSwiftness extends StatusEffect
 {
 	private static final long serialVersionUID = 1L;
@@ -35,6 +44,6 @@ public class StatusEffectSwiftness extends StatusEffect
 	
 	public String toString()
 	{
-		return "Status_Effect_Swiftness";
+		return "Increases movement speed by " + (int)(100 * power) + "%";
 	}
 }

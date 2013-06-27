@@ -37,7 +37,7 @@ public class AuraSmartHeal extends Aura
 	
 	public void onPercentageHealth(World world, EntityPlayer player)
 	{
-		if(remainingCooldown <= 0 && player.health > 0 && (player.getHealthPercent() <= activationThreshold))
+		if(remainingCooldown <= 0 && player.getHealth() > 0 && (player.getHealthPercent() <= activationThreshold))
 		{
 			double heal = (percentile) ? (this.healAmount * player.maxHealth) : this.healAmount;
 			player.heal(world, (int)heal, true);

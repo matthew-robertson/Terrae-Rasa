@@ -2,6 +2,15 @@ package statuseffects;
 
 import entities.EntityLiving;
 
+/**
+ * StatusEffectDaze decreases an entity's movement speed by a given amount. This amount is a multiplicative percentage 
+ * based on the statuseffect's power where 0.0 is no effect and 1.0 is full effect. A daze is capped at 95% effectiveness
+ * though to prevent complete snares (which would be another type of debuff)
+ * @author      Alec Sobeck
+ * @author      Matthew Robertson
+ * @version     1.0
+ * @since       1.0
+ */
 public class StatusEffectDazed extends StatusEffect
 {
 	private static final long serialVersionUID = 1L;
@@ -38,6 +47,6 @@ public class StatusEffectDazed extends StatusEffect
 	
 	public String toString()
 	{
-		return "Status_Effect_Stun_Dazed";
+		return "Reduces speed by " + (int)(power * 100) + "%";
 	}
 }

@@ -3,14 +3,11 @@ package render;
 import io.Chunk;
 
 import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.GL11;
-
-import entities.EntityPlayer;
 
 import utils.ChunkUtils;
 import world.World;
-
 import blocks.Block;
+import entities.EntityPlayer;
 
 public class RenderBlocks extends Render
 {
@@ -18,7 +15,7 @@ public class RenderBlocks extends Render
 	{
 		adjustCameraToLastPosition();
 		final int xsize = (int)(Display.getWidth() / 11.1);
-		final int ysize = (int)(Display.getHeight() / 11.1) + 2;
+		final int ysize = (int)(Display.getHeight() / 11.1) + 6;
 		int x = (int) ((player.x - (0.25f * Display.getWidth())) / 6);
 		int y = (int) ((player.y - (0.25f * Display.getHeight())) / 6);
 		if(y < 0) y = 0;
@@ -137,7 +134,7 @@ public class RenderBlocks extends Render
 	{
 		adjustCameraToLastPosition();
 		final int xsize = (int)(Display.getWidth() / 11.1);
-		final int ysize = (int)(Display.getHeight() / 11.1) + 2;
+		final int ysize = (int)(Display.getHeight() / 11.1) + 6;
 		int x = (int) ((player.x - (0.25f * Display.getWidth())) / 6);
 		int y = (int) ((player.y - (0.25f * Display.getHeight())) / 6);
 		if(y < 0) y = 0;

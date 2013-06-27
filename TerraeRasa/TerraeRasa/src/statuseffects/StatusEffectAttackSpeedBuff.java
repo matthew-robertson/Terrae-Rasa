@@ -2,6 +2,16 @@ package statuseffects;
 
 import entities.EntityLiving;
 
+/**
+ * StatusEffectAttackSpeed increases an entity's attack speed by a given amount. This amount is an additive percentage 
+ * based on the statuseffect's power where 0.0 is no increase and 1.0 is a 100% increase. Amounts beyond 1.0 increase 
+ * beyond 100% linearly. A 100% increase does not mean instant attacks, and may not provide a monster with any 
+ * effect at all. 
+ * @author      Alec Sobeck
+ * @author      Matthew Robertson
+ * @version     1.0
+ * @since       1.0
+ */
 public class StatusEffectAttackSpeedBuff extends StatusEffect
 {
 	private static final long serialVersionUID = 1L;
@@ -33,6 +43,6 @@ public class StatusEffectAttackSpeedBuff extends StatusEffect
 	
 	public String toString()
 	{
-		return "Status_Effect_Attack_Speed";
+		return "Increases attack speed by " + (int)(power * 100) + "%";
 	}
 }

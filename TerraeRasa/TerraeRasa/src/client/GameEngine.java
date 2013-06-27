@@ -11,6 +11,7 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
 import render.GuiMainMenu;
+import render.Render;
 import render.RenderGlobal;
 import render.RenderMenu;
 import spells.Spell;
@@ -49,6 +50,8 @@ import enums.EnumWorldDifficulty;
  */
 public class GameEngine 
 {
+	/** The number of game ticks per second - this will always be 20 */
+	public static final int TICKS_PER_SECOND = 20;
 	/** In single player one render mode can be active. This decides what world is updated, loaded, and rendered. The names
 	 * correspond directly to that respective world. */
 	public final static int RENDER_MODE_WORLD_EARTH = 1,
@@ -56,16 +59,14 @@ public class GameEngine
 							   RENDER_MODE_WORLD_SKY  = 3;
 	/** The currently selected RENDER_MODE_WORLD value, detailing what world to update, load, and render.*/
 	private int renderMode;
-	public GuiMainMenu mainMenu;
-	public World world;
-	public WorldHell worldHell;
-	public WorldSky worldSky;
-	public EntityPlayer player;
-	public Settings settings;
-	public SoundEngine soundEngine;
-	public RenderMenu renderMenu;
-	/** The number of game ticks per second - this will always be 20 */
-	public static final int TICKS_PER_SECOND = 20;
+	private GuiMainMenu mainMenu;
+	private World world;
+	private WorldHell worldHell;
+	private WorldSky worldSky;
+	private EntityPlayer player;
+	private Settings settings;
+	private SoundEngine soundEngine;
+	private RenderMenu renderMenu;
 	
 	/**
 	 * Creates a new instance of GameEngine. This includes setting the renderMode to RENDER_MODE_WORLD_EARTH
@@ -86,11 +87,6 @@ public class GameEngine
 		{
 			settings = new Settings();
 		}
-	}
-	
-	public void setWorld(World world)
-	{
-		this.world = world;
 	}
 	
 	public void run()
@@ -151,11 +147,7 @@ public class GameEngine
 		        		}
 		        	}
 		        	
-					if(TerraeRasa.needsResized || TerraeRasa.width < 640 || TerraeRasa.height < 400) //If the window needs resized, resize it
-					{
-						TerraeRasa.terraeRasa.resizeWindow();
-						TerraeRasa.needsResized = false;
-					}
+					TerraeRasa.terraeRasa.checkWindowSize();
 		        	 
 		        	next_game_tick += SKIP_TICKS;
  		            loops++;
@@ -204,7 +196,6 @@ public class GameEngine
 		        GL11.glPopMatrix();		        
 		        Display.swapBuffers(); //allows the display to update when using VBO's, probably
 		        Display.update(); //updates the display
-
 				
 		        if(System.currentTimeMillis() - start >= 5000)
 		        {
@@ -264,12 +255,14 @@ public class GameEngine
 	 */
 	public void init()
 	{
+		Render.initializeTextures(getWorld());
 		soundEngine = new SoundEngine(settings);
 		mainMenu = new GuiMainMenu();
 		renderMenu = new RenderMenu(settings);
 		Display.setVSyncEnabled(settings.vsyncEnabled);
 		debugCheats();
 	}
+	
 	/**
 	 * Loads the Settings for the entire game upon starting the game.
 	 * @throws IOException Indicates the saving operation has failed
@@ -281,6 +274,8 @@ public class GameEngine
 		FileManager fileManager = new FileManager();
 		this.settings = fileManager.loadSettings();
 	}
+	
+	
 	/**
 	 * Saves the Settings for the entire game to disk, this is called before exiting the run method.
 	 * @throws IOException Indicates the saving operation has failed
@@ -452,9 +447,14 @@ public class GameEngine
 			world.saveRemainingWorld();
 		}
 		//Reset to the main menu
-		TerraeRasa.resetMainMenu();
+		resetMainMenu();
 		TerraeRasa.isMainMenuOpen = true; //Sets menu open
 		System.out.println("Game Over.");
+	}
+	
+	public void setWorld(World world)
+	{
+		this.world = world;
 	}
 	
 	/**
@@ -540,5 +540,15 @@ public class GameEngine
 		{
 			world.saveRemainingWorld();
 		}
+		
+		resetMainMenu();
+	}
+	
+	/**
+	 * Creates a new GuiMainMenu and assigns it to mainMenu.
+	 */
+	public void resetMainMenu()
+	{
+		mainMenu = new GuiMainMenu();
 	}
 }

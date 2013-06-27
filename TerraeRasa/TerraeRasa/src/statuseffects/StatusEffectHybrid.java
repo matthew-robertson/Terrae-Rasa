@@ -25,19 +25,19 @@ public class StatusEffectHybrid extends StatusEffect
 		iconY = 0;
 	}
 	
-	public void applyInitialEffect(EntityLiving entity)
+	public void applyInitialEffect(World world, EntityLiving entity)
 	{	
 		for(StatusEffect effect : effects)
 		{
-			effect.applyInitialEffect(entity);
+			effect.applyInitialEffect(world, entity);
 		}
 	}
 	
-	public void removeInitialEffect(EntityLiving entity)
+	public void removeInitialEffect(World world, EntityLiving entity)
 	{	
 		for(StatusEffect effect : effects)
 		{
-			effect.removeInitialEffect(entity);
+			effect.removeInitialEffect(world, entity);
 		}
 	}
 	
@@ -50,8 +50,17 @@ public class StatusEffectHybrid extends StatusEffect
 		ticksLeft--;
 	}
 	
+	/**
+	 * Provides a string of all the different StatusEffects contained. This string is formatted such that one
+	 * effect is on each line (in essence, effects are separated by a newline character)
+	 */
 	public String toString()
 	{
-		return "Status_Effect_Hybrid";
+		String result = "";
+		for(StatusEffect effect : effects)
+		{
+			result += effect.toString() + '\n';
+		}
+		return result;
 	}
 }

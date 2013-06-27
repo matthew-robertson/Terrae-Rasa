@@ -33,24 +33,23 @@ import entities.EntityPlayer;
  */
 public class TerraeRasa
 {
-	public static boolean initInDebugMode = true;
-	public static TerraeRasa terraeRasa;
-	public static boolean done;
-	public static boolean isMainMenuOpen;
-	public static boolean areResourcesLoaded;	
-	public static int width;
-	public static int height;
-	public final GameEngine gameEngine;
-	private Frame terraeRasaFrame;
-	private Canvas terraeRasaCanvas;
-	private static String osName;
 	private final static String VERSION = "Alpha 0.1.1";	
 	private final static String WINDOW_TITLE = "Terrae Rasa " + VERSION;
 	private final static String WINDOWS_BASE_PATH = new StringBuilder().append("C:/Users/").append(System.getProperty("user.name")).append("/AppData/Roaming/terraerasa").toString();
 	private final static String MAC_BASE_PATH = new StringBuilder().append("/Users/").append(System.getProperty("user.name")).append("/Library/Application").append(" Support/terraerasa").toString();
 	private final static String LINUX_BASE_PATH = new StringBuilder().append("/home/").append(System.getProperty("user.name")).append("/terraerasa").toString();
+	private Frame terraeRasaFrame;
+	private Canvas terraeRasaCanvas;
+	private int width;
+	private int height;
+	private boolean needsResized;
+	private static String osName;
 	private static String basePath;
-	public static boolean needsResized;
+	public static boolean done;
+	public static boolean isMainMenuOpen;
+	public static boolean initInDebugMode = true;
+	public static TerraeRasa terraeRasa;
+	public final GameEngine gameEngine;
 	
 	/**
 	 * Creates a new instance of the container for all game objects, and a new GameEngine. 
@@ -69,7 +68,11 @@ public class TerraeRasa
 	public static void main(String[] args) 
 	{		
 		osName = System.getProperty("os.name").toLowerCase();
-		//System.out.println("User Operating System is: " + osName);
+		
+		for(String string : args)
+		{
+			System.out.println("ARGS: " + string);
+		}
 		
 		//Load the OpenGL libraries for rendering later on
 		if(osName.contains("win")) //Windows
@@ -92,14 +95,15 @@ public class TerraeRasa
 			throw new RuntimeException("OS not supported");
 		}
 						
-		terraeRasa = new TerraeRasa(900, 500/*784, 578/*854,480(widescreen)*/); //Init the game object with the specified resolution
-		terraeRasa.run(); //Start the game
+		//Default resolution is 900x500
+		terraeRasa = new TerraeRasa(900, 500);
+		terraeRasa.run(); 
 	}	
 	
 	/**
 	 * Initializes the canvas, display, and JFrame used by the game
 	 */
-	public void createWindow()
+	private void createWindow()
 	{
 		try
 		{
@@ -146,9 +150,22 @@ public class TerraeRasa
 	}	
 	
 	/**
+	 * Checks if the window needs resized, and will resize it if needed
+	 */
+	public void checkWindowSize()
+	{
+		//Minimum game window size is 640 x 480
+		if(needsResized || width < 640 || height < 400) 
+		{
+			resizeWindow();
+			needsResized = false;
+		}
+	}
+	
+	/**
 	 * Resizes the JFrame and all components when applicable 
 	 */
-	public void resizeWindow()
+	private void resizeWindow()
 	{
 		width = (terraeRasaFrame.getWidth() > 740) ? terraeRasaFrame.getWidth() : 740; //740 = arbitrary value for things not to look bad
 		height = (terraeRasaFrame.getHeight() > 480) ? terraeRasaFrame.getHeight() : 480; //same with 480
@@ -186,7 +203,7 @@ public class TerraeRasa
 	/**
 	 * Initializes the default openGL settings
 	 */	
-	public void initGL() 
+	private void initGL() 
 	{		
 		int width_fix = (int)(width / Render.BLOCK_SIZE) * Render.BLOCK_SIZE + Render.BLOCK_SIZE;
 		int height_fix = (int)(height / Render.BLOCK_SIZE) * Render.BLOCK_SIZE + Render.BLOCK_SIZE;
@@ -206,28 +223,6 @@ public class TerraeRasa
 	}	
 	
 	/**
-	 * Attempts to load all resources- images, sound...
-	 */
-	public void loadResources()
- 	{
-		Render.initializeTextures(gameEngine.getWorld()); 
-		/*
-		if(true)return;
-		soundManager = new SoundManager(5, 0.5f);
-		SoundEngine engine = new SoundEngine();
-		SOUND_T = engine.addSound(soundManager, "calm2.ogg");
-		soundManager.playEffect(SOUND_T);
-		soundManager.playSound(SOUND_T);
-        //Initialize Sound effects here, eventually
-		//soundManager = new SoundManager(); //Creates the instance of SoundManager used for sounds
-		//soundManager.initialize(5); //Initialize the soundManager object for 5 sounds
-		//soundManager.volume = 0.5f; //Default Volume % is 50%
-		//SOUND_EXPLODE = soundManager.addSound("resources/hit.wav");
-		//Gui.Load textures //Load textures 
-		*/
- 	}
-	
-	/**
 	 * Creates the window, loads resources, initializes the game engine,
 	 * and then beings to run the game engine and main game loop. When quitting, 
 	 * this method will destroy the display and then call System.exit(1) to ensure 
@@ -236,43 +231,14 @@ public class TerraeRasa
 	public void run()
 	{
 		createWindow(); //Create the display and embed it in an awtcanvas	
-		loadResources(); //Load all graphical and sound resources
 		
 		isMainMenuOpen = true;       
 		gameEngine.init();
 		gameEngine.run();
 	    
 	    Display.destroy(); //Cleans up  
-        //soundManager.destroy(); //Destroys the soundManager object
         System.exit(1); //remember to exit the system and release resources
 	} 		
-	
-	/**
-	 * Gets the file path to the root folder of the game save on Windows OS
-	 * @return the root folder of the game save for Windows OS
-	 */
-	public final static String getWindowsBasePath()
-	{
-		return WINDOWS_BASE_PATH;
-	}
-	
-	/**
-	 * Gets the file path to the root folder of the game save on Mac OSX
-	 * @return the root folder of the game save for Mac OSX
-	 */
-	public final static String getMacBasePath()
-	{
-		return MAC_BASE_PATH;
-	}
-	
-	/**
-	 * Gets the file path to the root folder of the game save on LINUS OS
-	 * @return the root folder of the game save for LINUX OS
-	 */
-	public final static String getLinuxBasePath()
-	{
-		return LINUX_BASE_PATH;
-	}
 	
 	/**
 	 * Gets the file path to the root folder of the game, for the OS executing the game jar
@@ -291,15 +257,7 @@ public class TerraeRasa
 	{
 		return VERSION;
 	}
-	
-	/**
-	 * Creates a new GuiMainMenu and assigns it to terraeRasa.gameEngine.mainMenu.
-	 */
-	public static void resetMainMenu()
-	{
-		terraeRasa.gameEngine.mainMenu = new GuiMainMenu();
-	}
-	
+		
 	/**
 	 * Calls the startGame(World, EntityPlayer) method of the GameEngine.
 	 */

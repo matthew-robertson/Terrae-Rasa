@@ -13,7 +13,7 @@ public class ItemPotionAttackSpeed extends ItemPotion
 	
 	public void onRightClick(World world, EntityPlayer player)
 	{
-		player.registerStatusEffect(new StatusEffectAttackSpeedBuff(durationSeconds, tier, power, ticksBetweenEffect));
+		player.registerStatusEffect(world, new StatusEffectAttackSpeedBuff(durationSeconds, tier, power, ticksBetweenEffect));
 		player.inventory.removeItemsFromInventoryStack(1, player.selectedSlot);
 		world.soundEngine.playSoundEffect(onUseSound);
 	}

@@ -13,7 +13,7 @@ public class ItemPotionRegeneration extends ItemPotion
 	
 	public void onRightClick(World world, EntityPlayer player)
 	{
-		player.registerStatusEffect(new StatusEffectRegeneration(durationSeconds, tier, power, ticksBetweenEffect, false));
+		player.registerStatusEffect(world, new StatusEffectRegeneration(durationSeconds, tier, power, ticksBetweenEffect, false));
 		player.inventory.removeItemsFromInventoryStack(1, player.selectedSlot);
 		world.soundEngine.playSoundEffect(onUseSound);
 	}

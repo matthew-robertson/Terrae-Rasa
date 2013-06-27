@@ -575,7 +575,7 @@ public class EntityPlayer extends EntityLiving
 		}
 		health = maxHealth;
 		world.soundEngine.playSoundEffect(deathSound);
-		clearStatusEffects();
+		clearStatusEffects(world);
 		world.clearEntityList();
 		world.spawnPlayer(this);	
 	}

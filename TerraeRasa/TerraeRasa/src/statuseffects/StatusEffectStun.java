@@ -3,6 +3,13 @@ package statuseffects;
 import entities.EntityLiving;
 import world.World;
 
+/**
+ * StatusEffectStun stuns the entity for the given period of time. Stun prevents attacking as well as movement.
+ * @author      Alec Sobeck
+ * @author      Matthew Robertson
+ * @version     1.0
+ * @since       1.0
+ */
 public class StatusEffectStun extends StatusEffect
 {
 	private static final long serialVersionUID = 1L;
@@ -33,6 +40,6 @@ public class StatusEffectStun extends StatusEffect
 	
 	public String toString()
 	{
-		return "Status_Effect_Stun";
+		return "You are stunned!";
 	}
 }

@@ -1724,7 +1724,7 @@ public class RenderUI extends Render
 		GL11.glColor4f(1, 0, 0, 1);
 		x1 = getCameraX() + 10;
 		y1 = getCameraY() + 10;		
-		newX = (int) (player.health / player.maxHealth * 100);
+		newX = (int) (player.getHealth() / player.maxHealth * 100);
 		newY = 11;		
 		t.startDrawingQuads();
 		t.addVertexWithUV(x1, y1 + newY, 0, 0, 1);
@@ -2381,7 +2381,7 @@ public class RenderUI extends Render
 		{
 			GL11.glColor4f(1, 1, 1, 1);
 			//Health:
-			String health = new StringBuilder().append((int)player.health).append(" / ").append(player.maxHealth).toString();
+			String health = new StringBuilder().append((int)player.getHealth()).append(" / ").append(player.maxHealth).toString();
 			trueTypeFont.drawString((getCameraX() + 35), (getCameraY() + 22), health, 0.3f, -0.3f);
 			
 			//specialOffsetY is increased if the mana bar is rendered, because then the special bar is 

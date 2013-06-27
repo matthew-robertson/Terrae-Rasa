@@ -68,7 +68,7 @@ public class EntityLiving extends Entity
 	public int maxMana;
 	public double mana;
 	public double defense;
-	public double health;
+	protected double health;
 	public List<StatusEffectAbsorb> absorbs;
 	
 	public String jumpSound;
@@ -294,7 +294,7 @@ public class EntityLiving extends Entity
 			statusEffects.get(i).applyPeriodicBonus(world, this);
 			if(statusEffects.get(i).isExpired())
 			{
-				statusEffects.get(i).removeInitialEffect(this);
+				statusEffects.get(i).removeInitialEffect(world, this);
 				if(statusEffects.get(i) instanceof StatusEffectAbsorb)
 				{
 					removeAbsorb((StatusEffectAbsorb)statusEffects.get(i));
@@ -334,7 +334,7 @@ public class EntityLiving extends Entity
 	 * @param effect the effect to register
 	 * @return whether or not the effect was successfully registered
 	 */
-	public boolean registerStatusEffect(StatusEffect effect)
+	public boolean registerStatusEffect(World world, StatusEffect effect)
 	{
 		if(effect instanceof StatusEffectAbsorb)
 		{
@@ -355,10 +355,10 @@ public class EntityLiving extends Entity
 					{
 						if(!statusEffects.get(i).reapplicationSkipsRemovalEffect)
 						{
-							statusEffects.get(i).removeInitialEffect(this);
+							statusEffects.get(i).removeInitialEffect(world, this);
 						}
 						statusEffects.remove(i);						
-						effect.applyInitialEffect(this);
+						effect.applyInitialEffect(world, this);
 						statusEffects.add(effect);
 						return true;
 					}
@@ -370,7 +370,7 @@ public class EntityLiving extends Entity
 			}
 		}
 		
-		effect.applyInitialEffect(this);
+		effect.applyInitialEffect(world, this);
 		statusEffects.add(effect);
 		return true;
 	}
@@ -485,12 +485,21 @@ public class EntityLiving extends Entity
 	/**
 	 * Clears all statuseffects active on this entityliving
 	 */
-	public void clearStatusEffects()
+	public void clearStatusEffects(World world)
 	{
 		for(StatusEffect effect : statusEffects)
 		{
-			effect.removeInitialEffect(this);
+			effect.removeInitialEffect(world, this);
 		}
 		statusEffects.clear();
+	}
+	
+	public double getHealth() {
+		return health;
+	}
+	
+	public void setHealth(double health)
+	{
+		this.health = health;
 	}
 }
