@@ -14,7 +14,6 @@ import world.World;
  */
 public class StatusEffectAbsorb extends StatusEffect
 {
-	private static final long serialVersionUID = 1L;
 	private int startAbsorbAmount;
 	private int remainingAbsorb;
 	

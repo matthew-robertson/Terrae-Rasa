@@ -10,19 +10,14 @@ import items.ItemArmorGloves;
 import items.ItemArmorHelmet;
 import items.ItemArmorPants;
 
-import java.io.Serializable;
 import java.util.Hashtable;
 
 import spells.Spell;
-
+import world.World;
+import blocks.Block;
 import entities.EntityPlayer;
 
-import world.World;
-
-import blocks.Block;
-
 /**
- * <code>InventoryPlayer implements Serializable</code> <br> 
  * <br>
  * <code>InventoryPlayer</code> is responsible for tracking all the items the player is holding or has equipped.
  * A new instance of <code>InventoryPlayer</code> creates a mainInventory of size 48, an armour inventory of size 
@@ -42,9 +37,8 @@ import blocks.Block;
  * @since       1.0
  */
 public class InventoryPlayer 
-		implements Serializable
+		 
 {
-	private static final long serialVersionUID = 1L;
 	private Hashtable<String, Integer> inventoryTotals;
 	private ItemStack[] trash;
 	private ItemStack[] mainInventory;

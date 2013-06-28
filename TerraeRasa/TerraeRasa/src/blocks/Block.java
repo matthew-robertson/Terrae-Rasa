@@ -2,18 +2,16 @@ package blocks;
 
 import items.Item;
 
-import java.io.Serializable;
 import java.util.Random;
 
 import render.Render;
 import utils.ActionbarItem;
 import utils.ItemStack;
-
 import enums.EnumBlockMaterial;
 
 
 /**
- * <code>Block extends ActionbarItem and implements Serializable, Cloneable</code>
+ * <code>Block extends ActionbarItem and implements , Cloneable</code>
  * <br>
  * <code>Block</code> defines the class for placable ItemStacks in the player's
  * inventory, and the Objects used to render the world and determine where
@@ -62,9 +60,8 @@ import enums.EnumBlockMaterial;
  * @since 1.0
  */
 public class Block extends ActionbarItem 
-		implements Cloneable, Serializable 
+		implements Cloneable   
 {
-	private static final long serialVersionUID = 1L;
 	/** (constant) Block width in pixels, currently this value is 6. Corresponds to the value of Render.BLOCK_SIZE. */
 	public final static int BLOCK_WIDTH = 6;
 	/** (constant) Block height in pixels, currently this is 6. Corresponds to the value of Render.BLOCK_SIZE. */
@@ -109,6 +106,17 @@ public class Block extends ActionbarItem
 		extraTooltipInformation = "";
 		isSolid = false;
 		isOveridable = true;
+		blockWidth = 6;
+		blockHeight = 6;
+		textureWidth = 16;
+		textureHeight = 16;
+		iconX = 0;
+		iconY = 0;
+		if (blocksList[id] != null) {
+			System.out.println(new StringBuilder().append("Conflict@ BlockID ").append(id).toString());
+			throw new RuntimeException(new StringBuilder().append("Conflict@ BlockID ").append(id).toString());
+		}
+		blocksList[id] = this;
 	}
 
 	/**
@@ -127,10 +135,10 @@ public class Block extends ActionbarItem
 	 * 
 	 * @param i the unique blockID of the <code>Block</code> being created
 	 */
-	protected Block(int i)
+	protected Block(int id)
 	{
-		super(i);
-		this.id = i;
+		super(id);
+		this.id = id;
 		breakable = true;
 		blockWidth = 6;
 		blockHeight = 6;
@@ -338,7 +346,7 @@ public class Block extends ActionbarItem
 		isMineable = b;
 		return this;
 	}
-	
+		
 	public Block setBitMap(int i) 
 	{
 		bitMap = i;

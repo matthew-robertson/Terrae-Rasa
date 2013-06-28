@@ -1,18 +1,11 @@
 package utils;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.Vector;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
+import savable.SaveManager;
 import world.World;
 import world.WorldGenEarth;
 import world.WorldGenHell;
@@ -180,20 +173,9 @@ public class FileManager
 			throws FileNotFoundException, IOException
 	{
 		verifyDirectoriesExist();
-		String fileName = (BASE_PATH + "/Player Saves/" + player.getName() + ".dat");		
-		GZIPOutputStream fileWriter = new GZIPOutputStream(new FileOutputStream(new File(fileName)));//Open an output stream
-	    ByteArrayOutputStream bos = new ByteArrayOutputStream();//Convert world to byte[]
-		ObjectOutputStream s = new ObjectOutputStream(bos); //open the OOS, used to save serialized objects to file
-		
-		s.writeObject(player); //write the byte[] to the OOS
-		byte data[] = bos.toByteArray();
-		fileWriter.write(data, 0, data.length);//Actually save it to file
-		System.out.println("Player Saved to: " + fileName + " With Initial Size: " + data.length);
-		
-		//Cleanup: 
-		s.close();
-		bos.close();
-		fileWriter.close();   		
+
+		SaveManager manager = new SaveManager();
+		manager.saveFile("/Player Saves/" + player.getName() + ".xml", player);
 	}
 	
 	/**
@@ -248,7 +230,7 @@ public class FileManager
 	
 	/**
 	 * Gets how many players exist in the ~/Player Saves/ Directory. Returns a maximum of 5, because there should never be more currently
-	 * @return upto 5 for the number of players in the directory, or in the case of a failure 0
+	 * @return the number of players in the directory, or in the case of a failure 0
 	 */
 	public int getTotalPlayers()
 	{
@@ -267,7 +249,7 @@ public class FileManager
 			    for (int i = 0; i < children.length; i++)  //for each entry, check if valid
 			    {
 			        String filename = children[i];
-			        if(filename.endsWith(".dat") && filename.length() > 4) //Ensure the filetype is valid and not ".dat"
+			        if(filename.endsWith(".xml") && filename.length() > 4) //Ensure the filetype is valid and not ".dat"
 			        {
 			        	vector.add(filename);
 			        }
@@ -321,7 +303,7 @@ public class FileManager
 			    for (int i = 0; i < children.length; i++) //For each name
 			    {
 			        String fileName = children[i];
-			        if(fileName.endsWith(".dat") && fileName.length() > 4 && index < 5) //Ensure the file is a valid .dat, has enough length, and that there're less than 5 players
+			        if(fileName.endsWith(".xml") && fileName.length() > 4 && index < 5) //Ensure the file is a valid .dat, has enough length, and that there're less than 5 players
 			        {
 			        	players[index] = (fileName.substring(0, fileName.length() - 4)); //Trim .dat ending
 			        	index++;
@@ -394,11 +376,8 @@ public class FileManager
 	public EntityPlayer loadPlayer(String name) 
 			throws IOException, ClassNotFoundException
 	{
-		String fileName = BASE_PATH + "/Player Saves/" + name + ".dat";
-		ObjectInputStream ois = new ObjectInputStream(new DataInputStream(new GZIPInputStream(new FileInputStream(fileName)))); //Open an input stream
-		EntityPlayer player = (EntityPlayer)ois.readObject(); //Load the object
-	    System.out.println("Player loaded from: " + fileName);
-		ois.close();
+		String fileName = "/Player Saves/" + name + ".xml";
+		EntityPlayer player = (EntityPlayer)new SaveManager().loadFile(fileName);
 		player.reconstructPlayerFromFile();
 		return player;
 	}
@@ -410,7 +389,7 @@ public class FileManager
 	 */
 	public boolean deletefile(String fileName)
 	{
-		File file = new File(BASE_PATH + fileName + ".dat");
+		File file = new File(BASE_PATH + fileName + ".xml");
 		boolean success = file.delete();
 		if (!success)
 		{
@@ -498,20 +477,7 @@ public class FileManager
 			throws FileNotFoundException, IOException
 	{
 		verifyDirectoriesExist();
-		String fileName = (BASE_PATH + "/settings.dat");		
-		GZIPOutputStream fileWriter = new GZIPOutputStream(new FileOutputStream(new File(fileName)));//Open an output stream
-	    ByteArrayOutputStream bos = new ByteArrayOutputStream();//Convert world to byte[]
-		ObjectOutputStream s = new ObjectOutputStream(bos); //open the OOS, used to save serialized objects to file
-		
-		s.writeObject(settings); //write the byte[] to the OOS
-		byte data[] = bos.toByteArray();
-		fileWriter.write(data, 0, data.length);//Actually save it to file
-		System.out.println("Settings Saved to: " + fileName + " With Initial Size: " + data.length);
-		
-		//Cleanup: 
-		s.close();
-		bos.close();
-		fileWriter.close();   		
+		new SaveManager().saveFile("/settings.xml", settings);
 	}	
 
 	/**
@@ -524,11 +490,6 @@ public class FileManager
 	public Settings loadSettings() 
 			throws IOException, ClassNotFoundException
 	{
-		String fileName = BASE_PATH + "/settings.dat";
-		ObjectInputStream ois = new ObjectInputStream(new DataInputStream(new GZIPInputStream(new FileInputStream(fileName)))); //Open an input stream
-		Settings settings = (Settings)ois.readObject(); //Load the object
-	    System.out.println("Settings loaded from: " + fileName);
-		ois.close();
-		return settings;
+		return (Settings)new SaveManager().loadFile("/settings.xml");
 	}
 }

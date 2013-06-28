@@ -1,9 +1,12 @@
 package io;
-import java.io.DataInputStream;
-import java.io.FileInputStream;
-import java.io.ObjectInputStream;
 import java.util.concurrent.Callable;
-import java.util.zip.GZIPInputStream;
+
+import savable.SavableBlock;
+import savable.SavableChunk;
+import savable.SaveManager;
+import world.Biome;
+import blocks.Block;
+import blocks.BlockChest;
 
 public class CallableLoadChunk implements Callable<Chunk>
 {
@@ -20,17 +23,37 @@ public class CallableLoadChunk implements Callable<Chunk>
 	
 	public Chunk call() throws Exception
 	{
-		String fileName = basepath + "/" + x + ".wdat";
-		ObjectInputStream ois = new ObjectInputStream(new DataInputStream(new GZIPInputStream(new FileInputStream(fileName)))); //Open an input stream
-		Chunk chunk = (Chunk)ois.readObject(); //Load the object
-		System.out.println("Chunk Loaded From File Path : " + fileName);
-		ois.close();
+		SavableChunk savable = (SavableChunk)new SaveManager().loadCompressedFile(basepath + "/" + x + ".trc");
+		Chunk chunk = new Chunk(Biome.getBiomeFromBiomeList(savable.biomeID), savable.x, savable.height);
+		chunk.light = savable.light;
+		chunk.diffuseLight = savable.diffuseLight;
+		chunk.ambientLight = savable.ambientLight;
+		chunk.backWalls = convertFromSavable(savable.backWalls);
+		chunk.blocks = convertFromSavable(savable.blocks);
+		chunk.setChanged(savable.wasChanged);
+		chunk.setFlaggedForLightingUpdate(true);
+		System.out.println("Chunk Loaded From File Path : " + basepath + "/" + x + ".trc");
 		manager.unlockChunk(chunk.getX());
 		return chunk;
 	}
 	
-	public String getBasePath()
+	private Block[][] convertFromSavable(SavableBlock[][] savables)
 	{
-		return basepath;
+		Block[][] blocks = new Block[savables.length][savables[0].length];
+		for(int i = 0; i < savables.length; i++)
+		{
+			for(int k = 0; k < savables[0].length; k++)
+			{
+				Block block = Block.blocksList[savables[i][k].id].clone();
+				block.setBitMap(savables[i][k].bitMap);
+				block.metaData = savables[i][k].metaData;
+				if(block instanceof BlockChest)
+				{
+					((BlockChest)(block)).setInventory(savables[i][k].mainInventory);
+				}
+				blocks[i][k] = block;			
+			}
+		}
+		return blocks;
 	}
 }

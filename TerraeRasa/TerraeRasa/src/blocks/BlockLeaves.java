@@ -1,13 +1,10 @@
 package blocks;
 
-import java.io.Serializable;
-
 import utils.ItemStack;
 
 
-public class BlockLeaves extends Block implements Serializable
+public class BlockLeaves extends Block 
 {
-	private static final long serialVersionUID = 1L;
 	
 	public BlockLeaves(int i)
 	{

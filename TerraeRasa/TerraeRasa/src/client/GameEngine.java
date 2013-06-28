@@ -4,7 +4,10 @@ import hardware.Keys;
 import hardware.MouseInput;
 import items.Item;
 
+import java.beans.DefaultPersistenceDelegate;
+import java.beans.XMLEncoder;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.lwjgl.opengl.Display;
@@ -238,10 +241,10 @@ public class GameEngine
 	 */
 	public void startGame(World world, EntityPlayer player)
 	{
-		if(this.world != null)
-		{
-			throw new RuntimeException("World already exists!");
-		}
+//		if(this.world != null)
+//		{
+//			throw new RuntimeException("World already exists!");
+//		}
 		this.world = world;
 		this.world.initSoundEngine(soundEngine);
 		this.player = player;
@@ -546,16 +549,6 @@ public class GameEngine
 			world.saveRemainingWorld();
 		}
 		
-		while(world.hasChunksLeft())
-		{
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-
-		world = null;
 		TerraeRasa.isMainMenuOpen = true;
 		resetMainMenu();
 	}

@@ -1,9 +1,7 @@
 package statuseffects;
 
-import java.io.Serializable;
-
-import entities.EntityLiving;
 import world.World;
+import entities.EntityLiving;
 
 /**
  * A StatusEffect is any short term beneficial or negative effect. They can be applied to an EntityLiving or any subclass
@@ -22,9 +20,8 @@ import world.World;
  * @since       1.0
  */
 public class StatusEffect 
-		implements Serializable, IStatusEffect
+		 implements IStatusEffect
 {
-	private static final long serialVersionUID = 1L;
 	public boolean reapplicationSkipsRemovalEffect;
 	public int ticksLeft;
 	public int tier;

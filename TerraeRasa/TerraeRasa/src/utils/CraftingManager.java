@@ -1,6 +1,5 @@
 package utils;
 
-import java.io.Serializable;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -24,9 +23,7 @@ import blocks.Block;
  * @since       1.0
  */
 public class CraftingManager 
-		implements Serializable
 {
-	private static final long serialVersionUID = 1L;
 	private static final Dictionary<String, Recipe[]> recipesByBlock = new Hashtable<String, Recipe[]>();
 	/** A list of all Blocks that can be considered a prerequisite to crafting something. For example, a Crafting Table. 
 	 	Block.none is not included here because the recipes are always available, independant to blocks */

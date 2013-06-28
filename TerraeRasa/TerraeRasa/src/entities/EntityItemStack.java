@@ -7,8 +7,6 @@ import utils.ActionbarItem;
 import utils.ItemStack;
 
 /**
- * <code>EntityItemStack extends EntityLiving</code> and <code>implements Serializable</code>
- * <br>
  * <code>EntityItemStack</code> implements a basic ItemStack entity that the world is able
  * to maintain, display, or possibly destroy. By default the fall speed is 1.8f, and the EntityItemStack
  * has only 1 (max)Health. EntityItemStacks can, in theory, die due to any damage at all, but in 
@@ -20,7 +18,6 @@ import utils.ItemStack;
  */
 public class EntityItemStack extends EntityParticle
 {
-	private static final long serialVersionUID = 1L;
 	private int ticksBeforePickup;
 	private ItemStack stack;
 	

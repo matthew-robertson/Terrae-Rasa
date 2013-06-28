@@ -22,6 +22,8 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 
 import render.Render;
+import savable.SavableWorld;
+import savable.SaveManager;
 import statuseffects.StatusEffectStun;
 import utils.ActionbarItem;
 import utils.Damage;
@@ -50,7 +52,6 @@ import enums.EnumEventType;
 import enums.EnumWorldDifficulty;
 
 /**
- * <code>World implements Serializable</code> <br>
  * <code>World</code> implements many of the key features for TerraeRasa to actually run properly and update. 
  * <br><br>
  * All players, chunks, Biomes, EntityEnemies, EntityLivingItemStacks, TemporaryText, Weather are stored in the 
@@ -241,40 +242,24 @@ public class World
 			throws FileNotFoundException, IOException, ClassNotFoundException
 	{
 		//Open an input stream for the file
-		ObjectInputStream ois = new ObjectInputStream(new DataInputStream(new GZIPInputStream(new FileInputStream(BASE_PATH + "/World Saves/" + universeName + "/" + dir + "/worlddata.dat")))); 
+	
+		SaveManager manager = new SaveManager();
+	
+		SavableWorld savable = (SavableWorld)(manager.loadFile("/World Saves/" + universeName + "/" + dir + "/worlddata.xml"));
+		this.width = savable.width;
+		this.height = savable.height;
+		this.chunkWidth = savable.chunkWidth;
+		this.chunkHeight = savable.chunkHeight;
+		this.averageSkyHeight = savable.averageSkyHeight;
+		this.generatedHeightMap = savable.generatedHeightMap;
+		this.worldTime = savable.worldTime;
+		this.worldName = savable.worldName;
+		this.totalBiomes = savable.totalBiomes;
+		this.difficulty = savable.difficulty;
+
+	
 		
-		/**
-		Variables are loaded in the following order:
-			worldName
-			width
-			height
-			chunkWidth
-			chunkHeight
-			averageSkyHeight
-			generatedHeightMap
-			worldTime
-			totalTimes
-			difficulty
-			biomes
-			biomesByColumn
-		**/
 		
-		width = Integer.valueOf((ois.readObject()).toString()).intValue();
-		height = Integer.valueOf((ois.readObject()).toString()).intValue();
-		chunkWidth = Integer.valueOf((ois.readObject()).toString()).intValue();
-		chunkHeight = Integer.valueOf((ois.readObject()).toString()).intValue();
-		averageSkyHeight = Integer.valueOf((ois.readObject()).toString()).intValue();
-		generatedHeightMap = (int[])ois.readObject();
-		worldTime = Long.valueOf((ois.readObject()).toString()).longValue();
-		worldName = String.valueOf(ois.readObject()).toString();
-		totalBiomes = Integer.valueOf((ois.readObject()).toString()).intValue();
-		difficulty = (EnumWorldDifficulty)ois.readObject();
-		itemsList = (ArrayList<EntityItemStack>)ois.readObject();
-		
-		System.out.println("Loaded And Applied World Data");
-		ois.close();
-		//Finalize construction of the world. For example, chunkManager must be constructed here as it depends on variables 
-		//from the .dat file
 		finishWorldReconstruction(universeName);
 	}
 	

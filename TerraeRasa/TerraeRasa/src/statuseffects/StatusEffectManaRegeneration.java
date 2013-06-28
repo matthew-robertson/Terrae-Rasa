@@ -14,7 +14,6 @@ import entities.EntityLiving;
  */
 public class StatusEffectManaRegeneration extends StatusEffect
 {
-	private static final long serialVersionUID = 1L;
 
 	public StatusEffectManaRegeneration(double durationSeconds, int tier, double power, int ticksBetweenEffect)
 	{

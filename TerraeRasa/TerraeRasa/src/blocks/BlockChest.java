@@ -3,7 +3,6 @@ package blocks;
 import utils.ItemStack;
 
 /**
- * <code>BlockChest extends Block implements Serializable</code> <br>
  * BlockChest is an extension of Block that allows items to be stored in it. Items can be placed in 
  * the chest with {@link #placeItemStack(ItemStack, int)} and removed using {@link #takeItemStack(int)}. 
  * Most methods which request an ItemStack make a deep copy to prevent reference errors, but this is not the 
@@ -18,7 +17,6 @@ import utils.ItemStack;
  */
 public class BlockChest extends Block
 {
-	private static final long serialVersionUID = 1L;
 	/** The contents of the chest. */
 	private ItemStack[] mainInventory;
 	/** The size of the mainInventory[], preferably a multiple of 5. */
@@ -142,6 +140,15 @@ public class BlockChest extends Block
 	public int getInventorySize()
 	{
 		return inventorySize;
+	}
+	
+	/**
+	 * Sets the mainInventory[] to the given ItemStacks
+	 * @param stacks the new contains of the mainInventory[]
+	 */
+	public void setInventory(ItemStack[] stacks)
+	{
+		this.mainInventory = stacks;
 	}
 	
 	/**

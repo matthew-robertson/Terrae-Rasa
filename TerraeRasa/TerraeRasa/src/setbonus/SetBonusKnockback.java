@@ -12,7 +12,6 @@ import entities.EntityPlayer;
  */
 public class SetBonusKnockback extends SetBonus 
 {
-	private static final long serialVersionUID = 1L;
 
 	public SetBonusKnockback(double power)
 	{

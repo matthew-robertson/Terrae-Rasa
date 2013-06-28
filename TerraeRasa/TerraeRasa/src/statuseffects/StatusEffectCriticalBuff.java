@@ -13,7 +13,6 @@ import entities.EntityLiving;
  */
 public class StatusEffectCriticalBuff extends StatusEffect
 {
-	private static final long serialVersionUID = 1L;
 
 	/**
 	 * Creates a critical strike buff effect. A critical buff's strength is based on it's power, indicating the overall % of increase. 

@@ -1,6 +1,5 @@
 package auras;
 
-import java.io.Serializable;
 import java.util.Random;
 
 import utils.Damage;
@@ -25,9 +24,8 @@ import entities.EntityPlayer;
  * @since       1.0
  */
 public class Aura 
-		implements IAura, Serializable
+		implements IAura  
 {
-	private static final long serialVersionUID = 1L;
 	protected final Random random;
 	/** The maximum cooldown of the Aura in game ticks. This will be the cooldown triggered when the aura actives. A value of zero or one indicates no cooldown*/
 	protected int maxCooldown;

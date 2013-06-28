@@ -12,7 +12,6 @@ import world.World;
  */
 public class StatusEffectStun extends StatusEffect
 {
-	private static final long serialVersionUID = 1L;
 
 	public StatusEffectStun(double durationSeconds, int tier, int power, int ticksBetweenEffect) 
 	{

@@ -12,7 +12,6 @@ import entities.EntityPlayer;
  */
 public class SetBonusDamageMagic extends SetBonus
 {
-	private static final long serialVersionUID = 1L;
 
 	public SetBonusDamageMagic(double power) 
 	{

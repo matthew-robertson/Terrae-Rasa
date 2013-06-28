@@ -12,7 +12,6 @@ import entities.EntityPlayer;
  */
 public class SetBonusCriticalStrike extends SetBonus
 {
-	private static final long serialVersionUID = 1L;
 
 	public SetBonusCriticalStrike(double power) 
 	{

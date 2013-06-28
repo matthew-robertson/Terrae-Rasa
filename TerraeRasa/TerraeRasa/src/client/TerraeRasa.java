@@ -1,5 +1,7 @@
 package client;
 
+import io.Chunk;
+
 import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Color;
@@ -17,7 +19,11 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.PixelFormat;
 
 import render.Render;
+import world.Biome;
 import world.World;
+
+import com.thoughtworks.xstream.XStream;
+
 import entities.EntityPlayer;
 
 /**

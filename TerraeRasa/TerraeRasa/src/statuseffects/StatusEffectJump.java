@@ -13,7 +13,6 @@ import entities.EntityLiving;
  */
 public class StatusEffectJump extends StatusEffect
 {
-	private static final long serialVersionUID = 1L;
 
 	/**
 	 * 

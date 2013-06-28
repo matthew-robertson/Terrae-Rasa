@@ -13,7 +13,6 @@ import entities.EntityPlayer;
  */
 public class SetBonusManaBoost extends SetBonus
 {
-	private static final long serialVersionUID = 1L;
 
 	protected SetBonusManaBoost(double power) 
 	{

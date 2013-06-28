@@ -1,10 +1,12 @@
 package io;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.ObjectOutputStream;
 import java.util.concurrent.Callable;
-import java.util.zip.GZIPOutputStream;
+
+import savable.SavableBlock;
+import savable.SavableChunk;
+import savable.SaveManager;
+import utils.ItemStack;
+import blocks.Block;
+import blocks.BlockChest;
 
 public class CallableSaveChunk implements Callable<Boolean>
 {
@@ -23,20 +25,41 @@ public class CallableSaveChunk implements Callable<Boolean>
 	
 	public Boolean call() throws Exception 
 	{
-		String fileName = (basepath + "/" + x + ".wdat"); 
-		GZIPOutputStream fileWriter = new GZIPOutputStream(new FileOutputStream(new File(fileName))); //Open an output stream
-	    ByteArrayOutputStream bos = new ByteArrayOutputStream(); //Convert world to byte[]
-		ObjectOutputStream s = new ObjectOutputStream(bos); //open the OOS, used to save serialized objects to file
-		s.writeObject(chunk); //write the byte[] to the OOS
-		byte data[] = bos.toByteArray();
-		fileWriter.write(data, 0, data.length); //Actually save it to file
-		System.out.println("Chunk Saved to: " + fileName + " With Initial Size: " + data.length + " X: " + x);
-		
-		//Cleanup: 
-		s.close();
-		bos.close();
-		fileWriter.close();     
+		SavableChunk savable = new SavableChunk();
+		savable.biomeID = chunk.getBiome().getBiomeID();
+		savable.light = chunk.getLight();
+		savable.diffuseLight = chunk.diffuseLight;
+		savable.ambientLight = chunk.ambientLight;
+		savable.backWalls = convertToSavable(chunk.backWalls);
+		savable.blocks = convertToSavable(chunk.blocks);
+		savable.x = chunk.getX();
+		savable.wasChanged = chunk.getChanged();
+		savable.height = chunk.getHeight();
+		savable.lightUpdated = true;
+		savable.flaggedForLightingUpdate = true;
+			
+		SaveManager smanager = new SaveManager();
+		smanager.saveCompressedFile(basepath + "/" + x + ".trc", savable);
+		System.out.println("Chunk Saved to: " + basepath + "/" + x + ".trc");
 		manager.unlockChunk(chunk.getX());
 		return true;
+	}
+	
+	private SavableBlock[][] convertToSavable(Block[][] blocks)
+	{
+		SavableBlock[][] savables = new SavableBlock[blocks.length][blocks[0].length];
+		for(int i = 0; i < savables.length; i++)
+		{
+			for(int k = 0; k < savables[0].length; k++)
+			{
+				SavableBlock sblock = new SavableBlock();
+				sblock.bitMap = blocks[i][k].getBitMap();
+				sblock.id = blocks[i][k].getID();
+				sblock.metaData = blocks[i][k].metaData;
+				sblock.mainInventory = (blocks[i][k] instanceof BlockChest) ? ((BlockChest)(blocks[i][k])).getMainInventory() : new ItemStack[0];
+				savables[i][k] = sblock;			
+			}
+		}
+		return savables;
 	}
 }

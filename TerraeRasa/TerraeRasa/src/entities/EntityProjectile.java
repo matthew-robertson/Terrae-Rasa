@@ -6,7 +6,6 @@ import world.World;
 
 public class EntityProjectile extends EntityParticle 
 {
-	private static final long serialVersionUID = 1L;
 	public int damage;
 	public boolean isFriendly;
 	public boolean isHostile;

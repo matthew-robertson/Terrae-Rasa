@@ -14,7 +14,6 @@ import entities.EntityLiving;
  */
 public class StatusEffectAttackSpeedBuff extends StatusEffect
 {
-	private static final long serialVersionUID = 1L;
 
 	/**
 	 * Creates a new attack speed effect. An attack speed effect's strength is based on it's power, indicating the overall % of increase. 

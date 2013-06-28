@@ -1,7 +1,5 @@
 package utils;
 
-import java.io.Serializable;
-
 import items.ItemGem;
 
 /**
@@ -13,9 +11,8 @@ import items.ItemGem;
  * @since       1.0
  */
 public class GemSocket
-		implements Serializable
+		 
 {
-	private static final long serialVersionUID = 1L;
 	private ItemGem gem;
 	
 	/**

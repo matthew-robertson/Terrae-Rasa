@@ -1,10 +1,8 @@
 package world;
 
-import java.io.Serializable;
 
-public class BiomeDesert extends Biome implements Serializable
+public class BiomeDesert extends Biome 
 {
-	private static final long serialVersionUID = 1L;
 	
 	public BiomeDesert(int i, String name) 
 	{

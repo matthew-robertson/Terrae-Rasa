@@ -17,7 +17,6 @@ import enums.EnumDamageType;
  */
 public class StatusEffectFatalWounds extends StatusEffect
 {
-	private static final long serialVersionUID = 1L;
 
 	public StatusEffectFatalWounds(double durationSeconds, int tier, int power, int ticksBetweenEffect) 
 	{

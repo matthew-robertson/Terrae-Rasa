@@ -13,7 +13,6 @@ import entities.EntityLiving;
  */
 public class StatusEffectDazed extends StatusEffect
 {
-	private static final long serialVersionUID = 1L;
 	
 	/**
 	 * Creates a new daze effect. A daze effect's strength is based on it's power from 0-1F, indicating the overall % slowed. 

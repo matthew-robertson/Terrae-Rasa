@@ -1,14 +1,10 @@
 package io;
 
-import java.io.Serializable;
-
 import utils.MathHelper;
 import world.Biome;
-
 import blocks.Block;
 
 /**
- * <code>Chunk implements Serializable</code>
  * <br>
  * <code>Chunk</code> implements something that is similar to a C(++) struct. A Chunk stores data relating to
  * Backwalls, Blocks, Biomes, and lighting data(including ambient, diffuse, and total). Upon initialization, 
@@ -31,23 +27,21 @@ import blocks.Block;
  * @since       1.0
  */
 public class Chunk 
-		implements Serializable
+		 
 {
-	/** V2 includes lighting */
-	private static final long serialVersionUID = 2L;
 	private Biome biome;
 	/** Light is the total of ambient and diffuse light. This value is inverted (0.0F becomes 1.0F, etc) to optimize rendering */
-	public final double[][] light;
+	public float[][] light;
 	/** Diffuse light is light from light sources*/
-	public final double[][] diffuseLight;
+	public float[][] diffuseLight;
 	/** Ambient light is light from the sun */
-	public final double[][] ambientLight;
-	public final Block[][] backWalls;
-	public final Block[][] blocks;
-	private final int X;
+	public float[][] ambientLight;
+	public Block[][] backWalls;
+	public Block[][] blocks;
+	private final int x;
 	private boolean wasChanged;
 	private static final int CHUNK_WIDTH = 100;
-	private final int CHUNK_HEIGHT;
+	private final int height;
 	private boolean lightUpdated;
 	private boolean flaggedForLightingUpdate;
 	
@@ -61,13 +55,13 @@ public class Chunk
 	 */
 	public Chunk(Biome biome, int x, final int height)
 	{
-		this.CHUNK_HEIGHT = height;
+		this.height = height;
 		this.biome = new Biome(biome);
-		blocks = new Block[CHUNK_WIDTH][CHUNK_HEIGHT];
-		backWalls = new Block[CHUNK_WIDTH][CHUNK_HEIGHT];
+		blocks = new Block[CHUNK_WIDTH][height];
+		backWalls = new Block[CHUNK_WIDTH][height];
 		for(int i = 0; i < CHUNK_WIDTH; i++)
 		{
-			for(int j = 0; j < CHUNK_HEIGHT; j++)
+			for(int j = 0; j < height; j++)
 			{
 				blocks[i][j] = Block.air;
 				backWalls[i][j] = Block.backAir;
@@ -75,10 +69,10 @@ public class Chunk
 		}
 		
 		setFlaggedForLightingUpdate(false);
-		light = new double[CHUNK_WIDTH][CHUNK_HEIGHT];
-		diffuseLight = new double[CHUNK_WIDTH][CHUNK_HEIGHT];
-		ambientLight = new double[CHUNK_WIDTH][CHUNK_HEIGHT];
-		this.X = x;
+		light = new float[CHUNK_WIDTH][height];
+		diffuseLight = new float[CHUNK_WIDTH][height];
+		ambientLight = new float[CHUNK_WIDTH][height];
+		this.x = x;
 	}
 	
 	/**
@@ -95,9 +89,9 @@ public class Chunk
 	 * world's height.
 	 * @return the height of this chunk
 	 */
-	public final int getChunkHeight()
+	public final int getHeight()
 	{
-		return CHUNK_HEIGHT;
+		return height;
 	}
 	
 	/**
@@ -122,7 +116,7 @@ public class Chunk
 	 * Gets the light[][] stored in this instanceof Chunk
 	 * @return the light array for this Chunk
 	 */
-	public final double[][] getLight()
+	public final float[][] getLight()
 	{
 		return light;
 	}
@@ -201,7 +195,7 @@ public class Chunk
 	 */
 	public synchronized void setDiffuseLight(double strength, int x, int y)
 	{
-		diffuseLight[x][y] = strength;
+		diffuseLight[x][y] = (float) strength;
 	}
 	
 	/**
@@ -212,7 +206,7 @@ public class Chunk
 	 */
 	public synchronized void setAmbientLight(double strength, int x, int y)
 	{
-		ambientLight[x][y] = strength;
+		ambientLight[x][y] = (float) strength;
 	}
 	
 	/**
@@ -230,7 +224,7 @@ public class Chunk
 	 */
 	public final int getX()
 	{
-		return X;
+		return x;
 	}
 	
 	/**
@@ -265,9 +259,9 @@ public class Chunk
 	{
 		for(int i = 0; i < CHUNK_WIDTH; i++)
 		{
-			for(int k = 0; k < CHUNK_HEIGHT; k++)
+			for(int k = 0; k < height; k++)
 			{
-				light[i][k] = MathHelper.sat(1.0F - ambientLight[i][k] - diffuseLight[i][k]);
+				light[i][k] = (float) MathHelper.sat(1.0F - ambientLight[i][k] - diffuseLight[i][k]);
 			}
 		}	
 	}
@@ -279,7 +273,7 @@ public class Chunk
 	{
 		for(int i = 0; i < CHUNK_WIDTH; i++)
 		{
-			for(int k = 0; k < CHUNK_HEIGHT; k++)
+			for(int k = 0; k < height; k++)
 			{
 				ambientLight[i][k] = 0.0F;
 			}

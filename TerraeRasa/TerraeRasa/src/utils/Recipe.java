@@ -1,7 +1,5 @@
 package utils;
 
-import java.io.Serializable;
-
 import blocks.Block;
 
 /**
@@ -14,9 +12,7 @@ import blocks.Block;
  * @since       1.0
  */
 public class Recipe 
-		implements Serializable
 {
-	private static final long serialVersionUID = 1L;
 	/** What the recipe yields */
 	private ItemStack result; 
 	/** What the recipe requires. */

@@ -1,9 +1,6 @@
 package auras;
 
-import java.io.Serializable;
 import java.util.Vector;
-
-import entities.EntityPlayer;
 
 /**
  * An aura container holds an array of auras for further use. For example, this is useful when 
@@ -16,9 +13,8 @@ import entities.EntityPlayer;
  * @since       1.0
  */
 public class AuraContainer 
-		implements Serializable
+		 
 {
-	private static final long serialVersionUID = 1L;
 	private Aura[] auras;
 	
 	/**

@@ -17,7 +17,6 @@ import world.World;
  */
 public class StatusEffectBleed extends StatusEffect 
 {
-	private static final long serialVersionUID = 1L;
 
 	public StatusEffectBleed(double durationSeconds, int tier, int power, int ticksBetweenEffect) 
 	{

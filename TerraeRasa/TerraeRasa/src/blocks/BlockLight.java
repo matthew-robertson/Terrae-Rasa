@@ -2,7 +2,6 @@ package blocks;
 
 public class BlockLight extends Block
 {
-	private static final long serialVersionUID = 1L;
 	public double lightStrength;
 	public int lightRadius;
 	

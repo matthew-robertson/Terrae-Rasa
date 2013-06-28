@@ -1,7 +1,5 @@
 package entities;
 
-import java.io.Serializable;
-
 import utils.MathHelper;
 import world.World;
 import blocks.Block;
@@ -12,16 +10,14 @@ import blocks.Block;
  * custom functionality. The Entity base class accounts for movement - something all entities will want to
  * do at some point.
  * <br><br>
- * Implements: Serializable
  * @author      Alec Sobeck
  * @author      Matthew Robertson
  * @version     1.0
  * @since       1.0
  */
 public class Entity 
-		implements Serializable
+		 
 {
-	private static final long serialVersionUID = 1L;
 	/** The x position of the entity in pixels. */
 	public double x;
 	/** The y position of the entity in pixels. */

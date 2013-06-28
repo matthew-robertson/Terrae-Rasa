@@ -1,14 +1,10 @@
 package blocks;
 
-import java.io.Serializable;
-
 import utils.ItemStack;
 
 
-public class BlockGrass extends Block implements Serializable
+public class BlockGrass extends Block
 {
-	private static final long serialVersionUID = 1L;
-
 	public BlockGrass(int i)
 	{
 		super(i);

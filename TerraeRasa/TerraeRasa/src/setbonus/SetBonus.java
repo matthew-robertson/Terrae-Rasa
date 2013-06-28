@@ -1,7 +1,5 @@
 package setbonus;
 
-import java.io.Serializable;
-
 import entities.EntityPlayer;
 
 /**
@@ -15,9 +13,8 @@ import entities.EntityPlayer;
  * @since       1.0
  */
 public abstract class SetBonus 
-		implements Serializable, ISetBonus
+		 implements ISetBonus
 {
-	private static final long serialVersionUID = 1L;
 	/** A value that determines the strength of a set bonus. Effects vary by actual bonus. */
 	protected double power;
 	/** The number of pieces required to activate this set bonus. */

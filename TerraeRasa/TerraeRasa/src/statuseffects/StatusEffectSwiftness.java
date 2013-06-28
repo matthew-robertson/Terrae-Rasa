@@ -13,7 +13,6 @@ import entities.EntityLiving;
  */
 public class StatusEffectSwiftness extends StatusEffect
 {
-	private static final long serialVersionUID = 1L;
 
 	/**
 	 * Creates a new damage speed effect. A speed effect's strength is based on it's power, indicating the overall % of increase. 

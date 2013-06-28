@@ -11,7 +11,6 @@ import entities.EntityPlayer;
  */
 public class SetBonusStamina extends SetBonus
 {
-	private static final long serialVersionUID = 1L;
 
 	public SetBonusStamina(double power) 
 	{

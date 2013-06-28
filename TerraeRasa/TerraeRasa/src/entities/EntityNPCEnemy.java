@@ -14,10 +14,6 @@ import enums.EnumDamageType;
 import enums.EnumMonsterType;
 
 /**
- * <code>EntityNPCEnemy extends EntityNPC</code>, 
- * and <code>implements Serializable</code>
- * (as a result of extending <code>EntityLiving</code>)
- * <br> 
  * <code>EntityNPCEnemy</code> implements many of the features and fields needed for a monster.
  * It provides a public implementation of {@link #clone()}, so that monsters
  * can be added to world, from their public final static declarations here.
@@ -41,7 +37,6 @@ import enums.EnumMonsterType;
  */
 public class EntityNPCEnemy extends EntityNPC 
 {	
-	private static final long serialVersionUID = 1L;	
 	public String type;
 	public String time;
 	protected final Random random = new Random();

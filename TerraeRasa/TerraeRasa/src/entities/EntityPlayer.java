@@ -44,7 +44,6 @@ import enums.EnumPlayerDifficulty;
 import enums.EnumToolMaterial;
 
 /**
- * <code>EntityPlayer</code> extends <code>EntityLiving</code> and implements Serializable
  * <br><br>
  * EntityPlayer implements all the features needed for the user's character. 
  * <br><br>
@@ -77,7 +76,6 @@ import enums.EnumToolMaterial;
  */
 public class EntityPlayer extends EntityLiving
 {
-	private static final long serialVersionUID = 2L;
 	private final static int HEALTH_FROM_STAMINA = 10;
 	private final static int MANA_FROM_INTELLECT = 10;
 	/** This value apparently has to be negative. */

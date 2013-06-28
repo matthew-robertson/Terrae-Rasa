@@ -1,6 +1,5 @@
 package setbonus;
 
-import java.io.Serializable;
 import java.util.Vector;
 
 import entities.EntityPlayer;
@@ -16,9 +15,7 @@ import entities.EntityPlayer;
  * @since       1.0
  */
 public class SetBonusContainer 
-		implements Serializable
 {
-	private static final long serialVersionUID = 1L;
 	private SetBonus[] bonuses;
 	
 	/**

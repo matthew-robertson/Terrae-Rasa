@@ -12,7 +12,6 @@ import entities.EntityPlayer;
  */
 public class SetBonusFallHeight extends SetBonus
 {
-	private static final long serialVersionUID = 1L;
 
 	public SetBonusFallHeight(double power) 
 	{

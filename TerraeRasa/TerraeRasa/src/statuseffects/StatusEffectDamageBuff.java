@@ -13,7 +13,6 @@ import entities.EntityLiving;
  */
 public class StatusEffectDamageBuff extends StatusEffect
 {
-	private static final long serialVersionUID = 1L;
 
 	/**
 	 * Creates a new damage buff effect. A damagebuff's strength is based on it's power, indicating the overall % of increase. 

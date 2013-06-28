@@ -1,12 +1,8 @@
 package io;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.concurrent.Callable;
-import java.util.zip.GZIPOutputStream;
 
 import world.World;
 import world.WorldGenEarth;
@@ -67,22 +63,11 @@ public class CallableGenerateWorld implements Callable<World>
 	 */
 	private void saveWorld(World world) throws FileNotFoundException, IOException
 	{
-		verifyDirectoriesExist();
-		
-		String fileName = (BASE_PATH + "/World Saves/" + world.getWorldName() + ".dat"); 
-		GZIPOutputStream fileWriter = new GZIPOutputStream(new FileOutputStream(new File(fileName))); //Open an output stream
-	    ByteArrayOutputStream bos = new ByteArrayOutputStream(); //Convert world to byte[]
-		ObjectOutputStream s = new ObjectOutputStream(bos); //open the OOS, used to save serialized objects to file
-		
-		s.writeObject(world); //write the byte[] to the OOS
-		byte data[] = bos.toByteArray();
-		fileWriter.write(data, 0, data.length); //Actually save it to file
-		System.out.println("World Saved to: " + fileName + " With Initial Size: " + data.length);
-		
-		//Cleanup: 
-		s.close();
-		bos.close();
-		fileWriter.close();      
+		throw new RuntimeException("NYI");
+//		verifyDirectoriesExist();
+//		
+//		String fileName = (BASE_PATH + "/World Saves/" + world.getWorldName() + ".dat"); 
+//		GZIPOutputStream fileWriter = new GZIPOutputStream(new FileOutputStream(new File(fileName))); //Open an output stream
 	}
 	
 	/**

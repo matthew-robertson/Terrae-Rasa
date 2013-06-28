@@ -1,9 +1,6 @@
 package io;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -11,8 +8,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.zip.GZIPOutputStream;
 
+import savable.SavableWorld;
+import savable.SaveManager;
 import world.World;
 import client.TerraeRasa;
 
@@ -187,7 +185,7 @@ public class ChunkManager
 	private void submitSaveOperation(Chunk chunk, String dir, int x)
 	{
 		Future<Boolean> event = threadPool.submit(new CallableSaveChunk(this,
-				chunk, x, BASE_PATH + "/World Saves/" + universeName + "/" + dir,
+				chunk, x, "/World Saves/" + universeName + "/" + dir,
 				universeName));
 		scheduledSaveOperations.add(event);
 	}
@@ -195,7 +193,7 @@ public class ChunkManager
 	private void submitLoadOperation(String dir, int x)	
 	{
 		Future<Chunk> event = threadPool.submit(new CallableLoadChunk(this, 
-				x, BASE_PATH + "/World Saves/" + universeName + "/" + dir, 
+				x, "/World Saves/" + universeName + "/" + dir, 
 				universeName));
 		scheduledLoadOperations.add(event);
 	}
@@ -269,47 +267,21 @@ public class ChunkManager
 	{
 		try
 		{
-			GZIPOutputStream fileWriter = new GZIPOutputStream(
-					new FileOutputStream(new File(BASE_PATH + "/World Saves/"
-							+ universeName + "/" + world.getWorldName() + "/worlddata.dat"))); 
-		    ByteArrayOutputStream bos = new ByteArrayOutputStream(); //Open a stream to turn objects into byte[]
-			ObjectOutputStream s = new ObjectOutputStream(bos); //open the OOS, used to save serialized objects to file
-			
-			/**
-			Variables are saved in the following order:
-				width
-				height
-				chunkWidth
-				chunkHeight
-				averageSkyHeight
-				generatedHeightMap
-				worldTime
-				totalTimes
-				difficulty
-				biomes
-				biomesByColumn
-			**/
+			SavableWorld savable = new SavableWorld();
+			savable.width = world.getWidth();
+			savable.height = world.getHeight();
+			savable.chunkWidth = world.getChunkWidth();
+			savable.chunkHeight = world.getChunkHeight();
+			savable.averageSkyHeight = world.getAverageSkyHeight();
+			savable.generatedHeightMap = world.getGeneratedHeightMap();
+			savable.worldTime = world.getWorldTime();
+			savable.worldName = world.getWorldName();
+			savable.totalBiomes = world.getTotalBiomes();
+			savable.difficulty = world.getDifficulty();
 
-			s.writeObject(world.getWidth());
-			s.writeObject(world.getHeight());
-			s.writeObject(world.getChunkWidth());
-			s.writeObject(world.getChunkHeight());
-			s.writeObject(world.getAverageSkyHeight());
-			s.writeObject(world.getGeneratedHeightMap());
-			s.writeObject(world.getWorldTime());
-			s.writeObject(world.getWorldName());
-			s.writeObject(world.getTotalBiomes());
-			s.writeObject(world.getDifficulty());
+			SaveManager manager = new SaveManager();
+			manager.saveFile("/World Saves/" + universeName + "/" + world.getWorldName() + "/worlddata.xml", savable);
 			
-			s.writeObject(world.itemsList);
-			byte data[] = bos.toByteArray();
-			fileWriter.write(data, 0, data.length); //Actually save it to file
-			
-			//Cleanup: 
-			s.close();
-			bos.close();
-			fileWriter.close();      
-			System.out.println("Saved World Data File");
 		}
 		catch (IOException e) 
 		{

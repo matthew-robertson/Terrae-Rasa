@@ -14,7 +14,6 @@ import entities.EntityLiving;
  */
 public class StatusEffectHybrid extends StatusEffect 
 {
-	private static final long serialVersionUID = 1L;
 	/** The effects caused by this HybridEffect*/
 	private StatusEffect[] effects;
 	

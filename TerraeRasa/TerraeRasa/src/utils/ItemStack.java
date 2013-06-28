@@ -2,16 +2,12 @@ package utils;
 
 import items.Item;
 import items.ItemGem;
-
-import java.io.Serializable;
-
 import setbonus.SetBonus;
 import spells.Spell;
 import auras.Aura;
 import blocks.Block;
 
 /**
- * <code>ItemStack implements Serializable</code>
  * <br><br>
  * ItemStack contains information about an item stored in an inventory of some sort, 
  * generally a: Chest, InventoryPlayer, or EntityItemStack. An ItemStack contains fields for 
@@ -32,9 +28,8 @@ import blocks.Block;
  * @since       1.0
  */
 public class ItemStack 
-		implements Serializable
+		 
 {
-	private static final long serialVersionUID = 1L;
 	private String itemName;
 	private int stackSize;
 	private int maxStackSize;

@@ -400,7 +400,7 @@ public class LightUtils
 								leftLight -= LIGHT_BLOCK_DISSIPATES;
 													
 							if(chunk.ambientLight[x - leftOffset][j] < leftLight)
-								chunk.ambientLight[x - leftOffset][j] =  leftLight;
+								chunk.ambientLight[x - leftOffset][j] =  (float) leftLight;
 							
 							if(leftLight <= 0.0F)
 							{
@@ -424,7 +424,7 @@ public class LightUtils
 								rightLight -= LIGHT_BLOCK_DISSIPATES;
 													
 							if(chunk.ambientLight[x + rightOffset][j] < rightLight)
-								chunk.ambientLight[x + rightOffset][j] = rightLight;
+								chunk.ambientLight[x + rightOffset][j] = (float) rightLight;
 							
 							if(rightLight <= 0.0F)
 							{
@@ -443,7 +443,7 @@ public class LightUtils
 				//}
 				
 				if(chunk.ambientLight[x][y] < tmpLight)
-					chunk.ambientLight[x][y] = tmpLight;
+					chunk.ambientLight[x][y] = (float) tmpLight;
 				
 				y++;
 			}

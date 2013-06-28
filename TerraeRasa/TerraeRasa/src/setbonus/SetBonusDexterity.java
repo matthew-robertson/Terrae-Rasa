@@ -12,7 +12,6 @@ import entities.EntityPlayer;
  */
 public class SetBonusDexterity extends SetBonus
 {
-	private static final long serialVersionUID = 1L;
 
 	public SetBonusDexterity(double power) 
 	{

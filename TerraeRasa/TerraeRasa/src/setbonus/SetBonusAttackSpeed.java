@@ -13,7 +13,6 @@ import entities.EntityPlayer;
  */
 public class SetBonusAttackSpeed extends SetBonus
 {
-	private static final long serialVersionUID = 1L;
 
 	public SetBonusAttackSpeed(double power) 
 	{

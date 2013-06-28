@@ -4,7 +4,6 @@ import render.Render;
 
 public class EntityNPCFriendly extends EntityNPC
 {
-	private static final long serialVersionUID = 1L;
 
 	public EntityNPCFriendly(int i, String name) 
 	{

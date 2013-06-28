@@ -1,15 +1,13 @@
 package world;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import entities.EntityNPCEnemy;
 
-
-public class Biome implements Serializable, Cloneable
+public class Biome 
+		 implements Cloneable
 {
-	private static final long serialVersionUID = 1L;
 	protected int biomeID;
 	protected double x;
 	protected double y;
@@ -93,6 +91,11 @@ public class Biome implements Serializable, Cloneable
 	
 	protected void setSpawnableEntities()
 	{
+	}
+	
+	public int getBiomeID()
+	{
+		return biomeID;
 	}
 	
 	/**

@@ -12,7 +12,6 @@ import entities.EntityPlayer;
  */
 public class SetBonusStrength extends SetBonus
 {
-	private static final long serialVersionUID = 1L;
 
 	public SetBonusStrength(double power) 
 	{

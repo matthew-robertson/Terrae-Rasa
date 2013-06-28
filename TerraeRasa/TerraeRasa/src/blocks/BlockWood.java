@@ -1,15 +1,9 @@
 package blocks;
 
-import java.io.Serializable;
-
 import utils.ItemStack;
 
-
-
-public class BlockWood extends Block implements Serializable
+public class BlockWood extends Block
 {
-	private static final long serialVersionUID = 1L;
-
 	public BlockWood(int i)
 	{
 		super(i);

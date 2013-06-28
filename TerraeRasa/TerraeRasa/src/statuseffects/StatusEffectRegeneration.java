@@ -19,7 +19,6 @@ import world.World;
  */
 public class StatusEffectRegeneration extends StatusEffect
 {
-	private static final long serialVersionUID = 1L;
 	private boolean percentageBased;
 	
 	/**
