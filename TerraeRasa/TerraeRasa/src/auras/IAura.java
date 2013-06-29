@@ -33,4 +33,10 @@ public interface IAura
 	public abstract void onDeath(World world, EntityPlayer player); 
 	
 	public abstract void onTick(World world, EntityPlayer player);
+	
+	public abstract void onManaRestored(World world, EntityPlayer player);
+	
+	public abstract void onManaSpend(World world, EntityPlayer player);
+	
+	public abstract void onPercentageMana(World world, EntityPlayer player);
 }

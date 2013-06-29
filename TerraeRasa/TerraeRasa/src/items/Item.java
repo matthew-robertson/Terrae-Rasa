@@ -336,12 +336,12 @@ public class Item extends ActionbarItem
 	}).setIconPosition(15, 1).setName("Divine Cross").setExtraTooltipInformation("The holy power of this cross protects its wearer.");	
 	
 	
-	public static Item t6Helmet = new ItemArmorHelmet(145).setArmorType(EnumArmor.TIER6).setTotalSockets(1).setIntellect(5).setStamina(10).setStrength(5).setDexterity(5).setIconPosition(20, 0).setName("TIER6 Helmet").setItemQuality(EnumItemQuality.RARE);
-	public static Item t6Body = new ItemArmorBody(140).setArmorType(EnumArmor.TIER6).setTotalSockets(2).setIntellect(5).setStamina(10).setStrength(5).setDexterity(5).setIconPosition(20, 1).setName("TIER6 Body").setItemQuality(EnumItemQuality.RARE);
-	public static Item t6Pants = new ItemArmorPants(141).setArmorType(EnumArmor.TIER6).setTotalSockets(3).setIntellect(5).setStamina(10).setStrength(5).setDexterity(5).setIconPosition(20, 2).setName("TIER6 Legguards").setItemQuality(EnumItemQuality.RARE);	
-	public static Item t6Boots = new ItemArmorBoots(142).setArmorType(EnumArmor.TIER6).setTotalSockets(4).setIntellect(5).setStamina(10).setStrength(5).setDexterity(5).setIconPosition(20, 3).setName("TIER6 Boots");
-	public static Item t6Gloves = new ItemArmorGloves(143).setArmorType(EnumArmor.TIER6).setTotalSockets(4).setIntellect(5).setStamina(10).setStrength(5).setDexterity(5).setIconPosition(20, 4).setName("TIER6 Gloves");
-	public static Item t6Belt = new ItemArmorBelt(144).setArmorType(EnumArmor.TIER6).setTotalSockets(4).setIntellect(5).setStamina(10).setStrength(5).setDexterity(5).setIconPosition(20, 5).setName("TIER6 Belt");
+	public static Item t6Helmet = new ItemArmorHelmet(194).setArmorType(EnumArmor.TIER6).setTotalSockets(1).setIntellect(5).setStamina(10).setStrength(5).setDexterity(5).setIconPosition(20, 0).setName("TIER6 Helmet").setItemQuality(EnumItemQuality.RARE);
+	public static Item t6Body = new ItemArmorBody(195).setArmorType(EnumArmor.TIER6).setTotalSockets(2).setIntellect(5).setStamina(10).setStrength(5).setDexterity(5).setIconPosition(20, 1).setName("TIER6 Body").setItemQuality(EnumItemQuality.RARE);
+	public static Item t6Pants = new ItemArmorPants(196).setArmorType(EnumArmor.TIER6).setTotalSockets(3).setIntellect(5).setStamina(10).setStrength(5).setDexterity(5).setIconPosition(20, 2).setName("TIER6 Legguards").setItemQuality(EnumItemQuality.RARE);	
+	public static Item t6Boots = new ItemArmorBoots(197).setArmorType(EnumArmor.TIER6).setTotalSockets(4).setIntellect(5).setStamina(10).setStrength(5).setDexterity(5).setIconPosition(20, 3).setName("TIER6 Boots");
+	public static Item t6Gloves = new ItemArmorGloves(198).setArmorType(EnumArmor.TIER6).setTotalSockets(4).setIntellect(5).setStamina(10).setStrength(5).setDexterity(5).setIconPosition(20, 4).setName("TIER6 Gloves");
+	public static Item t6Belt = new ItemArmorBelt(199).setArmorType(EnumArmor.TIER6).setTotalSockets(4).setIntellect(5).setStamina(10).setStrength(5).setDexterity(5).setIconPosition(20, 5).setName("TIER6 Belt");
 	
 	
 	public static Item copperCoin = new ItemCoin(200).setIconPosition(0, 0).setName("Copper Coin");

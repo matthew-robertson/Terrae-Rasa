@@ -204,7 +204,7 @@ public class UI extends UIBase
 			}
 			
 			//Special
-			String special = new StringBuilder().append((int)(player.specialEnergy / EntityPlayer.MAX_SPECIAL_ENERGY * 100)).append("%").toString();
+			String special = new StringBuilder().append((int)(player.specialEnergy / player.maxSpecialEnergy * 100)).append("%").toString();
 			trueTypeFont.drawString((getCameraX() + 35 + offset), (getCameraY() + specialOffsetY), special, 0.3f, -0.3f);
 		
 			//Defense:

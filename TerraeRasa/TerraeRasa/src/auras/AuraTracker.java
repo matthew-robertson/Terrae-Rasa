@@ -155,6 +155,51 @@ public class AuraTracker
 			}
 		}
 	}
+
+	public void onManaRestored(World world, EntityPlayer player) 
+	{
+		for(int i = 0; i < aurasByPiece.length; i++)
+		{
+			if(aurasByPiece[i] != null)
+			{
+				for(Aura aura : aurasByPiece[i].getAll())
+				{
+					aura.onManaRestored(world, player);
+				}
+			}
+		}
+		
+	}
+
+	public void onManaSpend(World world, EntityPlayer player) 
+	{
+		for(int i = 0; i < aurasByPiece.length; i++)
+		{
+			if(aurasByPiece[i] != null)
+			{
+				for(Aura aura : aurasByPiece[i].getAll())
+				{
+					aura.onManaSpend(world, player);
+				}
+			}
+		}
+		
+	}
+
+	public void onPercentageMana(World world, EntityPlayer player) 
+	{
+		for(int i = 0; i < aurasByPiece.length; i++)
+		{
+			if(aurasByPiece[i] != null)
+			{
+				for(Aura aura : aurasByPiece[i].getAll())
+				{
+					aura.onPercentageMana(world, player);
+				}
+			}
+		}
+		
+	}
 	
 	/*
 

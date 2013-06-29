@@ -33,7 +33,7 @@ public class SpellBulwark extends Spell
 	{
 		if(player.specialEnergy >= cost)
 		{
-			player.registerStatusEffect(world, new StatusEffectAbsorb(8, 1, (int) (player.maxHealth * 1.5)));
+			player.registerStatusEffect(world, new StatusEffectAbsorb(8, 1, (int) (player.maxHealth)));
 			player.spendSpecialEnergy(cost);
 		}	
 	}

@@ -80,6 +80,20 @@ public class Aura
 	public void onDeath(World world, EntityPlayer player)
 	{
 	}
+
+	public void onManaRestored(World world, EntityPlayer player) 
+	{
+		onPercentageMana(world, player);
+	}
+
+	public void onManaSpend(World world, EntityPlayer player) 
+	{
+		onPercentageMana(world, player);
+	}
+
+	public void onPercentageMana(World world, EntityPlayer player) 
+	{
+	}
 	
 	public void onTick(World world, EntityPlayer player)
 	{

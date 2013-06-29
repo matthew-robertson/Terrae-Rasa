@@ -32,7 +32,7 @@ public class SpellRejuvenate extends Spell
 	{
 		if(player.specialEnergy >= cost)
 		{
-			player.heal(world, player.maxHealth, true);
+			player.heal(world, (int) (0.8 * player.maxHealth), true);
 			player.spendSpecialEnergy(cost);
 		}
 	}	

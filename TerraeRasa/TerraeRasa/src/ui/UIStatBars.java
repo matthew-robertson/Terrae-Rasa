@@ -102,7 +102,7 @@ public class UIStatBars extends UIBase
 			y1 = getCameraY() + 40;		
 		else
 			y1 = getCameraY() + 25;
-		newX = (int) (player.specialEnergy / EntityPlayer.MAX_SPECIAL_ENERGY * 100);
+		newX = (int) (player.specialEnergy / player.maxSpecialEnergy * 100);
 		newY = 11;		
 		t.startDrawingQuads();
 		t.addVertexWithUV(x1, y1 + newY, 0, 0, 1);

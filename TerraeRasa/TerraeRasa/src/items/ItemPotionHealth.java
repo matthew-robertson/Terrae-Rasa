@@ -17,7 +17,7 @@ public class ItemPotionHealth extends Item
 	{
 		if(!player.isOnCooldown(id))
 		{
-			boolean success = player.healPlayer(world, healthRestored, true);
+			boolean success = player.heal(world, healthRestored, true);
 			if(success)
 			{
 				player.inventory.removeItemsFromInventoryStack(1, player.selectedSlot);

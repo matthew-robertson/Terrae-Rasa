@@ -44,11 +44,11 @@ public class StatusEffectRegeneration extends StatusEffect
 		{
 			if(percentageBased)
 			{
-				entity.heal(world, (int)((power / 100F) * entity.maxHealth), false);
+				entity.heal(world, ((power / 100) * entity.maxHealth), false);
 			}
 			else
 			{
-				entity.heal(world, (int)power, false);
+				entity.heal(world, power, false);
 			}
 		}
 		ticksLeft--;

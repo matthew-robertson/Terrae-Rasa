@@ -76,11 +76,12 @@ import enums.EnumToolMaterial;
  */
 public class EntityPlayer extends EntityLiving
 {
-	private final static int HEALTH_FROM_STAMINA = 10;
-	private final static int MANA_FROM_INTELLECT = 10;
 	/** This value apparently has to be negative. */
 	private static final double leftSwingBound = MathHelper.degreeToRadian(-135); 
 	private static final double rightSwingBound = MathHelper.degreeToRadian(55);
+	private static final int HEALTH_FROM_STAMINA = 10;
+	private static final int MANA_FROM_INTELLECT = 10;
+	
 	public int viewedChestX;
 	public int viewedChestY;
 	public boolean isViewingChest;	
@@ -89,7 +90,9 @@ public class EntityPlayer extends EntityLiving
 	public int intellect;
 	public int stamina;
 	public int baseMaxHealth;
+	public int temporaryMaxHealth;
 	public int baseMaxMana;	
+	public int temporaryMaxMana;
 	public double respawnXPos;
 	public double respawnYPos;	
 	
@@ -103,9 +106,12 @@ public class EntityPlayer extends EntityLiving
 	public boolean isInventoryOpen;	
 	public InventoryPlayer inventory;
 	
-	private boolean armorChanged;
+	public double healthRegenerationModifier;
+	public double manaRegenerationModifier;
+	public double specialRegenerationModifier;
 	
-	private int ticksSinceLastCast = 99999;
+	private boolean armorChanged;
+	private int ticksSinceLastCast ;
 	private int ticksInCombat;
 	private int ticksOfHealthRegen;
 	private boolean isInCombat;
@@ -118,20 +124,19 @@ public class EntityPlayer extends EntityLiving
 	private Recipe[] allPossibleRecipes;
 	private final String playerName;
 	private boolean inventoryChanged;
-
 	private final EnumPlayerDifficulty difficulty;
-	
 	private final int MAXIMUM_BASE_MANA;
 	private final int MAXIMUM_BASE_HEALTH;
 	private final int MAX_BLOCK_PLACE_DISTANCE;
 	private Hashtable<String, Cooldown> cooldowns;
-	public final static int MAX_SPECIAL_ENERGY = 100;
+	private int baseSpecialEnergy;
+	public int temporarySpecialEnergy;
 	public double specialEnergy;
+	public double maxSpecialEnergy;
 	private Dictionary<String, Boolean> nearBlock;
 	private Dictionary<String, Recipe[]> possibleRecipesByBlock;
 	private SetBonusContainer currentBonuses; 
 	private AuraTracker auraTracker;
-	
 	/** A flag indicating if the player has been forever defeated. If they have, they will not be saved to disk.*/
 	public boolean defeated;
 	
@@ -153,11 +158,15 @@ public class EntityPlayer extends EntityLiving
 		setBaseSpeed(5.0f);
 		width = 12;
 		height = 18;
+		baseSpecialEnergy = 100;
+		maxSpecialEnergy = 100;
+		temporarySpecialEnergy = 0;
 		setMaxHeightFallenSafely(78);
 		blockHeight = 3;
 		blockWidth = 2;
 		setRespawnPosition(50, 0);		
 		setUpwardJumpHeight(48);
+		ticksSinceLastCast = 99999;
 		upwardJumpCounter = 0;
 		jumpSpeed = 5;
 		canJumpAgain = true;
@@ -189,6 +198,8 @@ public class EntityPlayer extends EntityLiving
 		meleeDamageModifier = 1;
 		rangeDamageModifier = 1;
 		magicDamageModifier = 1;
+		healthRegenerationModifier = 1;
+		manaRegenerationModifier = 1;
 		allDamageModifier = 1;
 		isReloaded = false;
 		cooldowns = new Hashtable<String, Cooldown>();
@@ -262,8 +273,8 @@ public class EntityPlayer extends EntityLiving
 		checkAndUpdateStatusEffects(world);
 		applyGravity(world); //Apply Gravity to the player (and jumping)
 		applyHealthRegen(world);
-		applyManaRegen();
-		applySpecialRegen();
+		applyManaRegen(world);
+		applySpecialRegen(world);
 		checkForNearbyBlocks(world);	
 		verifyChestRange();
 		updateCooldowns();
@@ -466,7 +477,7 @@ public class EntityPlayer extends EntityLiving
 	 * @param h the amount healed
 	 * @param rendersText whether or not to render WorldText on the screen
 	 */
-	public boolean healPlayer(World world, int h, boolean rendersText)
+	public boolean heal(World world, double h, boolean rendersText)
 	{
 		if(health < maxHealth)
 		{
@@ -494,16 +505,15 @@ public class EntityPlayer extends EntityLiving
 	}
 	
 	/**
-	 * Applies mana regen (currently a static amount)
+	 * Applies mana regen to the player, increasing as time between casts increases.
 	 */
-	private void applyManaRegen()
+	private void applyManaRegen(World world)
 	{
 		if(ticksSinceLastCast > 120)
 		{
-			mana += ((ticksSinceLastCast - 120) / 1000 < 0.60f) ? ((ticksSinceLastCast - 120) / 1000) : 0.60f;
+			auraTracker.onManaRestored(world, this);
+			mana += manaRegenerationModifier * (((ticksSinceLastCast - 120) / 1000 < 0.60f) ? ((ticksSinceLastCast - 120) / 1000) : 0.60f);
 		}
-		
-		mana += (maxMana * 0.0002f);
 		
 		if(mana > maxMana)
 		{
@@ -516,19 +526,17 @@ public class EntityPlayer extends EntityLiving
 	 */
 	private void applyHealthRegen(World world)
 	{
-		if(health < maxHealth)
-		{
-			auraTracker.onHeal(world, this);
-		}
 		if(!isInCombat)
 		{
-			double amountHealed = (ticksOfHealthRegen / 1800f < 0.55f) ? (ticksOfHealthRegen / 1800f) : 0.55f;
+			if(health < maxHealth)
+			{
+				auraTracker.onHeal(world, this);
+			}
+			double amountHealed = healthRegenerationModifier * ((ticksOfHealthRegen / 1800f < 0.55f) ? (ticksOfHealthRegen / 1800f) : 0.55f);
 			health += amountHealed;
 			ticksOfHealthRegen++;	
 		}
 	
-		health += (maxHealth * 0.0002f);
-		
 		if(health > maxHealth)
 		{
 			health = maxHealth;
@@ -747,13 +755,14 @@ public class EntityPlayer extends EntityLiving
 	/**
 	 * Recalculates damage modifiers and health based on stats.
 	 */
-	private void recalculateStats()
+	public void recalculateStats()
 	{
 		rangeDamageModifier = 1.0f + 0.04f * dexterity;
 		meleeDamageModifier = 1.0f + 0.04f * strength;
 		magicDamageModifier = 1.0f + 0.04f * intellect;
-		maxHealth = baseMaxHealth + (stamina * HEALTH_FROM_STAMINA);
-		maxMana = baseMaxMana + (intellect * MANA_FROM_INTELLECT);		
+		maxHealth = temporaryMaxHealth + baseMaxHealth + (stamina * HEALTH_FROM_STAMINA);
+		maxMana = temporaryMaxMana + baseMaxMana + (intellect * MANA_FROM_INTELLECT);	
+		maxSpecialEnergy = temporarySpecialEnergy + baseSpecialEnergy;
 	}
 	
 	/**
@@ -1249,16 +1258,15 @@ public class EntityPlayer extends EntityLiving
 	}
 
 	/**
-	 * Regens a little bit of the special energy bar
+	 * Regens a little bit of the special energy bar, totalling 25% per minute * applicable modifiers
 	 */
-	private void applySpecialRegen()
+	private void applySpecialRegen(World world)
 	{
 		//25% per minute.
-		specialEnergy += 0.020833333F;
-		
-		if(specialEnergy > MAX_SPECIAL_ENERGY)
+		specialEnergy += (0.020833333) * specialRegenerationModifier;		
+		if(specialEnergy > maxSpecialEnergy)
 		{
-			specialEnergy = MAX_SPECIAL_ENERGY;
+			specialEnergy = maxSpecialEnergy;
 		}
 	}
 	
@@ -1269,15 +1277,15 @@ public class EntityPlayer extends EntityLiving
 	 */
 	public boolean restoreSpecialEnergy(int restore)
 	{
-		if(specialEnergy == MAX_SPECIAL_ENERGY)
+		if(specialEnergy == maxSpecialEnergy)
 		{
 			return false;
 		}
 		
 		specialEnergy += restore;
-		if(specialEnergy > MAX_SPECIAL_ENERGY)
+		if(specialEnergy > maxSpecialEnergy)
 		{
-			specialEnergy = MAX_SPECIAL_ENERGY;
+			specialEnergy = maxSpecialEnergy;
 		}
 		return true;
 	}
@@ -1382,5 +1390,15 @@ public class EntityPlayer extends EntityLiving
 	public double getHealthPercent() 
 	{
 		return health / maxHealth;
+	}
+	
+	/**
+	 * Gets the player's mana percentage, from 0.0-1.0, where 0.0 indicates 0% and 1.0 indicates 100%.
+	 * If the player has no mana, this will yield a value of 0.0
+	 * @return the player's mana percent as a double between 0.0 and 1.0
+	 */
+	public double getManaPercent() 
+	{
+		return (maxMana == 0) ? 0 : mana / maxMana;
 	}
 }

@@ -242,7 +242,7 @@ public class EntityLiving extends Entity
 	 * @param showWorldText whether or not to display world text
 	 * @return true if the entity was healed, otherwise false
 	 */
-	public boolean heal(World world, int h, boolean showWorldText)
+	public boolean heal(World world, double h, boolean showWorldText)
 	{
 		if(health < maxHealth)
 		{
