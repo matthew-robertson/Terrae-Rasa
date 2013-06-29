@@ -1,5 +1,6 @@
 package statuseffects;
 
+import world.World;
 import entities.EntityLiving;
 
 /**
@@ -20,12 +21,12 @@ public class StatusEffectSteelSkin extends StatusEffect
 		iconY = 1;
 	}
 
-	public void applyInitialEffect(EntityLiving entity)
+	public void applyInitialEffect(World world, EntityLiving entity)
 	{	
 		entity.defense += power;
 	}
 	
-	public void removeInitialEffect(EntityLiving entity)
+	public void removeInitialEffect(World world, EntityLiving entity)
 	{	
 		entity.defense -= power;
 	}

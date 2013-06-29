@@ -1,5 +1,6 @@
 package statuseffects;
 
+import world.World;
 import entities.EntityLiving;
 
 /**
@@ -32,13 +33,13 @@ public class StatusEffectDazed extends StatusEffect
 			power = 0.95F;
 	}
 
-	public void applyInitialEffect(EntityLiving entity)
+	public void applyInitialEffect(World world, EntityLiving entity)
 	{	
 		entity.setMovementSpeedModifier(entity.getMovementSpeedModifier()
 				* (1F - power));
 	}
 	
-	public void removeInitialEffect(EntityLiving entity)
+	public void removeInitialEffect(World world, EntityLiving entity)
 	{	
 		entity.setMovementSpeedModifier(entity.getMovementSpeedModifier()
 				/ (1F - power));

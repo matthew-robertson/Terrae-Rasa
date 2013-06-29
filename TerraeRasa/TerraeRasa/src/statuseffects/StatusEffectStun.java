@@ -21,12 +21,12 @@ public class StatusEffectStun extends StatusEffect
 		iconY = 0;
 	}
 
-	public void applyInitialEffect(EntityLiving entity)
+	public void applyInitialEffect(World world, EntityLiving entity)
 	{	
 		entity.setStunned(true);
 	}
 	
-	public void removeInitialEffect(EntityLiving entity)
+	public void removeInitialEffect(World world, EntityLiving entity)
 	{	
 		entity.setStunned(false);
 	}

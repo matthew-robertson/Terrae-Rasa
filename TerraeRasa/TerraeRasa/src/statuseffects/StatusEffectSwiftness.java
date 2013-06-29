@@ -1,5 +1,6 @@
 package statuseffects;
 
+import world.World;
 import entities.EntityLiving;
 
 /**
@@ -29,13 +30,13 @@ public class StatusEffectSwiftness extends StatusEffect
 		iconY = 0;
 	}
 
-	public void applyInitialEffect(EntityLiving entity)
+	public void applyInitialEffect(World world, EntityLiving entity)
 	{	
 		entity.setMovementSpeedModifier(entity.getMovementSpeedModifier()
 				* (1 + power));
 	}
 	
-	public void removeInitialEffect(EntityLiving entity)
+	public void removeInitialEffect(World world, EntityLiving entity)
 	{	
 		entity.setMovementSpeedModifier(entity.getMovementSpeedModifier()
 				/ (1 + power));

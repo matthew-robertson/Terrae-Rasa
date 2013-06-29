@@ -1,5 +1,6 @@
 package statuseffects;
 
+import world.World;
 import entities.EntityLiving;
 
 /**
@@ -29,12 +30,12 @@ public class StatusEffectFallHeight extends StatusEffect
 		iconY = 0;
 	}
 
-	public void applyInitialEffect(EntityLiving entity)
+	public void applyInitialEffect(World world, EntityLiving entity)
 	{	
 		entity.setMaxHeightFallenSafely(entity.getMaxHeightFallenSafely() + (6 * power));
 	}
 	
-	public void removeInitialEffect(EntityLiving entity)
+	public void removeInitialEffect(World world, EntityLiving entity)
 	{	
 		entity.setMaxHeightFallenSafely(entity.getMaxHeightFallenSafely() - (6 * power));
 	}

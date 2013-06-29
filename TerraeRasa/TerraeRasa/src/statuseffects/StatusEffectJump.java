@@ -1,5 +1,6 @@
 package statuseffects;
 
+import world.World;
 import entities.EntityLiving;
 
 /**
@@ -29,12 +30,12 @@ public class StatusEffectJump extends StatusEffect
 		iconY = 0;
 	}
 
-	public void applyInitialEffect(EntityLiving entity)
+	public void applyInitialEffect(World world, EntityLiving entity)
 	{	
 		entity.setUpwardJumpHeight(entity.getUpwardJumpHeight() + (power * 6));
 	}
 	
-	public void removeInitialEffect(EntityLiving entity)
+	public void removeInitialEffect(World world, EntityLiving entity)
 	{	
 		entity.setUpwardJumpHeight(entity.getUpwardJumpHeight() - (power * 6));
 	}

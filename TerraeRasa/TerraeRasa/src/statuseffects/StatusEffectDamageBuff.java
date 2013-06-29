@@ -1,5 +1,6 @@
 package statuseffects;
 
+import world.World;
 import entities.EntityLiving;
 
 /**
@@ -29,12 +30,12 @@ public class StatusEffectDamageBuff extends StatusEffect
 		iconY = 2;
 	}
 
-	public void applyInitialEffect(EntityLiving entity)
+	public void applyInitialEffect(World world, EntityLiving entity)
 	{
 		entity.allDamageModifier *= 1 + power;
 	}
 	
-	public void removeInitialEffect(EntityLiving entity)
+	public void removeInitialEffect(World world, EntityLiving entity)
 	{	
 		entity.allDamageModifier /= 1 + power;
 	}
