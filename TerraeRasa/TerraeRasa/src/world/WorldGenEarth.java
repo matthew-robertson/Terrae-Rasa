@@ -52,7 +52,8 @@ public class WorldGenEarth extends WorldGen
 	public World generate(World world, int xLoc, int width, int yLoc, int depth) 
 	{
 		System.gc();
-		Block[] placeableOres = {Block.tin, Block.copper, Block.iron, Block.coal, Block.silver, Block.gold, Block.diamond};
+		Block[] placeableOres = {Block.tin, Block.copper, Block.iron, Block.coal, Block.silver, Block.gold};
+		Block[] placeableGems = {Block.diamond, Block.ruby, Block.sapphire, Block.emerald, Block.opal, Block.jasper};
 		Biome[] biomes = generateBiomes(world);
 		assignBiomes(world, biomes);
 		count = 0;
@@ -68,6 +69,7 @@ public class WorldGenEarth extends WorldGen
 		stoneinter(world, xLoc, width, yLoc, depth);
 		cellauto(world, xLoc + 1, (xLoc + width) - 2, yLoc, (yLoc + depth) - 2);
 		ores(world, xLoc + 1, (xLoc + width) - 4, yLoc + 1, (yLoc + depth) - 11, placeableOres);
+		gems(world, xLoc + 1, (xLoc + width) - 4, yLoc + 1, (yLoc + depth) - 11, placeableGems);
 		System.gc();
 				
 		Biome biome;

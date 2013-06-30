@@ -159,6 +159,36 @@ public class WorldGen{
 		}
 	}	
 	
+	protected void gems(World world, int x, int w, int y, int h, Block[] placeableGems){
+		int minchance = 0;
+		int ore = 0;
+		Block gemc = Block.air;
+		for (int i = (y + h); i > y; i--){ //Go through the height
+			for (int j = x; j < (x + w); j++){ //go through the width
+				gemc = Block.air;
+				minchance = (int)(Math.random()*1000+1);	//Decide if an ore vein will be placed
+				if (minchance >=990 && world.getBlockGenerate(j, i).getID() == Block.stone.getID()){ // if a vein is to be placed						
+					if (i >= world.getHeight()/10 * 7){ //If it's instead in the bottom 3/10's
+						for (int k = 0; k < placeableGems.length; k++){
+							ore = (int)(Math.random()*100+1); //Determine which ore will be placed
+							if (ore <= placeableGems[k].getLRange()){
+								gemc = placeableGems[k];
+								break;
+							}
+							if (ore >= 80){
+								break;
+							}
+						}						
+					}
+					if (gemc.getID() != Block.air.getID()){ //If an ore is actually being placed				
+						oreplace(world, 3, j, i, gemc); //place the vein					
+					}
+				}
+			}
+		}
+		
+	}
+	
 	/**
 	 * Selects places to create veins of various ores
 	 * @param world - the current world.

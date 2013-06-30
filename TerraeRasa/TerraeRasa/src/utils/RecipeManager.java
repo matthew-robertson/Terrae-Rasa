@@ -252,15 +252,11 @@ public class RecipeManager
 	Recipe stoneRightChair = new Recipe(this, new ItemStack(Block.stoneChairRight), Block.craftingTable, new ItemStack[]{
 		new ItemStack(Block.stone, 5)
 	});	
-	Recipe stonePillarEnd = new Recipe(this, new ItemStack(Item.stonePillarEnd), Block.craftingTable, new ItemStack[]{
-		new ItemStack(Block.stone, 2)
-	});	
+	
 	Recipe stonePillar = new Recipe(this, new ItemStack(Block.stonePillar), Block.craftingTable, new ItemStack[]{
 		new ItemStack(Block.stone, 2)
 	});	
-	Recipe diamondPillarEnd = new Recipe(this, new ItemStack(Item.diamondPillarEnd), Block.craftingTable, new ItemStack[]{
-		new ItemStack(Item.diamond, 2)
-	});	
+	
 	Recipe diamondPillar = new Recipe(this, new ItemStack(Block.diamondPillar), Block.craftingTable, new ItemStack[]{
 		new ItemStack(Item.diamond, 2)
 	});

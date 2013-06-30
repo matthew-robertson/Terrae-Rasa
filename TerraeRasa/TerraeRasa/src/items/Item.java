@@ -266,10 +266,12 @@ public class Item extends ActionbarItem
 	public static Item silverOre = new Item(61).setIconPosition(0, 12).setName("Silver Ore");
 	public static Item goldOre = new Item(62).setIconPosition(0, 13).setName("Gold Ore");
 	public static Item coal = new Item(63).setIconPosition(1, 9).setName("Coal");
-	public static Item diamond = new Item(64).setIconPosition(0, 0).setName("Diamond");
-	public static Item ruby = new Item(65).setIconPosition(0, 0).setName("Ruby");
-	public static Item emerald = new Item(66).setIconPosition(0, 0).setName("Emerald");
-	public static Item sapphire = new Item(67).setIconPosition(0, 0).setName("Sapphire");
+	public static Item diamond = new Item(64).setIconPosition(2, 12).setName("Diamond");
+	public static Item ruby = new Item(65).setIconPosition(2, 11).setName("Ruby");
+	public static Item emerald = new Item(66).setIconPosition(2, 10).setName("Emerald");
+	public static Item sapphire = new Item(67).setIconPosition(2, 9).setName("Sapphire");
+	public static Item opal = new Item(68).setIconPosition(0, 0).setName("Opal");
+	public static Item jasper = new Item(69).setIconPosition(0, 0).setName("Jasper");
 	
 	public static Item copperHelmet = new ItemArmorHelmet(100).setArmorType(EnumArmor.COPPER).setIconPosition(16, 0).setName("Copper Helmet");
 	public static Item copperBody = new ItemArmorBody(101).setArmorType(EnumArmor.COPPER).setIconPosition(16, 1).setName("Copper Body");
@@ -348,11 +350,7 @@ public class Item extends ActionbarItem
 	public static Item silverCoin = new ItemCoin(201).setIconPosition(0, 0).setName("Silver Coin");
 	public static Item goldCoin = new ItemCoin(202).setIconPosition(0, 0).setName("Gold Coin");
 	public static Item platinumCoin = new ItemCoin(203).setIconPosition(0, 0).setName("Platinum Coin");
-	public static Item marblePillarEnd = new ItemPlacable(204, true).setIconPosition(4,9).setName("Marble Pillar");
-	public static Item stonePillarEnd = new ItemPlacable(205, true).setIconPosition(4,10).setName("Stone Pillar");
-	public static Item diamondPillarEnd = new Item(206).setIconPosition(4,11).setName("Diamond P");
-	public static Item goldPillarEnd = new Item(207).setIconPosition(4,12).setName("Gold P");
-	
+		
 	public static Item woodenArrow = new ItemAmmo(300).setProjectile(new EntityProjectile(7, 1, 1, 8f).setSpriteIndex(0, 1).setIsFriendly(true)).setIconPosition(5, 9).setName("Wooden Arrow");
 	public static Item bronzeArrow = new ItemAmmo(301).setProjectile(new EntityProjectile(10, 1, 1, 8f).setSpriteIndex(0, 2).setIsFriendly(true)).setIconPosition(5, 10).setName("Bronze Arrow");
 	public static Item ironArrow = new ItemAmmo(302).setProjectile(new EntityProjectile(13, 1, 1, 8f).setSpriteIndex(0, 3).setIsFriendly(true)).setIconPosition(5, 11).setName("Iron Arrow");

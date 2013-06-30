@@ -527,41 +527,41 @@ public class Block extends ActionbarItem
 			.setBlockHardness(1.0f).setIconIndex(2, 3).setPassable(true)
 			.setBlockType(2).setIsSolid(false);
 	public static Block tree = new BlockWood(9).setName("Tree").setTileMap('t')
-			.setBlockHardness(60.0f).setIconIndex(1, 24).setPassable(true)
+			.setBlockHardness(60.0f).setIconIndex(1, 27).setPassable(true)
 			.setBlockType(2).setIsSolid(false);
 	public static Block treebase = new BlockWood(10).setName("tree base")
-			.setTileMap('t').setBlockHardness(60.0f).setIconIndex(0, 24)
+			.setTileMap('t').setBlockHardness(60.0f).setIconIndex(0, 27)
 			.setPassable(true).setBlockType(2).setIsSolid(false);
 	public static Block treebranch = new BlockWood(12).setName("tree branch")
-			.setTileMap('b').setBlockHardness(5.0f).setIconIndex(4, 22)
+			.setTileMap('b').setBlockHardness(5.0f).setIconIndex(4, 25)
 			.setPassable(true).setIsSolid(false);
 	public static Block treetop = new BlockLeaves(20)
 			.setName("tree top left top").setTileMap('T')
-			.setBlockHardness(5.0f).setIconIndex(4, 24).setPassable(true)
+			.setBlockHardness(5.0f).setIconIndex(4, 27).setPassable(true)
 			.setIsSolid(false);
 	public static Block treetopl2 = new BlockLeaves(21)
 			.setName("tree top left bottom").setTileMap('T')
-			.setBlockHardness(5.0f).setIconIndex(4, 25).setPassable(true)
+			.setBlockHardness(5.0f).setIconIndex(4, 28).setPassable(true)
 			.setIsSolid(false);
 	public static Block treetopc1 = new BlockLeaves(22)
 			.setName("tree top center top").setTileMap('T')
-			.setBlockHardness(5.0f).setIconIndex(5, 24).setPassable(true)
+			.setBlockHardness(5.0f).setIconIndex(5, 27).setPassable(true)
 			.setIsSolid(false);
 	public static Block treetopc2 = new BlockLeaves(23)
 			.setName("tree top center bottom").setTileMap('T')
-			.setBlockHardness(5.0f).setIconIndex(5, 25).setPassable(true)
+			.setBlockHardness(5.0f).setIconIndex(5, 28).setPassable(true)
 			.setIsSolid(false);
 	public static Block treetopr1 = new BlockLeaves(24)
 			.setName("tree top right top").setTileMap('T')
-			.setBlockHardness(5.0f).setIconIndex(6, 24).setPassable(true)
+			.setBlockHardness(5.0f).setIconIndex(6, 27).setPassable(true)
 			.setIsSolid(false);
 	public static Block treetopr2 = new BlockLeaves(25)
 			.setName("tree top right bottom").setTileMap('T')
-			.setBlockHardness(5.0f).setIconIndex(6, 25).setPassable(true)
+			.setBlockHardness(5.0f).setIconIndex(6, 28).setPassable(true)
 			.setIsSolid(false);
-	public static Block gold = new BlockOre(26).setName("Bold Ore Block")
+	public static Block gold = new BlockOre(26).setName("Gold Ore Block")
 			.setBlockHardness(10.0f).setHRange(0).setLRange(3)
-			.setIconIndex(15, 12).setBlockType(1)
+			.setIconIndex(15, 11).setBlockType(1)
 			.setDroppedItem(new ItemStack(Item.goldOre), 1, 1);
 	public static Block iron = new BlockOre(27).setName("Iron Ore Block")
 			.setBlockHardness(10.0f).setHRange(5).setLRange(10)
@@ -572,28 +572,48 @@ public class Block extends ActionbarItem
 			.setBlockHardness(10.0f).setIconIndex(15, 7).setBlockType(1)
 			.setDroppedItem(new ItemStack(Item.coal), 1, 1);
 	public static Block diamond = new BlockOre(29).setName("Diamond Ore Block")
-			.setBlockHardness(10.0f).setHRange(0).setLRange(1)
-			.setIconIndex(15, 15).setBlockType(1)
+			.setBlockHardness(10.0f).setLRange(10)
+			.setIconIndex(15, 14).setBlockType(1)
 			.setDroppedItem(new ItemStack(Item.diamond), 1, 1);
-	public static Block copper = new BlockOre(30).setName("Copper Ore Block")
+	public static Block ruby = new BlockOre(30).setName("Ruby Ore Block")
+			.setBlockHardness(10.0f).setLRange(10)
+			.setIconIndex(15, 13).setBlockType(1)
+			.setDroppedItem(new ItemStack(Item.ruby), 1, 1);
+	public static Block sapphire = new BlockOre(31).setName("Sapphire Ore Block")
+			.setBlockHardness(10.0f).setLRange(10)
+			.setIconIndex(15, 12).setBlockType(1)
+			.setDroppedItem(new ItemStack(Item.sapphire), 1, 1);
+	public static Block emerald = new BlockOre(32).setName("Emerald Ore Block")
+			.setBlockHardness(10.0f).setLRange(10)
+			.setIconIndex(15, 15).setBlockType(1)
+			.setDroppedItem(new ItemStack(Item.emerald), 1, 1);
+	public static Block opal = new BlockOre(33).setName("Opal Ore Block")
+			.setBlockHardness(10.0f).setLRange(10)
+			.setIconIndex(15, 16).setBlockType(1)
+			.setDroppedItem(new ItemStack(Item.opal), 1, 1);
+	public static Block jasper = new BlockOre(34).setName("Jasper Ore Block")
+			.setBlockHardness(10.0f).setLRange(10)
+			.setIconIndex(15, 17).setBlockType(1)
+			.setDroppedItem(new ItemStack(Item.jasper), 1, 1);
+	public static Block copper = new BlockOre(35).setName("Copper Ore Block")
 			.setBlockHardness(55.0f).setHRange(20).setLRange(0)
-			.setIconIndex(15, 10).setBlockType(1)
-			.setDroppedItem(new ItemStack(Item.copperOre), 1, 1);
-	public static Block silver = new BlockOre(31).setName("Silver Ore Block")
-			.setBlockHardness(80.0f).setHRange(0).setLRange(5)
-			.setIconIndex(15, 11).setBlockType(1)
-			.setDroppedItem(new ItemStack(Item.silverOre), 1, 1);
-	public static Block tin = new BlockOre(32).setName("Tin Ore Block")
-			.setBlockHardness(55.0f).setHRange(10).setLRange(0)
 			.setIconIndex(15, 9).setBlockType(1)
+			.setDroppedItem(new ItemStack(Item.copperOre), 1, 1);
+	public static Block silver = new BlockOre(36).setName("Silver Ore Block")
+			.setBlockHardness(80.0f).setHRange(0).setLRange(5)
+			.setIconIndex(15, 10).setBlockType(1)
+			.setDroppedItem(new ItemStack(Item.silverOre), 1, 1);
+	public static Block tin = new BlockOre(37).setName("Tin Ore Block")
+			.setBlockHardness(55.0f).setHRange(10).setLRange(0)
+			.setIconIndex(15, 8).setBlockType(1)
 			.setDroppedItem(new ItemStack(Item.tinOre), 1, 1);
-	public static Block redflower = new Block(33).setName("Red Flower")
+	public static Block redflower = new Block(38).setName("Red Flower")
 			.setBlockHardness(10.0f).setIconIndex(0, 1).setPassable(true)
 			.setIsOveridable(true).setIsSolid(false);
-	public static Block yellowflower = new Block(34).setName("Yellow Flower")
+	public static Block yellowflower = new Block(39).setName("Yellow Flower")
 			.setBlockHardness(10.0f).setIconIndex(0, 1).setPassable(true)
 			.setIsOveridable(true).setIsSolid(false);
-	public static Block tallgrass = new Block(35).setName("Tall Grass")
+	public static Block tallgrass = new Block(40).setName("Tall Grass")
 			.setBlockHardness(10.0f).setIconIndex(0, 1).setPassable(true)
 			.setIsOveridable(true).setIsSolid(false);
 	public static Block snowCover = new Block(44).setName("Snow Cover")
@@ -605,19 +625,19 @@ public class Block extends ActionbarItem
 			.setLightStrengthAndRadius(1.0F, 10).setName("Torch")
 			.setBlockHardness(0.0f)
 			.overrideItemIcon(5, 0, Render.TEXTURE_SHEET_ITEMS)
-			.setIconIndex(0, 0).setPassable(true).setIsSolid(false);
+			.setPassable(true).setIsSolid(false);
 	public static Block adminium = new Block(49).setName("Adminium").setIsMineable(false)
 			.setBlockHardness(8000.0f).setIconIndex(0, 1);
 	public static Block plank = new Block(50).setName("Plank").setTileMap('g')
-			.setBlockHardness(30.0f).setIconIndex(0, 17).setBlockType(2);
+			.setBlockHardness(30.0f).setIconIndex(0, 20).setBlockType(2);
 	public static Block sapling = new Block(51).setName("Sapling")
 			.setBlockHardness(5.0f).setIconIndex(10, 4).setBlockType(2)
 			.setIsOveridable(true).setIsSolid(false);
 	public static Block furnace = new Block(52).setName("Furnace")
-			.setBlockHardness(50.0f).setIconIndex(12, 2).setBlockType(1)
+			.setBlockHardness(50.0f).setIconIndex(10, 23).setBlockType(1)
 			.setBothBlockWidthAndHeight(2, 2);
 	public static Block craftingTable = new Block(53).setName("Crafting table")
-			.setBlockHardness(50.0f).setIconIndex(14, 20).setBlockType(2)
+			.setBlockHardness(50.0f).setIconIndex(14, 23).setBlockType(2)
 			.setBothBlockWidthAndHeight(2, 2);
 	public static Block snow = new Block(54).setName("Snow Block")
 			.setBlockHardness(10.0f).setIconIndex(4, 1).setBlockType(1)
@@ -635,43 +655,39 @@ public class Block extends ActionbarItem
 	public static Block bookshelf = new Block(57).setName("Bookshelf")
 			.setIconIndex(4, 3).setBlockHardness(20.0f).setBlockType(2);
 	public static Block woodTable = new Block(58).setName("Wooden Table")
-			.setPassable(true).setBlockHardness(50.0f).setIconIndex(11, 1)
+			.setPassable(true).setBlockHardness(50.0f).setIconIndex(5, 24)
 			.setBlockType(2).setBothBlockWidthAndHeight(2, 1);
 	public static Block stoneTable = new Block(59).setName("Stone Table")
-			.setPassable(true).setBlockHardness(50.0f).setIconIndex(11, 0)
+			.setPassable(true).setBlockHardness(50.0f).setIconIndex(5, 23)
 			.setBlockType(1).setBothBlockWidthAndHeight(2, 1);
-	public static Block fenceLeft = new Block(60).setName("fence end left")
-			.setBlockHardness(50.0f).setIconIndex(2, 4).setBlockType(2);
 	public static Block fence = new Block(61).setName("Fence")
 			.setPassable(true).setBlockHardness(50.0f).setIconIndex(3, 4)
 			.setBlockType(2);
-	public static Block fenceRight = new Block(62).setName("fence end right")
-			.setBlockHardness(50.0f).setIconIndex(4, 4).setBlockType(2);
 	public static Block woodChairRight = new Block(63)
 			.setName("Right facing wood chair").setPassable(true)
-			.setBlockHardness(50.0f).setIconIndex(13, 1).setBlockType(2);
+			.setBlockHardness(50.0f).setIconIndex(5, 24).setBlockType(2);
 	public static Block woodChairLeft = new Block(64)
 			.setName("Left facing wood chair").setPassable(true)
-			.setBlockHardness(50.0f).setIconIndex(14, 1).setBlockType(2);
+			.setBlockHardness(50.0f).setIconIndex(4, 24).setBlockType(2);
 	public static Block stoneChairRight = new Block(65)
 			.setName("Right facing stone chair").setPassable(true)
-			.setBlockHardness(50.0f).setIconIndex(13, 0).setBlockType(1);
+			.setBlockHardness(50.0f).setIconIndex(5, 23).setBlockType(1);
 	public static Block stoneChairLeft = new Block(66)
 			.setName("Left facing stone chair").setPassable(true)
-			.setBlockHardness(50.0f).setIconIndex(14, 0).setBlockType(1);
+			.setBlockHardness(50.0f).setIconIndex(4, 23).setBlockType(1);
 
 	public static Block stonePillar = new BlockPillar(68)
 			.setName("Stone Pillar Block").setTileMap('p').setPassable(true)
-			.setBlockHardness(75.0f).setIconIndex(0, 20).setBlockType(1);
+			.setBlockHardness(75.0f).setIconIndex(0, 23).setBlockType(1);
 	public static Block marblePillar = new BlockPillar(71)
 			.setName("Marble Pillar Block").setTileMap('p').setPassable(true)
-			.setBlockHardness(75.0f).setIconIndex(0, 21).setBlockType(1);
+			.setBlockHardness(75.0f).setIconIndex(0, 24).setBlockType(1);
 	public static Block goldPillar = new BlockPillar(74)
 			.setName("Gold Pillar Block").setTileMap('p').setPassable(true)
-			.setBlockHardness(75.0f).setIconIndex(0, 22).setBlockType(1);
+			.setBlockHardness(75.0f).setIconIndex(0, 25).setBlockType(1);
 	public static Block diamondPillar = new BlockPillar(77)
 			.setName("Diamond Pillar Block").setTileMap('p').setPassable(true)
-			.setBlockHardness(75.0f).setIconIndex(0, 23).setBlockType(1);
+			.setBlockHardness(75.0f).setIconIndex(0, 26).setBlockType(1);
 
 	public static Block glass = new Block(79).setName("Glass Block")
 			.setBlockHardness(10.0f).setIconIndex(1, 3).setBlockType(1);
