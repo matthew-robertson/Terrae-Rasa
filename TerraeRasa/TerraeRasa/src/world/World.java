@@ -1214,6 +1214,13 @@ public class World
 					canBePlaced = true;
 				}
 			}
+			for (int i = 0; i < blockHeight; i++){
+				for (int j = 0; j < blockWidth; j++){
+					if (getBackBlock(mx + j, my + i).getIsSolid()){
+						canBePlaced = true;
+					}
+				}
+			}
 			
 			if(!canBePlaced) //If it cant be placed, then give up trying right here
 			{
@@ -1243,7 +1250,8 @@ public class World
 		else
 		{
 			if ((getBlock(mx, my).getIsOveridable() == true || getBlock(mx, my) == Block.air) && 
-				(getBlock(mx-1, my).getIsSolid() || getBlock(mx, my-1).getIsSolid() || getBlock(mx, my+1).getIsSolid() || getBlock(mx+1, my).getIsSolid())) //can the block be placed
+				(getBlock(mx-1, my).getIsSolid() || getBlock(mx, my-1).getIsSolid() || getBlock(mx, my+1).getIsSolid() || getBlock(mx+1, my).getIsSolid() ||
+				getBackBlock(mx, my).getIsSolid())) //can the block be placed
 			{
 				player.inventory.removeItemsFromInventory(this, player, new ItemStack(block, 1)); //remove the items from inventory	
 			
@@ -1281,7 +1289,8 @@ public class World
 	public void placeBackWall(EntityPlayer player, int mx, int my, Block block)
 	{
 		if ((getBackBlock(mx, my).getIsOveridable() == true || getBackBlock(mx, my).getID() == Block.backAir.getID()) && 
-			(getBackBlock(mx-1, my).getIsSolid() || getBackBlock(mx, my-1).getIsSolid() || getBackBlock(mx, my+1).getIsSolid() || getBackBlock(mx+1, my).getIsSolid())) //can the block be placed
+			(getBackBlock(mx-1, my).getIsSolid() || getBackBlock(mx, my-1).getIsSolid() || getBackBlock(mx, my+1).getIsSolid() || getBackBlock(mx+1, my).getIsSolid() || 
+			getBlock(mx, my).getIsSolid())) //can the block be placed
 		{
 			player.inventory.removeItemsFromInventory(this, player, new ItemStack(block, 1)); //remove the items from inventory		
 			setBackBlock(block, mx, my); //place it	

@@ -698,9 +698,9 @@ public class Block extends ActionbarItem
 	// Backwalls
 	public static Block backAir = new BlockBackWall(128).setIsSolid(false)
 			.setName("backwall air");
-	public static Block backDirt = new BlockBackWall(129).setIconIndex(0, 18)
+	public static Block backDirt = new BlockBackWall(129).setIconIndex(0, 21)
 			.setName("backwall dirt").setBlockHardness(40.0f).setBlockType(1);
-	public static Block backStone = new BlockBackWall(130).setIconIndex(0, 19)
+	public static Block backStone = new BlockBackWall(130).setIconIndex(0, 22)
 			.setName("backwall stone").setBlockHardness(70.0f).setBlockType(1);
 	
 }
