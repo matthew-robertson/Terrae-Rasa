@@ -92,7 +92,10 @@ public class GuiButtonImproved extends GuiComponent
 		double height = 530 * this.height * 0.5F;
 		double x = Display.getWidth() * this.x * 0.5F;
 		double y = Display.getHeight() * this.y * 0.5F;
-				
+		if(stopVerticalScaling)
+		{	
+			y = this.y;
+		}		
 	    t.addVertexWithUV(x, y + height, 0, 0, 1);
 	    t.addVertexWithUV(x + width, y + height, 0, 1, 1);
 	    t.addVertexWithUV(x + width, y, 0, 1, 0);
@@ -103,6 +106,15 @@ public class GuiButtonImproved extends GuiComponent
 		float xOffset = (float) (x + width/2 * 0.95f);//trueTypeFont.getWidth(values[buttonIndex]) / 2;
 		float yOffset = (float) (y + height - (height - trueTypeFont.getHeight(values[buttonIndex])) / 2);			
 		trueTypeFont.drawString(xOffset, yOffset, values[buttonIndex], 0.7f, -1, TrueTypeFont.ALIGN_CENTER); //Render the Text	
+	}
+	
+	public boolean inBounds(int mouseX, int mouseY) 
+	{
+		double yoff = (stopVerticalScaling) ? y : this.y * Display.getHeight() * 0.5F;
+		return (mouseX > (this.x * Display.getWidth() * 0.5F) && 
+				mouseX < (this.x * Display.getWidth() * 0.5F) + (Display.getWidth() * width * 0.5F) && 
+				mouseY > (yoff) && 
+				mouseY < (yoff) + (530 * height * 0.5F));
 	}
 	
 	/**

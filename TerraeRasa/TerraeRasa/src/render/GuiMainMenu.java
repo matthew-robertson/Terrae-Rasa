@@ -9,6 +9,7 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
 import utils.FileManager;
+import utils.MainMenuHelper;
 import utils.MathHelper;
 import client.TerraeRasa;
 import enums.EnumPlayerDifficulty;
@@ -27,7 +28,9 @@ import enums.EnumWorldSize;
  */
 public class GuiMainMenu extends Render
 {
-	private FileManager fileManager;	
+	private MainMenuHelper menuHelper;	
+	private FileManager fileManager;
+	
 	private String[] worldNames;
 	private String[] playerNames;
 	private int totalPlayers;
@@ -69,10 +72,11 @@ public class GuiMainMenu extends Render
 	 */
 	public GuiMainMenu()
 	{
+		menuHelper = new MainMenuHelper();
 		fileManager = new FileManager();
 		initialize();
-		totalPlayers = fileManager.getTotalPlayers();
-		totalWorlds = fileManager.getTotalWorlds();
+		totalPlayers = menuHelper.getTotalPlayers();
+		totalWorlds = menuHelper.getTotalWorlds();
 		onMenuOpen();
 	}
 	
@@ -183,7 +187,7 @@ public class GuiMainMenu extends Render
 	private boolean deleteCharacter(String name)
 	{
 		boolean success = fileManager.deletefile("/Player Saves/" + name); //delete the file
-		totalPlayers = fileManager.getTotalPlayers(); //update player count
+		totalPlayers = menuHelper.getTotalPlayers(); //update player count
 		//System.out.println("Total Players:" + totalPlayers);
 		generatePlayerMenu(); //The player menu has changed, regenerate it
 		return success;
@@ -197,7 +201,7 @@ public class GuiMainMenu extends Render
 	private boolean deleteWorld(String name)
 	{
 		boolean success = fileManager.deleteWorldSave("/World Saves/" + name); //try to delete the file
-		totalWorlds = fileManager.getTotalWorlds(); //update world count
+		totalWorlds = menuHelper.getTotalWorlds(); //update world count
 		//System.out.println("Total Worlds:" + totalWorlds);
 		generateWorldMenu(); //the world menu has changed, so update it
 		return success;
@@ -434,7 +438,7 @@ public class GuiMainMenu extends Render
 			worldIndex = index;
 			try 
 			{ //call the startGame method of TerraeRasa with the specified world and player, they of course have to be loaded though
-				TerraeRasa.startGame(fileManager.loadWorld("Earth", worldNames[worldIndex]), fileManager.loadPlayer(playerNames[playerIndex]));
+				TerraeRasa.startGame("",fileManager.loadWorld("Earth", worldNames[worldIndex]), fileManager.loadPlayer(playerNames[playerIndex]));
 			}
 			catch (Exception e)
 			{
@@ -683,8 +687,8 @@ public class GuiMainMenu extends Render
 	 */
 	private void generatePlayerMenu()
 	{
-		totalPlayers = fileManager.getTotalPlayers();
-		playerNames = fileManager.getPlayerFileNames(); //Get player names
+		totalPlayers = menuHelper.getTotalPlayers();
+		playerNames = menuHelper.getPlayerFileNames(); //Get player names
 		
 		playMenuTextAreas = new GuiResizableText[8];
 		String[] playMessages = { "", "", "", "", "", "Create Character", "Delete", "Back" }; //some values are default, some arent on this menu
@@ -707,8 +711,8 @@ public class GuiMainMenu extends Render
 	 */
 	private void generateWorldMenu()
 	{
-		totalWorlds = fileManager.getTotalWorlds();
-		worldNames = fileManager.getWorldFileNames(); //Get world names
+		totalWorlds = menuHelper.getTotalWorlds();
+		worldNames = menuHelper.getWorldFileNames(); //Get world names
 		
 		worldMenuTextAreas = new GuiResizableText[8];
 		String[] worldMessages = { "", "", "", "", "", "Create World", "Delete", "Back"}; //some values are default, some arent on this menu

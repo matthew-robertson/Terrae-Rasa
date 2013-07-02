@@ -107,7 +107,7 @@ public class World
 	private int totalBiomes;
 	private int chunkWidth;
 	private int chunkHeight;
-	private ChunkManager chunkManager;
+	public ChunkManager chunkManager;
 	private boolean weatherFinished;
 	private EnumWorldDifficulty difficulty;
 	private final Random random = new Random();
@@ -164,7 +164,6 @@ public class World
 		totalBiomes = 0;
 		previousLightLevel = getLightLevel();
 		this.difficulty = difficulty;
-		chunkManager = new ChunkManager(universeName);
 		manager = new SpawnManager();
 		chunkWidth = width / Chunk.getChunkWidth();
 		chunkHeight = height / height;
@@ -179,7 +178,6 @@ public class World
 	 */
 	public void finishWorldReconstruction(String universeName)
 	{
-		chunkManager = new ChunkManager(universeName);
 	}
 	
 	/**

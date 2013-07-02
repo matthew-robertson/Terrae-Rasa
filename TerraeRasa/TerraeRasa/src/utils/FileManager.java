@@ -39,7 +39,14 @@ public class FileManager
 	public World generateAndSaveWorld(String name, EnumWorldSize worldSize, EnumWorldDifficulty difficulty)
 	{
 		World world = generateNewWorld(name, worldSize.getWidth(), worldSize.getHeight(), difficulty);
+		verifyDirectoriesExist();
+		new File(TerraeRasa.getBasePath() + "/World Saves/" + name).mkdir();
+		new File(TerraeRasa.getBasePath() + "/World Saves/" + name + "/Earth").mkdir();
+		world.chunkManager = TerraeRasa.terraeRasa.gameEngine.chunkManager;
+		world.chunkManager.setUniverseName(name);
 		world.saveRemainingWorld();
+
+		
 		return world;
 	}
 	
@@ -195,74 +202,7 @@ public class FileManager
         new File(BASE_PATH + "/Player Saves").mkdir();
 	}
 	
-	/**
-	 * Gets how many worlds exist in the ~/World Saves/ Directory. Returns a maximum of 5, because there should never be more currently
-	 * @return upto 5, for the number of worlds in the directory, or in the case of a failure 0
-	 */
-	public int getTotalWorlds()
-	{
-		try 
-		{
-			File dir = new File(BASE_PATH + "/World Saves/");
-			String[] children = dir.list(); //Get names of all the files
-			Vector<String> vector = new Vector<String>();
-			
-			if (children.length == 0) //if there're no files, return 0
-			{
-				return 0;
-			}
-			else
-			{
-			    for (int i = 0; i < children.length; i++) //For each file name found
-			    {
-			        String filename = children[i];
-			    	vector.add(filename);
-			    }
-			}
-			
-			return vector.size(); 
-		}
-		catch(Exception e) //Failure
-		{
-			return 0;
-		}
-	}
 	
-	/**
-	 * Gets how many players exist in the ~/Player Saves/ Directory. Returns a maximum of 5, because there should never be more currently
-	 * @return the number of players in the directory, or in the case of a failure 0
-	 */
-	public int getTotalPlayers()
-	{
-		try
-		{
-			File dir = new File(BASE_PATH + "/Player Saves/");
-			String[] children = dir.list();//Get names of all the files
-			Vector<String> vector = new Vector<String>();
-			
-			if (children.length == 0) //if there're no files, return 0
-			{
-				return 0;
-			}
-			else
-			{
-			    for (int i = 0; i < children.length; i++)  //for each entry, check if valid
-			    {
-			        String filename = children[i];
-			        if(filename.endsWith(".xml") && filename.length() > 4) //Ensure the filetype is valid and not ".dat"
-			        {
-			        	vector.add(filename);
-			        }
-			    }
-			}
-			
-			return vector.size();			
-		}
-		catch(Exception e) //Failure simply returns no number of values.
-		{
-			return 0;
-		}
-	}
 	
 	/**
 	 * Saves the player and world to disk after quitting the game. This currently cheats a bit and gets the world using
@@ -281,90 +221,7 @@ public class FileManager
 		}
 	}
 	
-	/**
-	 * Gets upto the first 5 player.dat names in the ~/Player Saves/ Directory. There should not be more than 5 currently
-	 * @return upto the first 5 names for players, or in the case of a failure 0
-	 */
-	public String[] getPlayerFileNames()
-	{
-		try 
-		{
-			File dir = new File(BASE_PATH + "/Player Saves/");
-			String[] children = dir.list(); //get the file names
-			String[] players = new String[5];
-			int index = 0;
-			
-			if (children.length == 0) //return nothing if there was nothing
-			{
-				return new String[] { };
-			}
-			else
-			{
-			    for (int i = 0; i < children.length; i++) //For each name
-			    {
-			        String fileName = children[i];
-			        if(fileName.endsWith(".xml") && fileName.length() > 4 && index < 5) //Ensure the file is a valid .dat, has enough length, and that there're less than 5 players
-			        {
-			        	players[index] = (fileName.substring(0, fileName.length() - 4)); //Trim .dat ending
-			        	index++;
-			        }
-			    }
-			}
-			
-			String temp[] = new String[index]; 
-			for(int i = 0; i < temp.length; i++) //Copy the strings into a new array with no excess
-			{
-				temp[i] = players[i];
-			}
-			
-			return temp;
-		}
-		catch(Exception e) //Failure
-		{
-			return new String[] { };
-		}
-	}
 	
-	/**
-	 * Gets upto the first 5 world save dats in the ~/World Saves/ Directory. There should not be more than 5 currently
-	 * @return upto the first 5 names for worlds, or in the case of a failure 0
-	 */
-	public String[] getWorldFileNames()
-	{
-		try
-		{
-			File dir = new File(BASE_PATH + "/World Saves/");
-			String[] children = dir.list(); //get the file names
-			String[] worlds = new String[5];
-			int index = 0;
-			
-			if (children.length == 0) //return nothing if there was nothing
-			{
-				return new String[] { };
-			}
-			else
-			{
-			    for (int i = 0; i < children.length; i++) //For each name
-			    {
-		        	worlds[index] = children[i]; 
-		        	index++;
-			    }
-			}
-			
-			String temp[] = new String[index];
-			
-			for(int i = 0; i < temp.length; i++) //Copy the strings into a new array with no excess
-			{
-				temp[i] = worlds[i];
-			}
-			
-			return temp;			
-		}
-		catch(Exception e) //Failure
-		{
-			return new String[] { };
-		}
-	}
 
 	/**
 	 * Loads the specified player from the ~/Player Saves/ Directory

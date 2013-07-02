@@ -31,6 +31,7 @@ public abstract class GuiComponent
 	protected double x;
 	/** The y position as a % of the screen, between 0.0F and 1.0F */
 	protected double y;
+	protected boolean stopVerticalScaling;
 	
 	/**
 	 * Initializes all the variables to their default values and creates the font renderer if it's null.
@@ -92,12 +93,13 @@ public abstract class GuiComponent
 	 * @param y the y value of the point to compare
 	 * @return whether the point is in bounds or not
 	 */
-	public boolean inBounds(int x, int y) 
+	public boolean inBounds(int mouseX, int mouseY) 
 	{
-		return (x > (this.x * Display.getWidth() * 0.5F) && 
-				x < (this.x * Display.getWidth() * 0.5F) + (Display.getWidth() * width * 0.5F) && 
-				y > (this.y * Display.getHeight() * 0.5F) && 
-				y < (Display.getHeight() * this.y * 0.5F) + (Display.getHeight() * height * 0.5F));
+		double yoff = (stopVerticalScaling) ? y : this.y * Display.getHeight() * 0.5F;
+		return (mouseX > (this.x * Display.getWidth() * 0.5F) && 
+				mouseX < (this.x * Display.getWidth() * 0.5F) + (Display.getWidth() * width * 0.5F) && 
+				mouseY > (yoff) && 
+				mouseY < (yoff) + (Display.getHeight() * height * 0.5F));
 	}	
 	
 	/**
@@ -112,4 +114,10 @@ public abstract class GuiComponent
 	 * An overridable method to draw the gui component. All GuiComponents must implement this.
 	 */
 	public abstract void draw();
+
+	public GuiComponent setStopVerticalScaling(boolean flag)
+	{
+		stopVerticalScaling = flag;
+		return this;
+	}
 }

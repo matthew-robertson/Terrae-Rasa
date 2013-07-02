@@ -2,6 +2,7 @@ package client;
 
 import hardware.Keys;
 import hardware.MouseInput;
+import io.ChunkManager;
 import items.Item;
 
 import java.beans.DefaultPersistenceDelegate;
@@ -14,6 +15,7 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
 import render.GuiMainMenu;
+import render.MainMenu;
 import render.Render;
 import render.RenderGlobal;
 import render.RenderMenu;
@@ -62,7 +64,8 @@ public class GameEngine
 							   RENDER_MODE_WORLD_SKY  = 3;
 	/** The currently selected RENDER_MODE_WORLD value, detailing what world to update, load, and render.*/
 	private int renderMode;
-	private GuiMainMenu mainMenu;
+	//private GuiMainMenu mainMenu;
+	private MainMenu mainMenu;
 	private World world;
 	private WorldHell worldHell;
 	private WorldSky worldSky;
@@ -70,11 +73,14 @@ public class GameEngine
 	private Settings settings;
 	private SoundEngine soundEngine;
 	private RenderMenu renderMenu;
+	public ChunkManager chunkManager;
+	private String universeName;
 	
 	/**
 	 * Creates a new instance of GameEngine. This includes setting the renderMode to RENDER_MODE_WORLD_EARTH
 	 * and loading the settings object from disk. If a settings object cannot be found a new one is created. 
 	 */
+
 	public GameEngine()
 	{
 		renderMode = RENDER_MODE_WORLD_EARTH;
@@ -150,7 +156,7 @@ public class GameEngine
 		        		}
 		        	}
 		        	
-					TerraeRasa.terraeRasa.checkWindowSize();
+		        	TerraeRasa.terraeRasa.checkWindowSize();
 		        	 
 		        	next_game_tick += SKIP_TICKS;
  		            loops++;
@@ -239,13 +245,16 @@ public class GameEngine
 	 * @param world the world to play on.
 	 * @param player the player to play on.
 	 */
-	public void startGame(World world, EntityPlayer player)
+	public void startGame(String universeName, World world, EntityPlayer player)
 	{
 //		if(this.world != null)
 //		{
 //			throw new RuntimeException("World already exists!");
 //		}
+		this.universeName = universeName;
 		this.world = world;
+		this.world.chunkManager = chunkManager;
+		this.world.chunkManager.setUniverseName(universeName);
 		this.world.initSoundEngine(soundEngine);
 		this.player = player;
 		world.addPlayerToWorld(player);
@@ -260,8 +269,9 @@ public class GameEngine
 	public void init()
 	{
 		Render.initializeTextures(getWorld());
+		chunkManager = new ChunkManager();
 		soundEngine = new SoundEngine(settings);
-		mainMenu = new GuiMainMenu();
+		mainMenu = new MainMenu();
 		renderMenu = new RenderMenu(settings);
 		Display.setVSyncEnabled(settings.vsyncEnabled);
 		debugCheats();
@@ -558,6 +568,6 @@ public class GameEngine
 	 */
 	public void resetMainMenu()
 	{
-		mainMenu = new GuiMainMenu();
+		mainMenu = new MainMenu();
 	}
 }

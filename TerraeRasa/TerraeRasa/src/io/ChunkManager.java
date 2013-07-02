@@ -9,8 +9,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import blocks.Block;
+import blocks.BlockChest;
+
+import savable.SavableBlock;
+import savable.SavableChunk;
 import savable.SavableWorld;
 import savable.SaveManager;
+import utils.ItemStack;
 import world.World;
 import client.TerraeRasa;
 
@@ -28,7 +34,7 @@ public class ChunkManager
 	private final ArrayList<Future<Chunk>> scheduledLoadOperations;
 	private final ArrayList<Future<Boolean>> scheduledSaveOperations;
 	private final String BASE_PATH;
-	private final String universeName;
+	private String universeName;
 	private final List<Integer> chunkLock;
 
 	/**
@@ -38,12 +44,12 @@ public class ChunkManager
 	 * @param worldName the name of the world, to which this object belongs
 	 * @param worldName the name of the 'dimension' within the project (Ex. 'Earth')
 	 */
-	public ChunkManager(String universeName)
+	public ChunkManager()
 	{
 		threadPool = Executors.newFixedThreadPool(4);
 		scheduledLoadOperations = new ArrayList<Future<Chunk>>(4);
 		scheduledSaveOperations = new ArrayList<Future<Boolean>>(4);
-		this.universeName = universeName;
+		this.universeName = "";
 		loadRequests = new ArrayList<Integer>(8);
 		chunkLock = new ArrayList<Integer>(16);
 		BASE_PATH = TerraeRasa.getBasePath();
@@ -331,5 +337,77 @@ public class ChunkManager
 			}
 			scheduledLoadOperations.remove(0);
 		}
+	}
+	
+	public void setUniverseName(String name)
+	{
+		this.universeName = name;
+	}
+	
+	public boolean saveChunkAndLockThread(String directory, ConcurrentHashMap<String, Chunk> chunks, int x) 
+	{
+		if(chunkLocked(x))
+		{
+			return false;
+		}
+
+		verifyFolderExists(directory);
+		
+		String key = ""+x;
+		Chunk chunk = chunks.get(key);
+		chunks.remove(key);
+		
+		//Make sure the chunk isnt null before saving
+		if(chunk == null)
+		{
+			return false;
+		}
+		
+		lockChunk(x);
+		
+		SavableChunk savable = new SavableChunk();
+		savable.biomeID = chunk.getBiome().getBiomeID();
+		savable.light = chunk.getLight();
+		savable.diffuseLight = chunk.diffuseLight;
+		savable.ambientLight = chunk.ambientLight;
+		savable.backWalls = convertToSavable(chunk.backWalls);
+		savable.blocks = convertToSavable(chunk.blocks);
+		savable.x = chunk.getX();
+		savable.wasChanged = chunk.getChanged();
+		savable.height = chunk.getHeight();
+		savable.lightUpdated = true;
+		savable.flaggedForLightingUpdate = true;
+			
+		String basepath = "/World Saves/" + universeName + "/" + directory;
+		
+		SaveManager smanager = new SaveManager();
+		try {
+			smanager.saveCompressedFile(basepath + "/" + x + ".trc", savable);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.out.println("Chunk Saved to: " + basepath + "/" + x + ".trc");
+		unlockChunk(chunk.getX());
+		
+		
+		return true;
+	}
+	
+	private SavableBlock[][] convertToSavable(Block[][] blocks)
+	{
+		SavableBlock[][] savables = new SavableBlock[blocks.length][blocks[0].length];
+		for(int i = 0; i < savables.length; i++)
+		{
+			for(int k = 0; k < savables[0].length; k++)
+			{
+				SavableBlock sblock = new SavableBlock();
+				sblock.bitMap = blocks[i][k].getBitMap();
+				sblock.id = blocks[i][k].getID();
+				sblock.metaData = blocks[i][k].metaData;
+				sblock.mainInventory = (blocks[i][k] instanceof BlockChest) ? ((BlockChest)(blocks[i][k])).getMainInventory() : new ItemStack[0];
+				savables[i][k] = sblock;			
+			}
+		}
+		return savables;
 	}
 }

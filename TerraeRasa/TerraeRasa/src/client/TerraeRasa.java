@@ -91,6 +91,8 @@ public class TerraeRasa
 			initInDebugMode = true;
 		}
 		
+		initInDebugMode = false;
+		
 		//Load the OpenGL libraries for rendering later on
 		if(osName.contains("win")) //Windows
 		{
@@ -278,9 +280,9 @@ public class TerraeRasa
 	/**
 	 * Calls the startGame(World, EntityPlayer) method of the GameEngine.
 	 */
-	public static void startGame(World world, EntityPlayer player)
+	public static void startGame(String universeName, World world, EntityPlayer player)
 	{
-		terraeRasa.gameEngine.startGame(world, player);
+		terraeRasa.gameEngine.startGame(universeName, world, player);
 	}
 	
 	public static final String getOSName()

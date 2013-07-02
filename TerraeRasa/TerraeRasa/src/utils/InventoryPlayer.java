@@ -82,8 +82,6 @@ public class InventoryPlayer
 		armorInventory = new ItemStack[10];
 		trash = new ItemStack[1];
 		quiver = new ItemStack[4];
-		quiver[0] = new ItemStack(Item.woodenArrow, 200);
-		quiver[2] = new ItemStack(Item.woodenArrow, 200);
 		initializeInventoryTotals(false);	
 	}
 	

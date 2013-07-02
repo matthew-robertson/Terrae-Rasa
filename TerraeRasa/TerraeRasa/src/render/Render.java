@@ -80,6 +80,9 @@ public class Render
 	public static Texture[] moons;
 	public static Texture sun; 
 	public static Texture background_1; //Background (sky)
+	
+	public static Texture background_menu;
+	
 	/** 
 	 * cameraX is a relatively unique variable. It's where the camera is moved to on the X axis, based on player location. 
 	 * Therefore this value becomes very important to rendering user interface components. Using this value in addition 
@@ -176,7 +179,7 @@ public class Render
 		TERRAIN = loader.getTexture("Resources/terrain.png");
 		TERRAIN_GROUND = loader.getTexture("Resources/terrain_earth.png");
 		PROJECTILES = loader.getTexture("Resources/projectiles.png");
-		logo = loader.getTexture("Resources/logo.png");
+		
 		playerTexture = loader.getTexture("Resources/player_1.png");
 		actionbarSlot = loader.getTexture("Resources/player_actionbar_slot.png");
 		actionbarOutline = loader.getTexture("Resources/player_actionbar_outline.png");
@@ -192,6 +195,8 @@ public class Render
 				160, 
 				4, 
 				Animation.ANIMATE_HORIZONTAL);
+		background_menu = loader.getTexture("Resources/stars.png");
+		logo = loader.getTexture("Resources/logo.png");
 		//
 		
 		renderParticles = new RenderParticles();

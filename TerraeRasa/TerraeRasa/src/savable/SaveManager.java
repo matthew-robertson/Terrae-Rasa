@@ -19,6 +19,11 @@ import client.TerraeRasa;
 
 import com.thoughtworks.xstream.XStream;
 
+/**
+ * 
+ * @author alec
+ *
+ */
 public class SaveManager 
 {
 	public void saveFile(String path, Object object) 
@@ -26,7 +31,6 @@ public class SaveManager
 	{
 		XStream xstream = new XStream();
 		String xml = xstream.toXML(object);
-		System.out.println("len = " + xml.length());
 		BufferedWriter writer = new BufferedWriter(new FileWriter(new File(TerraeRasa.getBasePath() + path)));
 		writer.write(xml);
 		writer.close();
@@ -49,7 +53,7 @@ public class SaveManager
 		s.writeObject(object); 
 		byte data[] = bos.toByteArray();
 		fileWriter.write(data, 0, data.length);
-		System.out.println("Saved to: " + path + " With Initial Size: " + data.length);
+//		System.out.println("Saved to: " + path + " With Initial Size: " + data.length);
 		s.close();
 		bos.close();
 		fileWriter.close();  
@@ -60,7 +64,7 @@ public class SaveManager
 	{
 		ObjectInputStream ois = new ObjectInputStream(new DataInputStream(new GZIPInputStream(new FileInputStream(TerraeRasa.getBasePath() + path)))); //Open an input stream
 		Object obj = ois.readObject(); 
-	    System.out.println("loaded from: " + path);
+//	    System.out.println("loaded from: " + path);
 		ois.close();
 		return obj;
 	}

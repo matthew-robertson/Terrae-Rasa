@@ -1,5 +1,8 @@
 package enums;
 
+import java.util.EnumSet;
+import java.util.Vector;
+
 /**
  * Describes the world difficulty settings. Version 1.0 includes the following difficulties: <br>
  * <ol>
@@ -16,19 +19,32 @@ package enums;
 public enum EnumWorldDifficulty
 {
 	/** Difficulty modifier of 0.75, reducing damage taken by the player(s) by 25% */
-	EASY(0.75),
+	EASY("Easy", 0.75),
 	/** Difficulty modifier of 1.0, causing no additional effect */
-	NORMAL(1.0),
+	NORMAL("Normal", 1.0),
 	/** Difficulty modifier of 1.5, increasing damage taken by the player(s) by 50% */
-	HARD(1.5),
+	HARD("Hard", 1.5),
 	/** Difficulty modifier of 2.25, increasing damage taken by the player(s) by 125% */
-	INSANE(2.25);
+	INSANE("Insane", 2.25);
 
 	public double damageModifier;
+	private String name;
+	private static Vector<String> enumValues;
+	static
+	{
+		//Add all the EnumArmor to the armorTiers Vector to automatically update the SetBonusFactory and other classes
+		//of a change to EnumArmor
+		enumValues = new Vector<String>();
+		for (EnumWorldDifficulty tier: EnumSet.allOf(EnumWorldDifficulty.class))
+        {
+			enumValues.add(tier.getName());
+        }
+	}
 	
-	EnumWorldDifficulty(double f)
+	EnumWorldDifficulty(String name, double f)
 	{
 		damageModifier = f;
+		this.name = name;
 	}
 	
 	public double getDamageModifier()
@@ -61,5 +77,17 @@ public enum EnumWorldDifficulty
 			return EnumWorldDifficulty.INSANE;
 		}
 		return EnumWorldDifficulty.NORMAL;
+	}
+	
+	public static String[] getAllEnumAsStringArray()
+	{
+		String[] temp = new String[enumValues.size()];
+		enumValues.copyInto(temp);
+		return temp;
+	}
+	
+	public String getName()
+	{
+		return name;
 	}
 }
