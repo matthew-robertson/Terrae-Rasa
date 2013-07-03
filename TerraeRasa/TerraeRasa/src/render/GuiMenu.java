@@ -216,7 +216,8 @@ public class GuiMenu extends GuiComponent
 			//To visually indicate that it is selected
 			if(highlightedIndex == i) 
 			{
-				GL11.glColor4d(135.0/255, 206.0/255, 250.0/255, 0.6);
+				//GL11.glColor4d(135.0/255, 206.0/255, 250.0/255, 0.6);
+				GL11.glColor4d(15.0/255, 82.0/255, 186.0/255, 0.6);
 				t.startDrawingQuads();
 				t.addVertexWithUV(x, ((i + 1) * CELL_SIZE) + y, 0, 0, 1);
 			    t.addVertexWithUV(x + width, ((i + 1) * CELL_SIZE) + y , 0, 1, 1);
@@ -226,7 +227,7 @@ public class GuiMenu extends GuiComponent
 			}
 			else
 			{
-				GL11.glColor4d(2.0/3, 2.0/3, 2.0/3, 0.6);
+				GL11.glColor4d(192.0/255, 192.0/255, 192.0/255, 0.6);
 				t.startDrawingQuads();
 				t.addVertexWithUV(x, ((i + 1) * CELL_SIZE) + y, 0, 0, 1);
 			    t.addVertexWithUV(x + width, ((i + 1) * CELL_SIZE) + y , 0, 1, 1);

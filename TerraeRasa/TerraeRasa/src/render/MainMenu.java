@@ -18,12 +18,21 @@ import utils.MainMenuHelper;
 import utils.MathHelper;
 import utils.Particle;
 import utils.Vector2F;
+import client.Settings;
 import client.TerraeRasa;
 import enums.EnumColor;
 import enums.EnumPlayerDifficulty;
 import enums.EnumWorldDifficulty;
 import enums.EnumWorldSize;
 
+/**
+ * MainMenu handles the main game menu functions and functionality. This includes mouse input, keyboard input, and rendering.
+ * In general the menu is fairly self contained aside from the settings.
+ * @author      Alec Sobeck
+ * @author      Matthew Robertson
+ * @version     1.0
+ * @since       1.0
+ */
 public class MainMenu extends Render
 {
 	private final Random random = new Random();
@@ -50,6 +59,7 @@ public class MainMenu extends Render
 	private EnumColor[] fieryColors = { EnumColor.FIERY1, EnumColor.FIERY2, EnumColor.FIERY3, EnumColor.FIERY4, EnumColor.FIERY5 };
 	private MainMenuHelper menuHelper;
 	private FileManager fileManager;
+	private MainSettingsMenu settingsMenu;
 	private GuiMenu menu;
 	private GuiTextboxScaling characterName;
 	private GuiButtonImproved characterMode;
@@ -67,10 +77,14 @@ public class MainMenu extends Render
 	private GuiTitle deletePlayerConfirm;
 	private GuiTitle deletePlayerMessage;	
 	
-	public MainMenu()
+	/**
+	 * Creates a new MainMenu, initializing all the particles and components required.
+	 */
+	public MainMenu(Settings settings)
 	{
 		menuHelper = new MainMenuHelper();
 		fileManager = new FileManager();
+		settingsMenu = new MainSettingsMenu(settings);
 		worldNames = menuHelper.getWorldFileNames();
 		playerNames = menuHelper.getPlayerFileNames();
 		isMainMenuOpen = true;
@@ -100,13 +114,18 @@ public class MainMenu extends Render
 		
 		//Character Creation Menu:
 		characterName = (GuiTextboxScaling) new GuiTextboxScaling(0.225, 70, 0.55, 0.1).setStopVerticalScaling(true);
+		characterName.setRenderTexture(Render.menuButtonBackground);
 		characterMode = (GuiButtonImproved) new GuiButtonImproved(EnumPlayerDifficulty.getAllEnumAsStringArray(), 0.25, 100, 0.50, 0.1).setStopVerticalScaling(true);
+		characterMode.setRenderTexture(Render.menuButtonBackground);
 		createNewCharacter = (GuiTitle) new GuiTitle("Create Character", .30, 130, .20, 0.1).setStopVerticalScaling(true);
 		stopCreatingCharacter = (GuiTitle) new GuiTitle("Back", 0.60, 130, 0.2, 0.1).setStopVerticalScaling(true);
 		//World Creation Menu:
 		worldName = (GuiTextboxScaling) new GuiTextboxScaling(0.225, 70, 0.55, 0.1).setStopVerticalScaling(true);
+		worldName.setRenderTexture(Render.menuButtonBackground);
 		worldMode = (GuiButtonImproved) new GuiButtonImproved(EnumWorldDifficulty.getAllEnumAsStringArray(), 0.25, 100, 0.50, 0.1).setStopVerticalScaling(true);
+		worldMode.setRenderTexture(Render.menuButtonBackground);
 		worldSize = (GuiButtonImproved) new GuiButtonImproved(EnumWorldSize.getAllEnumAsStringArray(), 0.25, 130, 0.50, 0.1).setStopVerticalScaling(true);
+		worldSize.setRenderTexture(Render.menuButtonBackground);
 		createNewWorld = (GuiTitle) new GuiTitle("Create World", .30, 160, .20, 0.1).setStopVerticalScaling(true);
 		stopCreatingWorld = (GuiTitle) new GuiTitle("Back", 0.60, 160, 0.2, 0.1).setStopVerticalScaling(true);
 		//Delete Confirmation Menu(world):
@@ -120,7 +139,11 @@ public class MainMenu extends Render
 		menu = new GuiMenu(0.02, 0.05, 0.25, 0.90, "Main Menu", mainMenuVarying, mainMenuFooter);
 	}
 	
-	public void render()
+	/**
+	 * Handles the entire menu - first taking hardware input (keyboard/mouse) then rendering
+	 * the appropriate menu.
+	 */
+	public void render(Settings settings)
 	{
 		GL11.glLoadIdentity();
 		GL11.glTranslatef(0, 0, -2000f);
@@ -148,9 +171,16 @@ public class MainMenu extends Render
 			}
 		}
 		
-		keyboard();
-		mouse();
-		
+		if(settingsMenu.open)
+		{
+			settingsMenu.mouse(settings);
+			settingsMenu.keyboard(settings);
+		}
+		else
+		{
+			keyboard();
+			mouse();
+		}
 		renderBackground();
 		renderAnimation();
 		renderComponents();
@@ -163,11 +193,18 @@ public class MainMenu extends Render
 		if(flaggedForGameStart)
 		{
 			overwriteWithGameLoadScreen();
+		}		
+		if(settingsMenu.open)
+		{
+			settingsMenu.render(settings);
 		}
 		
 		GL11.glDisable(GL11.GL_ALPHA_TEST);
 	}
 	
+	/**
+	 * Renders anything that is animated, specifically particles such as the stars.
+	 */
 	private void renderAnimation()
 	{
 		GL11.glEnable(GL11.GL_BLEND);
@@ -182,7 +219,10 @@ public class MainMenu extends Render
 		while(iterator.hasNext())
 		{
 			Particle starTrail = iterator.next();
-			starTrail.integrate();
+			if(!settingsMenu.open)
+			{
+				starTrail.integrate();
+			}
 			t.setColorRGBA_F((float)starTrail.r, (float)starTrail.g, (float)starTrail.b, (float)starTrail.life);
 			t.addVertexWithUV(starTrail.x, starTrail.y + height, 0, 0, 1);
 		    t.addVertexWithUV(starTrail.x + width, starTrail.y + height, 0, 1, 1);
@@ -200,7 +240,10 @@ public class MainMenu extends Render
 		//The actual stars
 		for(Particle star : stars)
 		{
-			star.integrate();
+			if(!settingsMenu.open)
+			{
+				star.integrate();
+			}
 			width = 13;
 			height = 13;
 			double xoff = 0;
@@ -226,27 +269,30 @@ public class MainMenu extends Render
 		    t.addVertexWithUV(star.x + xoff, star.y + yoff, 0, 0, 0);
 			t.draw();
 		    
-			//Star Trail particles
-			for(int i = 0; i < 6; i++)
+			if(!settingsMenu.open)
 			{
-				Particle starTrail = new Particle();
-				starTrail.active = true;
-				starTrail.life = 1.0;
-				starTrail.fade = random.nextDouble() / 25 + 0.04;
-				starTrail.texture = Render.starParticleBackground;
-				EnumColor color = fieryColors[random.nextInt(fieryColors.length)];
-				starTrail.r = color.COLOR[0];
-				starTrail.g = color.COLOR[1];
-			    starTrail.b = color.COLOR[2];
-			    starTrail.a = 1;
-			    starTrail.x = star.x - 2 + random.nextInt(4) + (width / 2);
-			    starTrail.y = star.y - 2 + random.nextInt(4) + (height / 2);
-			    starTrail.zrot = random.nextInt(100);
-			    starTrail.velocity = new Vector2F(star.velocity.x * -0.35F, star.velocity.y * -0.35F);
-			    starTrail.acceleration = new Vector2F(star.acceleration.x * -0.35F, star.acceleration.y * -0.35F);
-			    starTrails.add(starTrail);
+				//Star Trail particles
+				for(int i = 0; i < 6; i++)
+				{
+					Particle starTrail = new Particle();
+					starTrail.active = true;
+					starTrail.life = 1.0;
+					starTrail.fade = random.nextDouble() / 25 + 0.04;
+					starTrail.texture = Render.starParticleBackground;
+					EnumColor color = fieryColors[random.nextInt(fieryColors.length)];
+					starTrail.r = color.COLOR[0];
+					starTrail.g = color.COLOR[1];
+				    starTrail.b = color.COLOR[2];
+				    starTrail.a = 1;
+				    starTrail.x = star.x - 2 + random.nextInt(4) + (width / 2);
+				    starTrail.y = star.y - 2 + random.nextInt(4) + (height / 2);
+				    starTrail.zrot = random.nextInt(100);
+				    starTrail.velocity = new Vector2F(star.velocity.x * -0.35F, star.velocity.y * -0.35F);
+				    starTrail.acceleration = new Vector2F(star.acceleration.x * -0.35F, star.acceleration.y * -0.35F);
+				    starTrails.add(starTrail);
+				}
 			}
-
+			
 			//Reset the shooting star if it's off the screen
 			if(star.x > Display.getWidth() * 0.6 || star.y > Display.getHeight() * 0.6)
 			{
@@ -271,12 +317,14 @@ public class MainMenu extends Render
 		GL11.glColor4d(1, 1, 1, 1);
 	}
 	
+	/**
+	 * Renders the starry background and logo.
+	 */
 	private void renderBackground()
 	{
-		//1535, 1151
+		//Starry background
 		int width = 450;
 		int height = 250;
-
 		background_menu.bind();
 		t.startDrawingQuads();
 		for(int x = 0; x < (Display.getWidth() / width) + 1; x++)
@@ -292,6 +340,7 @@ public class MainMenu extends Render
 		}
         t.draw();
 		
+        //Logo
         width = 300;
         height = 63;
         int xoff = (int) (0.15 * Display.getWidth());
@@ -306,6 +355,9 @@ public class MainMenu extends Render
         t.draw();
 	}
 
+	/**
+	 * Distributes mouse input as appropriate for the menu open
+	 */
 	private void mouse()
 	{
 		if(isMainMenuOpen || isPlayerMenuOpen || isWorldMenuOpen)
@@ -360,8 +412,15 @@ public class MainMenu extends Render
 		}
 	}
 
+	/**
+	 * Handles the input for the delete character menu, which contains a confirm and 
+	 * delete button.
+	 * @param mouseX the mouse's X position in ortho units
+	 * @param mouseY the mouse's Y position in ortho units
+	 */
 	private void mouseMenuDeleteCharacter(int mouseX, int mouseY)
 	{		
+		//Confirm Button
 		if(deletePlayerConfirm.inBounds(mouseX, mouseY))
 		{
 			deleteCharacter(selectedPlayerName);
@@ -369,23 +428,33 @@ public class MainMenu extends Render
 			isDeletePlayerMenuOpen = false;
 			isWaitingToDelete = false;
 		}
+		//Back button
 		if(deletePlayerBack.inBounds(mouseX, mouseY))
 		{
 			isDeletePlayerMenuOpen = false;
 			isWaitingToDelete = false;
 		}
 	}
-	
+
+	/**
+	 * Handles the mouse input for the player create menu. This involves a name textbox, 
+	 * the mode select button, and confirm/back buttons.
+	 * @param mouseX the mouse's X position in ortho units
+	 * @param mouseY the mouse's Y position in ortho units
+	 */
 	private void mouseMenuCreateCharacter(int mouseX, int mouseY)
 	{
+		//Player name text field
 		if(characterName.inBounds(mouseX, mouseY))
 		{
 			characterName.setFocused();
 		}			
+		//Player Mode Button
 		if(characterMode.inBounds(mouseX, mouseY))
 		{
 			characterMode.onClick(mouseX, mouseY);
 		}		
+		//Create new player button
 		if(createNewCharacter.inBounds(mouseX, mouseY))
 		{
 			fileManager.generateAndSavePlayer(characterName.getText(), EnumPlayerDifficulty.getDifficulty(characterMode.getValue()));
@@ -394,6 +463,7 @@ public class MainMenu extends Render
 			characterName.setText("");
 			characterName.freeFocused();
 		}
+		//Back button
 		if(stopCreatingCharacter.inBounds(mouseX, mouseY))
 		{
 			isNewPlayerMenuOpen = false;
@@ -401,9 +471,16 @@ public class MainMenu extends Render
 			characterName.freeFocused();
 		}
 	}
-	
+
+	/**
+	 * Handles mouse input for the delete world menu, which contains a confirm
+	 * and back button.
+	 * @param mouseX the mouse's X position in ortho units
+	 * @param mouseY the mouse's Y position in ortho units
+	 */
 	private void mouseMenuDeleteWorld(int mouseX, int mouseY)
 	{
+		//Confirm Button
 		if(deleteWorldConfirm.inBounds(mouseX, mouseY))
 		{
 			deleteWorld(selectedWorldName);
@@ -411,31 +488,44 @@ public class MainMenu extends Render
 			isDeleteWorldMenuOpen = false;
 			isWaitingToDelete = false;
 		}
+		//Back button
 		if(deleteWorldBack.inBounds(mouseX, mouseY))
 		{
 			isDeleteWorldMenuOpen = false;
 			isWaitingToDelete = false;
 		}
 	}
-	
+
+	/**
+	 * Handles all the mouse input for the create world menu. This holds fields for
+	 * the world's name, the world mode, the world size (soon to be eliminated), 
+	 * as well as 'create' and 'back' buttons.
+	 * @param mouseX the mouse's X position in ortho units
+	 * @param mouseY the mouse's Y position in ortho units
+	 */
 	private void mouseMenuCreateWorld(int mouseX, int mouseY)
 	{
+		//World Name Text Box
 		if(worldName.inBounds(mouseX, mouseY))
 		{
 			worldName.setFocused();
 		}		
+		//World Mode Button
 		if(worldMode.inBounds(mouseX, mouseY))
 		{
 			worldMode.onClick(mouseX, mouseY);
 		}
+		//World Size Button
 		if(worldSize.inBounds(mouseX, mouseY))
 		{
 			worldSize.onClick(mouseX, mouseY);
 		}
+		//Create World 'confirm' button
 		if(createNewWorld.inBounds(mouseX, mouseY))
 		{
 			flaggedForWorldGen = true;
 		}
+		//Back button
 		if(stopCreatingWorld.inBounds(mouseX, mouseY))
 		{
 			isNewWorldMenuOpen = false;
@@ -444,12 +534,17 @@ public class MainMenu extends Render
 		}
 	}
 	
+	/**
+	 * Handles mouse input for the main menu - this gives options for single player,
+	 * multiplayer, settings, and also to quit the game.
+	 * @param mouseX the mouse's X position in ortho units
+	 * @param mouseY the mouse's Y position in ortho units
+	 */
 	private void mouseMainMenu(int mouseX, int mouseY)
 	{
 		menu.onClick(mouseX, mouseY);
 		
 		int selectedMenuIndex = menu.getCellWithoutScroll(mouseX, mouseY);
-		System.out.println(selectedMenuIndex);
 		if(selectedMenuIndex == 1) //SP
 		{
 			isPlayerMenuOpen = true;
@@ -464,7 +559,7 @@ public class MainMenu extends Render
 		}
 		if(selectedMenuIndex == 3) //Settings
 		{
-			//This could actually launch the settings menu
+			settingsMenu.open = true;
 		}
 		if(selectedMenuIndex == 4) //Quit
 		{
@@ -472,28 +567,40 @@ public class MainMenu extends Render
 		}
 	}
 	
+	/**
+	 * Handles mouse input for the player select menu - which lists all the different players
+	 * as well as options to create/delete players and go back to the main menu
+	 * @param mouseX the mouse's X position in ortho units
+	 * @param mouseY the mouse's Y position in ortho units
+	 */
 	private void mousePlayerMenu(int mouseX, int mouseY)
 	{
 		menu.onClick(mouseX, mouseY);
 		int selectedIndex = menu.getSelectedCell(mouseX, mouseY);
 		if(selectedIndex == menu.getTotalMenuLength() - 3)
 		{
+			//New Player
 			isNewPlayerMenuOpen = true;
 		}
 		else if(selectedIndex == menu.getTotalMenuLength() - 2)
 		{
+			//Delete Player
 			isWaitingToDelete = true;
 		}
 		else if(selectedIndex == menu.getTotalMenuLength() - 1)
 		{
+			//Back
 			isPlayerMenuOpen = false;
 			isMainMenuOpen = true;
+			isWaitingToDelete = false;
 			menu.updateLockedInComponents(mainMenuFooter);
 			menu.updateTitle("Main Menu");
 			menu.updateVaryingItems(mainMenuVarying);
 		}
 		else if(selectedIndex > 0 && selectedIndex < menu.getVaryingItems().length + 1)
 		{
+			//If the user is waiting to delete something, then prompt them with a delete confirm thing, 
+			//otherwise go to the world select part
 			if(isWaitingToDelete)
 			{
 				isDeletePlayerMenuOpen = true;
@@ -511,6 +618,12 @@ public class MainMenu extends Render
 		}
 	}
 	
+	/**
+	 * Handles mouse input for the world select menu - which lists all the different worlds, as well as
+	 * the option to create/delete worlds and go back
+	 * @param mouseX the mouse's X position in ortho units
+	 * @param mouseY the mouse's Y position in ortho units
+	 */
 	private void mouseWorldMenu(int mouseX, int mouseY)
 	{
 		menu.onClick(mouseX, mouseY);
@@ -518,16 +631,20 @@ public class MainMenu extends Render
 		int selectedIndex = menu.getSelectedCell(mouseX, mouseY);
 		if(selectedIndex == menu.getTotalMenuLength() - 3)
 		{
+			//New World
 			isNewWorldMenuOpen= true;
 		}
 		else if(selectedIndex == menu.getTotalMenuLength() - 2)
 		{
+			//Delete World
 			isWaitingToDelete = true;			
 		}
 		else if(selectedIndex == menu.getTotalMenuLength() - 1)
 		{
+			//Back
 			isPlayerMenuOpen = true;
 			isWorldMenuOpen = false;
+			isWaitingToDelete = false;
 			selectedPlayerName = "";
 			menu.updateLockedInComponents(playerMenuFooter);
 			menu.updateTitle("Players");
@@ -535,6 +652,9 @@ public class MainMenu extends Render
 		}
 		else if(selectedIndex > 0 && selectedIndex < menu.getVaryingItems().length + 1)
 		{
+			//If the user wants to delete a world, open that confirm part of the menu,
+			//Otherwise, flag the menu to start playing the game. (allowing activation of a 
+			//Impromptu loading screen)
 			if(isWaitingToDelete)
 			{
 				selectedWorldName = menu.getVaryingItems()[selectedIndex - 1];
@@ -549,12 +669,20 @@ public class MainMenu extends Render
 		}
 	}
 	
+	/**
+	 * Starts the game and closes the main menu.
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
 	private void playGame() 
 			throws IOException, ClassNotFoundException
 	{
 		TerraeRasa.startGame(selectedWorldName, fileManager.loadWorld("Earth", selectedWorldName), fileManager.loadPlayer(selectedPlayerName));
 	}
 	
+	/**
+	 * Handles keyboard input. For the menu this means distributing typing to text boxes.
+	 */
 	private void keyboard()
 	{	
 		for( ; Keyboard.next(); handleKeyboardInput()) { } //Very hacky way of letting all keyboard input be recognized
@@ -584,6 +712,9 @@ public class MainMenu extends Render
 		}
 	}
 	
+	/**
+	 * Renders the appropriate menu components for the menu that is open
+	 */
 	private void renderComponents()
 	{		
 		if(isDeletePlayerMenuOpen) //character deletion screen
@@ -619,6 +750,9 @@ public class MainMenu extends Render
 		}		
 	}
 	
+	/**
+	 * Renders text for the version of the game.
+	 */
 	private void renderVersion()
 	{
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
@@ -638,6 +772,10 @@ public class MainMenu extends Render
 		trueTypeFont.drawString(Display.getWidth() / 2 - 10, (Display.getHeight() / 2) - 20, TerraeRasa.getVersion(), 0.5f, -0.5f, TrueTypeFont.ALIGN_RIGHT);
 	}
 	
+	/**
+	 * Updates the contents of the playerNames, and worldNames arrays. Then, if either of those menus are open
+	 * the left-side menu is refreshed.
+	 */
 	private void updateMenus()
 	{
 		worldNames = menuHelper.getWorldFileNames();
@@ -680,6 +818,9 @@ public class MainMenu extends Render
 		return success;
 	}
 	
+	/**
+	 * A quick and dirty fix for a load screen when the player decides to generate a world. TODO: Make more accurate.
+	 */
 	private void overwriteWithLoadingScreen()
 	{
 		int width = 450;
@@ -716,6 +857,9 @@ public class MainMenu extends Render
 	
 	}
 	
+	/**
+	 * A quick and dirty fix for the load screen between the player starting to play and the game actually being loaded.
+	 */
 	private void overwriteWithGameLoadScreen()
 	{
 		int width = 450;

@@ -148,7 +148,7 @@ public class GuiTextboxScaling extends GuiComponent
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		
 		//Texture
-		GuiMainMenu.buttonTexture.bind();
+		renderTexture.bind();
 		GL11.glColor4f(1, 1, 1, 1);
 		t.startDrawingQuads();		
 	    t.addVertexWithUV(x, y + height, 0, 0, 1);

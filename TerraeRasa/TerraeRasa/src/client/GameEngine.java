@@ -179,7 +179,7 @@ public class GameEngine
 		        if(TerraeRasa.isMainMenuOpen) //if the main menu is open, render that, otherwise render the game
 		        {
 		        	soundEngine.setCurrentMusic("Placeholder Music");
-		        	mainMenu.render();
+		        	mainMenu.render(settings);
 			    }
 		        else
 		        {
@@ -272,7 +272,7 @@ public class GameEngine
 		Render.initializeTextures(getWorld());
 		chunkManager = new ChunkManager();
 		soundEngine = new SoundEngine(settings);
-		mainMenu = new MainMenu();
+		mainMenu = new MainMenu(settings);
 		renderMenu = new RenderMenu(settings);
 		Display.setVSyncEnabled(settings.vsyncEnabled);
 		debugCheats();
@@ -571,6 +571,6 @@ public class GameEngine
 	 */
 	public void resetMainMenu()
 	{
-		mainMenu = new MainMenu();
+		mainMenu = new MainMenu(settings);
 	}
 }
