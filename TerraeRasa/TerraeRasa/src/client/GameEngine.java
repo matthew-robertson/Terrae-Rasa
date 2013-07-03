@@ -32,6 +32,7 @@ import blocks.Block;
 import entities.EntityPlayer;
 import enums.EnumPlayerDifficulty;
 import enums.EnumWorldDifficulty;
+import enums.EnumWorldSize;
 
 /**
  * <code>GameEngine</code> is the class responsible for running the main game loop, and other core features of multiple worlds.

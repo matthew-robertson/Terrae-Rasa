@@ -5,6 +5,15 @@ import java.awt.Font;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
+/**
+ * GuiMenu defines a menu which can accept any number of arguments and will use a scrollbar if there are more items in the list
+ * than are visible. Every GuiMenu has a title, a number of varying items, and a limited number of locked in values which are 
+ * always visible. 
+ * @author      Alec Sobeck
+ * @author      Matthew Robertson
+ * @version     1.0
+ * @since       1.0
+ */
 public class GuiMenu extends GuiComponent
 {
 	protected final static TrueTypeFont ttf = new TrueTypeFont(((new Font("times", Font.BOLD, 24)).deriveFont(16.0f)), true);
@@ -16,6 +25,16 @@ public class GuiMenu extends GuiComponent
 	private int highlightedIndex;
 	private boolean visible;
 	
+	/**
+	 * Constructs a new GuiMenu with the given positions
+	 * @param x the x position as a value from 0.0 to 1.0 indicating a percent
+	 * @param y the y position as a value from 0.0 to 1.0 indicating a percent, or a fixed value if the component does not adjust vertically
+	 * @param width the width as a value from 0.0 to 1.0 indicating a percent
+	 * @param height the height, a value from 0.0 to 1.0 indicating a percent
+	 * @param title the title of the menu
+	 * @param varyingItems the initial varying items in the menu
+	 * @param lockedInComponents the initial values which are always visible in the menu
+	 */
 	public GuiMenu(double x, double y, double width, double height, String title, String[] varyingItems, String[] lockedInComponents)
 	{
 		super();
@@ -31,14 +50,21 @@ public class GuiMenu extends GuiComponent
 		this.visible = true;
 	}
 	
+	/**
+	 * Checks if the scrollbar needs adjusted due to a mouse click
+	 */
 	public void onClick(int mouseX, int mouseY) 
 	{
+		if(!visible)
+		{
+			return;
+		}
+		//If there is the need for a scrollbar, activate mouse functionality.
 		if(varyingItems.length > (int) ((Display.getHeight() * 0.45) / 30) - lockedInComponents.length - 1)
 		{
 			double x = (this.x * Display.getWidth() * 0.5);
 			double y = (this.y * Display.getHeight() * 0.5);
 			double width = this.width * 0.5 * Display.getWidth() * 0.9;
-			double height = (this.height * Display.getHeight() * 0.5);
 			double scrollWidth = this.width * 0.5 * Display.getWidth() * 0.1;
 			double scrollHeight = ((int) ((Display.getHeight() * 0.45) / 30) - lockedInComponents.length) * CELL_SIZE - 1;
 			double yoff = CELL_SIZE;
@@ -46,8 +72,11 @@ public class GuiMenu extends GuiComponent
 			
 			int maxDisplayedValues = totalMenuItems - lockedInComponents.length;
 			if(maxDisplayedValues > varyingItems.length)
+			{
 				maxDisplayedValues = varyingItems.length;
-			
+			}
+			//Check if the mouse is in the scrollbar part, if so then adjust the scrollbar to the appropriate index
+			//Based on where there was a click.
 			if(mouseX > x + width && 
 				mouseX < x + width + scrollWidth && 
 				mouseY > y + yoff && 
@@ -55,12 +84,20 @@ public class GuiMenu extends GuiComponent
 			{
 				selectedIndex = (int) (varyingItems.length * ((double)(mouseY - y - CELL_SIZE) / scrollHeight));
 				if(selectedIndex > varyingItems.length - maxDisplayedValues + 1)
+				{
 					selectedIndex = varyingItems.length - maxDisplayedValues + 1;
+				}
 			}
 		}
 	}
 	
-	public int getSelectedIndex(int mouseX, int mouseY)
+	/**
+	 * Gets the cell of the menu that is selected, factoring in for scrolling through the different varying items.
+	 * @param mouseX the X position of the mouse in ortho units
+	 * @param mouseY the Y position of the mouse in ortho units
+	 * @return the square the mouse is currently clicking, or -1 if not inside any particular square
+	 */
+	public int getSelectedCell(int mouseX, int mouseY)
 	{
 		double x = (this.x * Display.getWidth() * 0.5);
 		double y = (this.y * Display.getHeight() * 0.5);
@@ -77,6 +114,7 @@ public class GuiMenu extends GuiComponent
 				index = i;
 			}
 		}		
+		//If the 
 		if(index > 0 && index < totalMenuItems - lockedInComponents.length)
 		{
 			index += selectedIndex;
@@ -84,7 +122,14 @@ public class GuiMenu extends GuiComponent
 		return index;
 	}
 	
-	public int getIndexWithoutScroll(int mouseX, int mouseY)
+	/**
+	 * Gets the cell of the menu that is selected without factoring in scrolling through the
+	 * scrollbar. 
+	 * @param mouseX the X position of the mouse in ortho units
+	 * @param mouseY the Y position of the mouse in ortho units
+	 * @return the selected cell without regard for scrolling varying_items
+	 */
+	public int getCellWithoutScroll(int mouseX, int mouseY)
 	{
 		double x = (this.x * Display.getWidth() * 0.5);
 		double y = (this.y * Display.getHeight() * 0.5);
@@ -104,6 +149,10 @@ public class GuiMenu extends GuiComponent
 		return index;
 	}
 	
+	/**
+	 * Updates the varying items in the list to the new given values
+	 * @param newVaryingItems the new varying item values for the menu
+	 */
 	public void updateVaryingItems(String[] newVaryingItems)
 	{
 		this.varyingItems = newVaryingItems;
@@ -111,6 +160,10 @@ public class GuiMenu extends GuiComponent
 		highlightedIndex = 0;
 	}
 	
+	/**
+	 * Updates the locked in values in the list to the new given values
+	 * @param newLockedInComponents the new locked in values' names
+	 */
 	public void updateLockedInComponents(String[] newLockedInComponents)
 	{
 		this.lockedInComponents = newLockedInComponents;
@@ -118,17 +171,28 @@ public class GuiMenu extends GuiComponent
 		highlightedIndex = 0;
 	}
 	
+	/**
+	 * Updates the menu title to the new value given.
+	 * @param newTitle the new menu title
+	 */
 	public void updateTitle(String newTitle)
 	{
 		this.title = newTitle;
 	}
 	
-	//-1 => none highlighted
+	/**
+	 * Marks a certain cell in the menu as being highlighted, which will cause it to show a different
+	 * background for emphasis
+	 * @param index the new cell of the menu to highlight
+	 */
 	public void setHighlighted(int index)
 	{
 		this.highlightedIndex = index; 
 	}
 	
+	/**
+	 * Draws this GuiMenu if it's visible
+	 */
 	public void draw() 
 	{
 		if(!visible)
@@ -139,11 +203,9 @@ public class GuiMenu extends GuiComponent
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA); //Re-enable this so the lighting renders properly
-		
 		double x = (this.x * Display.getWidth() * 0.5);
 		double y = (this.y * Display.getHeight() * 0.5);
 		double width = this.width * 0.5 * Display.getWidth() * 0.9;
-		double height = (this.height * Display.getHeight() * 0.5);
 		int totalMenuItems = (int) ((Display.getHeight() * 0.50 - (2 * y)) / 30);
 		
 		Tessellator t = Tessellator.instance;
@@ -267,7 +329,6 @@ public class GuiMenu extends GuiComponent
 					-yScale, 
 					TrueTypeFont.ALIGN_CENTER);
 		}
-		
 	}
 	
 	public String[] getVaryingItems()
@@ -284,5 +345,4 @@ public class GuiMenu extends GuiComponent
 	{
 		this.visible = visible;
 	}
-	
 }

@@ -44,9 +44,7 @@ public class FileManager
 		new File(TerraeRasa.getBasePath() + "/World Saves/" + name + "/Earth").mkdir();
 		world.chunkManager = TerraeRasa.terraeRasa.gameEngine.chunkManager;
 		world.chunkManager.setUniverseName(name);
-		world.saveRemainingWorld();
-
-		
+		world.saveRemainingWorld();	
 		return world;
 	}
 	

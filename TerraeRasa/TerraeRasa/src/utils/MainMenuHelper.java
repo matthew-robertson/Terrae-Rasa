@@ -5,6 +5,14 @@ import java.util.Vector;
 
 import client.TerraeRasa;
 
+/**
+ * MainMenuHelper defines some basic methods that help with the MainMenu. Currently, MainMenuHelper can be 
+ * used to get the total number of players, worlds, all the player names, and all the world names.
+ * @author Alec Sobeck
+ * @author Matthew Robertson
+ * @version 1.0
+ * @since 1.0
+ */
 public class MainMenuHelper 
 {
 	/**

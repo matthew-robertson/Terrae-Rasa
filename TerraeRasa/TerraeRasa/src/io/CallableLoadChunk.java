@@ -45,7 +45,7 @@ public class CallableLoadChunk implements Callable<Chunk>
 		{
 			for(int k = 0; k < savables[0].length; k++)
 			{
-				MinimalBlock block = new MinimalBlock(Block.blocksList[savables[i][k].id].clone());
+				MinimalBlock block = new MinimalBlock(savables[i][k]);
 				blocks[i][k] = block;			
 			}
 		}

@@ -320,7 +320,7 @@ public class MainMenu extends Render
 	{
 		menu.onClick(mouseX, mouseY);
 		
-		int selectedMenuIndex = menu.getIndexWithoutScroll(mouseX, mouseY);
+		int selectedMenuIndex = menu.getCellWithoutScroll(mouseX, mouseY);
 		System.out.println(selectedMenuIndex);
 		if(selectedMenuIndex == 1) //SP
 		{
@@ -348,7 +348,7 @@ public class MainMenu extends Render
 	{
 		menu.onClick(mouseX, mouseY);
 	
-		int selectedIndex = menu.getSelectedIndex(mouseX, mouseY);
+		int selectedIndex = menu.getSelectedCell(mouseX, mouseY);
 		if(selectedIndex > 0 && selectedIndex < menu.getVaryingItems().length + 1)
 		{
 			if(isWaitingToDelete)
@@ -391,7 +391,7 @@ public class MainMenu extends Render
 		menu.onClick(mouseX, mouseY);
 		
 
-		int selectedIndex = menu.getSelectedIndex(mouseX, mouseY);
+		int selectedIndex = menu.getSelectedCell(mouseX, mouseY);
 		if(selectedIndex > 0 && selectedIndex < menu.getVaryingItems().length + 1)
 		{
 			if(isWaitingToDelete)
