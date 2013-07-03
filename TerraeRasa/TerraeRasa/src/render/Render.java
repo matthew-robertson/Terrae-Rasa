@@ -82,6 +82,8 @@ public class Render
 	public static Texture background_1; //Background (sky)
 	
 	public static Texture background_menu;
+	public static Texture starParticleBackground;
+	public static Texture starParticleForeground;
 	
 	/** 
 	 * cameraX is a relatively unique variable. It's where the camera is moved to on the X axis, based on player location. 
@@ -197,8 +199,9 @@ public class Render
 				Animation.ANIMATE_HORIZONTAL);
 		background_menu = loader.getTexture("Resources/stars.png");
 		logo = loader.getTexture("Resources/logo.png");
-		//
-		
+		starParticleBackground = loader.getTexture("Resources/shooting_star_background.png");
+		starParticleForeground = loader.getTexture("Resources/shooting_star_foreground.png");
+	
 		renderParticles = new RenderParticles();
 		renderEntities = new RenderEntities();
 		renderBlocks = new RenderBlocks();

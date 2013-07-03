@@ -80,6 +80,36 @@ public class EntityPlayer extends EntityLiving
 	private static final double rightSwingBound = MathHelper.degreeToRadian(55);
 	private static final int HEALTH_FROM_STAMINA = 10;
 	private static final int MANA_FROM_INTELLECT = 10;
+	private static final double DAMAGE_BONUS_INTELLECT = 1.0 / 100;
+	private static final double DAMAGE_BONUS_DEXTERITY = 1.0 / 100;
+	private static final double DAMAGE_BONUS_STRENGTH = 1.0 / 100;
+	private boolean isSwingingRight;
+	private boolean hasSwungTool;
+	private double rotateAngle;
+	private boolean armorChanged;
+	private int ticksSinceLastCast;
+	private int ticksInCombat;
+	private int ticksOfHealthRegen;
+	private boolean isInCombat;
+	private boolean isMining;
+	private boolean isReloaded;
+	private int ticksreq;
+	private int sx;
+	private int sy;		
+	private CraftingManager craftingManager;
+	private Recipe[] allPossibleRecipes;
+	private final String playerName;
+	private boolean inventoryChanged;
+	private final EnumPlayerDifficulty difficulty;
+	private final int MAXIMUM_BASE_MANA;
+	private final int MAXIMUM_BASE_HEALTH;
+	private final int MAX_BLOCK_PLACE_DISTANCE;
+	private Hashtable<String, Cooldown> cooldowns;
+	private int baseSpecialEnergy;
+	private Dictionary<String, Boolean> nearBlock;
+	private Dictionary<String, Recipe[]> possibleRecipesByBlock;
+	private PassiveBonusContainer currentBonuses; 
+	private AuraTracker auraTracker;
 	
 	public int viewedChestX;
 	public int viewedChestY;
@@ -95,9 +125,7 @@ public class EntityPlayer extends EntityLiving
 	public double respawnXPos;
 	public double respawnYPos;	
 	
-	private boolean isSwingingRight;
-	private boolean hasSwungTool;
-	private double rotateAngle;
+	
 	
 	public int selectedRecipe;
 	public int selectedSlot;
@@ -109,33 +137,10 @@ public class EntityPlayer extends EntityLiving
 	public double manaRegenerationModifier;
 	public double specialRegenerationModifier;
 	
-	private boolean armorChanged;
-	private int ticksSinceLastCast ;
-	private int ticksInCombat;
-	private int ticksOfHealthRegen;
-	private boolean isInCombat;
-	protected boolean isMining;
-	private boolean isReloaded;
-	private int ticksreq;
-	private int sx;
-	private int sy;		
-	private CraftingManager craftingManager;
-	private Recipe[] allPossibleRecipes;
-	private final String playerName;
-	private boolean inventoryChanged;
-	private final EnumPlayerDifficulty difficulty;
-	private final int MAXIMUM_BASE_MANA;
-	private final int MAXIMUM_BASE_HEALTH;
-	private final int MAX_BLOCK_PLACE_DISTANCE;
-	private Hashtable<String, Cooldown> cooldowns;
-	private int baseSpecialEnergy;
 	public int temporarySpecialEnergy;
 	public double specialEnergy;
 	public double maxSpecialEnergy;
-	private Dictionary<String, Boolean> nearBlock;
-	private Dictionary<String, Recipe[]> possibleRecipesByBlock;
-	private PassiveBonusContainer currentBonuses; 
-	private AuraTracker auraTracker;
+	
 	/** A flag indicating if the player has been forever defeated. If they have, they will not be saved to disk.*/
 	public boolean defeated;
 	
@@ -756,9 +761,9 @@ public class EntityPlayer extends EntityLiving
 	 */
 	public void recalculateStats()
 	{
-		rangeDamageModifier = 1.0f + 0.04f * dexterity;
-		meleeDamageModifier = 1.0f + 0.04f * strength;
-		magicDamageModifier = 1.0f + 0.04f * intellect;
+		rangeDamageModifier = 1.0 + DAMAGE_BONUS_DEXTERITY * dexterity;
+		meleeDamageModifier = 1.0 + DAMAGE_BONUS_STRENGTH * strength;
+		magicDamageModifier = 1.0 + DAMAGE_BONUS_INTELLECT * intellect;
 		maxHealth = temporaryMaxHealth + baseMaxHealth + (stamina * HEALTH_FROM_STAMINA);
 		maxMana = temporaryMaxMana + baseMaxMana + (intellect * MANA_FROM_INTELLECT);	
 		maxSpecialEnergy = temporarySpecialEnergy + baseSpecialEnergy;
