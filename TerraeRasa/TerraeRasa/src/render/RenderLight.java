@@ -5,13 +5,11 @@ import io.Chunk;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
-import entities.EntityPlayer;
-
 import utils.ChunkUtils;
 import utils.LightUtils;
 import world.World;
-
-import blocks.BlockLight;
+import blocks.Block;
+import entities.EntityPlayer;
 
 public class RenderLight extends Render
 {	
@@ -41,7 +39,7 @@ public class RenderLight extends Render
 		
 		if(player.getHandheldLight() != null)
 		{
-			BlockLight block = (BlockLight)(player.getHandheldLight());
+			Block block = player.getHandheldLight();
 			LightUtils lightUtils = new LightUtils();
 			double[][] lightMap = lightUtils.getLightMap(world, 
 					((int)(player.x / 6)) + ((player.isFacingRight) ? 1 : 0), 

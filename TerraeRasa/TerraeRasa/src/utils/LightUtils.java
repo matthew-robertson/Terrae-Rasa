@@ -5,11 +5,8 @@ import io.Chunk;
 import java.util.Enumeration;
 
 import world.World;
-
+import blocks.Block;
 import enums.EnumEventType;
-
-
-import blocks.BlockLight;
 
 public class LightUtils 
 {
@@ -54,7 +51,7 @@ public class LightUtils
 					   	//	blockCount++;
 					   	
 						//THIS IS LIKELY AN ERROR!
-						if(world.getBlock(x1, y1).getIsSolid())
+						if(world.getBlock(x1, y1).isSolid)
 							blockCount++;
 							
 					    if (x1 == x2 && y1 == y2) {
@@ -134,7 +131,7 @@ public class LightUtils
 					   	//	blockCount++;
 					   	
 						//THIS IS LIKELY AN ERROR!
-						if(world.getBlock(x1, y1).getIsSolid())
+						if(world.getBlock(x1, y1).isSolid)
 							blockCount++;
 							
 					    if (x1 == x2 && y1 == y2) {
@@ -217,7 +214,7 @@ public class LightUtils
 					   	//	blockCount++;
 					   	
 						//THIS IS LIKELY AN ERROR!
-						if(world.getBlock(x1, y1).getIsSolid())
+						if(world.getBlock(x1, y1).isSolid)
 							blockCount++;
 							
 					    if (x1 == x2 && y1 == y2) {
@@ -281,7 +278,7 @@ public class LightUtils
 			
 			while(y < AVG_HEIGHT && tmpLight > 0.0F)
 			{
-				if(world.getBlock(x, y).getIsSolid())
+				if(world.getBlock(x, y).isSolid)
 				{
 					tmpLight -= LIGHT_BLOCK_DISSIPATES;
 				}
@@ -291,12 +288,12 @@ public class LightUtils
 					if(x - leftOffset < 0) 
 						continue;
 					
-					if(world.getBlock(x - leftOffset, y).getIsSolid() /*&& solid[x - leftOffset][y + 1] == 0*/)
+					if(world.getBlock(x - leftOffset, y).isSolid /*&& solid[x - leftOffset][y + 1] == 0*/)
 					{
 						double leftLight = tmpLight - ((leftOffset - 1) * LIGHT_BLOCK_DISSIPATES);
 						for(int j = y; j < AVG_HEIGHT; j++)
 						{	
-							if(world.getBlock(x - leftOffset, j).getIsSolid())
+							if(world.getBlock(x - leftOffset, j).isSolid)
 								leftLight -= LIGHT_BLOCK_DISSIPATES;
 													
 							if(world.getAmbientLight(x - leftOffset, j) < leftLight)
@@ -314,12 +311,12 @@ public class LightUtils
 				{
 					if(x + rightOffset >= world.getWidth())
 						continue;
-					if(world.getBlock(x + rightOffset, y).getIsSolid() /* && solid[x + rightOffset][y + 1] == 0 */)
+					if(world.getBlock(x + rightOffset, y).isSolid /* && solid[x + rightOffset][y + 1] == 0 */)
 					{
 						double rightLight = tmpLight - ((rightOffset - 1) * LIGHT_BLOCK_DISSIPATES);;
 						for(int j = y; j < AVG_HEIGHT; j++)
 						{	
-							if(world.getBlock(x + rightOffset, j).getIsSolid())
+							if(world.getBlock(x + rightOffset, j).isSolid)
 								rightLight -= LIGHT_BLOCK_DISSIPATES;
 													
 							if(world.getAmbientLight(x + rightOffset, j) < rightLight)
@@ -381,7 +378,7 @@ public class LightUtils
 			
 			while(y < AVG_HEIGHT && tmpLight > 0.0F)
 			{
-				if(chunk.blocks[x][y].getIsSolid())
+				if(Block.blocksList[chunk.blocks[x][y].getID()].getIsSolid())
 				{
 					tmpLight -= LIGHT_BLOCK_DISSIPATES;
 				}
@@ -391,12 +388,12 @@ public class LightUtils
 					if(x - leftOffset < 0) 
 						continue;
 					
-					if(chunk.blocks[x - leftOffset][y].getIsSolid() /*&& solid[x - leftOffset][y + 1] == 0*/)
+					if(Block.blocksList[chunk.blocks[x - leftOffset][y].getID()].getIsSolid() /*&& solid[x - leftOffset][y + 1] == 0*/)
 					{
 						double leftLight = tmpLight - ((leftOffset - 1) * LIGHT_BLOCK_DISSIPATES);
 						for(int j = y; j < AVG_HEIGHT; j++)
 						{	
-							if(chunk.blocks[x - leftOffset][j].getIsSolid())
+							if(Block.blocksList[chunk.blocks[x - leftOffset][j].getID()].getIsSolid())
 								leftLight -= LIGHT_BLOCK_DISSIPATES;
 													
 							if(chunk.ambientLight[x - leftOffset][j] < leftLight)
@@ -415,12 +412,12 @@ public class LightUtils
 					if(x + rightOffset >= Chunk.getChunkWidth())
 						continue;
 					
-					if(chunk.blocks[x + rightOffset][y].getIsSolid() /* && solid[x + rightOffset][y + 1] == 0 */)
+					if(Block.blocksList[chunk.blocks[x + rightOffset][y].getID()].getIsSolid() /* && solid[x + rightOffset][y + 1] == 0 */)
 					{
 						double rightLight = tmpLight - ((rightOffset - 1) * LIGHT_BLOCK_DISSIPATES);
 						for(int j = y; j < AVG_HEIGHT; j++)
 						{	
-							if(chunk.blocks[x + rightOffset][j].getIsSolid())
+							if(Block.blocksList[chunk.blocks[x + rightOffset][j].getID()].getIsSolid())
 								rightLight -= LIGHT_BLOCK_DISSIPATES;
 													
 							if(chunk.ambientLight[x + rightOffset][j] < rightLight)
@@ -663,9 +660,9 @@ public class LightUtils
 					continue;
 				}
 				
-				if(world.getBlock(i, k) instanceof BlockLight)
+				if(world.getBlockGenerate(i, k).lightStrength > 0)
 				{
-					BlockLight block = (BlockLight)world.getBlock(i, k);
+					Block block = world.getBlockGenerate(i, k);
 					removeLightSource(world, i, k, block.lightRadius, block.lightStrength);
 					//applyLightSource(world, i, k, block.lightRadius, block.lightStrength);				
 				}
@@ -684,9 +681,9 @@ public class LightUtils
 					continue;
 				}
 				
-				if(world.getBlock(i, k) instanceof BlockLight)
+				if(world.getBlockGenerate(i, k).lightStrength > 0)
 				{
-					BlockLight block = (BlockLight)world.getBlock(i, k);
+					Block block = world.getBlockGenerate(i, k);
 					removeLightSource(world, i, k, block.lightRadius, block.lightStrength);
 					//applyLightSource(world, i, k, block.lightRadius, block.lightStrength);				
 				}
@@ -705,9 +702,9 @@ public class LightUtils
 					continue;
 				}
 				
-				if(world.getBlock(i, k) instanceof BlockLight)
+				if(world.getBlockGenerate(i, k).lightStrength > 0)
 				{
-					BlockLight block = (BlockLight)world.getBlock(i, k);
+					Block block = world.getBlockGenerate(i, k);
 					//removeLightSource(world, i, k, block.lightRadius, block.lightStrength);
 					applyLightSource(world, i, k, block.lightRadius, block.lightStrength);				
 				}
@@ -735,7 +732,7 @@ public class LightUtils
 			
 			while(yChunk < AVG_HEIGHT && tmpLight > 0.0F)
 			{
-				if(world.getBlock(x, yChunk).getIsSolid())
+				if(world.getBlock(x, yChunk).isSolid)
 				{
 					tmpLight -= LIGHT_BLOCK_DISSIPATES;
 				}
@@ -745,12 +742,12 @@ public class LightUtils
 					if(x - leftOffset < 0) 
 						continue;
 					
-					if(world.getBlock(x - leftOffset, yChunk).getIsSolid() /*&& solid[x - leftOffset][yChunk + 1] == 0*/)
+					if(world.getBlock(x - leftOffset, yChunk).isSolid /*&& solid[x - leftOffset][yChunk + 1] == 0*/)
 					{
 						double leftLight = tmpLight - ((leftOffset - 1) * LIGHT_BLOCK_DISSIPATES);
 						for(int j = yChunk; j < AVG_HEIGHT; j++)
 						{	
-							if(world.getBlock(x - leftOffset, j).getIsSolid())
+							if(world.getBlock(x - leftOffset, j).isSolid)
 								leftLight -= LIGHT_BLOCK_DISSIPATES;
 													
 							if(world.getAmbientLight(x - leftOffset, j) < leftLight)
@@ -768,12 +765,12 @@ public class LightUtils
 				{
 					if(x + rightOffset >= world.getWidth())
 						continue;
-					if(world.getBlock(x + rightOffset, yChunk).getIsSolid() /* && solid[x + rightOffset][yChunk + 1] == 0 */)
+					if(world.getBlock(x + rightOffset, yChunk).isSolid /* && solid[x + rightOffset][yChunk + 1] == 0 */)
 					{
 						double rightLight = tmpLight - ((rightOffset - 1) * LIGHT_BLOCK_DISSIPATES);;
 						for(int j = yChunk; j < AVG_HEIGHT; j++)
 						{	
-							if(world.getBlock(x + rightOffset, j).getIsSolid())
+							if(world.getBlock(x + rightOffset, j).isSolid)
 								rightLight -= LIGHT_BLOCK_DISSIPATES;
 													
 							if(world.getAmbientLight(x + rightOffset, j) < rightLight)
@@ -817,7 +814,7 @@ public class LightUtils
 			
 			while(yChunk < AVG_HEIGHT && tmpLight > 0.0F)
 			{
-				if(world.getBlock(x, yChunk).getIsSolid())
+				if(world.getBlock(x, yChunk).isSolid)
 				{
 					tmpLight -= LIGHT_BLOCK_DISSIPATES;
 				}
@@ -827,12 +824,12 @@ public class LightUtils
 					if(x - leftOffset < 0) 
 						continue;
 					
-					if(world.getBlock(x - leftOffset, yChunk).getIsSolid() /*&& solid[x - leftOffset][yChunk + 1] == 0*/)
+					if(world.getBlock(x - leftOffset, yChunk).isSolid /*&& solid[x - leftOffset][yChunk + 1] == 0*/)
 					{
 						double leftLight = tmpLight - ((leftOffset - 1) * LIGHT_BLOCK_DISSIPATES);
 						for(int j = yChunk; j < AVG_HEIGHT; j++)
 						{	
-							if(world.getBlock(x - leftOffset, j).getIsSolid())
+							if(world.getBlock(x - leftOffset, j).isSolid)
 								leftLight -= LIGHT_BLOCK_DISSIPATES;
 													
 							if(world.getAmbientLight(x - leftOffset, j) < leftLight)
@@ -850,12 +847,12 @@ public class LightUtils
 				{
 					if(x + rightOffset >= world.getWidth())
 						continue;
-					if(world.getBlock(x + rightOffset, yChunk).getIsSolid() /* && solid[x + rightOffset][yChunk + 1] == 0 */)
+					if(world.getBlock(x + rightOffset, yChunk).isSolid /* && solid[x + rightOffset][yChunk + 1] == 0 */)
 					{
 						double rightLight = tmpLight - ((rightOffset - 1) * LIGHT_BLOCK_DISSIPATES);;
 						for(int j = yChunk; j < AVG_HEIGHT; j++)
 						{	
-							if(world.getBlock(x + rightOffset, j).getIsSolid())
+							if(world.getBlock(x + rightOffset, j).isSolid)
 								rightLight -= LIGHT_BLOCK_DISSIPATES;
 													
 							if(world.getAmbientLight(x + rightOffset, j) < rightLight)

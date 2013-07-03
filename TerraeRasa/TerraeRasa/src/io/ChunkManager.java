@@ -11,6 +11,7 @@ import java.util.concurrent.Future;
 
 import blocks.Block;
 import blocks.BlockChest;
+import blocks.MinimalBlock;
 
 import savable.SavableBlock;
 import savable.SavableChunk;
@@ -393,7 +394,7 @@ public class ChunkManager
 		return true;
 	}
 	
-	private SavableBlock[][] convertToSavable(Block[][] blocks)
+	private SavableBlock[][] convertToSavable(MinimalBlock[][] blocks)
 	{
 		SavableBlock[][] savables = new SavableBlock[blocks.length][blocks[0].length];
 		for(int i = 0; i < savables.length; i++)
@@ -401,10 +402,11 @@ public class ChunkManager
 			for(int k = 0; k < savables[0].length; k++)
 			{
 				SavableBlock sblock = new SavableBlock();
-				sblock.bitMap = blocks[i][k].getBitMap();
-				sblock.id = blocks[i][k].getID();
+				sblock.bitMap = blocks[i][k].bitMap;
+				sblock.id = blocks[i][k].id;
 				sblock.metaData = blocks[i][k].metaData;
-				sblock.mainInventory = (blocks[i][k] instanceof BlockChest) ? ((BlockChest)(blocks[i][k])).getMainInventory() : new ItemStack[0];
+				sblock.mainInventory = blocks[i][k].mainInventory;
+						//(blocks[i][k] instanceof BlockChest) ? ((BlockChest)(blocks[i][k])).getMainInventory() : new ItemStack[0];
 				savables[i][k] = sblock;			
 			}
 		}

@@ -7,6 +7,7 @@ import savable.SaveManager;
 import world.Biome;
 import blocks.Block;
 import blocks.BlockChest;
+import blocks.MinimalBlock;
 
 public class CallableLoadChunk implements Callable<Chunk>
 {
@@ -37,20 +38,14 @@ public class CallableLoadChunk implements Callable<Chunk>
 		return chunk;
 	}
 	
-	private Block[][] convertFromSavable(SavableBlock[][] savables)
+	private MinimalBlock[][] convertFromSavable(SavableBlock[][] savables)
 	{
-		Block[][] blocks = new Block[savables.length][savables[0].length];
+		MinimalBlock[][] blocks = new MinimalBlock[savables.length][savables[0].length];
 		for(int i = 0; i < savables.length; i++)
 		{
 			for(int k = 0; k < savables[0].length; k++)
 			{
-				Block block = Block.blocksList[savables[i][k].id].clone();
-				block.setBitMap(savables[i][k].bitMap);
-				block.metaData = savables[i][k].metaData;
-				if(block instanceof BlockChest)
-				{
-					((BlockChest)(block)).setInventory(savables[i][k].mainInventory);
-				}
+				MinimalBlock block = new MinimalBlock(Block.blocksList[savables[i][k].id].clone());
 				blocks[i][k] = block;			
 			}
 		}

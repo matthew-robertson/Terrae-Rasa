@@ -7,6 +7,7 @@ import savable.SaveManager;
 import utils.ItemStack;
 import blocks.Block;
 import blocks.BlockChest;
+import blocks.MinimalBlock;
 
 public class CallableSaveChunk implements Callable<Boolean>
 {
@@ -42,10 +43,12 @@ public class CallableSaveChunk implements Callable<Boolean>
 		smanager.saveCompressedFile(basepath + "/" + x + ".trc", savable);
 		System.out.println("Chunk Saved to: " + basepath + "/" + x + ".trc");
 		manager.unlockChunk(chunk.getX());
+		this.chunk = null;
+		savable = null;
 		return true;
 	}
 	
-	private SavableBlock[][] convertToSavable(Block[][] blocks)
+	private SavableBlock[][] convertToSavable(MinimalBlock[][] blocks)
 	{
 		SavableBlock[][] savables = new SavableBlock[blocks.length][blocks[0].length];
 		for(int i = 0; i < savables.length; i++)
@@ -53,10 +56,11 @@ public class CallableSaveChunk implements Callable<Boolean>
 			for(int k = 0; k < savables[0].length; k++)
 			{
 				SavableBlock sblock = new SavableBlock();
-				sblock.bitMap = blocks[i][k].getBitMap();
-				sblock.id = blocks[i][k].getID();
+				sblock.bitMap = blocks[i][k].bitMap;
+				sblock.id = blocks[i][k].id;
 				sblock.metaData = blocks[i][k].metaData;
-				sblock.mainInventory = (blocks[i][k] instanceof BlockChest) ? ((BlockChest)(blocks[i][k])).getMainInventory() : new ItemStack[0];
+				sblock.mainInventory = blocks[i][k].mainInventory;
+						//(blocks[i][k] instanceof BlockChest) ? ((BlockChest)(blocks[i][k])).getMainInventory() : new ItemStack[0];
 				savables[i][k] = sblock;			
 			}
 		}

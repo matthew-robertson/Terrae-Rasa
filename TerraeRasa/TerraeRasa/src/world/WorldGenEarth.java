@@ -93,7 +93,7 @@ public class WorldGenEarth extends WorldGen
 		for(int j = (yLoc + depth) - 1; j > yLoc; j--){ //go through the the y-axis of the world
 			for(int k = xLoc + 1; k < (xLoc + width) - 1; k++){ //x-axis
 				if (world.getBlockGenerate(k,j).isSolid){
-					world.getBlockGenerate(k, j).setBitMap(world.updateBlockBitMap(k, j)); //set the appropriate texture
+					world.setBitMap(k, j, world.updateBlockBitMap(k, j)); //set the appropriate texture
 				}				
 			}
 		}
@@ -116,18 +116,18 @@ public class WorldGenEarth extends WorldGen
 		for(int j = world.getHeight() - 200; j > 0; j--){ //go through the the y-axis of the world
 			for(int k =  x; k < x + w; k++){ //x-axis	
 				//Start replacing trees with snow-covered variant
-				if (world.getBlockGenerate(k, j+1).getID() == Block.treebranch.getID()) world.getBlockGenerate(k, j+1).setBitMap(world.getBlockGenerate(k, j+1).getBitMap() + 12);
+				if (world.getBlockGenerate(k, j+1).getID() == Block.treebranch.getID()) world.setBitMap(k, j+1, world.getBlockGenerate(k, j+1).getBitMap() + 12);
 				
 				else if (world.getBlockGenerate(k, j+1).getID() == Block.treetop.getID() || world.getBlockGenerate(k, j+1).getID() == Block.treetopl2.getID() ||
 						world.getBlockGenerate(k, j+1).getID() == Block.treetopc1.getID() || world.getBlockGenerate(k, j+1).getID() == Block.treetopc2.getID() ||
-						world.getBlockGenerate(k, j+1).getID() == Block.treetopr1.getID() || world.getBlockGenerate(k, j+1).getID() == Block.treetopr2.getID()) world.getBlockGenerate(k, j+1).setBitMap(1);
+						world.getBlockGenerate(k, j+1).getID() == Block.treetopr1.getID() || world.getBlockGenerate(k, j+1).getID() == Block.treetopr2.getID()) world.setBitMap(k, j+1, 1);
 				
 				else if (world.getBlockGenerate(k, j+1).isSolid){ //If there is a solid block with air above
 					if (world.getBlockGenerate(k, j).isOveridable){
 						world.setBlockGenerate(Block.snowCover, k, j); // If the current block is air or a unneeded plant, replace the block with snow
 					}
 				}
-				if (world.getBlockGenerate(k, j).getID() == Block.grass.getID()) world.getBlockGenerate(k, j).setBitMap(world.getBlockGenerate(k, j).getBitMap() + 16);								
+				if (world.getBlockGenerate(k, j).getID() == Block.grass.getID()) world.setBitMap(k, j, world.getBlockGenerate(k, j).getBitMap() + 16);								
 			}
 		}
 	}

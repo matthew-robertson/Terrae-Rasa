@@ -18,10 +18,9 @@ import java.util.Vector;
 
 import org.lwjgl.input.Mouse;
 
-import passiveBonus.PassiveBonus;
-import passiveBonus.PassiveBonusContainer;
-import passiveBonus.PassiveBonusFactory;
-
+import passivebonuses.PassiveBonus;
+import passivebonuses.PassiveBonusContainer;
+import passivebonuses.PassiveBonusFactory;
 import render.Render;
 import utils.Cooldown;
 import utils.CraftingManager;
@@ -37,7 +36,6 @@ import auras.Aura;
 import auras.AuraContainer;
 import auras.AuraTracker;
 import blocks.Block;
-import blocks.BlockLight;
 import enums.EnumColor;
 import enums.EnumDamageSource;
 import enums.EnumDamageType;
@@ -62,7 +60,7 @@ import enums.EnumToolMaterial;
  * <br><br>
  * The third major component of <code>EntityPlayer</code> is armour management. This is done almost 
  * automatically through a single method - {@link #onArmorChange()}. This method recalculates the armor
- * bonuses of the armour, as well as the passive bonuses. It then proceeds to cancel the previous ones. 
+ * bonuses of the armour, as well as the set bonuses. It then proceeds to cancel the previous ones. 
  * <b>NOTE: This method does dangerous things, and more than likely is going to terribly ruin any attempt 
  * at adding a +defense potion, or -defense debuff. It WILL have to be recoded, with little doubt.</b>
  * <br><br>
@@ -545,7 +543,7 @@ public class EntityPlayer extends EntityLiving
 	}
 	
 	/**
-	 * Recalculates defense and passive bonuses when armour changes
+	 * Recalculates defense and set bonuses when armour changes
 	 */
 	public void onArmorChange()
 	{
@@ -865,7 +863,7 @@ public class EntityPlayer extends EntityLiving
 	}
 	
 	/**
-	 * Updates passive bonus data. Unused bonuses are removed and new ones are applied. The new bonuses are 
+	 * Updates set bonus data. Unused bonuses are removed and new ones are applied. The new bonuses are 
 	 * stored in the player's instance to be removed later.
 	 */
 	private void refreshPassiveBonuses()
@@ -887,11 +885,12 @@ public class EntityPlayer extends EntityLiving
 	 */
 	public void breakBlock (World world, int mx, int my, Item item)
 	{
+		Block block = world.getBlockGenerate(mx,  my);
 		if (world.getBlock(mx, my).getID() != Block.air.getID()){
-			if (((item instanceof ItemToolPickaxe && world.getBlock(mx, my).getBlockType() == 1) 
-			  || (item instanceof ItemToolAxe && world.getBlock(mx, my).getBlockType() == 2) 
-			  || (item instanceof ItemToolHammer && world.getBlock(mx, my).getBlockType() == 3) 
-		      || world.getBlock(mx, my).getBlockType() == 0) && Mouse.isButtonDown(0))
+			if (((item instanceof ItemToolPickaxe && block.getBlockType() == 1) 
+			  || (item instanceof ItemToolAxe && block.getBlockType() == 2) 
+			  || (item instanceof ItemToolHammer && block.getBlockType() == 3) 
+		      || block.getBlockType() == 0) && Mouse.isButtonDown(0))
 			{ //If the left-mouse button is pressed && they have the correct tool to mine
 				EnumToolMaterial material;
 				if (item instanceof ItemTool)
@@ -905,31 +904,31 @@ public class EntityPlayer extends EntityLiving
 				double distance = MathHelper.distanceBetweenTwoPoints((MathHelper.getCorrectMouseXPosition() + Render.getCameraX()), (MathHelper.getCorrectMouseYPosition() + Render.getCameraY()), (this.x + ((isFacingRight) ? 9 : 3)), (this.y + 9));
 					      
 				if(distance <= material.getDistance()){
-					if (material.getToolTier() >= world.getBlock(mx, my).getBlockTier()) //If the block is within range
+					if (material.getToolTier() >= block.getBlockTier()) //If the block is within range
 						{ 	
 						if(ticksreq == 0 || world.getBlock(mx, my) != world.getBlock(sx, sy)) //the mouse has moved or they arent mining anything
 						{				
 							isMining = false;
 							sx = mx; //save the co-ords
 							sy = my;
-							ticksreq = (int) (world.getBlock(mx, my).getBlockHardness() / material.getStrength()) + 1; //Determine how long to break
+							ticksreq = (int) (block.getBlockHardness() / material.getStrength()) + 1; //Determine how long to break
 							
 						}	
-						else if(ticksreq == 1 && Mouse.isButtonDown(0) && world.getBlock(mx,  my).getIsMineable()) //If the block should break
+						else if(ticksreq == 1 && Mouse.isButtonDown(0) && block.getIsMineable()) //If the block should break
 						{
 							isMining = false;
-							if(world.getBlock(mx, my) == Block.cactus) 
+							if(block.id == Block.cactus.getID()) 
 							{
 								world.breakCactus(this, mx, my);
 							}
-							else if(world.getBlock(mx, my) == Block.tree)
+							else if(block.id == Block.tree.getID())
 							{
 								world.breakTree(this, mx, my);					
 							}
 							world.breakBlock(this, mx, my);
 							
 							//Overwrite snow/flowers/etc...
-							if (world.getBlock(mx, my-1).getIsOveridable() == true && world.getBlock(mx, my-1) != Block.air)
+							if (world.getBlockGenerate(mx, my-1).getIsOveridable() == true && world.getBlock(mx, my-1).id != Block.air.getID())
 							{
 								world.breakBlock(this, mx, my-1);
 							}
@@ -1192,7 +1191,7 @@ public class EntityPlayer extends EntityLiving
 		ItemStack stack = inventory.getMainInventoryStack(selectedSlot);
 		if(stack != null)
 		{
-			if(stack.getItemID() < Item.itemIndex && (Block.blocksList[stack.getItemID()]) instanceof BlockLight)
+			if(stack.getItemID() < Item.itemIndex && (Block.blocksList[stack.getItemID()]).lightStrength > 0)
 			{
 				return Block.blocksList[stack.getItemID()];
 			}

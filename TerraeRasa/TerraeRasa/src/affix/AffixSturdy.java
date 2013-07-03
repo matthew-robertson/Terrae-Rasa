@@ -1,8 +1,6 @@
 package affix;
 
-import java.util.Random;
-
-import passiveBonus.PassiveBonusDefense;
+import passivebonuses.PassiveBonusDefense;
 
 public class AffixSturdy extends Affix{
 	private int max = 10;

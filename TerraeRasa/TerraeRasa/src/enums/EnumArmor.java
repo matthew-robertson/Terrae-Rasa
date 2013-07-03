@@ -6,14 +6,12 @@ import items.ItemArmor;
 import java.util.EnumSet;
 import java.util.Vector;
 
-import passiveBonus.PassiveBonus;
-import passiveBonus.PassiveBonusCriticalStrike;
-import passiveBonus.PassiveBonusDefense;
-import passiveBonus.PassiveBonusSpeed;
-
-import entities.EntityPlayer;
-
+import passivebonuses.PassiveBonus;
+import passivebonuses.PassiveBonusCriticalStrike;
+import passivebonuses.PassiveBonusDefense;
+import passivebonuses.PassiveBonusSpeed;
 import utils.ItemStack;
+import entities.EntityPlayer;
 
 /**
  * EnumArmor defines the armour values given by a specific grade of equipment. These values are 

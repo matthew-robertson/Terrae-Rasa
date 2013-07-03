@@ -33,7 +33,7 @@ public class GuiMenu extends GuiComponent
 	
 	public void onClick(int mouseX, int mouseY) 
 	{
-		if(varyingItems.length > (int) ((Display.getHeight() * 0.45) / 30) - lockedInComponents.length)
+		if(varyingItems.length > (int) ((Display.getHeight() * 0.45) / 30) - lockedInComponents.length - 1)
 		{
 			double x = (this.x * Display.getWidth() * 0.5);
 			double y = (this.y * Display.getHeight() * 0.5);
@@ -56,8 +56,6 @@ public class GuiMenu extends GuiComponent
 				selectedIndex = (int) (varyingItems.length * ((double)(mouseY - y - CELL_SIZE) / scrollHeight));
 				if(selectedIndex > varyingItems.length - maxDisplayedValues + 1)
 					selectedIndex = varyingItems.length - maxDisplayedValues + 1;
-				
-				System.out.println(selectedIndex);
 			}
 		}
 	}

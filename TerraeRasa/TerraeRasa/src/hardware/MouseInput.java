@@ -34,7 +34,7 @@ public class MouseInput
 		
 		if(Mouse.isButtonDown(0))
 		{
-			Block frontBlock = world.getBlock(mouseBX, mouseBY);
+			Block frontBlock = world.getBlockGenerate(mouseBX, mouseBY);
 			Block backBlock = world.getBackBlock(mouseBX, mouseBY);
 			
 			System.out.println("(" + mouseBX + "," + mouseBY + "): " + frontBlock.getName() + " | " + backBlock.getName());
@@ -98,14 +98,14 @@ public class MouseInput
 		}
 		else if (Mouse.isButtonDown(1)) //Right Mouse down
 		{			
-			if(world.getBlock(mouseBX, mouseBY) instanceof BlockChest && player.isInventoryOpen) //If the block is a chest
+			if(world.getBlockGenerate(mouseBX, mouseBY) instanceof BlockChest && player.isInventoryOpen) //If the block is a chest
 			{
 				player.setViewedChest(mouseBX, mouseBY);
 			}
 			else
 			{
 				if((player.viewedChestX != mouseBX || player.viewedChestY != mouseBY) && 
-					world.getBlock(mouseBX, mouseBY) instanceof BlockChest && player.isInventoryOpen)
+					world.getBlockGenerate(mouseBX, mouseBY) instanceof BlockChest && player.isInventoryOpen)
 				{
 				}
 				else

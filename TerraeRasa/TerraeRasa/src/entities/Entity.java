@@ -292,7 +292,7 @@ public class Entity
 		{
 			for(int i = 0; i < xOffset; i++) //for each block below the entity, check if any are solid
 			{
-				if(world.getBlock((int)(x / 6) + i, (int)((y / 6) + Math.ceil(blockHeight))).getIsSolid())
+				if(world.getBlock((int)(x / 6) + i, (int)((y / 6) + Math.ceil(blockHeight))).isSolid)
 				{
 					return true; //if one is solid, they entity is on the ground
 				}
@@ -547,7 +547,7 @@ public class Entity
 		
 		for(int i = 0; i < blocks.length; i++) //get blocks to check
 		{
-			blocks[i] = world.getBlock((x / 6) + i, ((y - jumpSpeed) / 6));
+			blocks[i] = world.getBlockGenerate((x / 6) + i, ((y - jumpSpeed) / 6));
 		}
 		
 		for(int i = 0; i < blocks.length; i++)
@@ -595,7 +595,7 @@ public class Entity
 		
 		for(int i = 0; i < blocks.length; i++) //get the blocks to check against
 		{
-			blocks[i] = world.getBlock(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)(x / 6) + offset), MathHelper.returnIntegerInWorldMapBounds_Y(world, (int)(y / 6) + i));
+			blocks[i] = world.getBlockGenerate(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)(x / 6) + offset), MathHelper.returnIntegerInWorldMapBounds_Y(world, (int)(y / 6) + i));
 		}
 		
 		for(int i = 0; i < blocks.length; i++)
@@ -629,7 +629,7 @@ public class Entity
 
 		for(int i = 0; i < blocks.length; i++) //get the blocks to check against
 		{
-			blocks[i] =  world.getBlock(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)(x / 6) - 1), MathHelper.returnIntegerInWorldMapBounds_Y(world, ((int)(y / 6) + i)));
+			blocks[i] =  world.getBlockGenerate(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)(x / 6) - 1), MathHelper.returnIntegerInWorldMapBounds_Y(world, ((int)(y / 6) + i)));
 		}
 		
 		for(int i = 0; i < blocks.length; i++)
@@ -666,7 +666,7 @@ public class Entity
 		
 		for(int i = 0; i < blocks.length; i++) //get blocks to check
 		{
-			blocks[i] = world.getBlock((x / 6) + i, (int)(y / 6) + offset); 
+			blocks[i] = world.getBlockGenerate((x / 6) + i, (int)(y / 6) + offset); 
 		}		
 
 		for(int i = 0; i < blocks.length; i++)

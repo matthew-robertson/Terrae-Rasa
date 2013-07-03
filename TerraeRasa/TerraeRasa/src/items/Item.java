@@ -1,13 +1,13 @@
 package items;
 
-import passiveBonus.PassiveBonus;
-import passiveBonus.PassiveBonusAttackSpeed;
-import passiveBonus.PassiveBonusDamageAll;
-import passiveBonus.PassiveBonusDefense;
-import passiveBonus.PassiveBonusFallHeight;
-import passiveBonus.PassiveBonusIntellect;
-import passiveBonus.PassiveBonusSpeed;
-import passiveBonus.PassiveBonusStrength;
+import passivebonuses.PassiveBonus;
+import passivebonuses.PassiveBonusAttackSpeed;
+import passivebonuses.PassiveBonusDamageAll;
+import passivebonuses.PassiveBonusDefense;
+import passivebonuses.PassiveBonusFallHeight;
+import passivebonuses.PassiveBonusIntellect;
+import passivebonuses.PassiveBonusSpeed;
+import passivebonuses.PassiveBonusStrength;
 import utils.ActionbarItem;
 import auras.Aura;
 import auras.AuraHeavensReprieve;
@@ -58,7 +58,7 @@ import enums.EnumToolMaterial;
  */
 public class Item extends ActionbarItem
 {
-	/** Each tier of gear has a material - this is used to find a passive bonus */
+	/** Each tier of gear has a material - this is used to find a set bonus */
 	protected EnumToolMaterial material;
 	public EnumItemQuality itemQuality;	
 	protected int damage;
@@ -309,25 +309,25 @@ public class Item extends ActionbarItem
 	public static Item goldBelt = new ItemArmorBelt(129).setArmorType(EnumArmor.GOLD).setIconPosition(20, 5).setName("Gold Belt");
 	
 	public static Item rocketBoots = new ItemArmorAccessory(130).setIconPosition(0, 0).setName("Rocket Boots");	
-	public static Item ringOfVigor = new ItemArmorAccessory(131).setBonuses(new PassiveBonus[]{ 
+	public static Item ringOfVigor = new ItemArmorAccessory(131).PassiveBonuses(new PassiveBonus[]{ 
 			new PassiveBonusDamageAll(0.1F)
 	}).setIconPosition(15, 2).setName("Ring of Vigor").setExtraTooltipInformation("This ring instills a sense of courage in its wearer.");	
-	public static Item talismanOfWinds = new ItemArmorAccessory(132).setBonuses(new PassiveBonus[]{ 
+	public static Item talismanOfWinds = new ItemArmorAccessory(132).PassiveBonuses(new PassiveBonus[]{ 
 			new PassiveBonusSpeed(0.1F)
 	}).setIconPosition(15, 3).setName("Talisman of Winds").setExtraTooltipInformation("May the winds of fortune always be at your back.");	
 	public static Item ankh = new ItemArmorAccessory(133).setAuras(new Aura[]{ 
 			new AuraHeavensReprieve()
 	}).setIconPosition(14, 1).setName("Ankh").setExtraTooltipInformation("This relic will destroy itself to save the wearer.");	
-	public static Item goddessesTear = new ItemArmorAccessory(134).setBonuses(new PassiveBonus[]{ 
+	public static Item goddessesTear = new ItemArmorAccessory(134).PassiveBonuses(new PassiveBonus[]{ 
 			new PassiveBonusIntellect(8)
 	}).setIconPosition(15, 4).setName("Goddess' Tear").setExtraTooltipInformation("This tear contains immense magical power.");	
-	public static Item magicalCloud = new ItemArmorAccessory(135).setBonuses(new PassiveBonus[]{ 
+	public static Item magicalCloud = new ItemArmorAccessory(135).PassiveBonuses(new PassiveBonus[]{ 
 			new PassiveBonusFallHeight(8)
 	}).setIconPosition(15, 5).setName("Magical Cloud").setExtraTooltipInformation("As light as air itself.");	
-	public static Item berserkersEssence = new ItemArmorAccessory(136).setBonuses(new PassiveBonus[]{ 
+	public static Item berserkersEssence = new ItemArmorAccessory(136).PassiveBonuses(new PassiveBonus[]{ 
 			new PassiveBonusStrength(3), new PassiveBonusAttackSpeed(0.1F)
 	}).setIconPosition(15, 0).setName("Berserker's Essence").setExtraTooltipInformation("You sense deep inner rage within the essence.");	
-	public static Item guardianAmulet = new ItemArmorAccessory(137).setBonuses(new PassiveBonus[]{ 
+	public static Item guardianAmulet = new ItemArmorAccessory(137).PassiveBonuses(new PassiveBonus[]{ 
 			new PassiveBonusDefense(6), 
 	}).setIconPosition(15, 6).setName("Amulet of the Guardian").setExtraTooltipInformation("This amulet contains great defensive power.");	
 	public static Item stole = new ItemArmorAccessory(138).setAuras(new Aura[]{ 
@@ -410,7 +410,7 @@ public class Item extends ActionbarItem
 	public static Item absorbPotion1 = new ItemPotionAbsorb(395, 30, 1, 50, 1).setIconPosition(9, 1).setName("Minor Absorb Potion");
 	public static Item absorbPotion2 = new ItemPotionAbsorb(396, 30, 1, 100, 1).setIconPosition(9, 1).setName("Absorb Potion");
 	
-	public static Item gemDefense1 = new ItemGem(500).setBonuses(new PassiveBonus[] { 
+	public static Item gemDefense1 = new ItemGem(500).PassiveBonuses(new PassiveBonus[] { 
 			new PassiveBonusDefense(2)
 	}).setIconPosition(0, 0).setName("Gem of Stoneskin 1");
 	

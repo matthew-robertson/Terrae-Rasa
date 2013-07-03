@@ -504,7 +504,7 @@ public class UIMouse extends UIBase
 	protected static void chestMouseEvents(World world, EntityPlayer player, int x, int y)
 	{
 		//Get the initial block the player is viewing
-		BlockChest chest = (BlockChest)world.getBlock(player.viewedChestX, player.viewedChestY).clone();
+		BlockChest chest = (BlockChest)world.getBlockGenerate(player.viewedChestX, player.viewedChestY).clone();
 		
 		if(chest.metaData != 1) //Make sure its metadata is 1 (otherwise it doesnt technically exist)
 		{
@@ -531,7 +531,7 @@ public class UIMouse extends UIBase
 			}			
 			
 			//Update the chest
-			chest = (BlockChest)(world.getBlock(player.viewedChestX - x1, player.viewedChestY - y1));
+			chest = (BlockChest)(world.getBlockGenerate(player.viewedChestX - x1, player.viewedChestY - y1));
 		}	
 		
 		int totalRows = chest.getInventorySize() / 5;
@@ -672,7 +672,7 @@ public class UIMouse extends UIBase
 		if(player.isViewingChest)
 		{
 			//Get the initial block the player is viewing
-			BlockChest chest = (BlockChest)world.getBlock(player.viewedChestX, player.viewedChestY);
+			BlockChest chest = (BlockChest)world.getBlockGenerate(player.viewedChestX, player.viewedChestY);
 			
 			if(chest.metaData != 1) //Make sure its metadata is 1 (otherwise it doesnt technically exist)
 			{
@@ -699,7 +699,7 @@ public class UIMouse extends UIBase
 				}			
 				
 				//Update the chest
-				chest = (BlockChest)(world.getBlock(player.viewedChestX - x1, player.viewedChestY - y1));
+				chest = (BlockChest)(world.getBlockGenerate(player.viewedChestX - x1, player.viewedChestY - y1));
 			}	
 			
 			int totalRows = chest.getInventorySize() / 5;

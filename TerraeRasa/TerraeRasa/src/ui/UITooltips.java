@@ -101,7 +101,7 @@ public class UITooltips extends UIBase
 		if(player.isViewingChest)
 		{
 			//Get the initial block the player is viewing
-			BlockChest chest = (BlockChest)world.getBlock(player.viewedChestX, player.viewedChestY);
+			BlockChest chest = (BlockChest)world.getBlockGenerate(player.viewedChestX, player.viewedChestY);
 			
 			if(chest.metaData != 1) //Make sure its metadata is 1 (otherwise it doesnt technically exist)
 			{
@@ -128,7 +128,7 @@ public class UITooltips extends UIBase
 				}			
 				
 				//Update the chest
-				chest = (BlockChest)(world.getBlock(player.viewedChestX - x1, player.viewedChestY - y1));
+				chest = (BlockChest)(world.getBlockGenerate(player.viewedChestX - x1, player.viewedChestY - y1));
 			}	
 			
 			int totalRows = chest.getInventorySize() / 5;
@@ -213,7 +213,7 @@ public class UITooltips extends UIBase
 
 			String[] stats = { };
 			String fulltooltip = ""; 
-	        String[] setBonuses;
+	        String[] PassiveBonuses;
 			Vector<String> bonusesVector = new Vector<String>();
 	        String cooldown = "";
 	        boolean[] activePassiveBonuses = { };
@@ -250,8 +250,8 @@ public class UITooltips extends UIBase
 				bonusesVector.add(bonus);
 			}
 			
-			setBonuses = new String[bonusesVector.size()];
-			bonusesVector.copyInto(setBonuses);
+			PassiveBonuses = new String[bonusesVector.size()];
+			bonusesVector.copyInto(PassiveBonuses);
 			
 			if(player.isOnCooldown(stack.getItemID()))
 			{
@@ -297,30 +297,30 @@ public class UITooltips extends UIBase
 				renderLines.add(line);
 			}
 			
-			//Break the passive bonuses extra information into strings that don't exceed the tooltip's total width
+			//Break the set bonuses extra information into strings that don't exceed the tooltip's total width
 			//And look terrible as a result.			
-			List<String> setBonusesList = new ArrayList<String>(0);
-			if(setBonuses.length > 0)
+			List<String> PassiveBonusesList = new ArrayList<String>(0);
+			if(PassiveBonuses.length > 0)
 			{
-				line = "Bonuses: " + setBonuses[0]; 
-				setBonusesList.add(line);
-				for(int i = 1; i < setBonuses.length; i++)
+				line = "Bonuses: " + PassiveBonuses[0]; 
+				PassiveBonusesList.add(line);
+				for(int i = 1; i < PassiveBonuses.length; i++)
 				{
 					if(TerraeRasa.getOSName().startsWith("win"))
 					{
-						line = "                       " + setBonuses[i];
+						line = "                       " + PassiveBonuses[i];
 					}
 					else
 					{
-						line = "                " + setBonuses[i];
+						line = "                " + PassiveBonuses[i];
 					}
 				
-					setBonusesList.add(line);
+					PassiveBonusesList.add(line);
 				}
 			}
 			
 			//If there's just a title, crop the tooltip
-			if(setBonusesList.size() == 0 && renderLines.size() == 0 && stats.length == 0 && cooldown.equals(""))
+			if(PassiveBonusesList.size() == 0 && renderLines.size() == 0 && stats.length == 0 && cooldown.equals(""))
 			{
 				tooltipWidth = 3 * PADDING + (int) (0.5F * xScale * boldTooltip.getWidth(itemName));
 			}
@@ -339,9 +339,9 @@ public class UITooltips extends UIBase
 			
 			//Find out how long does the tooltip actually has to be
 			double requiredHeight = (boldTooltip.getHeight(itemName)) + 
-					PADDING * (setBonusesList.size() + stats.length) + 
+					PADDING * (PassiveBonusesList.size() + stats.length) + 
 					((plainTooltip.getHeight(itemName)) * 0.5f * (stats.length)) + 
-					((boldTooltip.getHeight(itemName)) * 0.5f * (setBonusesList.size())) + 
+					((boldTooltip.getHeight(itemName)) * 0.5f * (PassiveBonusesList.size())) + 
 					((plainTooltip.getHeight(itemName)) * 0.7f * (renderLines.size())) + 
 					((!cooldown.equals("")) ? plainTooltip.getHeight(cooldown) * 0.5f + 5: 0) + 
 					((stack.hasSockets()) ? 35 : 0);
@@ -391,11 +391,11 @@ public class UITooltips extends UIBase
 			
 			GL11.glColor4d(EnumColor.WHITE.COLOR[0], EnumColor.WHITE.COLOR[1], EnumColor.WHITE.COLOR[2], 1.0);
 			
-			//Render the passive bonuses
+			//Render the set bonuses
 			yOffset = yOffset + PADDING * (stats.length) + 
 					(((tooltipHeight) - (tooltipHeight - boldTooltip.getHeight(itemName))) * 0.5f * (stats.length));
 			
-			for(int i = 0; i < setBonusesList.size(); i++)
+			for(int i = 0; i < PassiveBonusesList.size(); i++)
 			{
 				if(i < activePassiveBonuses.length && !activePassiveBonuses[i])
 				{
@@ -408,7 +408,7 @@ public class UITooltips extends UIBase
 				
 				boldTooltip.drawString(frameX + PADDING, 
 						yOffset + PADDING*(1 + i) + (((tooltipHeight) - (tooltipHeight - boldTooltip.getHeight(itemName))) * 0.5f * (1+i)), 
-						setBonusesList.get(i),
+						PassiveBonusesList.get(i),
 						xScale,
 						-1, 
 						TrueTypeFont.ALIGN_LEFT); 
@@ -417,8 +417,8 @@ public class UITooltips extends UIBase
 			GL11.glColor4f(0.0F, 0.0F, 0.0F, 1.0F);
 			//Render the text lines which are now broken up to fit in the tooltip
 			//and adjust the yoffset so the text won't overlap
-			yOffset = yOffset + PADDING * (setBonusesList.size()) + 
-					(((tooltipHeight) - (tooltipHeight - boldTooltip.getHeight(itemName))) * 0.5f * (setBonusesList.size()));
+			yOffset = yOffset + PADDING * (PassiveBonusesList.size()) + 
+					(((tooltipHeight) - (tooltipHeight - boldTooltip.getHeight(itemName))) * 0.5f * (PassiveBonusesList.size()));
 			
 			for(int i = 0; i < renderLines.size(); i++)
 			{

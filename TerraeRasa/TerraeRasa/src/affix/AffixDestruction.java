@@ -1,6 +1,6 @@
 package affix;
 
-import passiveBonus.PassiveBonusDamageAll;
+import passivebonuses.PassiveBonusDamageAll;
 
 public class AffixDestruction extends Affix{
 	private double max = 0.06;

@@ -101,7 +101,7 @@ public class UI extends UIBase
 	protected static void renderChest(World world, EntityPlayer player)
 	{
 		//Get the initial block the player is viewing
-		BlockChest chest = (BlockChest)world.getBlock(player.viewedChestX, player.viewedChestY).clone();
+		BlockChest chest = (BlockChest)world.getBlockGenerate(player.viewedChestX, player.viewedChestY).clone();
 		
 		if(chest.metaData != 1)
 		{
@@ -128,7 +128,7 @@ public class UI extends UIBase
 			}
 			
 			//Update the chest
-			chest = (BlockChest)(world.getBlock(player.viewedChestX - x, player.viewedChestY - y));
+			chest = (BlockChest)(world.getBlockGenerate(player.viewedChestX - x, player.viewedChestY - y));
 			player.viewedChestX -= x;
 			player.viewedChestY -= y;
 		}	

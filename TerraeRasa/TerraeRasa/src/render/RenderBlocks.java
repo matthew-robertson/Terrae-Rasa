@@ -7,6 +7,7 @@ import org.lwjgl.opengl.Display;
 import utils.ChunkUtils;
 import world.World;
 import blocks.Block;
+import blocks.MinimalBlock;
 import entities.EntityPlayer;
 
 public class RenderBlocks extends Render
@@ -99,7 +100,7 @@ public class RenderBlocks extends Render
 			{	
 				for(int l = yoff; l < yoff + loopY; l++) //y
 				{						
-					Block block = chunks[i].backWalls[k][l];
+					MinimalBlock block = chunks[i].backWalls[k][l];
 					int x1 = k + baseX;
 					int y1 = l;
 					//Check if the block should be rendered
@@ -107,8 +108,8 @@ public class RenderBlocks extends Render
 					{
 						continue;
 					}
-				    double tx = block.iconX / TEXTURES_PER_ROW;
-				    double ty = block.iconY / TEXTURES_PER_COLUMN;
+				    double tx = (double)block.iconX / TEXTURES_PER_ROW;
+				    double ty = (double)block.iconY / TEXTURES_PER_COLUMN;
 				    double tw = tx + ((double)block.textureWidth / (double)TEXTURE_SHEET_WIDTH);
 				    double th = ty + ((double)block.textureHeight / (double)TEXTURE_SHEET_HEIGHT);				
 					int xm = x1 * BLOCK_SIZE; 
@@ -216,7 +217,7 @@ public class RenderBlocks extends Render
 			{	
 				for(int l = yoff; l < yoff + loopY; l++) //y
 				{						
-					Block block = chunks[i].blocks[k][l];
+					MinimalBlock block = chunks[i].blocks[k][l];
 					int x1 = k + baseX;
 					int y1 = l;
 										
@@ -231,8 +232,8 @@ public class RenderBlocks extends Render
 						{
 							double blockHeight = block.blockHeight;
 							double blockWidth = block.blockWidth;		
-							double tx = block.iconX / TEXTURES_PER_ROW;
-						    double ty = block.iconY / TEXTURES_PER_COLUMN;
+							double tx = (double)block.iconX / TEXTURES_PER_ROW;
+						    double ty = (double)block.iconY / TEXTURES_PER_COLUMN;
 						    double tw = tx + (block.textureWidth / TEXTURE_SHEET_WIDTH);
 						    double th = ty + (block.textureHeight / TEXTURE_SHEET_HEIGHT);			
 							int xm = x1 * 6; 
@@ -250,8 +251,8 @@ public class RenderBlocks extends Render
 					{
 						int blockHeight = 6;
 						int blockWidth = 6;
-					    double tx = block.iconX / TEXTURES_PER_ROW;
-					    double ty = block.iconY / TEXTURES_PER_COLUMN;
+					    double tx = (double)block.iconX / TEXTURES_PER_ROW;
+					    double ty = (double)block.iconY / TEXTURES_PER_COLUMN;
 					    double tw = tx + (block.textureWidth / TEXTURE_SHEET_WIDTH);
 					    double th = ty + (block.textureHeight / TEXTURE_SHEET_HEIGHT);				
 						int xm = x1 * BLOCK_SIZE; 

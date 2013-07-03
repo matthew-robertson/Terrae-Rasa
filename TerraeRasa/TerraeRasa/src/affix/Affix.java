@@ -3,9 +3,7 @@ package affix;
 import java.util.Random;
 import java.util.Vector;
 
-import passiveBonus.PassiveBonus;
-import passiveBonus.PassiveBonusAttackSpeed;
-import passiveBonus.PassiveBonusStrength;
+import passivebonuses.PassiveBonus;
 import auras.Aura;
 
 public class Affix{

@@ -5,18 +5,14 @@ import io.ChunkManager;
 import items.Item;
 import items.ItemTool;
 
-import java.io.DataInputStream;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.zip.GZIPInputStream;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
@@ -38,8 +34,8 @@ import audio.SoundEngine;
 import blocks.Block;
 import blocks.BlockChest;
 import blocks.BlockGrass;
-import blocks.BlockLight;
 import blocks.BlockPillar;
+import blocks.MinimalBlock;
 import entities.EntityItemStack;
 import entities.EntityNPC;
 import entities.EntityNPCEnemy;
@@ -628,7 +624,8 @@ public class World
 			bit += 2;
 		}
 		if (getBlockGenerate(x, y) instanceof BlockGrass && (bit == 15 || bit == 11 || bit == 27 || bit == 31)){
-			setBlockGenerate(Block.dirt.setBitMap(bit), x,y);
+			setBlockGenerate(Block.dirt, x,y);
+			setBitMap(x, y, bit);
 		}
 		return bit;
 	}
@@ -860,7 +857,7 @@ public class World
 				{
 					for(int k = 0; k < spawnList[entitych].getBlockWidth(); k++)//X
 					{
-						if(getBlock(xoff + k, yoff + j).getIsSolid())
+						if(getBlock(xoff + k, yoff + j).isSolid)
 						{
 							throw new RuntimeException("Dummy");
 						}
@@ -877,7 +874,7 @@ public class World
 			try
 			{
 				//Ground Entity:
-				if((getBlock(xoff, (yoff + 3)).getIsSolid() || getBlock(xoff + 1, (yoff + 3)).getIsSolid())) //make sure there's actually ground to spawn on
+				if((getBlock(xoff, (yoff + 3)).isSolid || getBlock(xoff + 1, (yoff + 3)).isSolid)) //make sure there's actually ground to spawn on
 				{
 					EntityNPCEnemy enemy = new EntityNPCEnemy(spawnList[entitych]);
 					enemy.setPosition(xoff * 6, yoff * 6);
@@ -1035,15 +1032,16 @@ public class World
 	 */
 	private void handleBlockBreakEvent(EntityPlayer player, int mx, int my)
 	{
+		Block block = getBlockGenerate(mx, my);
 		if(!getBlock(mx, my).hasMetaData) //normal block
 		{
-			ItemStack stack = getBlock(mx, my).getDroppedItem();
+			ItemStack stack = block.getDroppedItem();
 			if(stack != null) //if there's an item to drop, add it to the list of dropped items
 			{
 				addItemStackToItemList(new EntityItemStack((mx * 6) - 1, (my * 6) - 2, stack));
 			}
 			
-			if(getBlock(mx, my) instanceof BlockLight)
+			if(block.lightStrength > 0)
 			{
 				//removeLightSource(player, mx, my, ((BlockLight)(getBlock(mx, my))).lightRadius, ((BlockLight)(getBlock(mx, my))).lightStrength);
 				setBlock(Block.air, mx, my, EnumEventType.EVENT_BLOCK_BREAK_LIGHT); //replace it with air
@@ -1056,9 +1054,9 @@ public class World
 		}
 		else
 		{
-			if(getBlock(mx, my) instanceof BlockChest)
+			if(block instanceof BlockChest)
 			{
-				BlockChest chest = ((BlockChest)(getBlock(mx, my)));
+				BlockChest chest = ((BlockChest)(block));
 				if(chest.metaData != 1)
 				{
 					int[][] metadata = MetaDataHelper.getMetaDataArray((int)(getBlock(mx, my).blockWidth / 6), (int)(getBlock(mx, my).blockHeight / 6)); //metadata used by the block of size (x,y)
@@ -1080,7 +1078,7 @@ public class World
 						}
 					}			
 					
-					chest = (BlockChest)(getBlock(mx - x1, my - y1));
+					chest = (BlockChest)(getBlockGenerate(mx - x1, my - y1));
 					mx -= x1;
 					my -= y1;
 				}	
@@ -1097,7 +1095,7 @@ public class World
 				player.clearViewedChest();
 			}
 			
-			ItemStack stack = getBlock(mx, my).getDroppedItem(); //the item dropped by the block
+			ItemStack stack = block.getDroppedItem(); //the item dropped by the block
 			if(stack != null)
 			{			
 				int[][] metadata = MetaDataHelper.getMetaDataArray((int)(getBlock(mx, my).blockWidth / 6), (int)(getBlock(mx, my).blockHeight / 6)); //metadata used by the block of size (x,y)
@@ -1133,11 +1131,11 @@ public class World
 				addItemStackToItemList(new EntityItemStack((mx * 6) - 1, (my * 6) - 2, stack)); //drop the item into the world
 			}
 		}		
-		getBlockGenerate(mx-1,my).setBitMap(updateBlockBitMap(mx-1, my));
-		getBlockGenerate(mx,my-1).setBitMap(updateBlockBitMap(mx, my-1));
-		getBlockGenerate(mx,my).setBitMap(updateBlockBitMap(mx, my));
-		getBlockGenerate(mx+1,my).setBitMap(updateBlockBitMap(mx+1, my));
-		getBlockGenerate(mx,my+1).setBitMap(updateBlockBitMap(mx, my+1));
+		setBitMap(mx-1,my, updateBlockBitMap(mx-1, my));
+		setBitMap(mx,my-1, updateBlockBitMap(mx, my-1));
+		setBitMap(mx,my, updateBlockBitMap(mx, my));
+		setBitMap(mx+1,my, updateBlockBitMap(mx+1, my));
+		setBitMap(mx,my+1, updateBlockBitMap(mx, my+1));
 		player.resetMiningVariables();
 		//LightingEngine.applySunlight(this);
 	}
@@ -1175,7 +1173,7 @@ public class World
 			{
 				for(int j = 0; j < blockHeight; j++)
 				{
-					if(getBlock(mx + i, my + j) != Block.air && !getBlock(mx + i, my + j).getIsOveridable())
+					if(getBlock(mx + i, my + j).id != Block.air.id && !getBlockGenerate(mx + i, my + j).getIsOveridable())
 					{
 						return;
 					}
@@ -1186,28 +1184,28 @@ public class World
 			//Check for at least one solid block on some side of the placement:
 			for(int i = 0; i < blockWidth; i++) //Top
 			{
-				if(getBlock(mx + i, my - 1).getIsSolid())
+				if(getBlock(mx + i, my - 1).isSolid)
 				{
 					canBePlaced = true;
 				}
 			}
 			for(int i = 0; i < blockWidth; i++) //Bottom
 			{
-				if(getBlock(mx + i, my + blockHeight).getIsSolid())
+				if(getBlock(mx + i, my + blockHeight).isSolid)
 				{
 					canBePlaced = true;
 				}
 			}
 			for(int i = 0; i < blockHeight; i++) //Left
 			{
-				if(getBlock(mx - 1, my + i).getIsSolid())
+				if(getBlock(mx - 1, my + i).isSolid)
 				{
 					canBePlaced = true;
 				}
 			}
 			for(int i = 0; i < blockHeight; i++) //Right
 			{
-				if(getBlock(mx + blockWidth, my + i).getIsSolid())
+				if(getBlock(mx + blockWidth, my + i).isSolid)
 				{
 					canBePlaced = true;
 				}
@@ -1247,14 +1245,14 @@ public class World
 		}
 		else
 		{
-			if ((getBlock(mx, my).getIsOveridable() == true || getBlock(mx, my) == Block.air) && 
-				(getBlock(mx-1, my).getIsSolid() || getBlock(mx, my-1).getIsSolid() || getBlock(mx, my+1).getIsSolid() || getBlock(mx+1, my).getIsSolid() ||
+			if ((getBlockGenerate(mx, my).getIsOveridable() == true || getBlock(mx, my).id == Block.air.id) && 
+				(getBlock(mx-1, my).isSolid || getBlock(mx, my-1).isSolid || getBlock(mx, my+1).isSolid || getBlock(mx+1, my).isSolid ||
 				getBackBlock(mx, my).getIsSolid())) //can the block be placed
 			{
 				player.inventory.removeItemsFromInventory(this, player, new ItemStack(block, 1)); //remove the items from inventory	
 			
 				
-				if(block instanceof BlockLight)
+				if(block.lightStrength > 0)
 				{
 					setBlock(block, mx, my, EnumEventType.EVENT_BLOCK_PLACE_LIGHT); //place it
 			//		applyLightSource(player, block, mx, my, ((BlockLight)(block)).lightRadius,  ((BlockLight)(block)).lightStrength);
@@ -1268,11 +1266,11 @@ public class World
 				
 			}
 		}
-		getBlockGenerate(mx-1,my).setBitMap(updateBlockBitMap(mx-1, my));
-		getBlockGenerate(mx,my-1).setBitMap(updateBlockBitMap(mx, my-1));
-		getBlockGenerate(mx,my).setBitMap(updateBlockBitMap(mx, my));
-		getBlockGenerate(mx+1,my).setBitMap(updateBlockBitMap(mx+1, my));
-		getBlockGenerate(mx,my+1).setBitMap(updateBlockBitMap(mx, my+1));
+		setBitMap(mx-1,my, updateBlockBitMap(mx-1, my));
+		setBitMap(mx,my-1, updateBlockBitMap(mx, my-1));
+		setBitMap(mx,my, updateBlockBitMap(mx, my));
+		setBitMap(mx+1,my, updateBlockBitMap(mx+1, my));
+		setBitMap(mx,my+1, updateBlockBitMap(mx, my+1));
 	
 		
 		
@@ -1288,7 +1286,7 @@ public class World
 	{
 		if ((getBackBlock(mx, my).getIsOveridable() == true || getBackBlock(mx, my).getID() == Block.backAir.getID()) && 
 			(getBackBlock(mx-1, my).getIsSolid() || getBackBlock(mx, my-1).getIsSolid() || getBackBlock(mx, my+1).getIsSolid() || getBackBlock(mx+1, my).getIsSolid() || 
-			getBlock(mx, my).getIsSolid())) //can the block be placed
+			getBlock(mx, my).isSolid)) //can the block be placed
 		{
 			player.inventory.removeItemsFromInventory(this, player, new ItemStack(block, 1)); //remove the items from inventory		
 			setBackBlock(block, mx, my); //place it	
@@ -1362,7 +1360,7 @@ public class World
 		{
 			for(int j = 0; j < height; j++) //and each row
 			{
-				if(getBlock(i, j) != Block.air) //when something not air is hit, assume it's just the ground
+				if(getBlock(i, j).id != Block.air.id) //when something not air is hit, assume it's just the ground
 				{
 					values.add(j);
 					average += j;
@@ -1475,8 +1473,8 @@ public class World
 	{
 		try
 		{
-			return getChunks().get(""+(x / Chunk.getChunkWidth())).getBackWall(x % Chunk.getChunkWidth(), (y));
-
+			MinimalBlock block = getChunks().get(""+(x / Chunk.getChunkWidth())).getBackWall(x % Chunk.getChunkWidth(), (y));
+			return Block.blocksList[block.id].mergeOnto(block);
 		}
 		catch(Exception e)
 		{
@@ -1492,12 +1490,11 @@ public class World
 	 * @param y the block's y location in the new world map
 	 * @return the block at the location specified (this should never be null)
 	 */
-	public Block getBlock(int x, int y)
+	public MinimalBlock getBlock(int x, int y)
 	{
 		try
 		{
 			return getChunks().get(""+(x / Chunk.getChunkWidth())).getBlock(x % Chunk.getChunkWidth(), (y));
-
 		}
 		catch(Exception e)
 		{
@@ -1553,7 +1550,7 @@ public class World
 	 * @param y the block's y location in the new world map
 	 * @return the block at the location specified (this should never be null)
 	 */
-	public Block getBlock(double x, double y)
+	public MinimalBlock getBlock(double x, double y)
 	{
 		return getChunks().get(""+(int)(x / Chunk.getChunkWidth())).getBlock((int)x % Chunk.getChunkWidth(), (int)y);
 	}
@@ -1586,12 +1583,14 @@ public class World
 			int count = 1;
 			
 			if ((getBlockGenerate(x-1, y+1).getID() == Block.grass.getID()|| getBlockGenerate(x-1, y+1).getID() == Block.dirt.getID())){
-				setBlockGenerate(Block.treebase.setBitMap(0), x-1, y);
+				setBlockGenerate(Block.treebase, x-1, y);
+				setBitMap(x-1, y, 0);
 				setBlockGenerate(Block.dirt, x-1, y+1);
 			}
 			
 			if ((getBlockGenerate(x+1, y+1).getID() == Block.grass.getID()|| getBlockGenerate(x+1, y+1).getID() == Block.dirt.getID())){
-				setBlockGenerate(Block.treebase.setBitMap(3), x+1, y);
+				setBlockGenerate(Block.treebase, x+1, y);
+				setBitMap(x+1, y, 3);
 				setBlockGenerate(Block.dirt, x+1, y+1);
 			}
 			
@@ -1606,17 +1605,20 @@ public class World
 						setBlockGenerate(Block.treetop, x-1, k-1);
 					}
 					else{
-						setBlockGenerate(Block.tree.setBitMap(1), x, k); //Otherwise, place a tree trunk
+						setBlockGenerate(Block.tree, x, k); //Otherwise, place a tree trunk
+						setBitMap(x, k, 1);
 					}
 					if (count > 2 && k > y - height + 1){ //For each slice of tree, if it is more than the third log, determine if there should be a branch
 						int branchl = (int)(Math.random()*60); //Decide if a block should be placed left
 						int branchr = (int)(Math.random()*60); //Decide if a branch should be placed right
 						
 						if (branchl < 5){
-							setBlockGenerate(Block.treebranch.setBitMap(branchl * 2), x-1, k);
+							setBlockGenerate(Block.treebranch, x-1, k);
+							setBitMap(x-1, k, branchl * 2);
 						}
 						if (branchr < 5){
-							setBlockGenerate(Block.treebranch.setBitMap(branchr * 2 + 1), x+1, k);
+							setBlockGenerate(Block.treebranch, x+1, k);
+							setBitMap(x+1, k, branchr * 2 + 1);
 						}															
 					}
 					count++; //increment the counter 
@@ -1728,7 +1730,21 @@ public class World
 	{
 		try
 		{
-			return getChunks().get(""+x / Chunk.getChunkWidth()).getBlock(x % Chunk.getChunkWidth(), y);
+			MinimalBlock block = getChunks().get(""+(int)(x / Chunk.getChunkWidth())).getBlock((int)x % Chunk.getChunkWidth(), (int)y);
+			return Block.blocksList[block.id].mergeOnto(block);
+		}
+		catch (Exception e)
+		{
+		}
+		return Block.air;
+	}
+
+	public Block getBlockGenerate(double x, double y)
+	{
+		try
+		{
+			MinimalBlock block = getChunks().get(""+(int)(x / Chunk.getChunkWidth())).getBlock((int)x % Chunk.getChunkWidth(), (int)y);
+			return Block.blocksList[block.id].mergeOnto(block);
 		}
 		catch (Exception e)
 		{
@@ -1781,7 +1797,8 @@ public class World
 	{
 		try
 		{
-			return getChunks().get(""+x / Chunk.getChunkWidth()).getBackWall(x % Chunk.getChunkWidth(), y);
+			MinimalBlock block = getChunks().get(""+x / Chunk.getChunkWidth()).getBackWall(x % Chunk.getChunkWidth(), y);
+			return Block.blocksList[block.id].mergeOnto(block);
 		}
 		catch (Exception e)
 		{
@@ -1914,8 +1931,9 @@ public class World
         while (keys.hasMoreElements()) 
         {
             Chunk chunk = getChunks().get((String)(keys.nextElement()));
-            chunkManager.saveChunk(worldName, getChunks(), chunk.getX());		
+            chunkManager.saveChunkAndLockThread(worldName, getChunks(), chunk.getX());		
         }
+        System.gc();
 	}
 	
 	/**
@@ -2034,7 +2052,8 @@ public class World
 	 */
 	public Block getBackBlock(double x, double y)
 	{
-		return getChunks().get(""+(int)(x / Chunk.getChunkWidth())).getBlock((int)x % Chunk.getChunkWidth(), (int)y);
+		MinimalBlock block = getChunks().get(""+(int)(x / Chunk.getChunkWidth())).getBlock((int)x % Chunk.getChunkWidth(), (int)y);
+		return Block.blocksList[block.id].mergeOnto(block);
 	}
 	
 	public void setAmbientLight(double x, double y, double strength)
@@ -2169,5 +2188,11 @@ public class World
 	public void launchProjectile(World world, int angle, EntityProjectile projectile, double x, double y)
 	{
 		addEntityToProjectileList(new EntityProjectile(projectile).setXLocAndYLoc(x, y).setDirection(angle));
+	}
+	
+	public void setBitMap(int x, int y, int bitMap)
+	{
+		MinimalBlock block = getChunks().get(""+(x / Chunk.getChunkWidth())).getBlock(x % Chunk.getChunkWidth(), (y));
+		block.setBitMap(bitMap);
 	}
 }

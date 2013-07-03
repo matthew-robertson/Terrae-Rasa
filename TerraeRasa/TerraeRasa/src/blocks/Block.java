@@ -94,7 +94,9 @@ public class Block extends ActionbarItem
 	public boolean isSolid;
 	protected int hRange;
 	protected int lRange;
-
+	public double lightStrength;
+	public int lightRadius;
+	
 	/**
 	 * Constructs a special Block- air. This constructor should only ever be
 	 * used for the initial declaration of Block.air.
@@ -109,6 +111,8 @@ public class Block extends ActionbarItem
 		blockWidth = 6;
 		blockHeight = 6;
 		textureWidth = 16;
+		lightStrength = 0;
+		lightRadius = 0;
 		textureHeight = 16;
 		iconX = 0;
 		iconY = 0;
@@ -157,6 +161,8 @@ public class Block extends ActionbarItem
 		isSolid = true;
 		isMineable = true;
 		extraTooltipInformation = "";
+		lightStrength = 0;
+		lightRadius = 0;
 		iconX = 0;
 		iconY = 0;
 		associatedTextureSheet = Render.TEXTURE_SHEET_TERRAIN_EARTH;
@@ -214,6 +220,29 @@ public class Block extends ActionbarItem
 		this.hRange = block.hRange;
 		this.isMineable = block.isMineable;
 		this.lRange = block.lRange;
+	}
+	
+	/**
+	 * Set the light strength and radius
+	 * @param strength the max strength of the light. 1.0F is 100%, 0.0F is 0%
+	 * @param radius the max distance of the light in blocks
+	 * @return the updated block
+	 */
+	public Block setLightStrengthAndRadius(double strength, int radius)
+	{
+		this.lightStrength = strength;
+		this.lightRadius = radius;
+		return this;
+	}
+	
+	public double getLightStrength()
+	{
+		return lightStrength;
+	}
+	
+	public double getLightRadius()
+	{
+		return lightRadius;
 	}
 
 	/**
@@ -506,6 +535,25 @@ public class Block extends ActionbarItem
 		return this;
 	}
 
+	public Block mergeOnto(MinimalBlock block)
+	{
+		setBitMap(block.bitMap);
+		this.id = block.id;
+		this.metaData = block.metaData;
+		this.blockWidth = (float) block.blockWidth;
+		this.blockHeight = (float) block.blockHeight;
+		this.textureHeight = (float) block.textureHeight;
+		this.textureWidth = (float) block.textureWidth;
+		this.iconX = (int) block.iconX;
+		this.iconY = (int) block.iconY;
+		this.hasMetaData = block.hasMetaData;
+		if(this instanceof BlockChest)
+		{
+			((BlockChest)(this)).setInventory(block.mainInventory);
+		}
+		return this;
+	}
+	
 	public static final Block[] blocksList = new Block[2048];
 	/** Block Declarations **/
 
@@ -621,7 +669,7 @@ public class Block extends ActionbarItem
 			.setIsOveridable(true)
 			.setDroppedItem(new ItemStack(Item.snowball), 1, 1)
 			.setIsSolid(false);
-	public static Block torch = new BlockLight(48)
+	public static Block torch = new Block(48)
 			.setLightStrengthAndRadius(1.0F, 10).setName("Torch")
 			.setBlockHardness(0.0f)
 			.overrideItemIcon(5, 0, Render.TEXTURE_SHEET_ITEMS)

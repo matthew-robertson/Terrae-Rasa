@@ -3,6 +3,7 @@ package io;
 import utils.MathHelper;
 import world.Biome;
 import blocks.Block;
+import blocks.MinimalBlock;
 
 /**
  * <br>
@@ -36,8 +37,8 @@ public class Chunk
 	public float[][] diffuseLight;
 	/** Ambient light is light from the sun */
 	public float[][] ambientLight;
-	public Block[][] backWalls;
-	public Block[][] blocks;
+	public MinimalBlock[][] backWalls;
+	public MinimalBlock[][] blocks;
 	private final int x;
 	private boolean wasChanged;
 	private static final int CHUNK_WIDTH = 100;
@@ -57,14 +58,14 @@ public class Chunk
 	{
 		this.height = height;
 		this.biome = new Biome(biome);
-		blocks = new Block[CHUNK_WIDTH][height];
-		backWalls = new Block[CHUNK_WIDTH][height];
+		blocks = new MinimalBlock[CHUNK_WIDTH][height];
+		backWalls = new MinimalBlock[CHUNK_WIDTH][height];
 		for(int i = 0; i < CHUNK_WIDTH; i++)
 		{
 			for(int j = 0; j < height; j++)
 			{
-				blocks[i][j] = Block.air;
-				backWalls[i][j] = Block.backAir;
+				blocks[i][j] = new MinimalBlock(Block.air);
+				backWalls[i][j] = new MinimalBlock(Block.backAir);
 			}
 		}
 		
@@ -127,7 +128,7 @@ public class Chunk
 	 * @param y the y position of the block requested
 	 * @return the block at the specified position, which should never be null
 	 */
-	public final Block getBlock(int x, int y)
+	public final MinimalBlock getBlock(int x, int y)
 	{
 		return blocks[x][y];
 	}
@@ -138,7 +139,7 @@ public class Chunk
 	 * @param y the y position of the block requested
 	 * @return the block at the specified position, which should never be null
 	 */
-	public final Block getBackWall(int x, int y)
+	public final MinimalBlock getBackWall(int x, int y)
 	{
 		return backWalls[x][y];
 	}
@@ -173,7 +174,7 @@ public class Chunk
 	 */
 	public synchronized void setBackWall(Block block, int x, int y)
 	{
-		backWalls[x][y] = block.clone();
+		backWalls[x][y] = new MinimalBlock(block.clone());
 	}
 	
 	/**
@@ -184,7 +185,7 @@ public class Chunk
 	 */
 	public synchronized void setBlock(Block block, int x, int y)
 	{
-		blocks[x][y] = block.clone();
+		blocks[x][y] = new MinimalBlock(block.clone());
 	}
 	
 	/**

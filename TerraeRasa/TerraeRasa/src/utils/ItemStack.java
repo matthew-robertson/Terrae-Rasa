@@ -1,8 +1,8 @@
 package utils;
 
-import passiveBonus.PassiveBonus;
 import items.Item;
 import items.ItemGem;
+import passivebonuses.PassiveBonus;
 import spells.Spell;
 import affix.Affix;
 import auras.Aura;
@@ -265,7 +265,7 @@ public class ItemStack
 	 * Gives this ItemStack some specific PassiveBonuses.
 	 * @param bonuses the bonuses to give this ItemStack
 	 */
-	public void setBonuses(PassiveBonus[] bonuses)
+	public void PassiveBonuses(PassiveBonus[] bonuses)
 	{
 		this.bonuses = bonuses;
 	}

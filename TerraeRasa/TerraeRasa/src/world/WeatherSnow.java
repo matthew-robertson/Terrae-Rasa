@@ -109,10 +109,10 @@ public class WeatherSnow extends Weather
 					//Converting grass to snowy-grass:
 					if (block.getID() == Block.grass.getID() && block.getBitMap() < 16)
 					{
-						world.getBlockGenerate(MathHelper.returnIntegerInWorldMapBounds_X(world,
-								(int)snow[i].x / 6), 
-								MathHelper.returnIntegerInWorldMapBounds_Y(world, (int)((snow[i].y - 6) / 6) + 1)).setBitMap(world.getBlockGenerate(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)snow[i].x / 6), 
-								MathHelper.returnIntegerInWorldMapBounds_Y(world, (int)((snow[i].y - 6) / 6) + 1)).getBitMap() + 16);					
+						int x = MathHelper.returnIntegerInWorldMapBounds_X(world, (int)(snow[i].x / 6));
+						int y = MathHelper.returnIntegerInWorldMapBounds_Y(world, (int)((snow[i].y - 6) / 6) + 1);
+						Block requestedBlock = world.getBlockGenerate(x, y);
+						world.setBitMap(x, y, requestedBlock.getBitMap() + 16);					
 					}					
 					
 				}

@@ -1,7 +1,7 @@
 package affix;
 
-import passiveBonus.PassiveBonusAttackSpeed;
-import passiveBonus.PassiveBonusStrength;
+import passivebonuses.PassiveBonusAttackSpeed;
+import passivebonuses.PassiveBonusStrength;
 
 public class AffixFrenzied extends Affix{
 	

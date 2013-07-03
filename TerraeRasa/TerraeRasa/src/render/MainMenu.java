@@ -1,6 +1,8 @@
 package render;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
@@ -13,6 +15,7 @@ import utils.FileManager;
 import utils.MainMenuHelper;
 import utils.MathHelper;
 import client.TerraeRasa;
+import entities.EntityParticle;
 import enums.EnumPlayerDifficulty;
 import enums.EnumWorldDifficulty;
 import enums.EnumWorldSize;
@@ -57,6 +60,9 @@ public class MainMenu extends Render
 	private GuiTitle deletePlayerConfirm;
 	private GuiTitle deletePlayerMessage;	
 	private boolean flaggedForWorldGen;
+	private boolean flaggedForGameStart;
+	private List<EntityParticle> stars;
+	
 	
 	public MainMenu()
 	{
@@ -67,6 +73,7 @@ public class MainMenu extends Render
 		isMainMenuOpen = true;
 		selectedPlayerName = "";
 		selectedWorldName = "";
+		stars = new ArrayList<EntityParticle>();
 		
 		//Character Creation Menu:
 		characterName = (GuiTextboxScaling) new GuiTextboxScaling(0.225, 70, 0.55, 0.1).setStopVerticalScaling(true);
@@ -106,6 +113,16 @@ public class MainMenu extends Render
 			worldName.setText("");
 			worldName.freeFocused();
 		}
+		if(flaggedForGameStart)
+		{
+			try {
+				playGame();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
 		
 		keyboard();
 		mouse();
@@ -118,8 +135,17 @@ public class MainMenu extends Render
 		{
 			overwriteWithLoadingScreen();
 		}
+		if(flaggedForGameStart)
+		{
+			overwriteWithGameLoadScreen();
+		}
 		
 		GL11.glDisable(GL11.GL_ALPHA_TEST);
+	}
+	
+	private void renderAnimation()
+	{
+		
 	}
 	
 	private void renderBackground()
@@ -204,7 +230,6 @@ public class MainMenu extends Render
 		{
 			mouseWorldMenu(x, y);
 		}
-		
 	}
 
 	private void mouseMenuDeleteCharacter(int mouseX, int mouseY)
@@ -378,14 +403,10 @@ public class MainMenu extends Render
 			{
 				selectedWorldName = menu.getVaryingItems()[selectedIndex - 1];
 				isWorldMenuOpen = false;
-				//Load screen
-				try {
-					playGame();
-				} catch (IOException e) {
-					e.printStackTrace();
-				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
-				}
+				
+				flaggedForGameStart = true;
+				
+				
 			}
 		}
 		else if(selectedIndex == menu.getTotalMenuLength() - 3)
@@ -578,4 +599,41 @@ public class MainMenu extends Render
         trueTypeFont.drawString(Display.getWidth() * 0.25F, Display.getHeight() * 0.25F, "Generating the world...", 1F, -1F, TrueTypeFont.ALIGN_CENTER);
 	
 	}
+	
+	private void overwriteWithGameLoadScreen()
+	{
+		int width = 450;
+		int height = 250;
+		background_menu.bind();
+		t.startDrawingQuads();
+		for(int x = 0; x < (Display.getWidth() / width) + 1; x++)
+		{
+			for(int y = 0; y < (Display.getHeight() / height) + 1; y++)
+			{
+		        t.setColorRGBA_F(1, 1, 1, 1);
+		        t.addVertexWithUV(x * width, (y + 1) * height, 0, 0, 1);
+		        t.addVertexWithUV((x + 1) * width, (y + 1) * height, 0, 1, 1);
+		        t.addVertexWithUV((x + 1) * width, y * height, 0, 1, 0);
+		        t.addVertexWithUV(x * width, y * height, 0, 0, 0);
+			}
+		}
+        t.draw();
+		
+        width = 300;
+        height = 63;
+        int xoff = (int) (0.15 * Display.getWidth());
+        int yoff = 0;
+        logo.bind();
+		t.startDrawingQuads();
+        t.setColorRGBA_F(1, 1, 1, 1);
+        t.addVertexWithUV(xoff, yoff + height, 0, 0, 1);
+        t.addVertexWithUV(xoff + width, yoff + height, 0, 1, 1);
+        t.addVertexWithUV(xoff + width, yoff, 0, 1, 0);
+        t.addVertexWithUV(xoff, yoff, 0, 0, 0);
+        t.draw();
+
+        trueTypeFont.drawString(Display.getWidth() * 0.25F, Display.getHeight() * 0.25F, "Loading...", 1F, -1F, TrueTypeFont.ALIGN_CENTER);
+		
+	}
+	
 }
