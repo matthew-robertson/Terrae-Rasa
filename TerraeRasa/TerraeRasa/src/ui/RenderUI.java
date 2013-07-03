@@ -739,7 +739,7 @@ public class RenderUI extends Render
 	        String[] setBonuses;
 			Vector<String> bonusesVector = new Vector<String>();
 	        String cooldown = "";
-	        boolean[] activeSetBonuses = { };
+	        boolean[] activePassiveBonuses = { };
 	        
 			if(stack.getItemID() >= Item.itemIndex && stack.getItemID() < ActionbarItem.spellIndex)
 			{
@@ -753,7 +753,7 @@ public class RenderUI extends Render
 					{
 						bonusesVector.add(bonus);
 					}
-					activeSetBonuses = ((ItemArmor)(Item.itemsList[stack.getItemID()])).getArmorType().getBonusesActivated(player);
+					activePassiveBonuses = ((ItemArmor)(Item.itemsList[stack.getItemID()])).getArmorType().getBonusesActivated(player);
 				}
 			}
 			else if (stack.getItemID() < Item.itemIndex)
@@ -820,7 +820,7 @@ public class RenderUI extends Render
 				renderLines.add(line);
 			}
 			
-			//Break the set bonuses extra information into strings that don't exceed the tooltip's total width
+			//Break the passive bonuses extra information into strings that don't exceed the tooltip's total width
 			//And look terrible as a result.			
 			List<String> setBonusesList = new ArrayList<String>(0);
 			if(setBonuses.length > 0)
@@ -914,13 +914,13 @@ public class RenderUI extends Render
 			
 			GL11.glColor4d(EnumColor.WHITE.COLOR[0], EnumColor.WHITE.COLOR[1], EnumColor.WHITE.COLOR[2], 1.0);
 			
-			//Render the set bonuses
+			//Render the passive bonuses
 			yOffset = yOffset + PADDING * (stats.length) + 
 					(((tooltipHeight) - (tooltipHeight - boldTooltip.getHeight(itemName))) * 0.5f * (stats.length));
 			
 			for(int i = 0; i < setBonusesList.size(); i++)
 			{
-				if(i < activeSetBonuses.length && !activeSetBonuses[i])
+				if(i < activePassiveBonuses.length && !activePassiveBonuses[i])
 				{
 					GL11.glColor4d(EnumColor.GRAY.COLOR[0], EnumColor.GRAY.COLOR[1], EnumColor.GRAY.COLOR[2], 1.0);
 				}

@@ -5,16 +5,12 @@ import hardware.MouseInput;
 import io.ChunkManager;
 import items.Item;
 
-import java.beans.DefaultPersistenceDelegate;
-import java.beans.XMLEncoder;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
-import render.GuiMainMenu;
 import render.MainMenu;
 import render.Render;
 import render.RenderGlobal;
@@ -27,6 +23,10 @@ import utils.LightUtils;
 import world.World;
 import world.WorldHell;
 import world.WorldSky;
+import affix.AffixDestruction;
+import affix.AffixFrenzied;
+import affix.AffixSturdy;
+import affix.AffixTest;
 import audio.SoundEngine;
 import blocks.Block;
 import entities.EntityPlayer;
@@ -312,6 +312,8 @@ public class GameEngine
 			FileManager fileManager = new FileManager();
 			world = fileManager.generateNewWorld("World", 1200, 800, EnumWorldDifficulty.NORMAL);//EnumWorldSize.LARGE.getWidth(), EnumWorldSize.LARGE.getHeight());
 			world.initSoundEngine(soundEngine);
+			world.chunkManager = chunkManager;
+			  world.chunkManager.setUniverseName("World");
 			player = fileManager.generateAndSavePlayer("!!", EnumPlayerDifficulty.HARD);//new EntityLivingPlayer("Test player", EnumDifficulty.NORMAL);
 			world.addPlayerToWorld(player);
 			world.assessForAverageSky();
@@ -369,7 +371,7 @@ public class GameEngine
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.talismanOfWinds));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ringOfVigor));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goddessesTear));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.magicalCloud));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.magicalCloud).setAffix(new AffixDestruction()));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.berserkersEssence));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.guardianAmulet));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.stole));
@@ -400,12 +402,12 @@ public class GameEngine
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.copperAxe));
 //			
 			
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.t6Helmet));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.t6Body));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.t6Pants));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.t6Gloves));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.t6Boots));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.t6Belt));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.t6Helmet).setAffix(new AffixFrenzied()));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.t6Body).setAffix(new AffixFrenzied()));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.t6Pants).setAffix(new AffixDestruction()));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.t6Gloves).setAffix(new AffixFrenzied()));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.t6Boots).setAffix(new AffixTest()));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.t6Belt).setAffix(new AffixSturdy()));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ankh));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.divineCross));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.woodenBow));

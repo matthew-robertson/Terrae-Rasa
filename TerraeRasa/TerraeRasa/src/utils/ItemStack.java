@@ -1,9 +1,10 @@
 package utils;
 
+import passiveBonus.PassiveBonus;
 import items.Item;
 import items.ItemGem;
-import setbonus.SetBonus;
 import spells.Spell;
+import affix.Affix;
 import auras.Aura;
 import blocks.Block;
 
@@ -36,8 +37,9 @@ public class ItemStack
 	private int itemID;
 	private GemSocket[] gemSockets;
 	private String renderedName;
-	private SetBonus[] bonuses;
+	private PassiveBonus[] bonuses;
 	private Aura[] auras;
+	private Affix affix;
 	
 	public ItemStack(ActionbarItem item)
 	{
@@ -50,7 +52,7 @@ public class ItemStack
 		{
 			gemSockets[i] = new GemSocket();
 		}
-		bonuses = new SetBonus[0];
+		bonuses = new PassiveBonus[0];
 		auras = new Aura[0];
 		renderedName = itemName;
 	}
@@ -70,7 +72,7 @@ public class ItemStack
 		{
 			gemSockets[i] = new GemSocket();
 		}	
-		bonuses = new SetBonus[0];
+		bonuses = new PassiveBonus[0];
 		auras = new Aura[0];
 		renderedName = itemName;
 	}
@@ -102,7 +104,7 @@ public class ItemStack
 		{
 			gemSockets[i] = new GemSocket();
 		}
-		bonuses = new SetBonus[0];
+		bonuses = new PassiveBonus[0];
 		auras = new Aura[0];
 		renderedName = itemName;
 	}
@@ -134,7 +136,7 @@ public class ItemStack
 		{
 			gemSockets[i] = new GemSocket();
 		}
-		bonuses = new SetBonus[0];
+		bonuses = new PassiveBonus[0];
 		auras = new Aura[0];
 		renderedName = itemName;
 	}
@@ -260,12 +262,67 @@ public class ItemStack
 	}
 	
 	/**
-	 * Gives this ItemStack some specific SetBonuses.
+	 * Gives this ItemStack some specific PassiveBonuses.
 	 * @param bonuses the bonuses to give this ItemStack
 	 */
-	public void setBonuses(SetBonus[] bonuses)
+	public void setBonuses(PassiveBonus[] bonuses)
 	{
 		this.bonuses = bonuses;
+	}
+	
+	public ItemStack setAffix(Affix affix){
+		this.affix = affix;
+		
+		if (affix.getPrefix()){
+			this.setRenderedName(affix.getName() + " " + this.getItemName());
+		}
+		else{
+			this.setRenderedName(this.getItemName() + " " + affix.getName());
+		}
+		
+		updateAuras(affix);
+		updatePassives(affix);
+		
+		return this;
+	}
+	
+	public void updateAuras(Affix affix){
+		Aura[] aura = auras;
+		if (aura != null && affix.getAuras() != null){
+			auras = new Aura[affix.getAuras().length + auras.length];
+			for (int i = 0; i < aura.length; i++){
+				auras[i] = aura[i];
+			}
+			for (int i = 0; i < affix.getAuras().length; i++){
+				auras[i + aura.length] = affix.getAuras()[i];
+			}
+		}
+		else if (aura != null){
+			auras = aura;
+		}
+		else if (affix.getAuras() != null){
+			auras = affix.getAuras();
+		}
+	}
+	
+	public void updatePassives(Affix affix){
+		PassiveBonus[] passive = bonuses;
+		
+		if (passive != null && affix.getPassives() != null){
+			bonuses = new PassiveBonus[affix.getPassives().length + passive.length];			
+			for (int i = 0; i < passive.length; i++){
+				bonuses[i] = passive[i];
+			}
+			for (int i = 0; i < affix.getPassives().length; i++){
+				bonuses[i + passive.length] = affix.getPassives()[i];
+			}
+		}
+		else if (bonuses != null){
+			bonuses = passive;
+		}
+		else if (affix.getPassives() != null){
+			bonuses = affix.getPassives();
+		}
 	}
 	
 	/**
@@ -287,10 +344,10 @@ public class ItemStack
 	}
 	
 	/**
-	 * Gets any special SetBonuses assigned to this specific ItemStack
-	 * @return any SetBonuses assigned to this ItemStack
+	 * Gets any special PassiveBonuses assigned to this specific ItemStack
+	 * @return any PassiveBonuses assigned to this ItemStack
 	 */
-	public SetBonus[] getBonuses()
+	public PassiveBonus[] getBonuses()
 	{
 		return bonuses;
 	}
@@ -314,9 +371,9 @@ public class ItemStack
 	}
 
 	/**
-	 * Converts all the set bonuses and then auras into a string 
+	 * Converts all the passive bonuses and then auras into a string 
 	 * array. Useful for tooltips and visualization.
-	 * @return this ItemStack's SetBonuses, and Auras as a String[]
+	 * @return this ItemStack's PassiveBonuses, and Auras as a String[]
 	 */
 	public String[] getStringBonuses()
 	{

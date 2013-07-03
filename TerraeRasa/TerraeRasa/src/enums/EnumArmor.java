@@ -6,12 +6,13 @@ import items.ItemArmor;
 import java.util.EnumSet;
 import java.util.Vector;
 
+import passiveBonus.PassiveBonus;
+import passiveBonus.PassiveBonusCriticalStrike;
+import passiveBonus.PassiveBonusDefense;
+import passiveBonus.PassiveBonusSpeed;
+
 import entities.EntityPlayer;
 
-import setbonus.SetBonus;
-import setbonus.SetBonusCriticalStrike;
-import setbonus.SetBonusDefense;
-import setbonus.SetBonusSpeed;
 import utils.ItemStack;
 
 /**
@@ -19,7 +20,7 @@ import utils.ItemStack;
  * available for any piece of the Armour set (the helmet, chestpiece, and pants, boots, belts, and gloves). 
  * Defense values are generally: Chestpiece > helmet >= pants > boots >= gloves >= belt.
  * <br><br>
- * V1.1: EnumArmor now contains SetBonuses for a given grade of material.
+ * V1.1: EnumArmor now contains PassiveBonuses for a given grade of material.
  * Ex. Gold has (2): +1Defense; (3): +2Defense; (4): +2Defense. Total = +5Defense
  * @author      Alec Sobeck
  * @author      Matthew Robertson
@@ -28,35 +29,35 @@ import utils.ItemStack;
  */
 public enum EnumArmor 
 {
-	NOTHING(0, 0, 0, 0, 0, 0, new SetBonus[]{ }),
-	COPPER(2, 3, 2, 1, 1, 1, new SetBonus[]{
-			new SetBonusDefense(1).setPiecesRequiredToActivate(3),
-			new SetBonusDefense(1).setPiecesRequiredToActivate(6)
+	NOTHING(0, 0, 0, 0, 0, 0, new PassiveBonus[]{ }),
+	COPPER(2, 3, 2, 1, 1, 1, new PassiveBonus[]{
+			new PassiveBonusDefense(1).setPiecesRequiredToActivate(3),
+			new PassiveBonusDefense(1).setPiecesRequiredToActivate(6)
 		}),
-	BRONZE(2, 4, 3, 1, 1, 1, new SetBonus[]{ 
-			new SetBonusDefense(1).setPiecesRequiredToActivate(2), 
-			new SetBonusDefense(1).setPiecesRequiredToActivate(4),
-			new SetBonusDefense(1).setPiecesRequiredToActivate(6)
+	BRONZE(2, 4, 3, 1, 1, 1, new PassiveBonus[]{ 
+			new PassiveBonusDefense(1).setPiecesRequiredToActivate(2), 
+			new PassiveBonusDefense(1).setPiecesRequiredToActivate(4),
+			new PassiveBonusDefense(1).setPiecesRequiredToActivate(6)
 		}),
-	IRON(3, 5, 4, 2, 2, 2, new SetBonus[]{ 
-			new SetBonusDefense(1).setPiecesRequiredToActivate(2),
-			new SetBonusDefense(1).setPiecesRequiredToActivate(4),
-			new SetBonusDefense(2).setPiecesRequiredToActivate(6)
+	IRON(3, 5, 4, 2, 2, 2, new PassiveBonus[]{ 
+			new PassiveBonusDefense(1).setPiecesRequiredToActivate(2),
+			new PassiveBonusDefense(1).setPiecesRequiredToActivate(4),
+			new PassiveBonusDefense(2).setPiecesRequiredToActivate(6)
 		}),
-	SILVER(4, 6, 5, 3, 3, 3, new SetBonus[]{ 
-			new SetBonusDefense(1).setPiecesRequiredToActivate(2),
-			new SetBonusDefense(2).setPiecesRequiredToActivate(4),
-			new SetBonusDefense(2).setPiecesRequiredToActivate(6),
+	SILVER(4, 6, 5, 3, 3, 3, new PassiveBonus[]{ 
+			new PassiveBonusDefense(1).setPiecesRequiredToActivate(2),
+			new PassiveBonusDefense(2).setPiecesRequiredToActivate(4),
+			new PassiveBonusDefense(2).setPiecesRequiredToActivate(6),
 		}),
-	GOLD(5, 7, 5, 4, 4, 4, new SetBonus[]{ 
-			new SetBonusDefense(2).setPiecesRequiredToActivate(2),
-			new SetBonusDefense(3).setPiecesRequiredToActivate(4),
-			new SetBonusSpeed(0.1).setPiecesRequiredToActivate(6)
+	GOLD(5, 7, 5, 4, 4, 4, new PassiveBonus[]{ 
+			new PassiveBonusDefense(2).setPiecesRequiredToActivate(2),
+			new PassiveBonusDefense(3).setPiecesRequiredToActivate(4),
+			new PassiveBonusSpeed(0.1).setPiecesRequiredToActivate(6)
 		}),
-	TIER6(7, 9, 7, 5, 5, 5, new SetBonus[]{ 
-			new SetBonusDefense(4).setPiecesRequiredToActivate(2),
-			new SetBonusCriticalStrike(0.1).setPiecesRequiredToActivate(4),
-			new SetBonusSpeed(0.4).setPiecesRequiredToActivate(6)
+	TIER6(7, 9, 7, 5, 5, 5, new PassiveBonus[]{ 
+			new PassiveBonusDefense(4).setPiecesRequiredToActivate(2),
+			new PassiveBonusCriticalStrike(0.1).setPiecesRequiredToActivate(4),
+			new PassiveBonusSpeed(0.4).setPiecesRequiredToActivate(6)
 		});
 
 	private final int helmDefense;
@@ -65,11 +66,11 @@ public enum EnumArmor
 	private final int bootsDefense;
 	private final int glovesDefense;
 	private final int beltDefense;
-	private SetBonus[] bonuses;
+	private PassiveBonus[] bonuses;
 	private static Vector<EnumArmor> armorTiers;
 	static
 	{
-		//Add all the EnumArmor to the armorTiers Vector to automatically update the SetBonusFactory and other classes
+		//Add all the EnumArmor to the armorTiers Vector to automatically update the PassiveBonusFactory and other classes
 		//of a change to EnumArmor
 		armorTiers = new Vector<EnumArmor>();
 		for (EnumArmor tier: EnumSet.allOf(EnumArmor.class))
@@ -78,7 +79,7 @@ public enum EnumArmor
         }
 	}
 	
-	EnumArmor(int helmDef, int bodyDef, int pantsDef, int bootsDefense, int glovesDefense, int beltDefense, SetBonus[] bonuses)
+	EnumArmor(int helmDef, int bodyDef, int pantsDef, int bootsDefense, int glovesDefense, int beltDefense, PassiveBonus[] bonuses)
 	{
 		this.helmDefense = helmDef;
 		this.bodyDefense = bodyDef;
@@ -130,40 +131,40 @@ public enum EnumArmor
 		return beltDefense;
 	}
 	
-	public SetBonus[] getBonuses()
+	public PassiveBonus[] getBonuses()
 	{
 		return bonuses;
 	}
 	
 	/**
-	 * Gets the active SetBonuses for a given tier of armour, based on the number of pieces equipped.
-	 * All SetBonuses which require less than or equal to that number of armour pieces equipped will 
+	 * Gets the active PassiveBonuses for a given tier of armour, based on the number of pieces equipped.
+	 * All PassiveBonuses which require less than or equal to that number of armour pieces equipped will 
 	 * be returned.
 	 * @param piecesEquipped the number of pieces from this set the player has equipped
-	 * @return the SetBonuses that are active, based on piecesEquipped
+	 * @return the PassiveBonuses that are active, based on piecesEquipped
 	 */
-	public SetBonus[] getBonuses(int piecesEquipped)
+	public PassiveBonus[] getBonuses(int piecesEquipped)
 	{
-		Vector<SetBonus> bonusVect = new Vector<SetBonus>();
-		for(SetBonus set : bonuses)
+		Vector<PassiveBonus> bonusVect = new Vector<PassiveBonus>();
+		for(PassiveBonus set : bonuses)
 		{
 			if(set.getPiecesRequiredToActivate() <= piecesEquipped)
 			{
 				bonusVect.add(set);
 			}
 		}
-		SetBonus[] bonus = new SetBonus[bonusVect.size()];
+		PassiveBonus[] bonus = new PassiveBonus[bonusVect.size()];
 		bonusVect.copyInto(bonus);
 		return bonus;
 	}
 	
 	/**
-	 * Gets all the SetBonuses for this armour tier in a nicely formatted array of the following general
+	 * Gets all the PassiveBonuses for this armour tier in a nicely formatted array of the following general
 	 * form: <br>
 	 * (2): BONUS_NAME
-	 * @return the SetBonuses for this armour tier in a well formatted way
+	 * @return the PassiveBonuses for this armour tier in a well formatted way
 	 */
-	public String[] getSetBonusesAsStringArray()
+	public String[] getPassiveBonusesAsStringArray()
 	{
 		String[] values = new String[bonuses.length];
 		for(int i = 0; i < values.length; i++)
@@ -174,9 +175,9 @@ public enum EnumArmor
 	}
 	
 	/**
-	 * Gets a boolean[] representing what SetBonuses from this tier are active. If a bonus is active then
+	 * Gets a boolean[] representing what PassiveBonuses from this tier are active. If a bonus is active then
 	 * the player has enough pieces equipped for this to be the case and that index of the array will be true.
-	 * The boolean[] provided by this is in the same order as the {@link #getSetBonusesAsStringArray()} method
+	 * The boolean[] provided by this is in the same order as the {@link #getPassiveBonusesAsStringArray()} method
 	 * provides.
 	 * @return a boolean[] indicating which bonuses from this tier are active
 	 */

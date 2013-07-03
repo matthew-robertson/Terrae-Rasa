@@ -32,7 +32,7 @@ public enum EnumWorldDifficulty
 	private static Vector<String> enumValues;
 	static
 	{
-		//Add all the EnumArmor to the armorTiers Vector to automatically update the SetBonusFactory and other classes
+		//Add all the EnumArmor to the armorTiers Vector to automatically update the PassiveBonusFactory and other classes
 		//of a change to EnumArmor
 		enumValues = new Vector<String>();
 		for (EnumWorldDifficulty tier: EnumSet.allOf(EnumWorldDifficulty.class))

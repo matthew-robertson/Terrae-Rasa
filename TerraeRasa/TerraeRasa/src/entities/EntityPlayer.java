@@ -18,10 +18,11 @@ import java.util.Vector;
 
 import org.lwjgl.input.Mouse;
 
+import passiveBonus.PassiveBonus;
+import passiveBonus.PassiveBonusContainer;
+import passiveBonus.PassiveBonusFactory;
+
 import render.Render;
-import setbonus.SetBonus;
-import setbonus.SetBonusContainer;
-import setbonus.SetBonusFactory;
 import utils.Cooldown;
 import utils.CraftingManager;
 import utils.Damage;
@@ -61,7 +62,7 @@ import enums.EnumToolMaterial;
  * <br><br>
  * The third major component of <code>EntityPlayer</code> is armour management. This is done almost 
  * automatically through a single method - {@link #onArmorChange()}. This method recalculates the armor
- * bonuses of the armour, as well as the set bonuses. It then proceeds to cancel the previous ones. 
+ * bonuses of the armour, as well as the passive bonuses. It then proceeds to cancel the previous ones. 
  * <b>NOTE: This method does dangerous things, and more than likely is going to terribly ruin any attempt 
  * at adding a +defense potion, or -defense debuff. It WILL have to be recoded, with little doubt.</b>
  * <br><br>
@@ -135,7 +136,7 @@ public class EntityPlayer extends EntityLiving
 	public double maxSpecialEnergy;
 	private Dictionary<String, Boolean> nearBlock;
 	private Dictionary<String, Recipe[]> possibleRecipesByBlock;
-	private SetBonusContainer currentBonuses; 
+	private PassiveBonusContainer currentBonuses; 
 	private AuraTracker auraTracker;
 	/** A flag indicating if the player has been forever defeated. If they have, they will not be saved to disk.*/
 	public boolean defeated;
@@ -266,7 +267,7 @@ public class EntityPlayer extends EntityLiving
 		ticksSinceLastCast++;
 		if(armorChanged)
 		{
-			refreshSetBonuses();
+			refreshPassiveBonuses();
 			armorChanged = false;
 		}		
 		checkForCombatStatus();
@@ -544,7 +545,7 @@ public class EntityPlayer extends EntityLiving
 	}
 	
 	/**
-	 * Recalculates defense and set bonuses when armour changes
+	 * Recalculates defense and passive bonuses when armour changes
 	 */
 	public void onArmorChange()
 	{
@@ -766,14 +767,14 @@ public class EntityPlayer extends EntityLiving
 	}
 	
 	/**
-	 * Applies defense, stats, and SetBonuses from a single piece of armour that is being equipped. These 
+	 * Applies defense, stats, and PassiveBonuses from a single piece of armour that is being equipped. These 
 	 * should be constant for a given piece of armour to allow for easy removing.
 	 * @param armor the piece of armour being equipped
 	 */
 	public void applySingleArmorItem(ItemArmor armor, ItemStack stack, int index)
 	{
-		SetBonus[] bonuses = armor.getBonuses();		
-		for(SetBonus bonus : bonuses)
+		PassiveBonus[] bonuses = armor.getBonuses();		
+		for(PassiveBonus bonus : bonuses)
 		{
 			bonus.apply(this);
 		}		
@@ -782,7 +783,7 @@ public class EntityPlayer extends EntityLiving
 		{
 			if(socket.getGem() != null)
 			{
-				for(SetBonus bonus : socket.getGem().getBonuses())
+				for(PassiveBonus bonus : socket.getGem().getBonuses())
 				{
 					if(bonus != null)
 					{
@@ -798,7 +799,7 @@ public class EntityPlayer extends EntityLiving
 				}
 			}
 		}
-		for(SetBonus bonus : stack.getBonuses())
+		for(PassiveBonus bonus : stack.getBonuses())
 		{
 			bonus.apply(this);
 		}
@@ -823,15 +824,15 @@ public class EntityPlayer extends EntityLiving
 	}
 	
 	/**
-	 * Removes defense, stats, and SetBonuses for a single piece of armour that is now being removed.
+	 * Removes defense, stats, and PassiveBonuses for a single piece of armour that is now being removed.
 	 * These should be the same as when it was equipped due to constant values in armour that do not
 	 * change.
 	 * @param armor the piece of armour being removed
 	 */
 	public void removeSingleArmorItem(ItemArmor armor, ItemStack stack, int index)
 	{
-		SetBonus[] bonuses = armor.getBonuses();		
-		for(SetBonus bonus : bonuses)
+		PassiveBonus[] bonuses = armor.getBonuses();		
+		for(PassiveBonus bonus : bonuses)
 		{
 			bonus.remove(this);
 		}		
@@ -839,7 +840,7 @@ public class EntityPlayer extends EntityLiving
 		{
 			if(socket.getGem() != null)
 			{
-				for(SetBonus bonus : socket.getGem().getBonuses())
+				for(PassiveBonus bonus : socket.getGem().getBonuses())
 				{
 					if(bonus != null)
 					{
@@ -848,7 +849,7 @@ public class EntityPlayer extends EntityLiving
 				}
 			}
 		}
-		for(SetBonus bonus : stack.getBonuses())
+		for(PassiveBonus bonus : stack.getBonuses())
 		{
 			bonus.remove(this);
 		}
@@ -864,17 +865,17 @@ public class EntityPlayer extends EntityLiving
 	}
 	
 	/**
-	 * Updates set bonus data. Unused bonuses are removed and new ones are applied. The new bonuses are 
+	 * Updates passive bonus data. Unused bonuses are removed and new ones are applied. The new bonuses are 
 	 * stored in the player's instance to be removed later.
 	 */
-	private void refreshSetBonuses()
+	private void refreshPassiveBonuses()
 	{
 		if(currentBonuses != null)
 		{
 			currentBonuses.removeAll(this);
 			currentBonuses = null;
 		}
-		currentBonuses = SetBonusFactory.getSetBonuses(inventory);
+		currentBonuses = PassiveBonusFactory.getPassiveBonuses(inventory);
 		currentBonuses.applyAll(this);
 	}
 

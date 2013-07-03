@@ -3,16 +3,17 @@ package items;
 import java.util.ArrayList;
 import java.util.List;
 
+import passiveBonus.PassiveBonus;
+
 import auras.Aura;
 import auras.AuraHeavensReprieve;
 
-import setbonus.SetBonus;
 import enums.EnumArmor;
 
 public class ItemArmor extends Item
 {
 	protected boolean isSavingRelic;
-	protected SetBonus[] bonuses;
+	protected PassiveBonus[] bonuses;
 	protected Aura[] auras;
 	protected EnumArmor armorType;
 	protected int defense;
@@ -30,7 +31,7 @@ public class ItemArmor extends Item
 		dexterity = 0;
 		strength = 0;
 		armorType = EnumArmor.NOTHING;
-		bonuses = new SetBonus[0];
+		bonuses = new PassiveBonus[0];
 		auras = new Aura[0];
 		totalSockets = 0;
 	}
@@ -103,7 +104,7 @@ public class ItemArmor extends Item
 		return armorType;
 	}
 	
-	protected ItemArmor setBonuses(SetBonus[] bonuses)
+	protected ItemArmor setBonuses(PassiveBonus[] bonuses)
 	{
 		this.bonuses = bonuses;
 		return this;
@@ -138,7 +139,7 @@ public class ItemArmor extends Item
 		return this;
 	}
 	
-	public SetBonus[] getBonuses()
+	public PassiveBonus[] getBonuses()
 	{
 		return bonuses;
 	}
@@ -160,13 +161,13 @@ public class ItemArmor extends Item
 	}
 	
 	/**
-	 * Converts all the set bonuses for this piece of armour, then armour set bonuses, then auras into a string 
+	 * Converts all the passive bonuses for this piece of armour, then armour passive bonuses, then auras into a string 
 	 * array. Useful for tooltips and visualization.
-	 * @return this armour piece's SetBonuses, tier bonuses, and auras as a String[]
+	 * @return this armour piece's PassiveBonuses, tier bonuses, and auras as a String[]
 	 */
 	public String[] getStringBonuses()
 	{
-		String[] setBonuses = armorType.getSetBonusesAsStringArray();
+		String[] setBonuses = armorType.getPassiveBonusesAsStringArray();
 		String[] allBonuses = new String[bonuses.length + setBonuses.length + auras.length];
 		int i = 0;
 		for(i = 0; i < setBonuses.length; i++)

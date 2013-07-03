@@ -1,19 +1,19 @@
 package items;
 
-import setbonus.SetBonus;
+import passiveBonus.PassiveBonus;
 import auras.Aura;
 import enums.EnumColor;
 
 public class ItemGem extends Item
 {
 	protected EnumColor gemColor;
-	protected SetBonus[] setBonuses;
+	protected PassiveBonus[] setBonuses;
 	protected Aura[] auras;
 	
 	public ItemGem(int id)
 	{
 		super(id);
-		this.setBonuses = new SetBonus[0];
+		this.setBonuses = new PassiveBonus[0];
 		this.auras = new Aura[0];
 		this.gemColor = EnumColor.WHITE;
 	}
@@ -24,7 +24,7 @@ public class ItemGem extends Item
 		return this;
 	}
 	
-	public ItemGem setBonuses(SetBonus[] bonuses)
+	public ItemGem setBonuses(PassiveBonus[] bonuses)
 	{
 		this.setBonuses = bonuses;
 		return this;		
@@ -46,7 +46,7 @@ public class ItemGem extends Item
 		return auras;
 	}
 	
-	public SetBonus[] getBonuses()
+	public PassiveBonus[] getBonuses()
 	{
 		return setBonuses;
 	}
