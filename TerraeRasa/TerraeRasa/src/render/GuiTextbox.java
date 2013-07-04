@@ -9,29 +9,17 @@ import org.lwjgl.opengl.GL11;
 import utils.MathHelper;
 
 /**
- * GuiTextbox implements a simple textbox that accepts user input. Uses a single background texture in drawing.
- * Contains methods to draw and check for mouse clicks (inBounds(int, int)) as well as
- * basic methods to manipulate the text. Focus can also be set, to see if a user wants to have their
- * input go into this textbox. Focus on one textbox does not affect the focus of others, this must
- * be handled at the location in the code where the focus change occurs. 
- * 
+ * GuiTextbox is a rewrite of the original textbox intended to scale with screen size. 
  * @author      Alec Sobeck
  * @author      Matthew Robertson
  * @version     1.0
  * @since       1.0
  */
-public class GuiTextbox
+public class GuiTextbox extends GuiComponent
 {	
 	private int MAX_TEXT_CHARACTERS;
 	private static TrueTypeFont trueTypeFont; /*This has pretty heavy overhead to create. Should it be static?*/
-	private double width;
-	private double height;
-	private int screenX;
-	private int screenY;
 	private double textScale;	
-	private double x;
-	private double y;
-	private boolean centerComponent;	
 	private boolean isFocused;	
 	private String text;
 	
@@ -42,57 +30,33 @@ public class GuiTextbox
 	 * @param y the y position on the screen
 	 * @param center whether or not to center the component (this currently doesn't work, this component will always be centered)
 	 */
-	public GuiTextbox(int x, int y, boolean center)
+	public GuiTextbox(double x, double y, double width, double height)
 	{
+		super();
 		if(trueTypeFont == null)
 		{
 			trueTypeFont = new TrueTypeFont(new Font("Agent Orange", Font.BOLD, 20), false/*DO NOT use antialiasing*/);
 		}		
 		
-		centerComponent = center;
+		this.x = x;
 		this.y = y;
-		width = 200;
-		height = 30;
+		this.width = width;
+		this.height = height;
 		text = "";
 		textScale = 0.85f;
 		MAX_TEXT_CHARACTERS = 20;
-		screenX = Display.getWidth();
-		screenY = Display.getHeight();
-		
-		if(centerComponent)
-		{
-			this.x = (int) ((Display.getWidth() *0.25f) - (width * 0.5f));
-		}
-		else
-		{
-			this.x = x;
-		}		
 	}
-	
-	/**
-	 * Gets whether or not a point is inside the textbox
-	 * @param x x location to check against textbox
-	 * @param y y location to check against textbox
-	 * @return whether the specified vector2f is inside the text
-	 */
-	public boolean inBounds(int x, int y)
-	{
-		return (x > this.x && x < this.x + width && y > this.y && y < this.y + height);
-	}	
 	
 	/**
 	 * Renders the textbox to screen
 	 */
 	public void draw()
 	{	
-		if(Display.getWidth() != screenX || Display.getHeight() != screenY) //Has the screen been resized?
+		double x = (Display.getWidth() * 0.5 * this.x);
+		double y = Display.getHeight() * 0.5 * this.y;
+		if(stopVerticalScaling)
 		{
-			if(centerComponent) //if so, recenter it
-			{
-				this.x = (int) ((Display.getWidth() * 0.25f) - (width * 0.5f));
-			}
-			screenX = Display.getWidth();
-			screenY = Display.getHeight();
+			y = this.y;
 		}
 		drawBounds();
 		GL11.glColor4f(1, 1, 1, 1);
@@ -146,8 +110,16 @@ public class GuiTextbox
 	 */
 	public void drawBounds()
 	{
+		double x = (Display.getWidth() * 0.5 * this.x);
+		double y = Display.getHeight() * 0.5 * this.y;
+		double width = this.width * 0.5 * Display.getWidth();
+		double height = 530 * this.height * 0.5F;
+		if(stopVerticalScaling)
+		{
+			y = this.y;
+		}
+		
 		GL11.glColor4f(0, 0, 0, 1);
-
 		Tessellator t = Tessellator.instance;
 		
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
@@ -176,7 +148,7 @@ public class GuiTextbox
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		
 		//Texture
-		GuiMainMenu.buttonTexture.bind();
+		renderTexture.bind();
 		GL11.glColor4f(1, 1, 1, 1);
 		t.startDrawingQuads();		
 	    t.addVertexWithUV(x, y + height, 0, 0, 1);
@@ -227,5 +199,9 @@ public class GuiTextbox
 	public void freeFocused()
 	{
 		isFocused = false;
+	}
+
+	public void onClick(int x, int y) {
+		
 	}
 }

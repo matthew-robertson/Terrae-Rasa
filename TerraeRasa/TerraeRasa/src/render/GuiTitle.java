@@ -31,6 +31,11 @@ public class GuiTitle extends GuiComponent
 	public void onClick(int x, int y) 
 	{
 	}
+	
+	public void setText(String text)
+	{
+		this.value = text;
+	}
 
 	public void draw() 
 	{

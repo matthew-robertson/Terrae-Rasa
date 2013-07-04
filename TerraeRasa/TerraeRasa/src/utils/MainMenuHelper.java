@@ -87,7 +87,18 @@ public class MainMenuHelper
 	public String[] getWorldFileNames()
 	{
 		try {
-			return (new File(TerraeRasa.getBasePath() + "/World Saves/")).list();			
+			String[] possibleNames = (new File(TerraeRasa.getBasePath() + "/World Saves/")).list();
+			Vector<String> actualName = new Vector<String>();
+			for(int i = 0; i < possibleNames.length; i++)
+			{
+				if(new File(TerraeRasa.getBasePath() + "/World Saves/" + possibleNames[i]).isDirectory())
+				{
+					actualName.add(possibleNames[i]);
+				}
+			}
+			String[] temp = new String[actualName.size()];
+			actualName.copyInto(temp);
+			return temp;
 		} catch(Exception e) {
 			return new String[] { };
 		}

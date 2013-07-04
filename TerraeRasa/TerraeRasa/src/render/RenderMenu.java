@@ -23,46 +23,46 @@ public class RenderMenu extends Render
 	private boolean isOptionsMenuOpen;
 	private boolean isControlsMenuOpen;
 	private GuiTitle mainMenuTitle;
-	private GuiButtonImproved saveAndQuitButton;
-	private GuiButtonImproved optionsButton;
+	private GuiButton saveAndQuitButton;
+	private GuiButton optionsButton;
 
 	private GuiTitle optionsTitle;
-	private GuiButtonImproved graphicsButton;
-	private GuiButtonImproved keybindsButton;
+	private GuiButton graphicsButton;
+	private GuiButton keybindsButton;
 	private GuiSlideBar musicVolumeSlider;
 	private GuiSlideBar soundVolumeSlider;
-	private GuiButtonImproved autosaveButton;
+	private GuiButton autosaveButton;
 	
 	private GuiTitle keybindsTitle;
-	private GuiButtonImproved inventoryToggleButton;
+	private GuiButton inventoryToggleButton;
 	private boolean settingInventoryKeybind;
 	
 	private GuiTitle graphicsTitle;
 	
 	public RenderMenu(Settings settings)
 	{
-		mainMenuTitle = new GuiTitle("Pause Menu", 0.2, 0.05, 0.6, 0.1);
-		optionsButton = new GuiButtonImproved(new String[] { "Options" }, 0.3, 0.275, 0.4, 0.1);
-		saveAndQuitButton = new GuiButtonImproved(new String[] { "Save And Quit" }, 0.3, 0.425, 0.4, 0.1);
+		mainMenuTitle = (GuiTitle) new GuiTitle("Pause Menu", 0.2, 10, 0.6, 0.1).setStopVerticalScaling(true);
+		optionsButton = (GuiButton) new GuiButton(new String[] { "Options" }, 0.3, 50, 0.4, 0.1).setStopVerticalScaling(true);
+		saveAndQuitButton = (GuiButton) new GuiButton(new String[] { "Save And Quit" }, 0.3, 90, 0.4, 0.1).setStopVerticalScaling(true);
 		
 		//Options Part of the menu
-		optionsTitle = new GuiTitle("Options", 0.2, 0.05, 0.6, 0.1);
-		musicVolumeSlider = new GuiSlideBar("Music Volume: ", settings.musicVolume, 0.075, 0.2, 0.4, 0.1);		
-		soundVolumeSlider = new GuiSlideBar("Sound Volume: ", settings.soundVolume, 0.525, 0.2, 0.4, 0.1);		
-		autosaveButton = new GuiButtonImproved(new String[] { 
+		optionsTitle = (GuiTitle) new GuiTitle("Options", 0.2, 10, 0.6, 0.1).setStopVerticalScaling(true);
+		musicVolumeSlider = (GuiSlideBar) new GuiSlideBar("Music Volume: ", settings.musicVolume, 0.075, 50, 0.4, 0.1).setStopVerticalScaling(true);		
+		soundVolumeSlider = (GuiSlideBar) new GuiSlideBar("Sound Volume: ", settings.soundVolume, 0.525, 50, 0.4, 0.1).setStopVerticalScaling(true);		
+		autosaveButton = (GuiButton) new GuiButton(new String[] { 
 				"Autosave off", "Autosave 3 Minutes", "Autosave 5 Minutes", "Autosave 10 Minutes", "Autosave 30 Minutes"
-			}, 0.325, 0.35, 0.35, 0.1 );
-		graphicsButton = new GuiButtonImproved(new String[] { "Graphics" }, 0.15, 0.50, 0.3, 0.1);
-		keybindsButton = new GuiButtonImproved(new String[] { "Controls" }, 0.55, 0.50, 0.3, 0.1);
+			}, 0.325, 90, 0.35, 0.1 ).setStopVerticalScaling(true);
+		graphicsButton = (GuiButton) new GuiButton(new String[] { "Graphics" }, 0.15, 130, 0.3, 0.1).setStopVerticalScaling(true);
+		keybindsButton = (GuiButton) new GuiButton(new String[] { "Controls" }, 0.55, 130, 0.3, 0.1).setStopVerticalScaling(true);
 		
 	
 		//Graphics
-		graphicsTitle = new GuiTitle("Graphic Options", 0.2F, 0.05F, 0.6F, 0.1F);
+		graphicsTitle = new GuiTitle("Graphic Options", 0.2, 10, 0.6, 0.1);
 		
 		//Keybinds
-		keybindsTitle = new GuiTitle("Keybinds", 0.2F, 0.05F, 0.6F, 0.1F);
-		inventoryToggleButton = new GuiButtonImproved(new String[] { "Inventory: " + Keyboard.getKeyName(settings.keybinds.inventoryToggle)},
-				0.125F, 0.25F, 0.3F, 0.1F);
+		keybindsTitle = new GuiTitle("Keybinds", 0.2, 10, 0.6, 0.1);
+		inventoryToggleButton = (GuiButton) new GuiButton(new String[] { "Inventory: " + Keyboard.getKeyName(settings.keybinds.inventoryToggle)},
+				0.125, 60, 0.3, 0.1).setStopVerticalScaling(true);
 	}
 	
 	public void render(World world, Settings settings) 

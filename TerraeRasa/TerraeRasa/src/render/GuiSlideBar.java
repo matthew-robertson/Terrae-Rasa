@@ -107,7 +107,10 @@ public class GuiSlideBar extends GuiComponent
 		double height = 530 * this.height * 0.5F;
 		double x = Display.getWidth() * this.x * 0.5F;
 		double y = Display.getHeight() * this.y * 0.5F;
-		
+		if(stopVerticalScaling)
+		{
+			y = this.y;
+		}
 		t.startDrawingQuads();
 		t.addVertexWithUV(x, y + height, 0, 0, 1);
 	    t.addVertexWithUV(x + width, y + height, 0, 1, 1);

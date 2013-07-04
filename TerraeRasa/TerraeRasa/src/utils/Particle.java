@@ -4,7 +4,8 @@ import enums.EnumColor;
 
 
 public class Particle 
-{                        
+{                      
+	public double index;
     public boolean active;               // Active (Yes/No)
     public double life;                   // Particle Life
     public double fade;                   // Fade Speed
@@ -19,6 +20,7 @@ public class Particle
     public Vector2F velocity;
     public Vector2F acceleration;
     public EnumColor[] colors;
+    public boolean rotateRight;
     
     public Particle()
     {

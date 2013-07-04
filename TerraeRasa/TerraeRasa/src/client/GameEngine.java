@@ -5,16 +5,12 @@ import hardware.MouseInput;
 import io.ChunkManager;
 import items.Item;
 
-import java.beans.DefaultPersistenceDelegate;
-import java.beans.XMLEncoder;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
-import render.GuiMainMenu;
 import render.MainMenu;
 import render.Render;
 import render.RenderGlobal;
@@ -32,7 +28,6 @@ import blocks.Block;
 import entities.EntityPlayer;
 import enums.EnumPlayerDifficulty;
 import enums.EnumWorldDifficulty;
-import enums.EnumWorldSize;
 
 /**
  * <code>GameEngine</code> is the class responsible for running the main game loop, and other core features of multiple worlds.

@@ -47,7 +47,7 @@ public class ChunkManager
 	 */
 	public ChunkManager()
 	{
-		threadPool = Executors.newFixedThreadPool(4);
+		threadPool = Executors.newFixedThreadPool(16);
 		scheduledLoadOperations = new ArrayList<Future<Chunk>>(4);
 		scheduledSaveOperations = new ArrayList<Future<Boolean>>(4);
 		this.universeName = "";

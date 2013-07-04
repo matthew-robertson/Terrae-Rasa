@@ -56,18 +56,19 @@ public class MainMenu extends Render
 	private boolean flaggedForGameStart;
 	private List<Particle> stars;
 	private List<Particle> starTrails;
+	private List<Particle> staticStars;
 	private EnumColor[] fieryColors = { EnumColor.FIERY1, EnumColor.FIERY2, EnumColor.FIERY3, EnumColor.FIERY4, EnumColor.FIERY5 };
 	private MainMenuHelper menuHelper;
 	private FileManager fileManager;
 	private MainSettingsMenu settingsMenu;
 	private GuiMenu menu;
-	private GuiTextboxScaling characterName;
-	private GuiButtonImproved characterMode;
+	private GuiTextbox characterName;
+	private GuiButton characterMode;
 	private GuiTitle createNewCharacter;
 	private GuiTitle stopCreatingCharacter;	
-	private GuiTextboxScaling worldName;
-	private GuiButtonImproved worldMode;
-	private GuiButtonImproved worldSize;
+	private GuiTextbox worldName;
+	private GuiButton worldMode;
+	private GuiButton worldSize;
 	private GuiTitle createNewWorld;
 	private GuiTitle stopCreatingWorld;		
 	private GuiTitle deleteWorldBack;
@@ -108,23 +109,42 @@ public class MainMenu extends Render
 		    star.zrot = random.nextInt(100);
 		    star.velocity = new Vector2F(random.nextFloat() * 3, random.nextFloat() * 3);
 		    star.acceleration = new Vector2F(random.nextFloat() / 20, random.nextFloat() / 20);
-			
 			stars.add(star);
+		}
+		staticStars = new ArrayList<Particle>();
+		for(int i = 0; i < 7; i++)
+		{
+			Particle star = new Particle();
+			star.active = true;
+			star.life = 1 + random.nextDouble();
+			star.fade = 0.01;
+			star.texture = Render.starParticleBackground;
+		    star.r = 1;
+		    star.g = 1;
+		    star.b = 1;
+		    star.a = 1;
+		    star.rotateRight = random.nextBoolean();
+		    star.x = random.nextInt((int) (Display.getWidth() * 0.5));
+		    star.y = random.nextInt((int) (Display.getHeight() * 0.5));
+		    star.zrot = random.nextInt(100);
+		    star.velocity = new Vector2F(0, 0);
+		    star.acceleration = new Vector2F(0, 0);
+			staticStars.add(star);
 		}
 		
 		//Character Creation Menu:
-		characterName = (GuiTextboxScaling) new GuiTextboxScaling(0.225, 70, 0.55, 0.1).setStopVerticalScaling(true);
+		characterName = (GuiTextbox) new GuiTextbox(0.225, 70, 0.55, 0.1).setStopVerticalScaling(true);
 		characterName.setRenderTexture(Render.menuButtonBackground);
-		characterMode = (GuiButtonImproved) new GuiButtonImproved(EnumPlayerDifficulty.getAllEnumAsStringArray(), 0.25, 100, 0.50, 0.1).setStopVerticalScaling(true);
+		characterMode = (GuiButton) new GuiButton(EnumPlayerDifficulty.getAllEnumAsStringArray(), 0.25, 100, 0.50, 0.1).setStopVerticalScaling(true);
 		characterMode.setRenderTexture(Render.menuButtonBackground);
 		createNewCharacter = (GuiTitle) new GuiTitle("Create Character", .30, 130, .20, 0.1).setStopVerticalScaling(true);
 		stopCreatingCharacter = (GuiTitle) new GuiTitle("Back", 0.60, 130, 0.2, 0.1).setStopVerticalScaling(true);
 		//World Creation Menu:
-		worldName = (GuiTextboxScaling) new GuiTextboxScaling(0.225, 70, 0.55, 0.1).setStopVerticalScaling(true);
+		worldName = (GuiTextbox) new GuiTextbox(0.225, 70, 0.55, 0.1).setStopVerticalScaling(true);
 		worldName.setRenderTexture(Render.menuButtonBackground);
-		worldMode = (GuiButtonImproved) new GuiButtonImproved(EnumWorldDifficulty.getAllEnumAsStringArray(), 0.25, 100, 0.50, 0.1).setStopVerticalScaling(true);
+		worldMode = (GuiButton) new GuiButton(EnumWorldDifficulty.getAllEnumAsStringArray(), 0.25, 100, 0.50, 0.1).setStopVerticalScaling(true);
 		worldMode.setRenderTexture(Render.menuButtonBackground);
-		worldSize = (GuiButtonImproved) new GuiButtonImproved(EnumWorldSize.getAllEnumAsStringArray(), 0.25, 130, 0.50, 0.1).setStopVerticalScaling(true);
+		worldSize = (GuiButton) new GuiButton(EnumWorldSize.getAllEnumAsStringArray(), 0.25, 130, 0.50, 0.1).setStopVerticalScaling(true);
 		worldSize.setRenderTexture(Render.menuButtonBackground);
 		createNewWorld = (GuiTitle) new GuiTitle("Create World", .30, 160, .20, 0.1).setStopVerticalScaling(true);
 		stopCreatingWorld = (GuiTitle) new GuiTitle("Back", 0.60, 160, 0.2, 0.1).setStopVerticalScaling(true);
@@ -182,7 +202,8 @@ public class MainMenu extends Render
 			mouse();
 		}
 		renderBackground();
-		renderAnimation();
+		renderShootingStarAnimation();
+		renderStaticStarAnimation();
 		renderComponents();
 		renderVersion();
 		
@@ -203,9 +224,77 @@ public class MainMenu extends Render
 	}
 	
 	/**
+	 * Renders the stars that move around and twinkle in the background
+	 */
+	private void renderStaticStarAnimation()
+	{
+		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA); //Re-enable this so the lighting renders properly
+		
+		//Render and update every star
+		for(Particle star : staticStars)
+		{
+			if(!settingsMenu.open)
+			{
+				star.integrate();
+				if(star.rotateRight) 
+					star.zrot += random.nextDouble() * (random.nextInt(6));
+				else
+					star.zrot -= random.nextDouble() * random.nextInt(6);				
+				star.index += 0.5;
+				if(star.index >= 16)
+					star.index = 0;
+			}
+				
+			double width = 13;
+			double height = 13;
+			double xoff = star.x;
+			double yoff = star.y;
+		    
+			Render.starAnimationSheet.bind();
+		    t.startDrawingQuads();
+		    double u = (double)((int)(star.index) * 32) / 512;
+		    double v = 0;
+		    t.setColorRGBA_F((float)star.r, (float)star.g, (float)star.b, (float)star.a * 0.8F);
+		    t.addVertexWithUV(xoff, yoff + height, 0, u, v + 1);
+		    t.addVertexWithUV(xoff + width, yoff + height, 0, u + (32.0 / 512), v + 1);
+		    t.addVertexWithUV(xoff + width, yoff, 0, u + (32.0 / 512), v);
+		    t.addVertexWithUV(xoff, yoff, 0, u, v);
+			t.draw();
+		    
+			//Reset the background star if it's off the screen
+			if(star.life <= 0)
+			{
+				star.active = true;
+				star.life = 1;
+				star.fade = (1.0 / 32.0);
+				star.texture = Render.starParticleBackground;
+			    star.r = 1;
+			    star.g = 1;
+			    star.b = 1;
+			    star.a = 1;
+			    star.index = 0;
+			    star.rotateRight = random.nextBoolean();
+			    star.x = random.nextInt((int) (Display.getWidth() * 0.5));
+			    star.y = random.nextInt((int) (Display.getHeight() * 0.5));
+			    star.zrot = random.nextInt(100);
+			    star.velocity = new Vector2F(0, 0);
+			    star.acceleration = new Vector2F(0, 0);
+				
+			}
+		}	
+		
+		GL11.glLoadIdentity();
+		GL11.glTranslated(0, 0, -2000);
+		GL11.glDisable(GL11.GL_BLEND);
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		GL11.glColor4d(1, 1, 1, 1);
+	}
+	
+	/**
 	 * Renders anything that is animated, specifically particles such as the stars.
 	 */
-	private void renderAnimation()
+	private void renderShootingStarAnimation()
 	{
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA); //Re-enable this so the lighting renders properly
@@ -307,7 +396,12 @@ public class MainMenu extends Render
 			    star.x = (-1 * random.nextInt((int)(Display.getWidth() * 0.3)));
 			    star.y = (-1 * random.nextInt((int)(Display.getHeight() * 0.3)));
 			    star.zrot = random.nextInt(100);
-			    star.velocity = new Vector2F(random.nextFloat() * 2 + 1, random.nextFloat() * 3);
+			    float velocityModifier = 1;
+			    if(random.nextInt(6) == 0)
+			    {
+			    	velocityModifier *= 2;
+			    }
+			    star.velocity = new Vector2F(velocityModifier * random.nextFloat() * 2 + 1, velocityModifier * random.nextFloat() * 3);
 			    star.acceleration = new Vector2F(random.nextFloat() / 15, random.nextFloat() / 15);
 			}
 		}	
@@ -605,6 +699,7 @@ public class MainMenu extends Render
 			{
 				isDeletePlayerMenuOpen = true;
 				selectedPlayerName = menu.getVaryingItems()[selectedIndex - 1];
+				deletePlayerMessage.setText("Delete " + selectedPlayerName + "?");
 			}
 			else
 			{
@@ -659,6 +754,7 @@ public class MainMenu extends Render
 			{
 				selectedWorldName = menu.getVaryingItems()[selectedIndex - 1];
 				isDeleteWorldMenuOpen = true;
+				deleteWorldMessage.setText("Delete " + selectedWorldName + "?");
 			}
 			else
 			{

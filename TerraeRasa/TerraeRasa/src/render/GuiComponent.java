@@ -44,7 +44,7 @@ public abstract class GuiComponent
 		{
 			trueTypeFont = new TrueTypeFont(new Font("Agent Orange", Font.BOLD, 20), false/*DO NOT use antialiasing*/);
 		}
-		renderTexture = Render.buttonTexture;
+		renderTexture = Render.menuButtonBackground;
 		width = 0.4F;
 		height = 0.1F;
 		x = 0.0F;
