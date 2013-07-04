@@ -412,7 +412,7 @@ public class GameEngine
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.lunariumGloves));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.lunariumBoots));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.lunariumBelt));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.mastersBracers));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.mastersBracer));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.steadfastShield));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.eaglesFeather));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.woodenArrow, 50));

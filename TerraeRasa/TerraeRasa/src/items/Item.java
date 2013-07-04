@@ -365,9 +365,9 @@ public class Item extends ActionbarItem
 	public static Item nimblefootCloak = new ItemArmorAccessory(147).PassiveBonuses(new PassiveBonus[]{
 			new PassiveBonusDodge(0.05)
 	}).setIconPosition(15, 9).setName("Nimblefoot Cloak");
-	public static Item mastersBracers = new ItemArmorAccessory(148).PassiveBonuses(new PassiveBonus[]{
+	public static Item mastersBracer = new ItemArmorAccessory(148).PassiveBonuses(new PassiveBonus[]{
 			new PassiveBonusCriticalStrike(0.04)
-	}).setIconPosition(15, 10).setName("Master's Bracers");
+	}).setIconPosition(15, 10).setName("Master's Bracer");
 	public static Item heartyPendant = new ItemArmorAccessory(149).PassiveBonuses(new PassiveBonus[]{
 			new PassiveBonusStamina(5)
 	}).setIconPosition(14, 3).setName("Hearty Pendant");
