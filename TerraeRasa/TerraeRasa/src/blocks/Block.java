@@ -672,7 +672,7 @@ public class Block extends ActionbarItem
 	public static Block torch = new Block(48)
 			.setLightStrengthAndRadius(1.0F, 10).setName("Torch")
 			.setBlockHardness(0.0f)
-			.overrideItemIcon(5, 0, Render.TEXTURE_SHEET_ITEMS)
+			.overrideItemIcon(5, 0, Render.TEXTURE_SHEET_ITEMS).setOnlyBlockTextureWidthAndHeight(32, 32)
 			.setPassable(true).setIsSolid(false);
 	public static Block adminium = new Block(49).setName("Adminium").setIsMineable(false)
 			.setBlockHardness(8000.0f).setIconIndex(0, 1);

@@ -365,14 +365,14 @@ public class GameEngine
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldBoots));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldBelt));
 
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.divineCross));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.talismanOfWinds));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ringOfVigor));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goddessesTear));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.magicalCloud));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.jasper));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.sapphire));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.emerald));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.rubyRing));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.diamond));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.opal));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldRing, 6));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.berserkersEssence));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.guardianAmulet));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.stole));
 			
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.glass, 40));
 
@@ -406,9 +406,15 @@ public class GameEngine
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.t6Gloves));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.t6Boots));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.t6Belt));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ankh));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.divineCross));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.woodenBow));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.lunariumHelmet));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.lunariumBody));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.lunariumPants));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.lunariumGloves));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.lunariumBoots));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.lunariumBelt));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.mastersBracers));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.steadfastShield));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.eaglesFeather));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.woodenArrow, 50));
 			
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.gemSmartheal1, 40));

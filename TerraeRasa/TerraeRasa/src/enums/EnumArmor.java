@@ -9,6 +9,8 @@ import java.util.Vector;
 import passivebonuses.PassiveBonus;
 import passivebonuses.PassiveBonusCriticalStrike;
 import passivebonuses.PassiveBonusDefense;
+import passivebonuses.PassiveBonusIntellect;
+import passivebonuses.PassiveBonusManaBoost;
 import passivebonuses.PassiveBonusSpeed;
 import utils.ItemStack;
 import entities.EntityPlayer;
@@ -52,10 +54,15 @@ public enum EnumArmor
 			new PassiveBonusDefense(3).setPiecesRequiredToActivate(4),
 			new PassiveBonusSpeed(0.1).setPiecesRequiredToActivate(6)
 		}),
+	LUNARIUM(4, 6, 5, 3, 3, 3, new PassiveBonus[]{ 
+			new PassiveBonusSpeed(.1).setPiecesRequiredToActivate(2),
+			new PassiveBonusManaBoost(20).setPiecesRequiredToActivate(4),
+			new PassiveBonusIntellect(10).setPiecesRequiredToActivate(6)
+		}),
 	TIER6(7, 9, 7, 5, 5, 5, new PassiveBonus[]{ 
-			new PassiveBonusDefense(4).setPiecesRequiredToActivate(2),
-			new PassiveBonusCriticalStrike(0.1).setPiecesRequiredToActivate(4),
-			new PassiveBonusSpeed(0.4).setPiecesRequiredToActivate(6)
+			new PassiveBonusSpeed(.4).setPiecesRequiredToActivate(2),
+			new PassiveBonusDefense(200).setPiecesRequiredToActivate(4),
+			new PassiveBonusIntellect(100).setPiecesRequiredToActivate(6)
 		});
 
 	private final int helmDefense;

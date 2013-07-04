@@ -181,8 +181,8 @@ public class TextureLoader
      */
     public Texture[] getItemTextureArray() 
     {
-    	BufferedImage bufferStore[] = new BufferedImage[32000];
-        Texture textureStore[] = new Texture[32000];
+    	BufferedImage bufferStore[] = new BufferedImage[64000];
+        Texture textureStore[] = new Texture[64000];
         
     	int srcPixelFormat;
     	int textureID;
@@ -271,10 +271,10 @@ public class TextureLoader
 	        textureStore[i] = new Texture(textureID);
 	        glBindTexture(GL11.GL_TEXTURE_2D, textureID);
 	        
-	        int w = 16;
-	        int h = 16;
-	        int x = (int) (list1[i].iconX * 16);
-	        int y = (int) (list1[i].iconY * 16);
+	        int w = 32;
+	        int h = 32;
+	        int x = (int) (list1[i].iconX * 32);
+	        int y = (int) (list1[i].iconY * 32);
 	        
 	        bufferStore[i] = itemSheet.getSubimage(x, y, w, h);
 	        

@@ -42,10 +42,10 @@ public class Render
 	public final static int ICONS_PER_COLUMN = ICONS_SHEET_HEIGHT / 16;
 	
 	//Items.png variables
-	public final static int ITEMS_SHEET_WIDTH = 512;
-	public final static int ITEMS_SHEET_HEIGHT = 256;
-	public final static int ITEMS_PER_ROW =  ICONS_SHEET_WIDTH / 16;
-	public final static int ITEMS_PER_COLUMN = ICONS_SHEET_HEIGHT / 16;
+	public final static int ITEMS_SHEET_WIDTH = 1024;
+	public final static int ITEMS_SHEET_HEIGHT = 512;
+	public final static int ITEMS_PER_ROW =  ICONS_SHEET_WIDTH / 32;
+	public final static int ITEMS_PER_COLUMN = ICONS_SHEET_HEIGHT / 32;
 	
 	public static Texture[] icons;
 	

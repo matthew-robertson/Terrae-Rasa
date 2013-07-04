@@ -4,7 +4,8 @@ import items.Item;
 
 import java.util.Vector;
 
-
+import affix.AffixFrenzied;
+import affix.AffixSturdy;
 import blocks.Block;
 
 /**
@@ -264,6 +265,42 @@ public class RecipeManager
 		new ItemStack(Block.glass, 2)
 	});
 	
+	// Gemcrafting Bench (currently crafting bench)
+	Recipe goldRing = new Recipe(this, new ItemStack(Item.goldRing), Block.craftingTable, new ItemStack[]{
+		new ItemStack(Item.goldIngot, 2)
+	});
+	Recipe frenziedRubyRing1 = new Recipe(this, new ItemStack(Item.rubyRing).setAffix(new AffixFrenzied()), Block.craftingTable, new ItemStack[]{
+		new ItemStack(Item.berserkersEssence), new ItemStack(Item.rubyRing)
+	});
+	Recipe frenziedRuby = new Recipe(this, new ItemStack(Item.ruby).setAffix(new AffixFrenzied()), Block.craftingTable, new ItemStack[]{
+		new ItemStack(Item.berserkersEssence), new ItemStack(Item.ruby)
+	});
+	Recipe sturdyOpalRing = new Recipe(this, new ItemStack(Item.opalRing).setAffix(new AffixSturdy()), Block.craftingTable, new ItemStack[]{
+		new ItemStack(Item.steadfastShield), new ItemStack(Item.opalRing)
+	});
+	Recipe sturdyRuby = new Recipe(this, new ItemStack(Item.opal).setAffix(new AffixSturdy()), Block.craftingTable, new ItemStack[]{
+		new ItemStack(Item.steadfastShield), new ItemStack(Item.opal)
+	});
+	
+	Recipe sapphireRing = new Recipe(this, new ItemStack(Item.sapphireRing), Block.craftingTable, new ItemStack[]{
+		new ItemStack(Item.goldRing), new ItemStack(Item.sapphire)
+	});
+	Recipe emeraldRing = new Recipe(this, new ItemStack(Item.emeraldRing), Block.craftingTable, new ItemStack[]{
+		new ItemStack(Item.goldRing), new ItemStack(Item.emerald)
+	});
+	Recipe rubyRing = new Recipe(this, new ItemStack(Item.rubyRing), Block.craftingTable, new ItemStack[]{
+		new ItemStack(Item.goldRing), new ItemStack(Item.ruby)
+	});
+	Recipe diamondRing = new Recipe(this, new ItemStack(Item.diamondRing), Block.craftingTable, new ItemStack[]{
+		new ItemStack(Item.goldRing), new ItemStack(Item.diamond)
+	});
+	Recipe opalRing = new Recipe(this, new ItemStack(Item.opalRing), Block.craftingTable, new ItemStack[]{
+		new ItemStack(Item.goldRing), new ItemStack(Item.opal)
+	});
+	Recipe jasperRing = new Recipe(this, new ItemStack(Item.jasperRing), Block.craftingTable, new ItemStack[]{
+		new ItemStack(Item.goldRing), new ItemStack(Item.jasper)
+	});
+	
 	//Alchemy Station (currently crafting bench)
 	Recipe healingPotion1 = new Recipe(this, new ItemStack(Item.healthPotion1), Block.craftingTable, new ItemStack[]{
 		new ItemStack(Item.vialOfWater), new ItemStack(Item.healingHerb1)
@@ -302,7 +339,7 @@ public class RecipeManager
 	});
 	Recipe glass = new Recipe(this, new ItemStack(Block.sand), Block.furnace, new ItemStack[] {
 		new ItemStack(Block.glass) 
-	});
+	});	
 	
 	//Inventory Defaults:
 	Recipe torches = new Recipe(this, new ItemStack(Block.torch), Block.none, new ItemStack[] {

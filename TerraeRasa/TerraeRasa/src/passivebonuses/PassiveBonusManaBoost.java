@@ -14,7 +14,7 @@ import entities.EntityPlayer;
 public class PassiveBonusManaBoost extends PassiveBonus
 {
 
-	protected PassiveBonusManaBoost(double power) 
+	public PassiveBonusManaBoost(double power) 
 	{
 		super(power);
 	}
