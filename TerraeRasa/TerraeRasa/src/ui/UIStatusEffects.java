@@ -9,18 +9,29 @@ import org.lwjgl.opengl.GL11;
 import statuseffects.StatusEffect;
 import entities.EntityPlayer;
 
+/**
+ * UIStatusEffects handles everything relating to rendering and mouse events for status effects on the UI.
+ * @author      Alec Sobeck
+ * @author      Matthew Robertson
+ * @version     1.0
+ * @since       1.0
+ */
 public class UIStatusEffects extends UIBase
 {
+	private static final int MAX_STATUS_PER_ROW = 8;
+	protected static List<StatusEffect> goodEffects = new ArrayList<StatusEffect>();
+	protected static List<StatusEffect> badEffects = new ArrayList<StatusEffect>();
+
 	/**
-	 * Renders the status effects afflicting or benefiting the player, including their remaining time in seconds.
-	 * @param player the player in use currently
+	 * Updates the status effect lists as is appropriate
+	 * @param player the player to whom this UI belongs
 	 */
-	protected static void renderStatusEffects(EntityPlayer player)
+	protected static void updateStatusEffects(EntityPlayer player)
 	{
 		//Get the status effects
 		List<StatusEffect> statusEffects = player.statusEffects;
-		List<StatusEffect> goodEffects = new ArrayList<StatusEffect>();
-		List<StatusEffect> badEffects = new ArrayList<StatusEffect>();
+		goodEffects.clear();
+		badEffects.clear();
 		
 		//Split into positive and negative
 		for(int i = 0; i < statusEffects.size(); i++)
@@ -34,9 +45,52 @@ public class UIStatusEffects extends UIBase
 				badEffects.add(statusEffects.get(i));				
 			}
 		}
-		
+	}
+
+	/**
+	 * Gets the status effect the mouse is currently hovering over, or null if there is none
+	 * @param mouseX the mouse's X position in ortho units
+	 * @param mouseY the mouse's Y position in ortho units
+	 * @return the currently hovered over status effect, or null if there is none
+	 */
+	protected static StatusEffect getMouseoverStatusEffect(int mouseX, int mouseY)
+	{
+		int size = 16;
+		int goodEffectHeight = 2;
+		int badEffectHeight = 2 + (size + 2) * (1 + (goodEffects.size() / MAX_STATUS_PER_ROW));
+
+		//Check if mousing over a 'good' status effect
+		for(int i = 0; i < goodEffects.size(); i++) 
+		{
+			int x = (int) ((Display.getWidth() * 0.5f) - ((1 + (i % MAX_STATUS_PER_ROW)) * (size + 3)));
+			int y = goodEffectHeight + (int) (((i / MAX_STATUS_PER_ROW) * (size + 3)));
+			if(mouseX >= x && mouseX <= x + size && mouseY >= y && mouseY <= y + size)
+			{
+				return goodEffects.get(i);
+			}
+		}
+		//Check if mousing over a 'bad' status effect
+		for(int i = 0; i < badEffects.size(); i++) 
+		{
+			int x = (int) (getCameraX() + (Display.getWidth() * 0.5f) - ((1 + (i % MAX_STATUS_PER_ROW)) * (size + 3)));
+			int y = badEffectHeight + (int) (getCameraY() + (i / MAX_STATUS_PER_ROW) * (size + 3));
+			if(mouseX >= x && mouseX <= x + size && mouseY >= y && mouseY <= y + size)
+			{
+				return badEffects.get(i);
+			}
+		}
+		//Return nothing if there is no moused over status effect
+		return null;
+	}
+	
+	/**
+	 * Renders the status effects afflicting or benefiting the player, including their remaining time in seconds.
+	 * @param player the player to whom this UI belongs
+	 */
+	protected static void renderStatusEffects(EntityPlayer player)
+	{
 		//Ensure the icons render in the right place and on the screen (top-right)
-		final int MAX_STATUS_PER_ROW = 8;
+		
 		int size = 16;
 		int goodEffectHeight = 2;
 		int badEffectHeight = 2 + (size + 2) * (1 + (goodEffects.size() / MAX_STATUS_PER_ROW));

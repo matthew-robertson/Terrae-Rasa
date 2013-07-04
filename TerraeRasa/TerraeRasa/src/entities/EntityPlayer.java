@@ -78,6 +78,8 @@ public class EntityPlayer extends EntityLiving
 	/** This value apparently has to be negative. */
 	private static final double leftSwingBound = MathHelper.degreeToRadian(-135); 
 	private static final double rightSwingBound = MathHelper.degreeToRadian(55);
+	private static final double totalSwingArcRad = Math.abs(leftSwingBound) + Math.abs(rightSwingBound);
+ 	private static final double totalSwingArcDeg = MathHelper.radianToDegree(totalSwingArcRad);
 	private static final int HEALTH_FROM_STAMINA = 10;
 	private static final int MANA_FROM_INTELLECT = 10;
 	private static final double DAMAGE_BONUS_INTELLECT = 1.0 / 100;
@@ -204,6 +206,7 @@ public class EntityPlayer extends EntityLiving
 		magicDamageModifier = 1;
 		healthRegenerationModifier = 1;
 		manaRegenerationModifier = 1;
+		specialRegenerationModifier = 1;
 		allDamageModifier = 1;
 		isReloaded = false;
 		cooldowns = new Hashtable<String, Cooldown>();
@@ -1342,10 +1345,11 @@ public class EntityPlayer extends EntityLiving
 	 */
 	public void updateSwing()
 	{
-		double swingSpeed = (double)((ItemTool)(Item.itemsList[inventory.getMainInventoryStack(selectedSlot).getItemID()])).swingSpeed;
+		double swingSpeed = (double)((ItemTool)(Item.itemsList[inventory.getMainInventoryStack(selectedSlot).getItemID()])).swingTime;
+		swingSpeed = (swingSpeed / attackSpeedModifier);
 		if(isSwingingRight)
 		{
-            rotateAngle += MathHelper.degreeToRadian(10.0F * swingSpeed);	        
+            rotateAngle += MathHelper.degreeToRadian((double)totalSwingArcDeg / (swingSpeed * 20));	        
             if(rotateAngle <= leftSwingBound || rotateAngle >= rightSwingBound )
 	        {
 	        	clearSwing();
@@ -1353,7 +1357,7 @@ public class EntityPlayer extends EntityLiving
 		}
 		else
 		{
-			rotateAngle -= MathHelper.degreeToRadian(10F * swingSpeed);
+			rotateAngle -= MathHelper.degreeToRadian((double)totalSwingArcDeg / (swingSpeed * 20));
 		    if(rotateAngle <= leftSwingBound || rotateAngle >= rightSwingBound)
 	        {
 	        	clearSwing();

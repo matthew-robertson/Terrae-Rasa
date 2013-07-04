@@ -20,6 +20,10 @@ import world.World;
 import entities.EntityItemStack;
 import entities.EntityPlayer;
 
+/**
+ * Refactor not entirely done
+ * TODO: refactor more
+ */
 public class UIMouse extends UIBase
 {
 	/**

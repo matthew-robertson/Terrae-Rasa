@@ -6,6 +6,13 @@ import render.Render;
 import render.TrueTypeFont;
 import utils.ItemStack;
 
+/**
+ * UIBase holds common variables that the entire UI shares.
+ * @author      Alec Sobeck
+ * @author      Matthew Robertson
+ * @version     1.0
+ * @since       1.0
+ */
 public class UIBase extends Render
 {
 	protected final static TrueTypeFont boldTooltip = new TrueTypeFont(((new Font("times", Font.BOLD, 24)).deriveFont(16.0f)), true);

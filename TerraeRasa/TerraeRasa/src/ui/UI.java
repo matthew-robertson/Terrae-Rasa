@@ -16,12 +16,16 @@ import utils.Recipe;
 import world.World;
 import entities.EntityPlayer;
 
+/**
+ * Refactor not entirely done
+ * TODO: refactor more
+ */
 public class UI extends UIBase
 {
 	public static void render(World world, EntityPlayer player, Settings settings)
 	{		
 		GL11.glEnable(GL11.GL_BLEND);
-		
+		UIStatusEffects.updateStatusEffects(player);
 		UIStatBars.renderHeartsAndMana(world, player); //The hearts and mana	
 		if(player.isInventoryOpen)
 		{
@@ -33,7 +37,7 @@ public class UI extends UIBase
 			UIInventory.renderInventory(world, player); //The full inventory if it's open
 			if(player.isViewingChest) //Chest(s) if they're being viewed
 			{ 
-				renderChest(world, player);
+				UIInventory.renderChest(world, player);
 			}			
 			if(!settings.menuOpen)
 			{
@@ -42,7 +46,6 @@ public class UI extends UIBase
 				{
 					UISocketMenu.renderSocketsMenu(world, player);
 				}
-				UITooltips.attemptToRenderItemTooltip(world, player);
 			}
 		}	
 		else
@@ -50,6 +53,7 @@ public class UI extends UIBase
 			UISocketMenu.closeSocketWindow();
 			UIInventory.renderActionBar(world, player);	//The actionbar if the inventory is closed
 		}		
+		UITooltips.renderApplicableTooltip(world, player);
 		UIStatusEffects.renderStatusEffects(player);		
 		renderMouseItem(); //The item held by the mouse, if there is one
 		renderText(world, player); //Health and the 'Save And Quit' button		
@@ -94,90 +98,7 @@ public class UI extends UIBase
 		}
 	}
 
-	/**
-	 * Renders the selected chest(s), based on the chest's attachment. This function is relatively long
-	 * and tedious, due to there being multiple unique states a chest can have.
-	 */
-	protected static void renderChest(World world, EntityPlayer player)
-	{
-		//Get the initial block the player is viewing
-		BlockChest chest = (BlockChest)world.getBlockGenerate(player.viewedChestX, player.viewedChestY).clone();
-		
-		if(chest.metaData != 1)
-		{
-			//Get the metadata for the block's size
-			int[][] metadata = MetaDataHelper.getMetaDataArray((int)(world.getBlock(player.viewedChestX, player.viewedChestY).blockWidth / 6), (int)(world.getBlock(player.viewedChestX, player.viewedChestY).blockHeight / 6)); //metadata used by the block of size (x,y)
-			int metaWidth = metadata.length; 
-			int metaHeight = metadata[0].length;	
-			int x = 0;
-			int y = 0;				
-			
-			//Loop until a the current chest's metadata value is found
-			//This provides the offset to find the 'real' chest, with the actual items in it
-			for(int i = 0; i < metaWidth; i++) 
-			{
-				for(int j = 0; j < metaHeight; j++)
-				{
-					if(metadata[i][j] == world.getBlock(player.viewedChestX - x, player.viewedChestY - y).metaData)
-					{
-						x = i; 
-						y = j;
-						break;
-					}
-				}
-			}
-			
-			//Update the chest
-			chest = (BlockChest)(world.getBlockGenerate(player.viewedChestX - x, player.viewedChestY - y));
-			player.viewedChestX -= x;
-			player.viewedChestY -= y;
-		}	
-		
-		t.startDrawingQuads(); 
-		GL11.glColor4f(0.5f, 0.5f, 0.5f, 0.6f);
-		int totalRows = (chest.getInventorySize() / 5);
-		for(int i = 0; i < chest.getInventorySize(); i++) //Draw all the background slots
-		{			
-			int size = 20;
-			actionbarSlot.bind();
-			int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + ((((i % totalRows) - (totalRows / 2)) * (size))));
-			int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - ((4 + (i / totalRows)) * (size)) - (size + 22f));
-			t.addVertexWithUV(x, y + size, 0, 0, 1);
-			t.addVertexWithUV(x + size, y + size, 0, 1, 1);
-			t.addVertexWithUV(x + size, y, 0, 1, 0);
-			t.addVertexWithUV(x, y, 0, 0, 0);
-		}
-		t.draw();
-		
-		GL11.glColor4f(1, 1, 1, 1);
-		
-		for(int i = 0; i < chest.getInventorySize(); i++) //Draw all the items, in the slots (with text)
-		{
-			if(chest.getItemStack(i) != null)
-			{
-				textures[chest.getItemStack(i).getItemID()].bind();
-				int size = 16;
-				int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + ((((i % totalRows) - (totalRows / 2)) * (size + 4))) + 2);
-				int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - ((4 + (i / totalRows)) * (size + 4)) - (size + 22f) - 2);
-
-				t.startDrawingQuads();
-				t.addVertexWithUV(x, y + size, 0, 0, 1);
-				t.addVertexWithUV(x + size, y + size, 0, 1, 1);
-				t.addVertexWithUV(x + size, y, 0, 1, 0);
-				t.addVertexWithUV(x, y, 0, 0, 0);
-				t.draw();
-				
-				if(chest.getItemStack(i).getMaxStackSize() > 1) //If maxStackSize > 1, draw the stackSize
-				{
-					GL11.glColor4f(0, 1, 0, 1);
-					trueTypeFont.drawString(x - 2, y + 18, new StringBuilder().append(chest.getItemStack(i).getStackSize()).toString(), 0.25f, -0.25f);
-					GL11.glColor4f(1, 1, 1, 1);
-				}	
-			}
-		}			
-		
-		GL11.glColor4f(1, 1, 1, 1);
-	}
+	
 	
 	/**
 	 * Renders all constantly visible text that's required for the inventory.

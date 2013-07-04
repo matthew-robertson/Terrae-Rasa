@@ -91,7 +91,7 @@ public class TerraeRasa
 			initInDebugMode = true;
 		}
 		
-		initInDebugMode = false;
+		//initInDebugMode = false;
 		
 		//Load the OpenGL libraries for rendering later on
 		if(osName.contains("win")) //Windows

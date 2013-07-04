@@ -13,13 +13,272 @@ import items.ItemArmorPants;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
+import blocks.BlockChest;
+
 import utils.InventoryPlayer;
 import utils.ItemStack;
+import utils.MetaDataHelper;
 import world.World;
 import entities.EntityPlayer;
 
+/**
+ * Refactor not entirely done
+ * TODO: refactor more
+ */
 public class UIInventory extends UIBase 
 {
+	/**
+	 * Gets the slot of the main inventory the player is mousing over, or -1 if they arent mousing over a particular slot.
+	 * @param player
+	 * @param mouseX
+	 * @param mouseY
+	 * @return
+	 */
+	protected static int getMouseoverSlotInventory(EntityPlayer player, int mouseX, int mouseY)
+	{
+		for(int i = 0; i < player.inventory.getMainInventoryLength(); i++) 
+		{
+			int size = 20;
+			int x = (int) ((Display.getWidth() * 0.25f) + (((i % 12) - 6) * (size)));
+			int y = (int) ((Display.getHeight() * 0.5f) - ((i / 12) * (size)) - (size + 22f));
+			
+			if(mouseX > x && mouseX < x + size && mouseY > y && mouseY < y + size) //Is the click in bounds?
+			{
+				return i;
+			}		
+		}
+		return -1;
+	}
+	
+	protected static int getMouseoverSlotQuiver(EntityPlayer player, int mouseX, int mouseY)
+	{
+		for(int i = 0; i < player.inventory.getQuiverLength(); i++) 
+		{
+			int size = 20;
+			int x = (int) ((Display.getWidth() * 0.25f) + (-7 * size));
+			int y = (int) ((Display.getHeight() * 0.5f) - (i * size) - (size + 22f));
+			
+			if(mouseX > x && mouseX < x + size && mouseY > y && mouseY < y + size) //Is the click in bounds?
+			{
+				return i;
+			}		
+		}
+		return -1;
+	}
+	
+	protected static int getMouseoverSlotArmor(EntityPlayer player, int mouseX, int mouseY)
+	{
+		int armorOffset = 80;
+		int size = 20;
+		if(armorOffset + (9 * (size + 1)) > Display.getHeight() * 0.5F)
+		{
+			armorOffset = (int) ((Display.getHeight() * 0.5F) - ((9 * (size + 1))));
+		}
+		for(int i = 0; i < player.inventory.getArmorInventoryLength(); i++) //Armour and Accessories
+		{
+			int x = (int) ((Display.getWidth() * 0.5f) - ((size + 2) * (1.5 + (i / 5))));
+			int y = armorOffset + ((i % 5) * (size + 2));	
+			
+			if(mouseX > x && mouseX < x + size && mouseY > y && mouseY < y + size) //Is the click in bounds?
+			{
+				return i;
+			}			
+		}
+		return -1;
+	}
+	
+	protected static int getMouseoverSlotTrash(EntityPlayer player, int mouseX, int mouseY)
+	{
+		int size = 20;
+		int x = (int)(Display.getWidth() * 0.25f) - (6 * 20); 
+		int y = (int)(Display.getHeight() * 0.5f) - (6 * 20);
+		if(mouseX > x && mouseX < x + size && mouseY > y && mouseY < y + size) 
+		{
+			return 0;
+		}	
+		return -1;
+	}
+	
+	protected static ItemStack getMouseoverRecipeSliderStack(EntityPlayer player, int mouseX, int mouseY)
+	{
+		int size = 24;
+		int x = (int) (Display.getWidth() * 0.25f) - 13;
+		int y = 8; 
+	
+		//Middle slot
+		if(mouseX > x && mouseX < x + size && mouseY > y && mouseY < y + size && player.getAllPossibleRecipes().length > 0) 
+		{
+			return player.getAllPossibleRecipes()[player.selectedRecipe].getResult();
+		}
+		
+
+		x = (int) (Display.getWidth() * 0.25f) - 13;
+		y = 10 - 2; 
+		if(player.getAllPossibleRecipes() != null && player.getAllPossibleRecipes().length != 0) //Currently selected recipe (pane)
+		{				
+			for(int i = 0; i < player.getAllPossibleRecipes()[player.selectedRecipe].getRecipe().length; i++) //Panes for the recipe ingredients
+			{
+				double newSize = 20;
+				double newX = x + 2 + ((newSize + 2) * i);
+				double newY = y + size + 2;
+				
+				if(mouseX > newX && mouseX < newX + newSize && mouseY > newY && mouseY < newY + newSize)
+				{
+					return player.getAllPossibleRecipes()[player.selectedRecipe].getRecipe()[i];
+				}		
+			}
+		}
+		
+		
+		return null;
+	}
+	
+	protected static ItemStack getMouseoverChestStack(World world, EntityPlayer player, int mouseX, int mouseY)
+	{
+		if(player.isViewingChest)
+		{
+			//Get the initial block the player is viewing
+			BlockChest chest = (BlockChest)world.getBlockGenerate(player.viewedChestX, player.viewedChestY);
+			
+			if(chest.metaData != 1) //Make sure its metadata is 1 (otherwise it doesnt technically exist)
+			{
+				//Get the metadata for the block's size
+				int[][] metadata = MetaDataHelper.getMetaDataArray((int)(world.getBlock(player.viewedChestX, player.viewedChestY).blockWidth / 6), (int)(world.getBlock(player.viewedChestX, player.viewedChestY).blockHeight / 6)); //metadata used by the block of size (x,y)
+				int metaWidth = metadata.length; 
+				int metaHeight = metadata[0].length;	
+				int x = 0;
+				int y = 0;				
+				
+				//Loop until a the current chest's metadata value is found
+				//This provides the offset to find the 'real' chest, with the actual items in it
+				for(int i = 0; i < metaWidth; i++) 
+				{
+					for(int j = 0; j < metaHeight; j++)
+					{
+						if(metadata[i][j] == world.getBlock(player.viewedChestX - x, player.viewedChestY - y).metaData)
+						{
+							x = i; 
+							y = j;
+							break;
+						}
+					}
+				}			
+				
+				//Update the chest
+				chest = (BlockChest)(world.getBlockGenerate(player.viewedChestX - x, player.viewedChestY - y));
+			}	
+			
+			int totalRows = chest.getInventorySize() / 5;
+			for(int i = 0; i < chest.getInventorySize(); i++) //for each ItemStack in the chest
+			{
+				int size = 20;
+				int x = (int) ((Display.getWidth() * 0.25f) + ((((i % totalRows) - (totalRows / 2)) * (size))));
+				int y = (int) ((Display.getHeight() * 0.5f) - ((4 + (i / totalRows)) * (size)) - (size + 22f));
+				
+				if(mouseX > x && mouseX < x + size && mouseY > y && mouseY < y + size) //Is the click in bounds?
+				{
+					return chest.getItemStack(i);
+				}		
+			}
+		}
+		return null;
+	}
+	
+	
+	
+	
+	
+	
+	
+	/**
+	 * Renders the selected chest(s), based on the chest's attachment. This function is relatively long
+	 * and tedious, due to there being multiple unique states a chest can have.
+	 */
+	protected static void renderChest(World world, EntityPlayer player)
+	{
+		//Get the initial block the player is viewing
+		BlockChest chest = (BlockChest)world.getBlockGenerate(player.viewedChestX, player.viewedChestY).clone();
+		
+		if(chest.metaData != 1)
+		{
+			//Get the metadata for the block's size
+			int[][] metadata = MetaDataHelper.getMetaDataArray((int)(world.getBlock(player.viewedChestX, player.viewedChestY).blockWidth / 6), (int)(world.getBlock(player.viewedChestX, player.viewedChestY).blockHeight / 6)); //metadata used by the block of size (x,y)
+			int metaWidth = metadata.length; 
+			int metaHeight = metadata[0].length;	
+			int x = 0;
+			int y = 0;				
+			
+			//Loop until a the current chest's metadata value is found
+			//This provides the offset to find the 'real' chest, with the actual items in it
+			for(int i = 0; i < metaWidth; i++) 
+			{
+				for(int j = 0; j < metaHeight; j++)
+				{
+					if(metadata[i][j] == world.getBlock(player.viewedChestX - x, player.viewedChestY - y).metaData)
+					{
+						x = i; 
+						y = j;
+						break;
+					}
+				}
+			}
+			
+			//Update the chest
+			chest = (BlockChest)(world.getBlockGenerate(player.viewedChestX - x, player.viewedChestY - y));
+			player.viewedChestX -= x;
+			player.viewedChestY -= y;
+		}	
+		
+		t.startDrawingQuads(); 
+		GL11.glColor4f(0.5f, 0.5f, 0.5f, 0.6f);
+		int totalRows = (chest.getInventorySize() / 5);
+		for(int i = 0; i < chest.getInventorySize(); i++) //Draw all the background slots
+		{			
+			int size = 20;
+			actionbarSlot.bind();
+			int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + ((((i % totalRows) - (totalRows / 2)) * (size))));
+			int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - ((4 + (i / totalRows)) * (size)) - (size + 22f));
+			t.addVertexWithUV(x, y + size, 0, 0, 1);
+			t.addVertexWithUV(x + size, y + size, 0, 1, 1);
+			t.addVertexWithUV(x + size, y, 0, 1, 0);
+			t.addVertexWithUV(x, y, 0, 0, 0);
+		}
+		t.draw();
+		
+		GL11.glColor4f(1, 1, 1, 1);
+		
+		for(int i = 0; i < chest.getInventorySize(); i++) //Draw all the items, in the slots (with text)
+		{
+			if(chest.getItemStack(i) != null)
+			{
+				textures[chest.getItemStack(i).getItemID()].bind();
+				int size = 16;
+				int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + ((((i % totalRows) - (totalRows / 2)) * (size + 4))) + 2);
+				int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - ((4 + (i / totalRows)) * (size + 4)) - (size + 22f) - 2);
+
+				t.startDrawingQuads();
+				t.addVertexWithUV(x, y + size, 0, 0, 1);
+				t.addVertexWithUV(x + size, y + size, 0, 1, 1);
+				t.addVertexWithUV(x + size, y, 0, 1, 0);
+				t.addVertexWithUV(x, y, 0, 0, 0);
+				t.draw();
+				
+				if(chest.getItemStack(i).getMaxStackSize() > 1) //If maxStackSize > 1, draw the stackSize
+				{
+					GL11.glColor4f(0, 1, 0, 1);
+					trueTypeFont.drawString(x - 2, y + 18, new StringBuilder().append(chest.getItemStack(i).getStackSize()).toString(), 0.25f, -0.25f);
+					GL11.glColor4f(1, 1, 1, 1);
+				}	
+			}
+		}			
+		
+		GL11.glColor4f(1, 1, 1, 1);
+	}
+	
+	
+	
+	
+	
 	/**
 	 * Renders the actionbar (only if the inventory is closed)
 	 */

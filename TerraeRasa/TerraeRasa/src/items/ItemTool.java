@@ -9,7 +9,8 @@ public class ItemTool extends Item
 	public double[] yBounds;
 	//Render size - ortho (1/2 pixel)
 	public double size;
-	public double swingSpeed;
+	/** The swing time of the tool in seconds*/
+	public double swingTime;
 	public String swingSound;
 	public String hitSound;
 		
@@ -21,7 +22,7 @@ public class ItemTool extends Item
 		setXBounds(new double[] { 13F/16, 16F/16, 16F/16, 4F/16, 1F/16 });
 		setYBounds(new double[] { 1F/16, 1F/16 ,  4F/16, 16F/16, 13F/16 });		
 		size = 20;
-		swingSpeed = 1.0D;
+		swingTime = 3.0;
 		hitSound = hit;
 	}
 	
@@ -30,9 +31,9 @@ public class ItemTool extends Item
 	 * @param speed
 	 * @return
 	 */
-	protected ItemTool setSwingSpeed(double speed)
+	protected ItemTool setSwingTime(double speed)
 	{
-		this.swingSpeed = speed;
+		this.swingTime = speed;
 		return this;
 	}
 		

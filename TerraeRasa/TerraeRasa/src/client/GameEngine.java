@@ -321,7 +321,9 @@ public class GameEngine
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.chest, 100));
 
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.ironChest, 100));
-			
+
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldIngot, 100));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.silverIngot, 100));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.healthPotion1, 100));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.healthPotion2, 100));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.manaPotion1, 100));
@@ -432,6 +434,8 @@ public class GameEngine
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.copperGloves));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.copperBoots));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.copperBelt));
+
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.absorbPotion2, 200));
 
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.snowball));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.woodenArrow, 100));

@@ -21,6 +21,54 @@ public class UISocketMenu extends UIBase
 	{
 		isSocketWindowOpen = false;
 	}
+
+	/**
+	 * Returns an applicable ItemStack if a gem that is being socketed is moused over, otherwise this will yield null.
+	 * @return an applicable ItemStack if a gem in the socket UI is moused over, otherwise null
+	 */
+	protected static ItemStack getMouseoverSocketedGems(int mouseX, int mouseY)
+	{
+		if(isSocketWindowOpen)
+		{
+			int tooltipHeight = 100;
+			int frameX = (int) (Display.getWidth() * 0.25) - 80;  
+			int frameY = (int) (Display.getHeight() * 0.5) - 106; 
+			
+			ItemStack stack = socketedItem;
+			String itemName = socketedItem.getItemName();
+			String[] stats = { };        
+			if(stack.getItemID() >= Item.itemIndex && stack.getItemID() < ActionbarItem.spellIndex)
+			{
+				stats = Item.itemsList[stack.getItemID()].getStats();
+			}
+			
+			final int PADDING = 5;					
+			tooltipHeight = (int) (boldTooltip.getHeight(itemName) + (boldTooltip.getHeight(itemName) * 0.75 * stats.length) + 30);
+			
+			frameY -= tooltipHeight;			
+			
+			float yOffset = frameY + boldTooltip.getHeight(itemName) + PADDING * (stats.length) + 
+					(((tooltipHeight) - (tooltipHeight - boldTooltip.getHeight(itemName))) * 0.5f * (stats.length));
+			
+			int numberOfSockets = stack.getGemSockets().length;
+			
+			for(int i = 0; i < numberOfSockets; i++)
+			{
+				int size = 30;
+				double offsetByTotal = (numberOfSockets == 1) ? 65 : (numberOfSockets == 2) ? 47.5 : (numberOfSockets == 3) ? 30 : 10;
+				double xOffset = frameX + offsetByTotal + (i * (size + 7.5));
+				
+				if(mouseY > yOffset && mouseY < yOffset + size && mouseX > xOffset && mouseX < xOffset + size)
+				{
+					if(stack.getGemSockets()[i].getGem() != null)
+					{
+						return new ItemStack(stack.getGemSockets()[i].getGem());
+					}
+				}
+			}
+		}
+		return null;
+	}
 	
 	/**
 	 * Renders the sockets menu for a given item.
