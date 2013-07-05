@@ -151,6 +151,7 @@ public class ItemStack
 		this.bonuses = stack.getBonuses();
 		this.auras = stack.getAuras();
 		this.renderedName = stack.getRenderedName();
+		this.affix = stack.getAffix();
 	}
 	
 	/**
@@ -283,7 +284,7 @@ public class ItemStack
 		
 		updateAuras(affix);
 		updatePassives(affix);
-		
+		this.maxStackSize =1;
 		return this;
 	}
 	
@@ -360,6 +361,14 @@ public class ItemStack
 	public Aura[] getAuras()
 	{
 		return auras;
+	}
+	
+	/**
+	 * Gets the affix for this specific ItemStack
+	 * @return the affix assigned to this specific ItemStack
+	 */
+	public Affix getAffix(){
+		return affix;
 	}
 	
 	/**
