@@ -868,4 +868,28 @@ public class InventoryPlayer
 		}
 		return false;
 	}
+	
+
+	/**
+	 * Removes items from trash[] at the specified index
+	 * @param howMany how many items to remove
+	 * @param index slot in trash[]
+	 * @return whether the operation succeeded or not (fails due to not enough items)
+	 */
+	public boolean removeItemsFromTrashStack(int howMany, int index)
+	{
+		if(howMany < trash[index].getStackSize())
+		{
+			trash[index].removeFromStack(howMany);
+			return true;
+		}
+		else if(howMany == trash[index].getStackSize())
+		{
+			trash[index].removeFromStack(howMany);
+			trash[index] = null;
+			return true;
+		}
+		return false;
+	}
+	
 }

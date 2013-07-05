@@ -181,9 +181,10 @@ public class ItemStack
 	 * Sets the ItemStack's stack size to the given integer value.
 	 * @param i the new stack size of the ItemStack
 	 */
-	public void setStackSize(int i)
+	public ItemStack setStackSize(int i)
 	{
 		stackSize = i;
+		return this;
 	}
 	
 	/**

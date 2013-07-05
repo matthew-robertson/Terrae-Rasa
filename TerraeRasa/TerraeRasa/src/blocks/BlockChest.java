@@ -161,4 +161,21 @@ public class BlockChest extends Block
 		this.inventorySize = newsize;
 		mainInventory = new ItemStack[inventorySize];
 	}
+	
+	public boolean removeItemsFromInventoryStack(int howMany, int index)
+	{
+		if(howMany < mainInventory[index].getStackSize())
+		{
+			mainInventory[index].removeFromStack(howMany);
+			return true;
+		}
+		else if(howMany == mainInventory[index].getStackSize())
+		{
+			mainInventory[index].removeFromStack(howMany);
+			mainInventory[index] = null;
+			return true;
+		}
+		return false;
+	}
+	
 }

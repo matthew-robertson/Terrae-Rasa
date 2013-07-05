@@ -1,5 +1,6 @@
 package hardware;
 
+import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 
@@ -153,7 +154,8 @@ public class Keys
 	        } 
 	        if (Keyboard.isKeyDown(Keyboard.KEY_F))
 			{
-	        	player.damage(world, new Damage(10.0, new EnumDamageType[] { EnumDamageType.NONE }, EnumDamageSource.UNDEFINED), false);
+	        //	player.damage(world, new Damage(10.0, new EnumDamageType[] { EnumDamageType.NONE }, EnumDamageSource.UNDEFINED), false);
+	        	
 	        	//player.launchProjectile(world, player.x, player.y, Item.snowball);
 				/*EntityProjectile.woodenArrow.clone().setXLocAndYLoc(world.player.x, world.player.y).setDirection(count));
 				count++;

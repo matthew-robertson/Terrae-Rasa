@@ -22,7 +22,10 @@ import entities.EntityPlayer;
 
 /**
  * Refactor not entirely done
- * TODO: refactor more
+ * @author      Alec Sobeck
+ * @author      Matthew Robertson
+ * @version     1.0
+ * @since       1.0
  */
 public class UIMouse extends UIBase
 {
@@ -65,19 +68,172 @@ public class UIMouse extends UIBase
 		
 		if(Keys.lshiftDown)
 		{
-			boolean[] equipped = { false };
-			ItemStack clickedItem = getClickedStack(world, player, x, y, equipped);
-			socketItemEquipped = equipped[0];
-			if(clickedItem != null && clickedItem.hasSockets())
-			{					
-				isSocketWindowOpen = true;
-				player.clearViewedChest();
-				socketedItem = clickedItem;
-			}
-			else
+			mouseEventRightClickShift(world, player, x, y);
+		}
+		else
+		{
+			mouseEventRightClickNoModifier(world, player, x, y);
+		}
+	}
+	
+	protected static void mouseEventRightClickShift(World world, EntityPlayer player, int mouseX, int mouseY)
+	{
+		boolean[] equipped = { false };
+		ItemStack clickedItem = getClickedStack(world, player, mouseX, mouseY, equipped);
+		socketItemEquipped = equipped[0];
+		if(clickedItem != null && clickedItem.hasSockets())
+		{					
+			isSocketWindowOpen = true;
+			player.clearViewedChest();
+			socketedItem = clickedItem;
+		}
+		else
+		{
+			UISocketMenu.closeSocketWindow();
+		}
+	}
+	
+	protected static void mouseEventRightClickNoModifier(World world, EntityPlayer player, int x, int y)
+	{
+		for(int i = 0; i < player.inventory.getMainInventoryLength(); i++) //Inventory
+		{
+			int size = 20;
+			int x1 = (int) ((Display.getWidth() * 0.25f) + (((i % 12) - 6) * (size)));
+			int y1 = (int) ((Display.getHeight() * 0.5f) - ((i / 12) * (size)) - (size + 22f));
+			
+			if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
 			{
-				UISocketMenu.closeSocketWindow();
+				//The mouse doesn't have something picked up 
+				//Pick up 1/2 stack of whatever is in the inventory. 
+				if(player.inventory.getMainInventoryStack(i) != null && mouseItem == null)
+				{
+					pickUpHalfMouseItem(world, player, 1, i, x - x1 - 2, y - y1 - 2, 16);
+				}
+				else if(mouseItem != null) //The mouse has something picked up
+				{
+					UIInventory.placeOneItemIntoInventory(world, player, 1, i);
+				}
+			}		
+		}
+		
+		for(int i = 0; i < player.inventory.getQuiverLength(); i++) //Quiver
+		{
+			int size = 20;
+			int x1 = (int) ((Display.getWidth() * 0.25f) + (-7 * size));
+			int y1 = (int) ((Display.getHeight() * 0.5f) - (i * (size)) - (size + 22f));
+			
+			if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
+			{
+				//The mouse doesn't have something picked up 
+				//Pick up 1/2 stack of whatever is in the inventory. 
+				if(player.inventory.getQuiverStack(i) != null && mouseItem == null) 
+				{
+					pickUpHalfMouseItem(world, player, 4, i, x - x1 - 2, y - y1 - 2, 16);
+				}
+				else if(mouseItem != null) //The mouse has something picked up
+				{
+					UIInventory.placeOneItemIntoInventory(world, player, 4, i);
+				}
+			}		
+		}
+		
+		int armorOffset = 80;
+		int size = 20;
+		if(armorOffset + (9 * (size + 1)) > Display.getHeight() * 0.5F)
+		{
+			armorOffset = (int) ((Display.getHeight() * 0.5F) - ((9 * (size + 1))));
+		}
+		for(int i = 0; i < player.inventory.getArmorInventoryLength(); i++) //Armour and Accessories
+		{
+			int x1 = (int) ((Display.getWidth() * 0.5f) - ((size + 2) * (1.5 + (i / 5))));
+			int y1 = armorOffset + ((i % 5) * (size + 2));	
+			
+			if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
+			{
+				//The mouse doesn't have something picked up 
+				//Pick up 1/2 stack of whatever is in the inventory. 
+				if(player.inventory.getArmorInventoryStack(i) != null && mouseItem == null) 
+				{
+					pickUpHalfMouseItem(world, player, 2, i, x - x1 - 2, y - y1 - 2, 16);
+				}
+				else if(mouseItem != null) //The mouse has something picked up
+				{
+					UIInventory.placeOneItemIntoInventory(world, player, 2, i);
+				}
+				player.onArmorChange();
+			}			
+		}
+		
+		int x1 = (int)(Display.getWidth() * 0.25f) - (6 * 20); 
+		int y1 = (int)(Display.getHeight() * 0.5f) - (6 * 20);
+		
+		if(x > x1 && x < x1 + 20 && y > y1 && y < y1 + 20) //Garbage
+		{
+			if(player.inventory.getTrashStack(0) != null && mouseItem == null)  //The mouse doesn't have something picked up
+			{
+				pickUpHalfMouseItem(world, player, 3, 0, x - x1, y - y1, 16);
 			}
+			else if(mouseItem != null) //The mouse has something picked up
+			{
+				UIInventory.placeOneItemIntoInventory(world, player, 3, 0);
+			}
+		}	
+
+		if(player.isViewingChest)
+		{
+			BlockChest chest = (BlockChest)world.getBlockGenerate(player.viewedChestX, player.viewedChestY).clone();
+			
+			if(chest.metaData != 1) //Make sure its metadata is 1 (otherwise it doesnt technically exist)
+			{
+				//Get the metadata for the block's size
+				int[][] metadata = MetaDataHelper.getMetaDataArray((int)(world.getBlock(player.viewedChestX, player.viewedChestY).blockWidth / 6), (int)(world.getBlock(player.viewedChestX, player.viewedChestY).blockHeight / 6)); //metadata used by the block of size (x,y)
+				int metaWidth = metadata.length; 
+				int metaHeight = metadata[0].length;	
+				x1 = 0;
+				y1 = 0;				
+				
+				//Loop until a the current chest's metadata value is found
+				//This provides the offset to find the 'real' chest, with the actual items in it
+				for(int i = 0; i < metaWidth; i++) 
+				{
+					for(int j = 0; j < metaHeight; j++)
+					{
+						if(metadata[i][j] == world.getBlock(player.viewedChestX - x1, player.viewedChestY - y1).metaData)
+						{
+							x1 = i; 
+							y1 = j;
+							break;
+						}
+					}
+				}			
+				
+				//Update the chest
+				chest = (BlockChest)(world.getBlockGenerate(player.viewedChestX - x1, player.viewedChestY - y1));
+			}	
+			
+			int totalRows = chest.getInventorySize() / 5;
+			for(int i = 0; i < chest.getInventorySize(); i++) //for each ItemStack in the chest
+			{
+				size = 20;
+				x1 = (int) ((Display.getWidth() * 0.25f) + ((((i % totalRows) - (totalRows / 2)) * (size))));
+				y1 = (int) ((Display.getHeight() * 0.5f) - ((4 + (i / totalRows)) * (size)) - (size + 22f));
+				
+				if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
+				{
+					if(chest.getItemStack(i) != null && mouseItem == null) //The mouse doesn't have something picked up, so this is straightforward
+					{
+						pickUpHalfMouseItemChest(chest, i, x - x1 - 2, y - y1 - 2, 16);
+					}
+					else if(mouseItem != null) //The mouse has something picked up, things need swapped
+					{
+						//Reference safe swap
+						ItemStack stack = new ItemStack(mouseItem);
+						mouseItem = chest.takeItemStack(i);
+						chest.placeItemStack(stack, i);
+						shouldDropItem = false;
+					}
+				}		
+			}	
 		}
 	}
 	
@@ -153,7 +309,7 @@ public class UIMouse extends UIBase
 			
 			if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
 			{
-				if(player.inventory.getMainInventoryStack(i) != null && mouseItem == null) //The mouse doesn't have something picked up
+				if(player.inventory.getQuiverStack(i) != null && mouseItem == null) //The mouse doesn't have something picked up
 				{
 					pickUpMouseItem(world, player, 4, i, x - x1 - 2, y - y1 - 2, 16);
 				}
@@ -320,8 +476,6 @@ public class UIMouse extends UIBase
 		}
 	}
 	
-
-	
 	/**
 	 * Picks up an item from the inventory to the mouse's temperary 'itemstack'. This function is by itself not very safe.
 	 * Don't call it without ensuring that the mouseItem Itemstack is null.
@@ -357,6 +511,48 @@ public class UIMouse extends UIBase
 		{
 			mouseItem = player.inventory.getQuiverStack(index);
 			player.inventory.setQuiverStack(null, index);
+		}			
+	}
+	
+	/**
+	 * Picks up an item from the inventory to the mouse's temperary 'itemstack'. This function is by itself not very safe.
+	 * Don't call it without ensuring that the mouseItem Itemstack is null. This version only picks up 1 item, not the entire
+	 * stack
+	 * @param whichInventory An integer value determining which inventory to pick up the item from. 1-main, 2-coin, 3-ammo, 4-armor, 5-social armor, 6-trash
+	 * @param index The slot of the selected inventory in which an item is being removed from.
+	 * @param xOffset how far on the x-axis is the rendered mouse item adjusted
+	 * @param yOffset how far on the y-axis is the rendered mouse item adjusted
+	 * @param itemSize how big is the mouse item being rendered
+	 */
+	private static void pickUpHalfMouseItem(World world, EntityPlayer player, int whichInventory, int index, int xOffset, int yOffset, int itemSize)
+	{
+		shouldDropItem = false;
+		mouseItemSize = itemSize;
+		mouseXOffset = xOffset;
+		mouseYOffset = yOffset;
+		
+		if(whichInventory == 1) //Main Inventory
+		{
+			mouseItem = new ItemStack(player.inventory.getMainInventoryStack(index));
+			mouseItem.setStackSize((int)(MathHelper.floorOne(mouseItem.getStackSize() / 2)));
+			player.inventory.removeItemsFromInventoryStack(mouseItem.getStackSize(), index); 
+		}
+		else if(whichInventory == 2) //Armor Inventory
+		{
+			mouseItem = player.inventory.getArmorInventoryStack(index);
+			player.inventory.setArmorInventoryStack(player, null, player.inventory.getArmorInventoryStack(index), index);
+		}
+		else if(whichInventory == 3) //Trash
+		{
+			mouseItem = new ItemStack(player.inventory.getTrashStack(index));
+			mouseItem.setStackSize((int)(MathHelper.floorOne(mouseItem.getStackSize() / 2)));
+			player.inventory.removeItemsFromTrashStack(mouseItem.getStackSize(), index);
+		}
+		else if(whichInventory == 4) //Quiver
+		{
+			mouseItem = new ItemStack(player.inventory.getQuiverStack(index));
+			mouseItem.setStackSize((int)(MathHelper.floorOne(mouseItem.getStackSize() / 2)));
+			player.inventory.removeItemsFromQuiverStack(mouseItem.getStackSize(), index);
 		}			
 	}
 	
@@ -582,6 +778,17 @@ public class UIMouse extends UIBase
 		mouseYOffset = yOffset;
 		mouseItem = chest.getItemStack(index);
 		chest.removeItemStack(index);
+	}
+	
+	protected static void pickUpHalfMouseItemChest(BlockChest chest, int index, int xOffset, int yOffset, int itemSize)
+	{
+		shouldDropItem = false;
+		mouseItemSize = itemSize;
+		mouseXOffset = xOffset;
+		mouseYOffset = yOffset;
+		mouseItem = new ItemStack(chest.getItemStack(index));
+		mouseItem.setStackSize((int)(MathHelper.floorOne(mouseItem.getStackSize() / 2)));
+		chest.removeItemsFromInventoryStack((mouseItem.getStackSize()), index);
 	}
 	
 	/**

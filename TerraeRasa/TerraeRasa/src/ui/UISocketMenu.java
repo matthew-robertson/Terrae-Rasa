@@ -35,7 +35,7 @@ public class UISocketMenu extends UIBase
 			int frameY = (int) (Display.getHeight() * 0.5) - 106; 
 			
 			ItemStack stack = socketedItem;
-			String itemName = socketedItem.getItemName();
+			String itemName = socketedItem.getRenderedName();
 			String[] stats = { };        
 			if(stack.getItemID() >= Item.itemIndex && stack.getItemID() < ActionbarItem.spellIndex)
 			{

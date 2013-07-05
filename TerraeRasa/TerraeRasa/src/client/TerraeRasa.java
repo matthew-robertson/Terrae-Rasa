@@ -8,10 +8,14 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+
+import javax.swing.JFrame;
 
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
@@ -139,7 +143,18 @@ public class TerraeRasa
 			terraeRasaFrame.pack();
 			terraeRasaFrame.setLocationRelativeTo(null);
 			terraeRasaFrame.setVisible(true);
-		
+
+//			GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+//			if (gd.isFullScreenSupported()) {
+//	    		try {
+//	    			gd.setFullScreenWindow(terraeRasaFrame);
+//	    		}
+//	    		catch (Exception e) {
+//	    			e.printStackTrace();
+//	    			gd.setFullScreenWindow(null);
+//	    		}
+//	    	}			
+			
 			//Opengl display
 			Display.setParent(terraeRasaCanvas); //The display is inside an awtCanvas to allow for resizing
 	        Display.setTitle(WINDOW_TITLE); //sets the title of the window

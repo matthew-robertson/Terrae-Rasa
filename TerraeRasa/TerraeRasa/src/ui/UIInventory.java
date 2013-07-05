@@ -621,8 +621,168 @@ public class UIInventory extends UIBase
 						-0.25f);
 			}
 		}	
-	
+		
+		if(player.inventory.getTrashStack(0) != null && player.inventory.getTrashStack(0).getMaxStackSize() != 1) 
+		{
+				GL11.glColor4f(0, 1, 0, 1);
+				int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + ((-6 * (size + 4)))) + 2;
+				int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - (4 * (size + 4)) - (size + 26)) + 2;
+				trueTypeFont.drawString(x - 2, 
+						y + 18, 
+						new StringBuilder().append(player.inventory.getTrashStack(0).getStackSize()).toString(), 
+						0.25f, 
+						-0.25f);
+		}
+			
 		GL11.glColor4f(1, 1, 1, 1);
+	}
+	
+	protected static void placeOneItemIntoInventory(World world, EntityPlayer player, int whichInventory, int index)
+	{
+		shouldDropItem = false;
+		try
+		{
+			if(whichInventory == 1) //Main Inventory
+			{
+				if(player.inventory.getMainInventoryStack(index) == null) //There's nothing there, so the mouse doesnt have to pickup something
+				{
+					player.inventory.putItemStackInSlot(world, player, new ItemStack(mouseItem).setStackSize(1), index);
+					mouseItem.removeFromStack(1);
+					if(mouseItem.getStackSize() <= 0)
+					{
+						mouseItem = null;
+					}
+				}
+				else if(player.inventory.getMainInventoryStack(index).getItemID() == mouseItem.getItemID())
+				{
+					if(player.inventory.getMainInventoryStack(index).getStackSize() + 1
+							<= player.inventory.getMainInventoryStack(index).getMaxStackSize())
+					{
+						player.inventory.combineItemStacksInSlot(world, player, new ItemStack(mouseItem).setStackSize(1), index);
+						mouseItem.removeFromStack(1);
+						if(mouseItem.getStackSize() <= 0)
+						{
+							mouseItem = null;
+						}
+					}
+				}
+			}
+			else if(whichInventory == 2) //Armor && Accessories
+			{
+				Item item = Item.itemsList[mouseItem.getItemID()];			
+				//Check if the item is actually valid for the selected slot:
+				if(index == InventoryPlayer.HELMET_INDEX) //Helmet
+				{
+					if(!(item != null) || !(item instanceof ItemArmorHelmet))
+					{
+						return;
+					}	
+				}
+				else if(index == InventoryPlayer.BODY_INDEX) //Body
+				{
+					if(!(item != null) || !(item instanceof ItemArmorBody))
+					{
+						return;
+					}	
+				}
+				else if(index == InventoryPlayer.BELT_INDEX) //Belt
+				{
+					if(!(item != null) || !(item instanceof ItemArmorBelt))
+					{
+						return;
+					}	
+				}			
+				else if(index == InventoryPlayer.PANTS_INDEX) //Pants
+				{
+					if(!(item != null) || !(item instanceof ItemArmorPants))
+					{
+						return;
+					}	
+				}
+				else if(index == InventoryPlayer.BOOTS_INDEX) //Boots
+				{
+					if(!(item != null) || !(item instanceof ItemArmorBoots))
+					{
+						return;
+					}	
+				}
+				else if(index == InventoryPlayer.GLOVES_INDEX) //Gloves
+				{
+					if(!(item != null) || !(item instanceof ItemArmorGloves))
+					{
+						return;
+					}	
+				}
+				else //Accessory
+				{
+					if(!(item != null) || !(item instanceof ItemArmorAccessory))
+					{
+						return;
+					}	
+				}
+				
+				if(player.inventory.getArmorInventoryStack(index) == null) //There's nothing there, so the mouse doesnt have to pickup something
+				{
+					player.inventory.setArmorInventoryStack(player, mouseItem, player.inventory.getArmorInventoryStack(index), index);
+					mouseItem = null;
+				}
+				else //If there is an item there, swap that slot's item and the mouse's item.
+				{
+					ItemStack stack = player.inventory.getArmorInventoryStack(index);
+					player.inventory.setArmorInventoryStack(player, mouseItem, player.inventory.getArmorInventoryStack(index), index);
+					mouseItem = stack;
+				}
+			}
+			else if(whichInventory == 3) //Trash
+			{
+				player.inventory.setTrashStack(new ItemStack(mouseItem).setStackSize(1), index);
+				mouseItem.removeFromStack(1);
+				if(mouseItem.getStackSize() <= 0)
+				{
+					mouseItem = null;
+				}
+			}
+			else if(whichInventory == 4) //Quiver
+			{								
+				Item item = Item.itemsList[mouseItem.getItemID()];
+				if(!(item instanceof ItemAmmo))
+				{
+					return;
+				}
+				
+				if(player.inventory.getQuiverStack(index) == null) //There's nothing there, so the mouse doesnt have to pickup something
+				{
+					player.inventory.setQuiverStack(new ItemStack(mouseItem).setStackSize(1), index);
+					mouseItem.removeFromStack(1);
+					if(mouseItem.getStackSize() <= 0)
+					{
+						mouseItem = null;
+					}
+				}
+				else if(player.inventory.getQuiverStack(index).getItemID() == mouseItem.getItemID())
+				{
+					if(player.inventory.getQuiverStack(index).getStackSize() + 1 
+							<= player.inventory.getQuiverStack(index).getMaxStackSize())
+					{
+						player.inventory.combineItemStacksInQuiverSlot(world, player, new ItemStack(mouseItem).setStackSize(1), index);
+						mouseItem.removeFromStack(1);
+						if(mouseItem.getStackSize() <= 0)
+						{
+							mouseItem = null;
+						}
+					}
+				}
+				
+			}
+			else //If something's added to no inventory, then obviously something's wrong.
+			{
+				throw new RuntimeException("Tried to place item into inventory " + whichInventory + " but failed");
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	/**
