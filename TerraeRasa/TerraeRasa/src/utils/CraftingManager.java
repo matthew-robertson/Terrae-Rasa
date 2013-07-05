@@ -31,6 +31,8 @@ public class CraftingManager
 	{ 
 		Block.craftingTable,
 		Block.furnace,
+		Block.alchemyStation,
+		Block.gemcraftingBench
 	};
 	
 	/**

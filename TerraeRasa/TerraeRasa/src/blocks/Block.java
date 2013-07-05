@@ -742,7 +742,14 @@ public class Block extends ActionbarItem
 	public static Block ironChest = new BlockChest(80, 40)
 			.setName("Iron Chest").setBothBlockWidthAndHeight(2, 2)
 			.setBlockHardness(40.0f).setIconIndex(11, 1).setBlockType(2);
-
+	
+	public static Block gemcraftingBench = new Block(81).setName("Gemcrafting table")
+			.setBlockHardness(50.0f).setIconIndex(0, 0).setBlockType(1)
+			.setBothBlockWidthAndHeight(2, 2);
+	public static Block alchemyStation = new Block(82).setName("Alchemy station")
+			.setBlockHardness(50.0f).setIconIndex(12, 23).setBlockType(2)
+			.setBothBlockWidthAndHeight(2, 2);
+	
 	// Backwalls
 	public static Block backAir = new BlockBackWall(128).setIsSolid(false)
 			.setName("backwall air");

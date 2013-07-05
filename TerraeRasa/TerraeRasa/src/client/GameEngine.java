@@ -23,6 +23,7 @@ import utils.LightUtils;
 import world.World;
 import world.WorldHell;
 import world.WorldSky;
+import affix.AffixSturdy;
 import audio.SoundEngine;
 import blocks.Block;
 import entities.EntityPlayer;
@@ -318,9 +319,9 @@ public class GameEngine
 			
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.stone, 100));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.torch, 100));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.chest, 100));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.chest, 100));
 
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.ironChest, 100));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.ironChest, 100));
 
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldIngot, 100));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.silverIngot, 100));
@@ -368,32 +369,32 @@ public class GameEngine
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.jasper));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.sapphire));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.emerald));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.rubyRing));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ruby));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.diamond));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.opal));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldRing, 6));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.berserkersEssence));
 			
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.glass, 40));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.glass, 40));
 
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.snowball, 100));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.snowball, 100));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.vialEmpty, 100));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.vialOfWater, 100));
 			
 			
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldSword));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldSword));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.silverSword));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ironSword));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.bronzeSword));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.copperSword));
 //			
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldPickaxe));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldPickaxe));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.silverPickaxe));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ironPickaxe));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.bronzePickaxe));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.copperPickaxe));
 //			
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldAxe));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldAxe));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.silverAxe));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ironAxe));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.bronzeAxe));
@@ -406,19 +407,19 @@ public class GameEngine
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.t6Gloves));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.t6Boots));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.t6Belt));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.lunariumHelmet));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.lunariumHelmet).setAffix(new AffixSturdy()));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.lunariumBody));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.lunariumPants));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.lunariumGloves));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.lunariumBoots));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.lunariumBelt));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.mastersBracer));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.steadfastShield));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.gemcraftingBench));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.alchemyStation));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.eaglesFeather));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.woodenArrow, 50));
 			
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.gemSmartheal1, 40));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.gemDefense1, 40));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.gemSmartheal1, 40));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.gemDefense1, 40));
 			
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ironHelmet));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.ironBody));
@@ -434,14 +435,14 @@ public class GameEngine
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.bronzeBoots));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.bronzeBelt));
 			
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.copperHelmet));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.copperBody));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.copperPants));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.copperGloves));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.copperBoots));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.copperBelt));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.copperHelmet));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.copperBody));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.copperPants));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.copperGloves));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.copperBoots));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.copperBelt));
 
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.absorbPotion2, 200));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.absorbPotion2, 200));
 
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.snowball));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.woodenArrow, 100));

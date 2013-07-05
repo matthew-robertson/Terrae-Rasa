@@ -225,6 +225,12 @@ public class RecipeManager
 	Recipe furnace = new Recipe(this, new ItemStack(Block.furnace), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Block.stone, 15), new ItemStack(Item.coal, 5)
 	});	
+	Recipe gemcraftingBench = new Recipe(this, new ItemStack(Block.gemcraftingBench), Block.craftingTable, new ItemStack[] {
+		new ItemStack(Block.craftingTable), new ItemStack(Block.stone, 10), new ItemStack(Item.silverIngot, 2) 
+	});	
+	Recipe alchemyStation = new Recipe(this, new ItemStack(Block.alchemyStation), Block.craftingTable, new ItemStack[] {
+		new ItemStack(Block.stone, 20), new ItemStack(Item.vialEmpty), new ItemStack(Item.coal)
+	});	
 	Recipe chest = new Recipe(this, new ItemStack(Block.chest), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Block.plank, 20) 
 	});	
@@ -264,54 +270,54 @@ public class RecipeManager
 	Recipe vial = new Recipe(this, new ItemStack(Item.vialOfWater), Block.craftingTable, new ItemStack[]{
 		new ItemStack(Block.glass, 2)
 	});
-	
-	// Gemcrafting Bench (currently crafting bench)
 	Recipe goldRing = new Recipe(this, new ItemStack(Item.goldRing), Block.craftingTable, new ItemStack[]{
 		new ItemStack(Item.goldIngot, 2)
 	});
-	Recipe frenziedRubyRing1 = new Recipe(this, new ItemStack(Item.rubyRing).setAffix(new AffixFrenzied()), Block.craftingTable, new ItemStack[]{
+	
+	// Gemcrafting Bench (currently crafting bench)	
+	Recipe frenziedRubyRing1 = new Recipe(this, new ItemStack(Item.rubyRing).setAffix(new AffixFrenzied()), Block.gemcraftingBench, new ItemStack[]{
 		new ItemStack(Item.berserkersEssence), new ItemStack(Item.rubyRing)
 	});
-	Recipe frenziedRuby = new Recipe(this, new ItemStack(Item.ruby).setAffix(new AffixFrenzied()), Block.craftingTable, new ItemStack[]{
+	Recipe frenziedRuby = new Recipe(this, new ItemStack(Item.ruby).setAffix(new AffixFrenzied()), Block.gemcraftingBench, new ItemStack[]{
 		new ItemStack(Item.berserkersEssence), new ItemStack(Item.ruby)
 	});
-	Recipe sturdyOpalRing = new Recipe(this, new ItemStack(Item.opalRing).setAffix(new AffixSturdy()), Block.craftingTable, new ItemStack[]{
+	Recipe sturdyOpalRing = new Recipe(this, new ItemStack(Item.opalRing).setAffix(new AffixSturdy()), Block.gemcraftingBench, new ItemStack[]{
 		new ItemStack(Item.steadfastShield), new ItemStack(Item.opalRing)
 	});
-	Recipe sturdyRuby = new Recipe(this, new ItemStack(Item.opal).setAffix(new AffixSturdy()), Block.craftingTable, new ItemStack[]{
+	Recipe sturdyRuby = new Recipe(this, new ItemStack(Item.opal).setAffix(new AffixSturdy()), Block.gemcraftingBench, new ItemStack[]{
 		new ItemStack(Item.steadfastShield), new ItemStack(Item.opal)
 	});
 	
-	Recipe sapphireRing = new Recipe(this, new ItemStack(Item.sapphireRing), Block.craftingTable, new ItemStack[]{
+	Recipe sapphireRing = new Recipe(this, new ItemStack(Item.sapphireRing), Block.gemcraftingBench, new ItemStack[]{
 		new ItemStack(Item.goldRing), new ItemStack(Item.sapphire)
 	});
-	Recipe emeraldRing = new Recipe(this, new ItemStack(Item.emeraldRing), Block.craftingTable, new ItemStack[]{
+	Recipe emeraldRing = new Recipe(this, new ItemStack(Item.emeraldRing), Block.gemcraftingBench, new ItemStack[]{
 		new ItemStack(Item.goldRing), new ItemStack(Item.emerald)
 	});
-	Recipe rubyRing = new Recipe(this, new ItemStack(Item.rubyRing), Block.craftingTable, new ItemStack[]{
+	Recipe rubyRing = new Recipe(this, new ItemStack(Item.rubyRing), Block.gemcraftingBench, new ItemStack[]{
 		new ItemStack(Item.goldRing), new ItemStack(Item.ruby)
 	});
-	Recipe diamondRing = new Recipe(this, new ItemStack(Item.diamondRing), Block.craftingTable, new ItemStack[]{
+	Recipe diamondRing = new Recipe(this, new ItemStack(Item.diamondRing), Block.gemcraftingBench, new ItemStack[]{
 		new ItemStack(Item.goldRing), new ItemStack(Item.diamond)
 	});
-	Recipe opalRing = new Recipe(this, new ItemStack(Item.opalRing), Block.craftingTable, new ItemStack[]{
+	Recipe opalRing = new Recipe(this, new ItemStack(Item.opalRing), Block.gemcraftingBench, new ItemStack[]{
 		new ItemStack(Item.goldRing), new ItemStack(Item.opal)
 	});
-	Recipe jasperRing = new Recipe(this, new ItemStack(Item.jasperRing), Block.craftingTable, new ItemStack[]{
+	Recipe jasperRing = new Recipe(this, new ItemStack(Item.jasperRing), Block.gemcraftingBench, new ItemStack[]{
 		new ItemStack(Item.goldRing), new ItemStack(Item.jasper)
 	});
 	
 	//Alchemy Station (currently crafting bench)
-	Recipe healingPotion1 = new Recipe(this, new ItemStack(Item.healthPotion1), Block.craftingTable, new ItemStack[]{
+	Recipe healingPotion1 = new Recipe(this, new ItemStack(Item.healthPotion1), Block.alchemyStation, new ItemStack[]{
 		new ItemStack(Item.vialOfWater), new ItemStack(Item.healingHerb1)
 	});
-	Recipe healingPotion2 = new Recipe(this, new ItemStack(Item.healthPotion2), Block.craftingTable, new ItemStack[]{
+	Recipe healingPotion2 = new Recipe(this, new ItemStack(Item.healthPotion2), Block.alchemyStation, new ItemStack[]{
 		new ItemStack(Item.vialOfWater), new ItemStack(Item.healingHerb2)
 	});
-	Recipe magicPotion1 = new Recipe(this, new ItemStack(Item.manaPotion1), Block.craftingTable, new ItemStack[]{
+	Recipe magicPotion1 = new Recipe(this, new ItemStack(Item.manaPotion1), Block.alchemyStation, new ItemStack[]{
 		new ItemStack(Item.vialOfWater), new ItemStack(Item.magicHerb1)
 	});
-	Recipe magicPotion2 = new Recipe(this, new ItemStack(Item.manaPotion2), Block.craftingTable, new ItemStack[]{
+	Recipe magicPotion2 = new Recipe(this, new ItemStack(Item.manaPotion2), Block.alchemyStation, new ItemStack[]{
 		new ItemStack(Item.vialOfWater), new ItemStack(Item.magicHerb2)
 	});
 	

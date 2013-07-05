@@ -6,6 +6,12 @@ import java.util.Vector;
 import passivebonuses.PassiveBonus;
 import auras.Aura;
 
+/**
+ * Provides the basic infrastructure for creating affixes.
+ * In addition to the intializing constructor, this class contains the getters and setters important for functioning.
+ * @author Matthew Robertson
+ *
+ */
 public class Affix{
 	
 	protected Random rng;
@@ -14,6 +20,11 @@ public class Affix{
 	private Vector<Aura> auras;
 	private boolean prefix;
 	
+	/**
+	 * The default constructor for Affixes. This is not to be used alone, as it won't actually do anything.
+	 * Initializes all of the variables and sets the name, nothing more.
+	 * @param name is the name of the affix
+	 */
 	public Affix(String name){
 		this.name = name;
 		rng = new Random();
@@ -47,6 +58,11 @@ public class Affix{
 		return this;
 	}
 	
+	/**
+	 * Sets whether the name of the affix is a Prefix or suffix.
+	 * @param flag - true for prefix, false for suffix.
+	 * @return the affix
+	 */
 	public Affix setPrefix(boolean flag){
 		prefix = flag;
 		return this;

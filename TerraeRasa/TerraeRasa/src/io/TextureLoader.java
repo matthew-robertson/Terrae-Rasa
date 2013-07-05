@@ -216,8 +216,8 @@ public class TextureLoader
 		        {
 		        	w = (int)list[i].textureWidth;
 			        h = (int)list[i].textureHeight;
-			        x = (int) (list[i].iconOverrideX * 16);
-			        y = (int) (list[i].iconOverrideY * 16);
+			        x = (int) (list[i].iconOverrideX * 32);
+			        y = (int) (list[i].iconOverrideY * 32);
 			        bufferStore[i] = itemSheet.getSubimage(x, y, w, h);
 		        	
 		        }
@@ -308,10 +308,10 @@ public class TextureLoader
 	        textureStore[i] = new Texture(textureID);
 	        glBindTexture(GL11.GL_TEXTURE_2D, textureID);
 	        
-	        int w = 16;
-	        int h = 16;
-	        int x = (int) (list2[i].iconX * 16);
-	        int y = (int) (list2[i].iconY * 16);
+	        int w = 32;
+	        int h = 32;
+	        int x = (int) (list2[i].iconX * 32);
+	        int y = (int) (list2[i].iconY * 32);
 	        
 	        bufferStore[i] = itemSheet.getSubimage(x, y, w, h);
 	        

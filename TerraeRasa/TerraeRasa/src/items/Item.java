@@ -270,66 +270,58 @@ public class Item extends ActionbarItem
 	public static Item silverOre = new Item(61).setIconPosition(0, 12).setName("Silver Ore");
 	public static Item goldOre = new Item(62).setIconPosition(0, 13).setName("Gold Ore");
 	public static Item coal = new Item(63).setIconPosition(1, 9).setName("Coal");
-	public static Item diamond = new Item(64).setIconPosition(2, 12).setName("Diamond");
-	public static Item ruby = new Item(65).setIconPosition(2, 11).setName("Ruby");
-	public static Item emerald = new Item(66).setIconPosition(2, 10).setName("Emerald");
-	public static Item sapphire = new Item(67).setIconPosition(2, 9).setName("Sapphire");
-	public static Item opal = new Item(68).setIconPosition(2, 13).setName("Opal");
-	public static Item jasper = new Item(69).setIconPosition(2, 14).setName("Jasper");
+	public static Item diamond = new ItemGem(64).setIconPosition(2, 12).setName("Diamond");
+	public static Item ruby = new ItemGem(65).setIconPosition(2, 11).setName("Ruby");
+	public static Item emerald = new ItemGem(66).setIconPosition(2, 10).setName("Emerald");
+	public static Item sapphire = new ItemGem(67).setIconPosition(2, 9).setName("Sapphire");
+	public static Item opal = new ItemGem(68).setIconPosition(2, 13).setName("Opal");
+	public static Item jasper = new ItemGem(69).setIconPosition(2, 14).setName("Jasper");
 	
 	public static Item copperHelmet = new ItemArmorHelmet(100).setArmorType(EnumArmor.COPPER).setIconPosition(16, 0).setName("Copper Helmet");
 	public static Item copperBody = new ItemArmorBody(101).setArmorType(EnumArmor.COPPER).setIconPosition(16, 1).setName("Copper Body");
-	public static Item copperPants = new ItemArmorPants(102).setArmorType(EnumArmor.COPPER).setIconPosition(16, 2).setName("Copper Legguards");
+	public static Item copperPants = new ItemArmorPants(102).setArmorType(EnumArmor.COPPER).setIconPosition(0, 0).setName("Copper Legguards");
 	public static Item copperBoots = new ItemArmorBoots(103).setArmorType(EnumArmor.COPPER).setIconPosition(16, 3).setName("Copper Boots");
 	public static Item copperGloves = new ItemArmorGloves(104).setArmorType(EnumArmor.COPPER).setIconPosition(16, 4).setName("Copper Gloves");
 	public static Item copperBelt = new ItemArmorBelt(105).setArmorType(EnumArmor.COPPER).setIconPosition(16, 5).setName("Copper Belt");
 	
 	public static Item bronzeHelmet = new ItemArmorHelmet(106).setArmorType(EnumArmor.BRONZE).setIconPosition(17, 0).setName("Bronze Helmet");
 	public static Item bronzeBody = new ItemArmorBody(107).setArmorType(EnumArmor.BRONZE).setIconPosition(17, 1).setName("Bronze Body");
-	public static Item bronzePants = new ItemArmorPants(108).setArmorType(EnumArmor.BRONZE).setIconPosition(17, 2).setName("Bronze Legguards");
+	public static Item bronzePants = new ItemArmorPants(108).setArmorType(EnumArmor.BRONZE).setIconPosition(0, 0).setName("Bronze Legguards");
 	public static Item bronzeBoots = new ItemArmorBoots(109).setArmorType(EnumArmor.BRONZE).setIconPosition(17, 3).setName("Bronze Boots");
 	public static Item bronzeGloves = new ItemArmorGloves(110).setArmorType(EnumArmor.BRONZE).setIconPosition(17, 4).setName("Bronze Gloves");
 	public static Item bronzeBelt = new ItemArmorBelt(111).setArmorType(EnumArmor.BRONZE).setIconPosition(17, 5).setName("Bronze Belt");
 	
 	public static Item ironHelmet = new ItemArmorHelmet(112).setArmorType(EnumArmor.IRON).setIconPosition(18, 0).setName("Iron Helmet");
 	public static Item ironBody = new ItemArmorBody(113).setArmorType(EnumArmor.IRON).setIconPosition(18, 1).setName("Iron Body");
-	public static Item ironPants = new ItemArmorPants(114).setArmorType(EnumArmor.IRON).setIconPosition(18, 2).setName("Iron Legguards");
+	public static Item ironPants = new ItemArmorPants(114).setArmorType(EnumArmor.IRON).setIconPosition(0, 0).setName("Iron Legguards");
 	public static Item ironBoots = new ItemArmorBoots(115).setArmorType(EnumArmor.IRON).setIconPosition(18, 3).setName("Iron Boots");
 	public static Item ironGloves = new ItemArmorGloves(116).setArmorType(EnumArmor.IRON).setIconPosition(18, 4).setName("Iron Gloves");
 	public static Item ironBelt = new ItemArmorBelt(117).setArmorType(EnumArmor.IRON).setIconPosition(18, 5).setName("Iron Belt");
 	
 	public static Item silverHelmet = new ItemArmorHelmet(118).setArmorType(EnumArmor.SILVER).setIconPosition(19, 0).setName("Silver Helmet");
 	public static Item silverBody = new ItemArmorBody(119).setArmorType(EnumArmor.SILVER).setIconPosition(19, 1).setName("Silver Body");
-	public static Item silverPants = new ItemArmorPants(120).setArmorType(EnumArmor.SILVER).setIconPosition(19, 2).setName("Silver Legguards");	
+	public static Item silverPants = new ItemArmorPants(120).setArmorType(EnumArmor.SILVER).setIconPosition(0, 0).setName("Silver Legguards");	
 	public static Item silverBoots = new ItemArmorBoots(121).setArmorType(EnumArmor.SILVER).setIconPosition(19, 3).setName("Silver Boots");
 	public static Item silverGloves = new ItemArmorGloves(122).setArmorType(EnumArmor.SILVER).setIconPosition(19, 4).setName("Silver Gloves");
 	public static Item silverBelt = new ItemArmorBelt(123).setArmorType(EnumArmor.SILVER).setIconPosition(19, 5).setName("Silver Belt");
 	
 	public static Item goldHelmet = new ItemArmorHelmet(124).setArmorType(EnumArmor.GOLD).setIconPosition(20, 0).setName("Gold Helmet").setItemQuality(EnumItemQuality.RARE);
 	public static Item goldBody = new ItemArmorBody(125).setArmorType(EnumArmor.GOLD).setIconPosition(20, 1).setName("Gold Body").setItemQuality(EnumItemQuality.RARE);
-	public static Item goldPants = new ItemArmorPants(126).setArmorType(EnumArmor.GOLD).setIconPosition(20, 2).setName("Gold Legguards").setItemQuality(EnumItemQuality.RARE);	
+	public static Item goldPants = new ItemArmorPants(126).setArmorType(EnumArmor.GOLD).setIconPosition(0, 0).setName("Gold Legguards").setItemQuality(EnumItemQuality.RARE);	
 	public static Item goldBoots = new ItemArmorBoots(127).setArmorType(EnumArmor.GOLD).setIconPosition(20, 3).setName("Gold Boots");
 	public static Item goldGloves = new ItemArmorGloves(128).setArmorType(EnumArmor.GOLD).setIconPosition(20, 4).setName("Gold Gloves");
 	public static Item goldBelt = new ItemArmorBelt(129).setArmorType(EnumArmor.GOLD).setIconPosition(20, 5).setName("Gold Belt");
 	
-	public static Item lunariumHelmet = new ItemArmorHelmet(130).setArmorType(EnumArmor.LUNARIUM).PassiveBonuses(new PassiveBonus[]{
-			new PassiveBonusIntellect(5), new PassiveBonusCriticalStrike(0.03)
+	public static Item lunariumHelmet = new ItemArmorHelmet(130).setArmorType(EnumArmor.LUNARIUM).setIntellect(5).PassiveBonuses(new PassiveBonus[]{
+			new PassiveBonusCriticalStrike(0.03)
 	}).setIconPosition(22, 0).setName("Lunarium Crown");
-	public static Item lunariumBody = new ItemArmorBody(131).setArmorType(EnumArmor.LUNARIUM).PassiveBonuses(new PassiveBonus[]{
-			new PassiveBonusIntellect(3)
-	}).setIconPosition(22, 1).setName("Lunarum Robe");
-	public static Item lunariumPants = new ItemArmorPants(132).setArmorType(EnumArmor.LUNARIUM).PassiveBonuses(new PassiveBonus[]{
-			new PassiveBonusIntellect(3)
-	}).setIconPosition(22, 2).setName("Lunarium Pants");	
-	public static Item lunariumBoots = new ItemArmorBoots(133).setArmorType(EnumArmor.LUNARIUM).PassiveBonuses(new PassiveBonus[]{
-			new PassiveBonusIntellect(3), new PassiveBonusSpeed(0.03)
+	public static Item lunariumBody = new ItemArmorBody(131).setArmorType(EnumArmor.LUNARIUM).setIntellect(3).setIconPosition(22, 1).setName("Lunarum Robe");
+	public static Item lunariumPants = new ItemArmorPants(132).setArmorType(EnumArmor.LUNARIUM).setIntellect(3).setIconPosition(22, 2).setName("Lunarium Pants");	
+	public static Item lunariumBoots = new ItemArmorBoots(133).setArmorType(EnumArmor.LUNARIUM).setIntellect(3).PassiveBonuses(new PassiveBonus[]{
+			new PassiveBonusSpeed(0.03)
 	}).setIconPosition(22, 3).setName("Lunarium Boots");
-	public static Item lunariumGloves = new ItemArmorGloves(134).setArmorType(EnumArmor.LUNARIUM).PassiveBonuses(new PassiveBonus[]{
-			new PassiveBonusIntellect(3)
-	}).setIconPosition(22, 4).setName("Lunarium Gloves");
-	public static Item lunariumBelt = new ItemArmorBelt(135).setArmorType(EnumArmor.LUNARIUM).PassiveBonuses(new PassiveBonus[]{
-			new PassiveBonusIntellect(3)
-	}).setIconPosition(22, 5).setName("Lunarium Belt");
+	public static Item lunariumGloves = new ItemArmorGloves(134).setArmorType(EnumArmor.LUNARIUM).setIntellect(3).setIconPosition(22, 4).setName("Lunarium Gloves");
+	public static Item lunariumBelt = new ItemArmorBelt(135).setArmorType(EnumArmor.LUNARIUM).setIntellect(3).setIconPosition(22, 5).setName("Lunarium Belt");
 	
 	public static Item rocketBoots = new ItemArmorAccessory(136).setIconPosition(0, 0).setName("Rocket Boots");	
 	public static Item ringOfVigor = new ItemArmorAccessory(137).PassiveBonuses(new PassiveBonus[]{ 
@@ -402,10 +394,10 @@ public class Item extends ActionbarItem
 	public static Item t6Belt = new ItemArmorBelt(199).setArmorType(EnumArmor.TIER6).setTotalSockets(4).setIntellect(5).setStamina(10).setStrength(5).setDexterity(5).setIconPosition(21, 5).setName("TIER6 Belt");
 	
 	
-	public static Item copperCoin = new ItemCoin(200).setIconPosition(0, 0).setName("Copper Coin");
-	public static Item silverCoin = new ItemCoin(201).setIconPosition(0, 0).setName("Silver Coin");
-	public static Item goldCoin = new ItemCoin(202).setIconPosition(0, 0).setName("Gold Coin");
-	public static Item platinumCoin = new ItemCoin(203).setIconPosition(0, 0).setName("Platinum Coin");
+	public static Item copperCoin = new ItemCoin(200).setIconPosition(0, 1).setName("Copper Coin");
+	public static Item silverCoin = new ItemCoin(201).setIconPosition(0, 2).setName("Silver Coin");
+	public static Item goldCoin = new ItemCoin(202).setIconPosition(0, 3).setName("Gold Coin");
+	public static Item platinumCoin = new ItemCoin(203).setIconPosition(0, 4).setName("Platinum Coin");
 		
 	public static Item woodenArrow = new ItemAmmo(300).setProjectile(new EntityProjectile(7, 1, 1, 8f).setSpriteIndex(0, 1).setIsFriendly(true)).setIconPosition(4, 9).setName("Wooden Arrow");
 	public static Item bronzeArrow = new ItemAmmo(301).setProjectile(new EntityProjectile(10, 1, 1, 8f).setSpriteIndex(0, 2).setIsFriendly(true)).setIconPosition(4, 10).setName("Bronze Arrow");
