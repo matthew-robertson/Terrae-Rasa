@@ -22,6 +22,7 @@ import savable.SavableWorld;
 import savable.SaveManager;
 import statuseffects.StatusEffectStun;
 import utils.ActionbarItem;
+import utils.ChestLootGenerator;
 import utils.Damage;
 import utils.ItemStack;
 import utils.LightUtils;
@@ -97,6 +98,7 @@ public class World
 	public List<EntityProjectile> projectileList;
 	public SpawnManager manager;
 	public SoundEngine soundEngine;
+	public ChestLootGenerator lootGenerator;
 	
 	private int[] generatedHeightMap;
 	private int averageSkyHeight;
@@ -130,6 +132,7 @@ public class World
 		itemsList = new ArrayList<EntityItemStack>(250);
 		chunksLoaded= new Hashtable<String, Boolean>(25);
 		manager = new SpawnManager();
+		lootGenerator = new ChestLootGenerator();
 		utils = new LightUtils();
 		checkChunks();
 		lightingUpdateRequired = true;
@@ -161,6 +164,7 @@ public class World
 		previousLightLevel = getLightLevel();
 		this.difficulty = difficulty;
 		manager = new SpawnManager();
+		lootGenerator = new ChestLootGenerator();
 		chunkWidth = width / Chunk.getChunkWidth();
 		chunkHeight = height / height;
 		utils = new LightUtils();
@@ -1153,6 +1157,65 @@ public class World
 			addItemStackToItemList(new EntityItemStack((mx * 6) - 1, (my * 6) - 2, stack));
 		}
 		setBackBlock(Block.backAir, mx, my); //replace it with air
+	}
+	
+	/**
+	 * Handles player block placement
+	 * @param mx x position in worldmap array, of the block being placed
+	 * @param my y position in the worldmap array, of the block being placed
+	 * @param block the block to be placed
+	 */
+	public void placeLargeBlockWorld(int mx, int my, Block block)
+	{
+		if(block.hasMetaData) //if the block is large
+		{
+			double blockWidth = block.getBlockWidth() / 6;
+			double blockHeight = block.getBlockHeight() / 6;
+			int[][] metadata = MetaDataHelper.getMetaDataArray((int)blockWidth, (int)blockHeight);
+			
+			for(int i = 0; i < blockWidth; i++) //is it possible to place the block?
+			{
+				for(int j = 0; j < blockHeight; j++)
+				{
+					if(getBlock(mx + i, my + j).id != Block.air.id && !getBlockGenerate(mx + i, my + j).getIsOveridable())
+					{
+						return;
+					}
+				}
+			}
+			
+			boolean canBePlaced = false;
+			//Check for at least one solid block on some side of the placement:
+			for(int i = 0; i < blockWidth; i++) //Bottom
+			{
+				if(getBlock(mx + i, my + blockHeight).isSolid)
+				{
+					canBePlaced = true;
+				}
+			}					
+			if(!canBePlaced) //If it cant be placed, then give up trying right here
+			{
+				return;
+			}
+			
+			for(int i = 0; i < metadata.length; i++) //place the block(s)
+			{
+				for(int j = 0; j < metadata[0].length; j++)
+				{
+					if(block instanceof BlockChest)
+					{
+						BlockChest chest = (BlockChest) block.clone();						
+						setBlock(chest, mx + i, my + j);
+					}
+					else
+					{
+						setBlock(block.clone(), mx + i, my + j);
+						
+					}
+					getBlock(mx + i, my + j).metaData = metadata[i][j];
+				}
+			}
+		}	
 	}
 	
 	/**

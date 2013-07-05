@@ -1,6 +1,7 @@
 package world;
 
 import blocks.Block;
+import blocks.BlockChest;
 
 
 /**
@@ -10,6 +11,39 @@ import blocks.Block;
  */
 public class WorldGen{
 	protected int count;
+	
+	protected void generateChests(World world, Block chest, int x, int w, int y, int h){
+		int chance = 0;
+		int xskip = 1;
+		int yskip = 1;
+		for (int i = x; i < x + w; i += xskip){ //Go through the height
+			//xskip = (int)(Math.random() * 15 + 1);
+			for (int j = y; j < (y + h); j += yskip){ //go through the width
+				//yskip = (int)(Math.random() * 15 + 1);
+				chance = (int) (Math.random() * 1000 + 1);
+				if (chance >= 999){
+					placeChest(world, chest, i,j);
+				}
+			}
+		}
+	}
+	
+	protected void placeChest(World world, Block chest, int x, int y){
+		//Ensure that there is enough space to place the chest.
+		/*for (int i = x; i < x + (chest.getBlockWidth() / 6); i++){
+			for (int j = y; j < y + (chest.getBlockHeight() / 6); j++){
+				if (world.getBlock(i, j).isSolid){
+					return;
+				}
+			}
+		}*/
+		world.placeLargeBlockWorld(x, y, Block.chest);
+		Block active = world.getBlockGenerate(x, y);
+		if (active instanceof BlockChest){
+			BlockChest c = (BlockChest)active;
+			c.setInventory(world.lootGenerator.getLowLevelChestCommon());
+		}
+	}
 	
 	/**
 	 * Ensures that there are not null blocks in the world

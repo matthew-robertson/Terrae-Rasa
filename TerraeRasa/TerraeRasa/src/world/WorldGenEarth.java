@@ -70,6 +70,7 @@ public class WorldGenEarth extends WorldGen
 		cellauto(world, xLoc + 1, (xLoc + width) - 2, yLoc, (yLoc + depth) - 2);
 		ores(world, xLoc + 1, (xLoc + width) - 4, yLoc + 1, (yLoc + depth) - 11, placeableOres);
 		gems(world, xLoc + 1, (xLoc + width) - 4, yLoc + 1, (yLoc + depth) - 11, placeableGems);
+		generateChests(world, Block.chest, xLoc, width - 5, yLoc + 400, depth - 405);
 		System.gc();
 				
 		Biome biome;
