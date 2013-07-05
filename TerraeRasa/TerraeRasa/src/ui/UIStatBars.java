@@ -85,7 +85,7 @@ public class UIStatBars extends UIBase
 			GL11.glColor4f(0, 0, 1, 1);
 			x = getCameraX() + 10;
 			y = getCameraY() + 25;		
-			width = (int) (player.mana / player.maxMana * 100);
+			width = (int) ((double)player.mana / player.maxMana * 100);
 			height  = 11;		
 			t.startDrawingQuads();
 			t.addVertexWithUV(x, y + height, 0, 0, 1);
@@ -108,7 +108,7 @@ public class UIStatBars extends UIBase
 		GL11.glColor4f(0, 0, 0, 1);
 		int x = getCameraX() + 10;
 		int y = getCameraY() + 25;
-		if(player.mana > 0)
+		if(player.maxMana > 0)
 		{
 			y = getCameraY() + 40;		
 		}

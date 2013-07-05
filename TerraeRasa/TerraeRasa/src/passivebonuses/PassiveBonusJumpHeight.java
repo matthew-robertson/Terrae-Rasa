@@ -1,5 +1,6 @@
 package passivebonuses;
 
+import blocks.Block;
 import entities.EntityPlayer;
 
 /**
@@ -20,12 +21,12 @@ public class PassiveBonusJumpHeight extends PassiveBonus
 
 	public void apply(EntityPlayer player) 
 	{
-		player.setUpwardJumpHeight(player.getUpwardJumpHeight() + power);
+		player.setUpwardJumpHeight(player.getUpwardJumpHeight() + (Block.BLOCK_HEIGHT * power));
 	}
 
 	public void remove(EntityPlayer player) 
 	{
-		player.setUpwardJumpHeight(player.getUpwardJumpHeight() - power);
+		player.setUpwardJumpHeight(player.getUpwardJumpHeight() - (Block.BLOCK_HEIGHT * power));
 	}
 
 	public String toString()

@@ -116,7 +116,7 @@ public class UI extends UIBase
 			//rendered further down. Otherwise, special energy is rendered directly under the healthbar
 			int specialOffsetY = 37; 
 			int offset = (player.maxMana < 100) ? 5 : 0;
-			if(player.mana > 0) 
+			if(player.maxMana > 0) 
 			{
 				//Mana
 				String mana = new StringBuilder().append((int)player.mana).append(" / ").append(player.maxMana).toString();

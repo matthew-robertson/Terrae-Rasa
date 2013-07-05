@@ -56,7 +56,7 @@ public enum EnumArmor
 		}),
 	LUNARIUM(4, 6, 5, 3, 3, 3, new PassiveBonus[]{ 
 			new PassiveBonusSpeed(.1).setPiecesRequiredToActivate(2),
-			new PassiveBonusManaBoost(20).setPiecesRequiredToActivate(4),
+			new PassiveBonusManaBoost(200).setPiecesRequiredToActivate(4),
 			new PassiveBonusIntellect(10).setPiecesRequiredToActivate(6)
 		}),
 	TIER6(7, 9, 7, 5, 5, 5, new PassiveBonus[]{ 

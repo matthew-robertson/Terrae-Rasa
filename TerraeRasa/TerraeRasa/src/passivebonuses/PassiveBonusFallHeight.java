@@ -1,5 +1,6 @@
 package passivebonuses;
 
+import blocks.Block;
 import entities.EntityPlayer;
 
 /**
@@ -20,12 +21,12 @@ public class PassiveBonusFallHeight extends PassiveBonus
 
 	public void apply(EntityPlayer player) 
 	{
-		player.setMaxHeightFallenSafely(player.getMaxHeightFallenSafely() + 6 * power);
+		player.setMaxHeightFallenSafely(player.getMaxHeightFallenSafely() +(Block.BLOCK_HEIGHT * power));
 	}
 
 	public void remove(EntityPlayer player) 
 	{
-		player.setMaxHeightFallenSafely(player.getMaxHeightFallenSafely() - 6 * power); 
+		player.setMaxHeightFallenSafely(player.getMaxHeightFallenSafely() - (Block.BLOCK_HEIGHT * power)); 
 	}
 
 	public String toString()

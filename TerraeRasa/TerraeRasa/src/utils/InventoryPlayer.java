@@ -605,9 +605,9 @@ public class InventoryPlayer
 			{
 				player.removeSingleArmorItem((ItemArmor)(Item.itemsList[armorInventory[index].getItemID()]), oldStack, index);
 			}
+			armorInventory[index] = new ItemStack(newStack);
 			//Apply a newly added armour piece's stats
 			player.applySingleArmorItem((ItemArmor)(Item.itemsList[newStack.getItemID()]), newStack, index);
-			armorInventory[index] = new ItemStack(newStack);
 		}
 		return true;
 	}

@@ -274,7 +274,7 @@ public class EntityPlayer extends EntityLiving
 		if(armorChanged)
 		{
 			refreshPassiveBonuses();
-			armorChanged = false;
+			recalculateStats();
 		}		
 		checkForCombatStatus();
 		checkAndUpdateStatusEffects(world);
@@ -826,7 +826,7 @@ public class EntityPlayer extends EntityLiving
 		intellect += armor.getIntellect();
 		strength += armor.getStrength();
 		stamina += armor.getStamina();
-		recalculateStats();
+		armorChanged = true;
 	}
 	
 	/**
@@ -867,7 +867,7 @@ public class EntityPlayer extends EntityLiving
 		intellect -= armor.getIntellect();
 		strength -= armor.getStrength();
 		stamina -= armor.getStamina();
-		recalculateStats();
+		armorChanged = true;
 	}
 	
 	/**

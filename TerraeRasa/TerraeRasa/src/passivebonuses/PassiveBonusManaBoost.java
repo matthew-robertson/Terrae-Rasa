@@ -21,11 +21,16 @@ public class PassiveBonusManaBoost extends PassiveBonus
 	
 	public void apply(EntityPlayer player) 
 	{
-		player.maxMana += power;
+		player.temporaryMaxMana += power;
 	}
 
 	public void remove(EntityPlayer player) 
 	{
-		player.maxHealth -= power;
+		player.temporaryMaxMana -= power;
+	}
+	
+	public String toString()
+	{
+		return "+" + (int)(power) + " maximum mana";
 	}
 }
