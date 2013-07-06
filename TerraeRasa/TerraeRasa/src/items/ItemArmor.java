@@ -102,7 +102,7 @@ public class ItemArmor extends Item
 		return armorType;
 	}
 	
-	protected ItemArmor PassiveBonuses(PassiveBonus[] bonuses)
+	protected ItemArmor passiveBonuses(PassiveBonus[] bonuses)
 	{
 		this.bonuses = bonuses;
 		return this;
@@ -165,20 +165,20 @@ public class ItemArmor extends Item
 	 */
 	public String[] getStringBonuses()
 	{
-		String[] PassiveBonuses = armorType.getPassiveBonusesAsStringArray();
-		String[] allBonuses = new String[bonuses.length + PassiveBonuses.length + auras.length];
+//		String[] PassiveBonuses = armorType.getPassiveBonusesAsStringArray();
+		String[] allBonuses = new String[bonuses.length + 0 + auras.length];
 		int i = 0;
-		for(i = 0; i < PassiveBonuses.length; i++)
-		{
-			allBonuses[i] = PassiveBonuses[i].toString();
-		}
+//		for(i = 0; i < PassiveBonuses.length; i++)
+//		{
+//			allBonuses[i] = PassiveBonuses[i].toString();
+//		}
 		for(i = 0; i < bonuses.length; i++)
 		{
-			allBonuses[PassiveBonuses.length + i] = bonuses[i].toString();
+			allBonuses[0 + i] = bonuses[i].toString();
 		}
 		for(i = 0; i < auras.length; i++)
 		{
-			allBonuses[bonuses.length + PassiveBonuses.length + i] = auras[i].toString();
+			allBonuses[bonuses.length + 0 + i] = auras[i].toString();
 		}
 		return allBonuses;
 	}
@@ -219,6 +219,16 @@ public class ItemArmor extends Item
 			strings[i] = stats.get(i);
 		}
 		return strings;
+	}
+	
+	public PassiveBonus[] getTierBonuses()
+	{
+		return armorType.getBonuses();
+	}
+	
+	public String getTierName()
+	{
+		return armorType.getSetName();
 	}
 	
 	protected ItemArmor setTotalSockets(int total)

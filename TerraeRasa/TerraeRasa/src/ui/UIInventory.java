@@ -231,7 +231,7 @@ public class UIInventory extends UIBase
 		
 		t.startDrawingQuads(); 
 		GL11.glColor4f(0.5f, 0.5f, 0.5f, 0.6f);
-		int totalRows = (chest.getInventorySize() / 5);
+		int totalRows = (chest.getInventorySize() / 4);
 		for(int i = 0; i < chest.getInventorySize(); i++) //Draw all the background slots
 		{			
 			int size = 20;

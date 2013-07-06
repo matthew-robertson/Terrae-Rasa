@@ -12,6 +12,7 @@ public class AffixFrenzied extends Affix{
 	
 	public AffixFrenzied(){
 		super("Frenzied");
+		this.id = 2;
 		int strength = (int) (rng.nextDouble() * (maxStr - minStr) + minStr);
 		double speed = rng.nextDouble() * (maxSpd - minSpd) + minSpd;
 		addPassive(new PassiveBonusStrength(strength));

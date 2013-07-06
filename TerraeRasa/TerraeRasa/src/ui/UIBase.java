@@ -15,6 +15,10 @@ import utils.ItemStack;
  */
 public class UIBase extends Render
 {
+	//protected final static TrueTypeFont plainTooltip = new TrueTypeFont(((new Font("times", Font.PLAIN, 48)).deriveFont(48.0f)), true);
+	protected final static TrueTypeFont tooltipFont = new TrueTypeFont(((new Font("times", Font.PLAIN, 36)).deriveFont(36.0f)), true);
+	//plainTooltip.drawString(getCameraX() + 50, getCameraY() + 50, "ABCDEFGHIJKLMNOPQRSTUVWXYZ!?.", 0.16F, -0.16F);
+	//plainTooltip.drawString(getCameraX() + 50, getCameraY() + 50, "ABCDEFGHIJKLMNOPQRSTUVWXYZ!?.", 0.22F, -0.22F);
 	protected final static TrueTypeFont boldTooltip = new TrueTypeFont(((new Font("times", Font.BOLD, 24)).deriveFont(16.0f)), true);
 	protected final static TrueTypeFont plainTooltip = new TrueTypeFont(((new Font("times", Font.PLAIN, 24)).deriveFont(16.0f)), true);
 	//Variables for the item picked up by the mouse:

@@ -718,15 +718,19 @@ public class Entity
 	{
 		int x = (int)(this.x / 6);
 		int y = (int)(this.y / 6);
-		for(int i = leftOffset; i < rightOffset + blockWidth; i++) //for each block horizontally
-		{
-			for(int j = upOffset; j < downOffset + blockHeight; j++) //and each block vertically
+		try {
+			for(int i = leftOffset; i < rightOffset + blockWidth; i++) //for each block horizontally
 			{
-				if(world.getBlock(MathHelper.returnIntegerInWorldMapBounds_X(world, x + i), MathHelper.returnIntegerInWorldMapBounds_Y(world, y + j)).id == block.id)
-				{ //see if the block matches the specified block
-					return true;				
+				for(int j = upOffset; j < downOffset + blockHeight; j++) //and each block vertically
+				{
+					if(world.getBlock(MathHelper.returnIntegerInWorldMapBounds_X(world, x + i), MathHelper.returnIntegerInWorldMapBounds_Y(world, y + j)).id == block.id)
+					{ //see if the block matches the specified block
+						return true;				
+					}
 				}
 			}
+		} catch(NullPointerException e) {
+			e.printStackTrace();
 		}
 		return false;
 	}

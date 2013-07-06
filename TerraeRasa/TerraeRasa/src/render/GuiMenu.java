@@ -114,9 +114,12 @@ public class GuiMenu extends GuiComponent
 				index = i;
 			}
 		}		
-		//If the 
-		if(index > 0 && index < totalMenuItems - lockedInComponents.length)
+		if(index != -1)
 		{
+			if(index >= totalMenuItems - lockedInComponents.length)
+			{
+				return index - (totalMenuItems - lockedInComponents.length) + varyingItems.length + 1;
+			}
 			index += selectedIndex;
 		}
 		return index;
@@ -321,6 +324,11 @@ public class GuiMenu extends GuiComponent
 	public String[] getVaryingItems()
 	{
 		return varyingItems;
+	}
+	
+	public int getNumberOfItems()
+	{
+		return varyingItems.length + lockedInComponents.length + 1; 
 	}
 	
 	public int getTotalMenuLength()

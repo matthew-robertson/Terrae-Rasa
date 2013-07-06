@@ -671,17 +671,17 @@ public class MainMenu extends Render
 	{
 		menu.onClick(mouseX, mouseY);
 		int selectedIndex = menu.getSelectedCell(mouseX, mouseY);
-		if(selectedIndex == menu.getTotalMenuLength() - 3)
+		if(selectedIndex == menu.getNumberOfItems() - 3)
 		{
 			//New Player
 			isNewPlayerMenuOpen = true;
 		}
-		else if(selectedIndex == menu.getTotalMenuLength() - 2)
+		else if(selectedIndex == menu.getNumberOfItems() - 2)
 		{
 			//Delete Player
 			isWaitingToDelete = true;
 		}
-		else if(selectedIndex == menu.getTotalMenuLength() - 1)
+		else if(selectedIndex == menu.getNumberOfItems() - 1)
 		{
 			//Back
 			isPlayerMenuOpen = false;
@@ -724,17 +724,17 @@ public class MainMenu extends Render
 		menu.onClick(mouseX, mouseY);
 		
 		int selectedIndex = menu.getSelectedCell(mouseX, mouseY);
-		if(selectedIndex == menu.getTotalMenuLength() - 3)
+		if(selectedIndex == menu.getNumberOfItems() - 3)
 		{
 			//New World
 			isNewWorldMenuOpen= true;
 		}
-		else if(selectedIndex == menu.getTotalMenuLength() - 2)
+		else if(selectedIndex == menu.getNumberOfItems() - 2)
 		{
 			//Delete World
 			isWaitingToDelete = true;			
 		}
-		else if(selectedIndex == menu.getTotalMenuLength() - 1)
+		else if(selectedIndex == menu.getNumberOfItems() - 1)
 		{
 			//Back
 			isPlayerMenuOpen = true;

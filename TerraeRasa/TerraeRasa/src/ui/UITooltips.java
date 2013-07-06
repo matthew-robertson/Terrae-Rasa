@@ -10,6 +10,7 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
 import passivebonuses.PassiveBonus;
+import passivebonuses.PassiveBonusDefense;
 
 import render.TrueTypeFont;
 import spells.Spell;
@@ -25,12 +26,7 @@ import enums.EnumColor;
 import enums.EnumItemQuality;
 
 public class UITooltips extends UIBase
-{
-	//protected final static TrueTypeFont plainTooltip = new TrueTypeFont(((new Font("times", Font.PLAIN, 48)).deriveFont(48.0f)), true);
-	protected final static TrueTypeFont tooltipFont = new TrueTypeFont(((new Font("times", Font.PLAIN, 36)).deriveFont(36.0f)), true);
-	//plainTooltip.drawString(getCameraX() + 50, getCameraY() + 50, "ABCDEFGHIJKLMNOPQRSTUVWXYZ!?.", 0.16F, -0.16F);
-	//plainTooltip.drawString(getCameraX() + 50, getCameraY() + 50, "ABCDEFGHIJKLMNOPQRSTUVWXYZ!?.", 0.22F, -0.22F);
-	
+{	
 	/**
 	 * Checks to see if the mouse is hovering over something that needs to have a tooltip rendered.
 	 * Will return null if nothing appropriate is found.
@@ -141,14 +137,20 @@ public class UITooltips extends UIBase
 			String[] bonuses = ((ItemArmor)(Item.itemsList[stack.getItemID()])).getStringBonuses();
 			for(String bonus : bonuses)
 			{
-				bonusesVector.add(bonus);
+				if(!(bonus.contains("Defense")))
+				{
+					bonusesVector.add(bonus);
+				}
 			}
 		}
 		
 		String[] bonuses = stack.getStringBonuses();
 		for(String bonus : bonuses)
 		{
-			bonusesVector.add(bonus);
+			if(!(bonus.contains("Defense")))
+			{
+				bonusesVector.add(bonus);
+			}
 		}
 		
 		String[] passiveBonuses = new String[bonusesVector.size()];
@@ -194,13 +196,14 @@ public class UITooltips extends UIBase
 		String[] words = fulltooltip.split(" ");
 		Vector<String> renderLines = new Vector<String>();
 		String line = "";
-		int length = 0;			
-		int spaceLength = (int) (xScale * plainTooltip.getWidth(" ") * 0.5F);
+		double length = 0;			
+		tooltipWidth -= 15;
+		double spaceLength = xScale * plainTooltip.getWidth(" ");
 		if(fulltooltip != "")
 		{
 			for(int i = 0; i < words.length; i++)
 			{
-				int width = (int) (0.5F * xScale * plainTooltip.getWidth(words[i]));
+				double width = xScale * plainTooltip.getWidth(words[i]);
 				if(length + width + spaceLength < tooltipWidth)
 				{
 					length += width + spaceLength;
@@ -230,20 +233,9 @@ public class UITooltips extends UIBase
 		Vector<String> passiveBonusesVector = new Vector<String>();
 		if(passiveBonuses.length > 0)
 		{
-			String line = "Bonuses: " + passiveBonuses[0]; 
-			passiveBonusesVector.add(line);
-			for(int i = 1; i < passiveBonuses.length; i++)
+			for(int i = 0; i < passiveBonuses.length; i++)
 			{
-				if(TerraeRasa.getOSName().startsWith("win"))
-				{
-					line = "                       " + passiveBonuses[i];
-				}
-				else
-				{
-					line = "                " + passiveBonuses[i];
-				}
-			
-				passiveBonusesVector.add(line);
+				passiveBonusesVector.add(passiveBonuses[i]);
 			}
 		}
 		String[] temp = new String[passiveBonusesVector.size()];
@@ -261,16 +253,42 @@ public class UITooltips extends UIBase
 				bonusesVector.add(bonus);
 			}
 		}
-		
 		for(PassiveBonus bonus : stack.getBonuses())
 		{
 			bonusesVector.add(bonus);
 		}
 		
-		int totalArmor = 0; 
+		int totalArmor = ((ItemArmor)(Item.itemsList[stack.getItemID()])).getDefense(); 
+		for(PassiveBonus bonus : bonusesVector)
+		{
+			if(bonus instanceof PassiveBonusDefense)
+			{
+				totalArmor += bonus.getPower();
+			}
+		}
 		
-		//armor = "  " + ((ItemArmor)(Item.itemsList[stack.getItemID()])).getDefense();
-		return "";
+		return (totalArmor > 0) ? "  " + totalArmor : "";
+	}
+	
+	private static String[] getSetBonuses(ItemStack stack)
+	{
+		Vector<String> bonusesVector = new Vector<String>();
+		if(stack.getItemID() >= Item.itemIndex && stack.getItemID() < ActionbarItem.spellIndex && Item.itemsList[stack.getItemID()] instanceof ItemArmor)
+		{
+			PassiveBonus[] bonuses = ((ItemArmor)(Item.itemsList[stack.getItemID()])).getTierBonuses();
+			bonusesVector.add(((ItemArmor)(Item.itemsList[stack.getItemID()])).getTierName());
+			for(PassiveBonus bonus : bonuses)
+			{
+				String setRequirement = "(" + bonus.getPiecesRequiredToActivate() + ") Set: ";
+				bonusesVector.add(setRequirement);
+				String bonusInfo = "    " + bonus.toString();
+				bonusesVector.add(bonusInfo);
+			}
+		}
+		
+		String[] temp = new String[bonusesVector.size()];
+		bonusesVector.copyInto(temp);
+		return temp;
 	}
 	
 	/**
@@ -317,20 +335,17 @@ public class UITooltips extends UIBase
 			String[] tooltipLines = splitFulltooltip(getFullTooltip(stack), xScale, tooltipWidth);
 			//Break the set bonuses extra information into strings that don't exceed the tooltip's total width
 			String[] passiveBonusLines = formatPassiveBonuses(getBonuses(stack));
-			
+			String[] setBonuses = getSetBonuses(stack);
 			String armor = "";
-			if(stack.getItemID() >= ActionbarItem.itemIndex && 
-					stack.getItemID() < ActionbarItem.spellIndex && 
-					Item.itemsList[stack.getItemID()] instanceof ItemArmor)
+			if(stack.getItemID() >= ActionbarItem.itemIndex && stack.getItemID() < ActionbarItem.spellIndex && Item.itemsList[stack.getItemID()] instanceof ItemArmor)
 			{
 				armor = getTotalArmor(player, stack);
 			}
 			
-			
 			//If there's just a title, crop the tooltip
 			if(passiveBonusLines.length == 0 && tooltipLines.length == 0 && stats.length == 0 && cooldown.equals(""))
 			{
-				tooltipWidth = 3 * PADDING + (int) (0.5F * xScale * boldTooltip.getWidth(itemName));
+				tooltipWidth = 3 * PADDING + (int) (xScale * tooltipFont.getWidth(itemName));
 			}
 			
 			//Ensure the tooltip won't go off the right side of the screen
@@ -346,11 +361,13 @@ public class UITooltips extends UIBase
 			frameX += getCameraX();
 			
 			//Find out how long does the tooltip actually has to be
-			double requiredHeight = (tooltipFont.getHeight(itemName)) + 
-					PADDING * (passiveBonusLines.length + stats.length) + 
-					((tooltipFont.getHeight(itemName)) * 0.5f * (stats.length)) + 
-					((tooltipFont.getHeight(itemName)) * 0.5f * (passiveBonusLines.length)) + 
-					((tooltipFont.getHeight(itemName)) * 0.7f * (tooltipLines.length)) + 
+			double requiredHeight = 10 + 
+					(tooltipFont.getHeight("!") * xScale * 1.5) + 
+					((!armor.equals("")) ? (tooltipFont.getHeight("!") * xScale * 2.2F) : 0) + 
+					((tooltipFont.getHeight(itemName)) * xScale * (stats.length)) + 
+					((tooltipFont.getHeight(itemName)) * xScale * (passiveBonusLines.length)) + 
+					((setBonuses.length > 1) ? ((tooltipFont.getHeight(itemName)) * xScale * (setBonuses.length)) : 0) + 
+					((tooltipFont.getHeight(itemName)) * xScale * (tooltipLines.length)) + 
 					((!cooldown.equals("")) ? tooltipFont.getHeight(cooldown) * 0.5f + 5: 0) + 
 					((stack.hasSockets()) ? 35 : 0);
 			int tooltipHeight = (int) requiredHeight;
@@ -381,34 +398,58 @@ public class UITooltips extends UIBase
 			GL11.glColor4d(quality.r, quality.g, quality.b, 1.0);
 			
 			//Title
-			float yOffset = frameY + boldTooltip.getHeight(itemName);
+			float yOffset = frameY + tooltipFont.getHeight(itemName) * xScale * 1.5F + PADDING;
 			tooltipFont.drawString(frameX + PADDING, yOffset, itemName, xScale * 1.5F, -xScale * 1.5F, TrueTypeFont.ALIGN_LEFT); 
 			
-			yOffset += 20;
-			GL11.glColor4d(EnumColor.WHITE.COLOR[0], EnumColor.WHITE.COLOR[1], EnumColor.WHITE.COLOR[2], 1.0);
-			tooltipFont.drawString(frameX + PADDING, yOffset, armor, xScale * 2F, -xScale * 2F, TrueTypeFont.ALIGN_LEFT); 
-			
+			//Armor value, if applicable
+			if(!armor.equals(""))
+			{
+				yOffset += 24;
+				GL11.glColor4d(EnumColor.WHITE.COLOR[0], EnumColor.WHITE.COLOR[1], EnumColor.WHITE.COLOR[2], 1.0);
+				tooltipFont.drawString(frameX + PADDING, yOffset, armor, xScale * 2.2F, -xScale * 2.2F, TrueTypeFont.ALIGN_LEFT); 
+			}
 			GL11.glColor4d(EnumColor.LIME_GREEN.COLOR[0], EnumColor.LIME_GREEN.COLOR[1], EnumColor.LIME_GREEN.COLOR[2], 1.0);
 			//Stats
 			for(int i = 0; i < stats.length; i++)
 			{
 				tooltipFont.drawString(frameX + PADDING, 
-						yOffset + PADDING*(1 + i) + (((tooltipHeight) - (tooltipHeight - boldTooltip.getHeight(itemName))) * 0.5f * (1+i)), 
+						yOffset + (((tooltipHeight) - (tooltipHeight - tooltipFont.getHeight(itemName))) * xScale * (1+i)), 
 						stats[i],
 						xScale,
 						-xScale, 
 						TrueTypeFont.ALIGN_LEFT); 
-			}			
-			
+			}		
 			GL11.glColor4d(EnumColor.WHITE.COLOR[0], EnumColor.WHITE.COLOR[1], EnumColor.WHITE.COLOR[2], 1.0);
 			
 			//Render the set bonuses
-			yOffset = yOffset + PADDING * (stats.length) + 
-					(((tooltipHeight) - (tooltipHeight - boldTooltip.getHeight(itemName))) * 0.5f * (stats.length));
-			
+			yOffset = yOffset + (((tooltipHeight) - (tooltipHeight - tooltipFont.getHeight(itemName))) * xScale * (stats.length));
 			for(int i = 0; i < passiveBonusLines.length; i++)
 			{
-				if(i < activePassiveBonuses.length && !activePassiveBonuses[i])
+				tooltipFont.drawString(frameX + PADDING, 
+						yOffset + (((tooltipHeight) - (tooltipHeight - tooltipFont.getHeight(itemName))) * xScale * (1+i)), 
+						passiveBonusLines[i],
+						xScale,
+						-xScale, 
+						TrueTypeFont.ALIGN_LEFT); 
+			}
+			
+			//The actual set bonuses
+			yOffset = yOffset + PADDING + (((tooltipHeight) - (tooltipHeight - tooltipFont.getHeight(itemName))) * xScale * (passiveBonusLines.length));
+			//Title
+			if(setBonuses.length > 0 && !setBonuses[0].equals("None"))
+			{
+				GL11.glColor4d(EnumColor.LIME_GREEN.COLOR[0], EnumColor.LIME_GREEN.COLOR[1], EnumColor.LIME_GREEN.COLOR[2], 1.0);
+				tooltipFont.drawString(frameX + PADDING, 
+						yOffset + (((tooltipHeight) - (tooltipHeight - tooltipFont.getHeight(itemName))) * xScale), 
+						setBonuses[0],
+						xScale,
+						-xScale, 
+						TrueTypeFont.ALIGN_LEFT); 
+			}
+			//Bonuses
+			for(int i = 1; i < setBonuses.length; i+=2)
+			{
+				if(!activePassiveBonuses[((i - 1) / 2)])
 				{
 					GL11.glColor4d(EnumColor.GRAY.COLOR[0], EnumColor.GRAY.COLOR[1], EnumColor.GRAY.COLOR[2], 1.0);
 				}
@@ -416,25 +457,30 @@ public class UITooltips extends UIBase
 				{
 					GL11.glColor4d(EnumColor.WHITE.COLOR[0], EnumColor.WHITE.COLOR[1], EnumColor.WHITE.COLOR[2], 1.0);
 				}
-				
+
 				tooltipFont.drawString(frameX + PADDING, 
-						yOffset + PADDING*(1 + i) + (((tooltipHeight) - (tooltipHeight - boldTooltip.getHeight(itemName))) * 0.5f * (1+i)), 
-						passiveBonusLines[i],
+						yOffset + (((tooltipHeight) - (tooltipHeight - tooltipFont.getHeight(itemName))) * xScale * (1+i)), 
+						setBonuses[i],
 						xScale,
 						-xScale, 
 						TrueTypeFont.ALIGN_LEFT); 
+
+				tooltipFont.drawString(frameX + PADDING, 
+						yOffset + (((tooltipHeight) - (tooltipHeight - tooltipFont.getHeight(itemName))) * xScale * (2 + i)), 
+						setBonuses[i + 1],
+						xScale,
+						-xScale, 
+						TrueTypeFont.ALIGN_LEFT); 
+
 			}
 			
+			//the full tooltip
 			GL11.glColor4f(0.0F, 0.0F, 0.0F, 1.0F);
-			//Render the text lines which are now broken up to fit in the tooltip
-			//and adjust the yoffset so the text won't overlap
-			yOffset = yOffset + PADDING * (passiveBonusLines.length) + 
-					(((tooltipHeight) - (tooltipHeight - boldTooltip.getHeight(itemName))) * 0.5f * (passiveBonusLines.length));
-			
+			yOffset += (((tooltipHeight) - (tooltipHeight - tooltipFont.getHeight(itemName))) * xScale * ((setBonuses.length > 1) ? setBonuses.length : 0));
 			for(int i = 0; i < tooltipLines.length; i++)
 			{
 				tooltipFont.drawString(frameX + PADDING, 
-						yOffset + PADDING*(i+ 1) + (((tooltipHeight) - (tooltipHeight - plainTooltip.getHeight(itemName))) * 0.5f * (1+i)), 
+						yOffset + (((tooltipHeight) - (tooltipHeight - tooltipFont.getHeight(itemName))) * xScale * (1+i)), 
 						tooltipLines[i],
 						xScale,
 						-xScale,
@@ -443,17 +489,16 @@ public class UITooltips extends UIBase
 			
 			//Render the cooldown remaining if it happens to be applicable.
 			//(After adjusting to the proper position)
-			yOffset = yOffset + PADDING * (tooltipLines.length) + 
-					(((tooltipHeight) - (tooltipHeight - boldTooltip.getHeight(itemName))) * 0.5f * (tooltipLines.length));
+			yOffset += PADDING * (tooltipLines.length) + (((tooltipHeight) - (tooltipHeight - tooltipFont.getHeight(itemName))) * xScale * (tooltipLines.length));
 			
 			GL11.glColor4f(1.0F, 0.0F, 0.0F, 1.0F);
 			tooltipFont.drawString(frameX + PADDING, 
-					yOffset + PADDING + (((tooltipHeight) - (tooltipHeight - plainTooltip.getHeight(cooldown))) * 0.5f), 
+					yOffset + PADDING + (((tooltipHeight) - (tooltipHeight - tooltipFont.getHeight(cooldown))) * xScale), 
 					cooldown,
 					xScale,
 					-xScale,
 					TrueTypeFont.ALIGN_LEFT); 			
-		
+			
 			if(stack.hasSockets())
 			{
 				//Sockets 
@@ -463,7 +508,7 @@ public class UITooltips extends UIBase
 				for(int i = 0; i < numberOfSockets; i++)
 				{
 					int size = 30;			
-					double offsetByTotal = (numberOfSockets == 1) ? 65 : (numberOfSockets == 2) ? 47.5 : (numberOfSockets == 3) ? 30 : 10;
+					double offsetByTotal = (tooltipWidth - (37.5 * numberOfSockets)) / 2; 
 					double xoff = offsetByTotal + (i * (size + 7.5));
 					int yoff = (int) yOffset;			
 					t.startDrawingQuads();
@@ -479,7 +524,7 @@ public class UITooltips extends UIBase
 					if(stack.getGemSockets()[i].getGem() != null)
 					{
 						int size = 24;				
-						double offsetByTotal = (numberOfSockets == 1) ? 68 : (numberOfSockets == 2) ? 50.5 : (numberOfSockets == 3) ? 33 : 13;
+						double offsetByTotal = ((tooltipWidth - (37.5 * numberOfSockets)) / 2) + 3; 
 						double xoff = offsetByTotal + (i * (size + 6 + 7.5));
 						int yoff = (int) yOffset + 3;
 						textures[stack.getGemSockets()[i].getGem().getItemID()].bind();
@@ -502,7 +547,7 @@ public class UITooltips extends UIBase
 		int frameX = MathHelper.getCorrectMouseXPosition() - 25; 
 		int frameY = MathHelper.getCorrectMouseYPosition() - 25;
 		//% of total text size to render, in this case sacale to 1/2 size.
-		float xScale = 0.5F;
+		float xScale = 0.25F * 1.5F;
 		//Arbitrary padding to make things look nicer
 		final int PADDING = 5;
 		
@@ -511,7 +556,7 @@ public class UITooltips extends UIBase
 		String[] tooltipLines = splitFulltooltip(effect.toString(), xScale, tooltipWidth);
 		if(tooltipLines.length == 1)
 		{
-			tooltipWidth = 3 * PADDING + (int) (0.5F * xScale * boldTooltip.getWidth(effect.toString()));
+			tooltipWidth = 4 * PADDING + (int) (0.25f * tooltipFont.getWidth(effect.toString()));
 		}
 		
 		//Ensure the tooltip won't go off the right side of the screen
@@ -527,7 +572,7 @@ public class UITooltips extends UIBase
 		frameX += getCameraX();
 		
 		//Find out how long does the tooltip actually has to be
-		int tooltipHeight = (int) ((plainTooltip.getHeight("")) * 0.9 * (tooltipLines.length));
+		int tooltipHeight = (int) ((tooltipFont.getHeight("")) * xScale * (tooltipLines.length));
 
 		//Make sure the tooltip doesnt go off the bottom
 		if(frameY + tooltipHeight > Display.getHeight() * 0.5)
@@ -556,11 +601,11 @@ public class UITooltips extends UIBase
 		GL11.glColor4d(EnumColor.WHITE.COLOR[0], EnumColor.WHITE.COLOR[1], EnumColor.WHITE.COLOR[2], 1.0);
 		for(int i = 0; i < tooltipLines.length; i++)
 		{
-			boldTooltip.drawString(frameX + PADDING, 
-					frameY + boldTooltip.getHeight("") + ((tooltipHeight - boldTooltip.getHeight("")) * 0.5f * i), 
+			tooltipFont.drawString(frameX + PADDING, 
+					frameY + tooltipFont.getHeight("") * xScale + ((tooltipHeight - tooltipFont.getHeight("")) * xScale * i), 
 					tooltipLines[i],
-					0.5F,
-					-1,
+					xScale,
+					-xScale,
 					TrueTypeFont.ALIGN_LEFT); 			
 		}
 	}

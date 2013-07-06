@@ -8,6 +8,7 @@ public class AffixDestruction extends Affix{
 	
 	public AffixDestruction(){
 		super("of destruction");
+		this.id = 3;
 		this.setPrefix(false);
 		double power = rng.nextDouble() * (max - min) + min;
 		this.addPassive(new PassiveBonusDamageAll(power));

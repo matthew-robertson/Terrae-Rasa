@@ -495,7 +495,11 @@ public class World
 	{
 		for(int i = 0; i < itemsList.size(); i++)
 		{
-			itemsList.get(i).move(this);
+			try {
+				itemsList.get(i).move(this);
+			} catch (NullPointerException e) {
+				e.printStackTrace();
+			}
 		}		
 	}
 	
@@ -1958,6 +1962,10 @@ public class World
 		}
 		for(int i = leftOff; i <= rightOff; i++) //Check for chunks that need loaded
 		{
+			if(i >= 0 && chunksLoaded.get(""+i) == null)
+			{
+				chunksLoaded.put(""+i, false);
+			}
 			if(chunksLoaded.get(""+i) != null && !chunksLoaded.get(""+i)) //If a needed chunk isnt loaded, request it.
 			{
 				chunkManager.requestChunk(worldName, this, chunks, i);

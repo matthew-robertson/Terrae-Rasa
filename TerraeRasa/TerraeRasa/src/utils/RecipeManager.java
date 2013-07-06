@@ -351,9 +351,9 @@ public class RecipeManager
 	Recipe torches = new Recipe(this, new ItemStack(Block.torch), Block.none, new ItemStack[] {
 		new ItemStack(Item.coal, 1), new ItemStack(Block.plank, 1) 
 	});	
-	Recipe manaCrystal = new Recipe(this, new ItemStack(Item.manaCrystal), Block.none, new ItemStack[] {
-		new ItemStack(Item.manaStar, 15)
-	});	
+//	Recipe manaCrystal = new Recipe(this, new ItemStack(Item.manaCrystal), Block.none, new ItemStack[] {
+//		new ItemStack(Item.manaStar, 15)
+//	});	
 	Recipe craftingTable = new Recipe(this, new ItemStack(Block.craftingTable), Block.none, new ItemStack[] {
 		new ItemStack(Block.plank, 10)
 	});	

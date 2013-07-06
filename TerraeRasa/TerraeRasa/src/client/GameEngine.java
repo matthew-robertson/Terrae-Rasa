@@ -29,6 +29,7 @@ import blocks.Block;
 import entities.EntityPlayer;
 import enums.EnumPlayerDifficulty;
 import enums.EnumWorldDifficulty;
+import enums.EnumWorldSize;
 
 /**
  * <code>GameEngine</code> is the class responsible for running the main game loop, and other core features of multiple worlds.
@@ -305,24 +306,32 @@ public class GameEngine
 	{
 		if(TerraeRasa.initInDebugMode)
 		{
-			TerraeRasa.isMainMenuOpen = false;
+//			TerraeRasa.isMainMenuOpen = false;
 			FileManager fileManager = new FileManager();
-			world = fileManager.generateNewWorld("World", 1200, 800, EnumWorldDifficulty.NORMAL);//EnumWorldSize.LARGE.getWidth(), EnumWorldSize.LARGE.getHeight());
-			world.initSoundEngine(soundEngine);
-			world.chunkManager = chunkManager;
-			world.chunkManager.setUniverseName("World");
-			player = fileManager.generateAndSavePlayer("!!", EnumPlayerDifficulty.HARD);//new EntityLivingPlayer("Test player", EnumDifficulty.NORMAL);
-			world.addPlayerToWorld(player);
-			world.assessForAverageSky();
-			LightUtils utils = new LightUtils();
-			utils.applyAmbient(world);
-			
+//			world = fileManager.generateAndSaveWorld("World", EnumWorldSize.MINI, EnumWorldDifficulty.NORMAL);//EnumWorldSize.LARGE.getWidth(), EnumWorldSize.LARGE.getHeight());
+//			world.initSoundEngine(soundEngine);
+//			world.chunkManager = chunkManager;
+//			world.chunkManager.setUniverseName("World");
+			player = fileManager.generateAndSavePlayer("Debug_Player", EnumPlayerDifficulty.HARD);//new EntityLivingPlayer("Test player", EnumDifficulty.NORMAL);
+//			world.addPlayerToWorld(player);
+//		//	world.assessForAverageSky();
+//			LightUtils utils = new LightUtils();
+//			utils.applyAmbient(world);
+			player.setAffectedByWalls(false);
+//			
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldSword));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.godminiumPickaxe));
+//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldPickaxe));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldAxe));
+
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.stone, 100));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.torch, 100));
-//			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.chest, 100));
-
-//			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.ironChest, 100));
-
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.chest, 100));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.ironChest, 100));
+			
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.woodenBow));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.absorbPotion2, 50));
+			
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldIngot, 100));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.silverIngot, 100));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.healthPotion1, 100));
@@ -401,12 +410,12 @@ public class GameEngine
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.copperAxe));
 //			
 			
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.t6Helmet));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.t6Body));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.t6Pants));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.t6Gloves));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.t6Boots));
-			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.t6Belt));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.opHelmet));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.opBody));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.opPants));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.opGloves));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.opBoots));
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.opBelt));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.lunariumHelmet).setAffix(new AffixSturdy()));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.lunariumBody));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.lunariumPants));
@@ -455,7 +464,13 @@ public class GameEngine
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Spell.rejuvenate));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Spell.bulwark));
 			
-			
+			try {
+				fileManager.savePlayer(player);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}		
 	}
 	

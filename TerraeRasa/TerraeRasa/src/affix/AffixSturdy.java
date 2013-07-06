@@ -8,6 +8,7 @@ public class AffixSturdy extends Affix{
 	
 	public AffixSturdy() {
 		super("Sturdy");
+		this.id = 1;
 		int power = (int) (rng.nextDouble() * (max - min) + min);
 		this.addPassive(new PassiveBonusDefense(power));
 	}

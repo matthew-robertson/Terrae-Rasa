@@ -1,7 +1,9 @@
 package utils;
 
 import items.Item;
-import items.ItemGem;
+
+import java.io.Serializable;
+
 import passivebonuses.PassiveBonus;
 import spells.Spell;
 import affix.Affix;
@@ -29,8 +31,9 @@ import blocks.Block;
  * @since       1.0
  */
 public class ItemStack 
-		 
+		implements Serializable
 {
+	private static final long serialVersionUID = 1L;
 	private String itemName;
 	private int stackSize;
 	private int maxStackSize;

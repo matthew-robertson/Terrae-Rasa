@@ -19,8 +19,6 @@ public class BlockChest extends Block
 {
 	/** The contents of the chest. */
 	private ItemStack[] mainInventory;
-	/** The size of the mainInventory[], preferably a multiple of 5. */
-	private int inventorySize;
 	
 	/**
 	 * Creates a chest of the specified size and ID. Block(int) is called, and handed the ID of the 
@@ -33,7 +31,6 @@ public class BlockChest extends Block
 	{
 		super(i);
 		mainInventory = new ItemStack[inventorySize];
-		this.inventorySize = inventorySize;
 	}	
 	
 	/**
@@ -44,8 +41,7 @@ public class BlockChest extends Block
 	public BlockChest(BlockChest block)
 	{
 		super(block);
-		this.mainInventory = new ItemStack[block.inventorySize];
-		this.inventorySize = block.inventorySize;
+		this.mainInventory = new ItemStack[block.getInventorySize()];
 	}
 	
 	/**
@@ -139,7 +135,7 @@ public class BlockChest extends Block
 	 */
 	public int getInventorySize()
 	{
-		return inventorySize;
+		return mainInventory.length;
 	}
 	
 	/**
@@ -158,8 +154,7 @@ public class BlockChest extends Block
 	 */
 	public void setInventorySize(int newsize)
 	{
-		this.inventorySize = newsize;
-		mainInventory = new ItemStack[inventorySize];
+		mainInventory = new ItemStack[newsize];
 	}
 	
 	public boolean removeItemsFromInventoryStack(int howMany, int index)

@@ -54,12 +54,12 @@ public enum EnumArmor
 			new PassiveBonusDefense(3).setPiecesRequiredToActivate(4),
 			new PassiveBonusSpeed(0.1).setPiecesRequiredToActivate(6)
 		}),
-	LUNARIUM("Mage's ", 4, 6, 5, 3, 3, 3, new PassiveBonus[]{ 
+	LUNARIUM("Mage's Grace", 4, 6, 5, 3, 3, 3, new PassiveBonus[]{ 
 			new PassiveBonusSpeed(.1).setPiecesRequiredToActivate(2),
 			new PassiveBonusManaBoost(200).setPiecesRequiredToActivate(4),
 			new PassiveBonusIntellect(10).setPiecesRequiredToActivate(6)
 		}),
-	TIER6("OP-Ness", 7, 9, 7, 5, 5, 5, new PassiveBonus[]{ 
+	OP_TEST_SET("OP-Ness", 7, 9, 7, 5, 5, 5, new PassiveBonus[]{ 
 			new PassiveBonusSpeed(.4).setPiecesRequiredToActivate(2),
 			new PassiveBonusDefense(200).setPiecesRequiredToActivate(4),
 			new PassiveBonusIntellect(100).setPiecesRequiredToActivate(6)

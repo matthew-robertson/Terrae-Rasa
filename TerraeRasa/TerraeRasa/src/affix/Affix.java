@@ -19,6 +19,13 @@ public class Affix{
 	private Vector<PassiveBonus> passives;
 	private Vector<Aura> auras;
 	private boolean prefix;
+	/**
+	 * Base->0
+	 * Sturdy->1
+	 * Frenzied->2
+	 * Destruction->3
+	 */
+	protected int id;
 	
 	/**
 	 * The default constructor for Affixes. This is not to be used alone, as it won't actually do anything.
@@ -27,6 +34,7 @@ public class Affix{
 	 */
 	public Affix(String name){
 		this.name = name;
+		this.id = 0;
 		rng = new Random();
 		passives = new Vector<PassiveBonus>();
 		auras = new Vector<Aura>();
@@ -86,5 +94,10 @@ public class Affix{
 	
 	public boolean getPrefix(){
 		return prefix;
+	}
+	
+	public int getID()
+	{
+		return id;
 	}
 }

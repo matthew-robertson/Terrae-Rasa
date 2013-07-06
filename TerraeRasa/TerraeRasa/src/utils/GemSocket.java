@@ -1,6 +1,6 @@
 package utils;
 
-import items.ItemGem;
+import java.io.Serializable;
 
 /**
  * A GemSocket is a small helper class to hold an ItemGem. Socketting a new gem will remove
@@ -11,8 +11,9 @@ import items.ItemGem;
  * @since       1.0
  */
 public class GemSocket
-		 
+		implements Serializable
 {
+	private static final long serialVersionUID = 1L;
 	private ItemStack gem;
 	
 	/**

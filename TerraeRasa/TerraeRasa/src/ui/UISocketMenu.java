@@ -10,6 +10,7 @@ import utils.ActionbarItem;
 import utils.ItemStack;
 import world.World;
 import entities.EntityPlayer;
+import enums.EnumColor;
 import enums.EnumItemQuality;
 
 public class UISocketMenu extends UIBase
@@ -94,13 +95,14 @@ public class UISocketMenu extends UIBase
 		}
 		
 		//% of total text size to render, in this case sacale to 1/2 size.
-		float xScale = 0.5F;
+		float xScale = 0.25F;
 		//Arbitrary padding to make things look nicer
 		final int PADDING = 5;		
 		
 		//Find out how long does the tooltip actually has to be
-		double requiredHeight = boldTooltip.getHeight(itemName) + 				
-				(boldTooltip.getHeight(itemName) * 0.75 * stats.length) 
+		double requiredHeight = 10 + 
+				tooltipFont.getHeight(itemName) * xScale * 1.5F + 				
+				(tooltipFont.getHeight(itemName) * xScale * stats.length) 
 				+ 30;
 		
 		tooltipHeight = (int) requiredHeight;
@@ -120,24 +122,22 @@ public class UISocketMenu extends UIBase
 		GL11.glColor4d(quality.r, quality.g, quality.b, 1.0);
 		
 		//Title
-		float yOffset = frameY + boldTooltip.getHeight(itemName);
-		boldTooltip.drawString(frameX + PADDING, yOffset, itemName, xScale , -1, TrueTypeFont.ALIGN_LEFT); 
-		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+		float yOffset = frameY + tooltipFont.getHeight(itemName) * xScale * 1.5F;
+		tooltipFont.drawString(frameX + PADDING, yOffset, itemName, xScale * 1.5F, -xScale * 1.5F, TrueTypeFont.ALIGN_LEFT); 
 		
+		GL11.glColor4d(EnumColor.LIME_GREEN.COLOR[0], EnumColor.LIME_GREEN.COLOR[1], EnumColor.LIME_GREEN.COLOR[2], 1.0);
 		//Stats
 		for(int i = 0; i < stats.length; i++)
 		{
-			boldTooltip.drawString(frameX + PADDING, 
-					yOffset + PADDING*(1 + i) + (((tooltipHeight) - (tooltipHeight - boldTooltip.getHeight(itemName))) * 0.5f * (1+i)), 
+			tooltipFont.drawString(frameX + PADDING, 
+					yOffset + (((tooltipHeight) - (tooltipHeight - tooltipFont.getHeight(itemName))) * xScale * (1+i)), 
 					stats[i],
 					xScale,
-					-1, 
+					-xScale, 
 					TrueTypeFont.ALIGN_LEFT); 
 		}			
 		
-		yOffset = yOffset + PADDING * (stats.length) + 
-				(((tooltipHeight) - (tooltipHeight - boldTooltip.getHeight(itemName))) * 0.5f * (stats.length));
-		
+		yOffset = yOffset + PADDING + (((tooltipHeight) - (tooltipHeight - tooltipFont.getHeight(itemName))) * xScale * (stats.length));
 		int numberOfSockets = stack.getGemSockets().length;
 		
 		icons[8].bind(); //Gem Socket Icon
