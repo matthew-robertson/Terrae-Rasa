@@ -113,21 +113,24 @@ public class EntityPlayer extends EntityLiving
 	private PassiveBonusContainer currentBonuses; 
 	private AuraTracker auraTracker;
 	
-	public int viewedChestX;
-	public int viewedChestY;
-	public boolean isViewingChest;	
 	public int strength;
 	public int dexterity;
 	public int intellect;
 	public int stamina;
+	
+	public int temporarySpecialEnergy;
+	public double specialEnergy;
+	public double maxSpecialEnergy;
+	
+	public int viewedChestX;
+	public int viewedChestY;
+	public boolean isViewingChest;	
 	public int baseMaxHealth;
 	public int temporaryMaxHealth;
 	public int baseMaxMana;	
 	public int temporaryMaxMana;
 	public double respawnXPos;
 	public double respawnYPos;	
-	
-	
 	
 	public int selectedRecipe;
 	public int selectedSlot;
@@ -139,9 +142,12 @@ public class EntityPlayer extends EntityLiving
 	public double manaRegenerationModifier;
 	public double specialRegenerationModifier;
 	
-	public int temporarySpecialEnergy;
-	public double specialEnergy;
-	public double maxSpecialEnergy;
+	public double pickupRangeModifier;
+	public double staminaModifier;
+	public double intellectModifier;
+	public double dexterityModifier;
+	public double strengthModifier;
+	
 	
 	/** A flag indicating if the player has been forever defeated. If they have, they will not be saved to disk.*/
 	public boolean defeated;
@@ -208,6 +214,11 @@ public class EntityPlayer extends EntityLiving
 		manaRegenerationModifier = 1;
 		specialRegenerationModifier = 1;
 		allDamageModifier = 1;
+		pickupRangeModifier = 1;
+		staminaModifier = 1;
+		intellectModifier = 1;
+		dexterityModifier = 1;
+		strengthModifier = 1;
 		isReloaded = false;
 		cooldowns = new Hashtable<String, Cooldown>();
 		nearBlock = new Hashtable<String, Boolean>();
@@ -764,11 +775,11 @@ public class EntityPlayer extends EntityLiving
 	 */
 	public void recalculateStats()
 	{
-		rangeDamageModifier = 1.0 + DAMAGE_BONUS_DEXTERITY * dexterity;
-		meleeDamageModifier = 1.0 + DAMAGE_BONUS_STRENGTH * strength;
-		magicDamageModifier = 1.0 + DAMAGE_BONUS_INTELLECT * intellect;
-		maxHealth = temporaryMaxHealth + baseMaxHealth + (stamina * HEALTH_FROM_STAMINA);
-		maxMana = temporaryMaxMana + baseMaxMana + (intellect * MANA_FROM_INTELLECT);	
+		rangeDamageModifier = 1.0 + (DAMAGE_BONUS_DEXTERITY * dexterity * dexterityModifier);
+		meleeDamageModifier = 1.0 + (DAMAGE_BONUS_STRENGTH * strength * strengthModifier);
+		magicDamageModifier = 1.0 + (DAMAGE_BONUS_INTELLECT * intellect * intellectModifier);
+		maxHealth = (int) (temporaryMaxHealth + baseMaxHealth + (staminaModifier * stamina * HEALTH_FROM_STAMINA));
+		maxMana = (int) (temporaryMaxMana + baseMaxMana + (intellectModifier * intellect * MANA_FROM_INTELLECT));	
 		maxSpecialEnergy = temporarySpecialEnergy + baseSpecialEnergy;
 	}
 	

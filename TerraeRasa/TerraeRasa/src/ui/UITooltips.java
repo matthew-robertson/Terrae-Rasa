@@ -137,20 +137,20 @@ public class UITooltips extends UIBase
 			String[] bonuses = ((ItemArmor)(Item.itemsList[stack.getItemID()])).getStringBonuses();
 			for(String bonus : bonuses)
 			{
-				if(!(bonus.contains("Defense")))
-				{
+//				if(!(bonus.contains("Defense")))
+//				{
 					bonusesVector.add(bonus);
-				}
+//				}
 			}
 		}
 		
 		String[] bonuses = stack.getStringBonuses();
 		for(String bonus : bonuses)
 		{
-			if(!(bonus.contains("Defense")))
-			{
+//			if(!(bonus.contains("Defense")))
+//			{
 				bonusesVector.add(bonus);
-			}
+//			}
 		}
 		
 		String[] passiveBonuses = new String[bonusesVector.size()];
@@ -243,7 +243,7 @@ public class UITooltips extends UIBase
 		return temp;
 	}
 	
-	private static String getTotalArmor(EntityPlayer player, ItemStack stack)
+	private static String getTotalArmor(EntityPlayer player, ItemStack stack, EnumColor color)
 	{
 		Vector<PassiveBonus> bonusesVector = new Vector<PassiveBonus>();
 		if(stack.getItemID() >= Item.itemIndex && stack.getItemID() < ActionbarItem.spellIndex && Item.itemsList[stack.getItemID()] instanceof ItemArmor)
@@ -263,6 +263,7 @@ public class UITooltips extends UIBase
 		{
 			if(bonus instanceof PassiveBonusDefense)
 			{
+				color = EnumColor.LIME_GREEN;
 				totalArmor += bonus.getPower();
 			}
 		}
@@ -337,9 +338,10 @@ public class UITooltips extends UIBase
 			String[] passiveBonusLines = formatPassiveBonuses(getBonuses(stack));
 			String[] setBonuses = getSetBonuses(stack);
 			String armor = "";
+			EnumColor color = EnumColor.WHITE;
 			if(stack.getItemID() >= ActionbarItem.itemIndex && stack.getItemID() < ActionbarItem.spellIndex && Item.itemsList[stack.getItemID()] instanceof ItemArmor)
 			{
-				armor = getTotalArmor(player, stack);
+				armor = getTotalArmor(player, stack, color);
 			}
 			
 			//If there's just a title, crop the tooltip
@@ -405,7 +407,7 @@ public class UITooltips extends UIBase
 			if(!armor.equals(""))
 			{
 				yOffset += 24;
-				GL11.glColor4d(EnumColor.WHITE.COLOR[0], EnumColor.WHITE.COLOR[1], EnumColor.WHITE.COLOR[2], 1.0);
+				GL11.glColor4d(color.COLOR[0], color.COLOR[1], color.COLOR[2], 1.0);
 				tooltipFont.drawString(frameX + PADDING, yOffset, armor, xScale * 2.2F, -xScale * 2.2F, TrueTypeFont.ALIGN_LEFT); 
 			}
 			GL11.glColor4d(EnumColor.LIME_GREEN.COLOR[0], EnumColor.LIME_GREEN.COLOR[1], EnumColor.LIME_GREEN.COLOR[2], 1.0);
@@ -434,7 +436,9 @@ public class UITooltips extends UIBase
 			}
 			
 			//The actual set bonuses
-			yOffset = yOffset + PADDING + (((tooltipHeight) - (tooltipHeight - tooltipFont.getHeight(itemName))) * xScale * (passiveBonusLines.length));
+			yOffset = yOffset + (((tooltipHeight) - (tooltipHeight - tooltipFont.getHeight(itemName))) * xScale * (passiveBonusLines.length));
+			if(setBonuses.length > 1)
+				yOffset += PADDING;
 			//Title
 			if(setBonuses.length > 0 && !setBonuses[0].equals("None"))
 			{

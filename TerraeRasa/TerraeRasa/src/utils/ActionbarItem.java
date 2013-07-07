@@ -233,4 +233,9 @@ public class ActionbarItem
 	public void onRightClick(World world, EntityPlayer entity)
 	{
 	}
+	
+	public String toString()
+	{
+		return name;
+	}
 }

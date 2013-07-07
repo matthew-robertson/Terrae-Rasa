@@ -518,7 +518,7 @@ public class World
 					PLAYER_X_CENTER, 
 					PLAYER_Y_CENTER);
 			//Check if the itemstack is near the player and able to be picked up
-			if(distance <= itemsList.get(i).width * 2 && itemsList.get(i).canBePickedUp()) 
+			if(distance <= itemsList.get(i).width * 2 * player.pickupRangeModifier && itemsList.get(i).canBePickedUp()) 
 			{
 				ItemStack stack = player.inventory.pickUpItemStack(this, player, itemsList.get(i).getStack()); //if so try to pick it up
 				

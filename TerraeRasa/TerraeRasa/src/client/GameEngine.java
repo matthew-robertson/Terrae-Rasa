@@ -329,6 +329,8 @@ public class GameEngine
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.chest, 100));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.ironChest, 100));
 			
+			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.steadfastShield));
+			
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.woodenBow));
 			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.absorbPotion2, 50));
 			

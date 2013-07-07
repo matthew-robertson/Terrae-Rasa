@@ -325,9 +325,9 @@ public class Item extends ActionbarItem
 	public static Item talismanOfWinds = new ItemArmorAccessory(402).passiveBonuses(new PassiveBonus[]{ 
 			new PassiveBonusSpeed(0.1F)
 	}).setIconPosition(15, 3).setName("Talisman of Winds").setExtraTooltipInformation("The winds of fortune are at your back.");	
-	public static Item generic_name_2 = new ItemArmorAccessory(403).setAuras(new Aura[]{ 
+	public static Item ankh = new ItemArmorAccessory(403).setAuras(new Aura[]{ 
 			new AuraHeavensReprieve()
-	}).setIconPosition(14, 1).setName("Generic Name 2").setExtraTooltipInformation("This relic will destroy itself to save the wearer.");	
+	}).setIconPosition(14, 1).setName("Ankh").setExtraTooltipInformation("This relic will destroy itself to save the wearer.");	
 	public static Item goddessesTear = new ItemArmorAccessory(404).passiveBonuses(new PassiveBonus[]{ 
 			new PassiveBonusIntellect(8)
 	}).setIconPosition(15, 4).setName("Goddess' Tear").setExtraTooltipInformation("This tear contains immense magical power.");	
@@ -337,48 +337,44 @@ public class Item extends ActionbarItem
 	public static Item berserkersEssence = new ItemArmorAccessory(406).passiveBonuses(new PassiveBonus[]{ 
 			new PassiveBonusStrength(3), new PassiveBonusAttackSpeed(0.1F)
 	}).setIconPosition(15, 0).setName("Berserker's Essence").setExtraTooltipInformation("You sense deep inner rage within the essence.");	
-	public static Item guardianAmulet = new ItemArmorAccessory(407).passiveBonuses(new PassiveBonus[]{ 
-			new PassiveBonusDefense(6), 
-	}).setIconPosition(15, 6).setName("Amulet of the Guardian").setExtraTooltipInformation("This amulet contains great defensive power.");	
-	public static Item generic_name_1 = new ItemArmorAccessory(408).setAuras(new Aura[]{ 
-			new AuraSmartHeal(30, 50, 0.5, false)
-	}).setIconPosition(15, 7).setName("Generic_name_1").setExtraTooltipInformation("TODO");	
+	public static Item guardianAmulet = new ItemArmorAccessory(407).setDefense(6).setIconPosition(15, 6).setName("Amulet of the Guardian").setExtraTooltipInformation("This amulet contains great defensive power.");	
+	public static Item sigilOfAsclepius = new ItemArmorAccessory(408).setAuras(new Aura[]{ 
+			new AuraSmartHeal(25, 50, 0.5, false)
+	}).setIconPosition(15, 7).setName("Sigil of Asclepius").setExtraTooltipInformation("This sigil radiates holy energy.");	
 	public static Item heavyMedal = new ItemArmorAccessory(409).setAuras(new Aura[]{ 
 			new AuraPeriodicModifier(0.75)
 	}).setIconPosition(15, 1).setName("Heavy Medal").setExtraTooltipInformation("The power of this medal protects its wearer.");	
 	public static Item eaglesFeather = new ItemArmorAccessory(410).passiveBonuses(new PassiveBonus[]{
 		new PassiveBonusJumpHeight(4)	
-	}).setIconPosition(14, 2).setName("Eagle's Feather").setExtraTooltipInformation("TODO");
+	}).setIconPosition(14, 2).setName("Eagle's Feather").setExtraTooltipInformation("The eagle's feather almost lets take to the sky.");
 	public static Item nimblefootCloak = new ItemArmorAccessory(411).passiveBonuses(new PassiveBonus[]{
 			new PassiveBonusDodge(0.05)
-	}).setIconPosition(15, 9).setName("Nimblefoot Cloak").setExtraTooltipInformation("TODO");
+	}).setIconPosition(15, 9).setName("Nimblefoot Cloak").setExtraTooltipInformation("Grants the wearer great agility.");
 	public static Item mastersBracer = new ItemArmorAccessory(412).passiveBonuses(new PassiveBonus[]{
 			new PassiveBonusCriticalStrike(0.04)
-	}).setIconPosition(15, 10).setName("Master's Bracer").setExtraTooltipInformation("TODO");
+	}).setIconPosition(15, 10).setName("Master's Bracer").setExtraTooltipInformation("These bracers contain the spirit of a combat master.");
 	public static Item heartyPendant = new ItemArmorAccessory(413).passiveBonuses(new PassiveBonus[]{
 			new PassiveBonusStamina(5)
-	}).setIconPosition(14, 3).setName("Hearty Pendant").setExtraTooltipInformation("TODO");
-	public static Item steadfastShield = new ItemArmorAccessory(414).passiveBonuses(new PassiveBonus[]{
-			new PassiveBonusDefense(5)
-	}).setIconPosition(15, 8).setName("Steadfast Shield").setExtraTooltipInformation("TODO");
+	}).setIconPosition(14, 3).setName("Hearty Pendant").setExtraTooltipInformation("This pendant radiates life energy.");
+	public static Item steadfastShield = new ItemArmorAccessory(414).setDefense(5).setIconPosition(15, 8).setName("Steadfast Shield").setExtraTooltipInformation("A symbol of unwaivering resolve.");
 	public static Item sapphireRing = new ItemArmorAccessory(415).passiveBonuses(new PassiveBonus[]{
 			new PassiveBonusCriticalStrike(0.01)
-	}).setIconPosition(14, 4).setName("Sapphire Ring").setExtraTooltipInformation("TODO");
+	}).setIconPosition(14, 4).setName("Sapphire Ring").setExtraTooltipInformation("A basic sapphire ring.");
 	public static Item emeraldRing = new ItemArmorAccessory(416).passiveBonuses(new PassiveBonus[]{
 			new PassiveBonusAttackSpeed(0.01)
-	}).setIconPosition(14, 5).setName("Emerald Ring").setExtraTooltipInformation("TODO");
+	}).setIconPosition(14, 5).setName("Emerald Ring").setExtraTooltipInformation("A basic emerald ring.");
 	public static Item rubyRing = new ItemArmorAccessory(417).passiveBonuses(new PassiveBonus[]{
 			new PassiveBonusStrength(1)
-	}).setIconPosition(14, 6).setName("Ruby Ring").setExtraTooltipInformation("TODO");
+	}).setIconPosition(14, 6).setName("Ruby Ring").setExtraTooltipInformation("A basic ruby ring.");
 	public static Item diamondRing = new ItemArmorAccessory(418).passiveBonuses(new PassiveBonus[]{
 			new PassiveBonusDodge(0.01)
-	}).setIconPosition(14, 7).setName("Diamond Ring").setExtraTooltipInformation("TODO");
+	}).setIconPosition(14, 7).setName("Diamond Ring").setExtraTooltipInformation("A basic diamond ring.");
 	public static Item opalRing = new ItemArmorAccessory(419).passiveBonuses(new PassiveBonus[]{
 			new PassiveBonusDefense(1)
-	}).setIconPosition(14, 8).setName("Opal Ring").setExtraTooltipInformation("TODO");
+	}).setIconPosition(14, 8).setName("Opal Ring").setExtraTooltipInformation("A basic opal ring.");
 	public static Item jasperRing = new ItemArmorAccessory(420).passiveBonuses(new PassiveBonus[]{
 			new PassiveBonusStamina(1)
-	}).setIconPosition(14, 9).setName("Jasper Ring").setExtraTooltipInformation("TODO");
+	}).setIconPosition(14, 9).setName("Jasper Ring").setExtraTooltipInformation("A basic jasper ring.");
 	public static Item goldRing = new ItemArmorAccessory(421).setIconPosition(14, 10).setName("Gold Ring");
 	
 	public static Item opHelmet = new ItemArmorHelmet(454).setArmorType(EnumArmor.OP_TEST_SET).passiveBonuses(new PassiveBonus[]{

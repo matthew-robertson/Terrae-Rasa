@@ -7,11 +7,14 @@ import java.util.EnumSet;
 import java.util.Vector;
 
 import passivebonuses.PassiveBonus;
+import passivebonuses.PassiveBonusAttackSpeed;
 import passivebonuses.PassiveBonusCriticalStrike;
 import passivebonuses.PassiveBonusDefense;
+import passivebonuses.PassiveBonusDexterity;
 import passivebonuses.PassiveBonusIntellect;
 import passivebonuses.PassiveBonusManaBoost;
 import passivebonuses.PassiveBonusSpeed;
+import passivebonuses.PassiveBonusStrength;
 import utils.ItemStack;
 import entities.EntityPlayer;
 
@@ -59,6 +62,16 @@ public enum EnumArmor
 			new PassiveBonusManaBoost(200).setPiecesRequiredToActivate(4),
 			new PassiveBonusIntellect(10).setPiecesRequiredToActivate(6)
 		}),
+	RANGE_SET("Archer's Finesse", 4, 6, 5, 3, 3, 3, new PassiveBonus[]{ 
+			new PassiveBonusSpeed(.1).setPiecesRequiredToActivate(2),
+			new PassiveBonusCriticalStrike(0.05).setPiecesRequiredToActivate(4),
+			new PassiveBonusDexterity(10).setPiecesRequiredToActivate(6)
+		}),
+	STRENGTH_SET("Warriors's Tact", 6, 9, 6, 4, 4, 4, new PassiveBonus[]{ 
+			new PassiveBonusSpeed(.1).setPiecesRequiredToActivate(2),
+			new PassiveBonusAttackSpeed(0.05).setPiecesRequiredToActivate(4),
+			new PassiveBonusStrength(10).setPiecesRequiredToActivate(6)
+		}),		
 	OP_TEST_SET("OP-Ness", 7, 9, 7, 5, 5, 5, new PassiveBonus[]{ 
 			new PassiveBonusSpeed(.4).setPiecesRequiredToActivate(2),
 			new PassiveBonusDefense(200).setPiecesRequiredToActivate(4),

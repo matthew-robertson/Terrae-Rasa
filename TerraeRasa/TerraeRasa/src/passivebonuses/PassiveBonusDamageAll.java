@@ -12,7 +12,6 @@ import entities.EntityPlayer;
  */
 public class PassiveBonusDamageAll extends PassiveBonus
 {
-
 	public PassiveBonusDamageAll(double power) 
 	{
 		super(power);

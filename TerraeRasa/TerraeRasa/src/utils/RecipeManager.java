@@ -22,7 +22,7 @@ import blocks.Block;
  */
 public class RecipeManager 
 {
-	private static final Vector<Recipe> unorganizedRecipes = new Vector<Recipe>(128);
+	private final Vector<Recipe> unorganizedRecipes = new Vector<Recipe>(128);
 	
 	public RecipeManager()
 	{
@@ -88,7 +88,6 @@ public class RecipeManager
 	Recipe copperGloves = new Recipe(this, new ItemStack(Item.copperGloves), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.copperIngot, 5)
 	});	
-	
 	
 	Recipe bronzeAxe = new Recipe(this, new ItemStack(Item.bronzeAxe), Block.craftingTable, new ItemStack[] {
 		new ItemStack(Item.bronzeIngot, 7), new ItemStack(Block.plank, 5)
