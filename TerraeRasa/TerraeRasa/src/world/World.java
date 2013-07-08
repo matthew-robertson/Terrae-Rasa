@@ -1067,7 +1067,8 @@ public class World
 				BlockChest chest = ((BlockChest)(block));
 				if(chest.metaData != 1)
 				{
-					int[][] metadata = MetaDataHelper.getMetaDataArray((int)(getBlock(mx, my).blockWidth / 6), (int)(getBlock(mx, my).blockHeight / 6)); //metadata used by the block of size (x,y)
+					int[][] metadata = MetaDataHelper.getMetaDataArray((int)(Block.blocksList[getBlock(mx, my).id].blockWidth / 6), 
+							(int)(Block.blocksList[getBlock(mx, my).id].blockHeight / 6)); //metadata used by the block of size (x,y)
 					int metaWidth = metadata.length; 
 					int metaHeight = metadata[0].length;	
 					int x1 = 0;
@@ -1106,7 +1107,8 @@ public class World
 			ItemStack stack = block.getDroppedItem(); //the item dropped by the block
 			if(stack != null)
 			{			
-				int[][] metadata = MetaDataHelper.getMetaDataArray((int)(getBlock(mx, my).blockWidth / 6), (int)(getBlock(mx, my).blockHeight / 6)); //metadata used by the block of size (x,y)
+				int[][] metadata = MetaDataHelper.getMetaDataArray((int)(Block.blocksList[getBlock(mx, my).id].blockWidth / 6),
+						(int)(Block.blocksList[getBlock(mx, my).id].blockHeight / 6)); //metadata used by the block of size (x,y)
 				int metaWidth = metadata.length; //width of the metadata
 				int metaHeight = metadata[0].length; //height of the metadata
 	
@@ -1216,7 +1218,7 @@ public class World
 						setBlock(block.clone(), mx + i, my + j);
 						
 					}
-					getBlock(mx + i, my + j).metaData = metadata[i][j];
+					getBlock(mx + i, my + j).metaData = (short)metadata[i][j];
 				}
 			}
 		}	
@@ -1304,7 +1306,7 @@ public class World
 						setBlock(block.clone(), mx + i, my + j, EnumEventType.EVENT_BLOCK_PLACE);
 						
 					}
-					getBlock(mx + i, my + j).metaData = metadata[i][j];
+					getBlock(mx + i, my + j).metaData = (short)metadata[i][j];
 				}
 			}
 			//Make more generic later

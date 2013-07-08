@@ -347,7 +347,7 @@ public class RecipeManager
 	});	
 	
 	//Inventory Defaults:
-	Recipe torches = new Recipe(this, new ItemStack(Block.torch), Block.none, new ItemStack[] {
+	Recipe torches = new Recipe(this, new ItemStack(Block.torch, 6), Block.none, new ItemStack[] {
 		new ItemStack(Item.coal, 1), new ItemStack(Block.plank, 1) 
 	});	
 //	Recipe manaCrystal = new Recipe(this, new ItemStack(Item.manaCrystal), Block.none, new ItemStack[] {

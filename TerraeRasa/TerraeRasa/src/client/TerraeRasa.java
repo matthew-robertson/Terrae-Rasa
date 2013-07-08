@@ -42,7 +42,7 @@ import entities.EntityPlayer;
  */
 public class TerraeRasa
 {
-	private final static String VERSION = "Alpha 0.1.3";	
+	private final static String VERSION = "Alpha 0.1.4";	
 	private final static String WINDOW_TITLE = "Terrae Rasa " + VERSION;
 	private final static String WINDOWS_BASE_PATH = new StringBuilder().append("C:/Users/").append(System.getProperty("user.name")).append("/AppData/Roaming/terraerasa").toString();
 	private final static String MAC_BASE_PATH = new StringBuilder().append("/Users/").append(System.getProperty("user.name")).append("/Library/Application").append(" Support/terraerasa").toString();

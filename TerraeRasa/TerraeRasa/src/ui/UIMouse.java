@@ -10,6 +10,7 @@ import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 
+import blocks.Block;
 import blocks.BlockChest;
 
 import utils.ActionbarItem;
@@ -186,7 +187,8 @@ public class UIMouse extends UIBase
 			if(chest.metaData != 1) //Make sure its metadata is 1 (otherwise it doesnt technically exist)
 			{
 				//Get the metadata for the block's size
-				int[][] metadata = MetaDataHelper.getMetaDataArray((int)(world.getBlock(player.viewedChestX, player.viewedChestY).blockWidth / 6), (int)(world.getBlock(player.viewedChestX, player.viewedChestY).blockHeight / 6)); //metadata used by the block of size (x,y)
+				int[][] metadata = MetaDataHelper.getMetaDataArray((int)(Block.blocksList[world.getBlock(player.viewedChestX, player.viewedChestY).id].blockWidth / 6), 
+						(int)(Block.blocksList[world.getBlock(player.viewedChestX, player.viewedChestY).id].blockHeight / 6)); //metadata used by the block of size (x,y)
 				int metaWidth = metadata.length; 
 				int metaHeight = metadata[0].length;	
 				x1 = 0;
@@ -709,7 +711,8 @@ public class UIMouse extends UIBase
 		if(chest.metaData != 1) //Make sure its metadata is 1 (otherwise it doesnt technically exist)
 		{
 			//Get the metadata for the block's size
-			int[][] metadata = MetaDataHelper.getMetaDataArray((int)(world.getBlock(player.viewedChestX, player.viewedChestY).blockWidth / 6), (int)(world.getBlock(player.viewedChestX, player.viewedChestY).blockHeight / 6)); //metadata used by the block of size (x,y)
+			int[][] metadata = MetaDataHelper.getMetaDataArray((int)(Block.blocksList[world.getBlock(player.viewedChestX, player.viewedChestY).id].blockWidth / 6), 
+					(int)(Block.blocksList[world.getBlock(player.viewedChestX, player.viewedChestY).id].blockHeight / 6)); //metadata used by the block of size (x,y)
 			int metaWidth = metadata.length; 
 			int metaHeight = metadata[0].length;	
 			int x1 = 0;
@@ -888,7 +891,8 @@ public class UIMouse extends UIBase
 			if(chest.metaData != 1) //Make sure its metadata is 1 (otherwise it doesnt technically exist)
 			{
 				//Get the metadata for the block's size
-				int[][] metadata = MetaDataHelper.getMetaDataArray((int)(world.getBlock(player.viewedChestX, player.viewedChestY).blockWidth / 6), (int)(world.getBlock(player.viewedChestX, player.viewedChestY).blockHeight / 6)); //metadata used by the block of size (x,y)
+				int[][] metadata = MetaDataHelper.getMetaDataArray((int)(Block.blocksList[world.getBlock(player.viewedChestX, player.viewedChestY).id].blockWidth / 6), 
+						(int)(Block.blocksList[world.getBlock(player.viewedChestX, player.viewedChestY).id].blockHeight / 6)); //metadata used by the block of size (x,y)
 				int metaWidth = metadata.length; 
 				int metaHeight = metadata[0].length;	
 				x1 = 0;

@@ -540,10 +540,6 @@ public class Block extends ActionbarItem
 		setBitMap(block.bitMap);
 		this.id = block.id;
 		this.metaData = block.metaData;
-		this.blockWidth = (float) block.blockWidth;
-		this.blockHeight = (float) block.blockHeight;
-		this.textureHeight = (float) block.textureHeight;
-		this.textureWidth = (float) block.textureWidth;
 		this.iconX = (int) block.iconX;
 		this.iconY = (int) block.iconY;
 		this.hasMetaData = block.hasMetaData;

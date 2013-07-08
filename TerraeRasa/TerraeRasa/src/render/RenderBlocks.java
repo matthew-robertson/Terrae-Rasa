@@ -110,8 +110,8 @@ public class RenderBlocks extends Render
 					}
 				    double tx = (double)block.iconX / TEXTURES_PER_ROW;
 				    double ty = (double)block.iconY / TEXTURES_PER_COLUMN;
-				    double tw = tx + ((double)block.textureWidth / (double)TEXTURE_SHEET_WIDTH);
-				    double th = ty + ((double)block.textureHeight / (double)TEXTURE_SHEET_HEIGHT);				
+				    double tw = tx + ((double)Block.blocksList[block.id].textureWidth / (double)TEXTURE_SHEET_WIDTH);
+				    double th = ty + ((double)Block.blocksList[block.id].textureHeight / (double)TEXTURE_SHEET_HEIGHT);				
 					int xm = x1 * BLOCK_SIZE; 
 					int ym = y1 * BLOCK_SIZE; 
 																	
@@ -230,12 +230,12 @@ public class RenderBlocks extends Render
 					{
 						if(block.metaData == 1) //if the block with metadata is in the top-left corner of the larger block, render it
 						{
-							double blockHeight = block.blockHeight;
-							double blockWidth = block.blockWidth;		
+							double blockHeight = Block.blocksList[block.id].blockHeight;
+							double blockWidth = Block.blocksList[block.id].blockWidth;		
 							double tx = (double)block.iconX / TEXTURES_PER_ROW;
 						    double ty = (double)block.iconY / TEXTURES_PER_COLUMN;
-						    double tw = tx + (block.textureWidth / TEXTURE_SHEET_WIDTH);
-						    double th = ty + (block.textureHeight / TEXTURE_SHEET_HEIGHT);			
+						    double tw = tx + (Block.blocksList[block.id].textureWidth / TEXTURE_SHEET_WIDTH);
+						    double th = ty + (Block.blocksList[block.id].textureHeight / TEXTURE_SHEET_HEIGHT);			
 							int xm = x1 * 6; 
 							int ym = y1 * 6; 
 							
@@ -253,8 +253,8 @@ public class RenderBlocks extends Render
 						int blockWidth = 6;
 					    double tx = (double)block.iconX / TEXTURES_PER_ROW;
 					    double ty = (double)block.iconY / TEXTURES_PER_COLUMN;
-					    double tw = tx + (block.textureWidth / TEXTURE_SHEET_WIDTH);
-					    double th = ty + (block.textureHeight / TEXTURE_SHEET_HEIGHT);				
+					    double tw = tx + (Block.blocksList[block.id].textureWidth / TEXTURE_SHEET_WIDTH);
+					    double th = ty + (Block.blocksList[block.id].textureHeight / TEXTURE_SHEET_HEIGHT);				
 						int xm = x1 * BLOCK_SIZE; 
 						int ym = y1 * BLOCK_SIZE; 
 																	
