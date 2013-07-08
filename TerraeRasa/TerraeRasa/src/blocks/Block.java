@@ -616,43 +616,43 @@ public class Block extends ActionbarItem
 			.setIconIndex(15, 8).setBlockType(1)
 			.setDroppedItem(new ItemStack(Item.ironOre), 1, 1);
 	public static Block coal = new BlockOre(28).setName("Coal Ore Block")
-			.setTileMap('g').setHRange(20).setLRange(10)
-			.setBlockHardness(10.0f).setIconIndex(15, 7).setBlockType(1)
+			.setTileMap('g').setHRange(40).setLRange(10)
+			.setBlockHardness(10.0f).setIconIndex(15, 6).setBlockType(1)
 			.setDroppedItem(new ItemStack(Item.coal), 1, 1);
 	public static Block diamond = new BlockOre(29).setName("Diamond Ore Block")
 			.setBlockHardness(10.0f).setLRange(10)
 			.setIconIndex(15, 14).setBlockType(1)
 			.setDroppedItem(new ItemStack(Item.diamond), 1, 1);
 	public static Block ruby = new BlockOre(30).setName("Ruby Ore Block")
-			.setBlockHardness(10.0f).setLRange(10)
+			.setBlockHardness(10.0f).setLRange(5)
 			.setIconIndex(15, 13).setBlockType(1)
 			.setDroppedItem(new ItemStack(Item.ruby), 1, 1);
 	public static Block sapphire = new BlockOre(31).setName("Sapphire Ore Block")
-			.setBlockHardness(10.0f).setLRange(10)
+			.setBlockHardness(10.0f).setLRange(5)
 			.setIconIndex(15, 12).setBlockType(1)
 			.setDroppedItem(new ItemStack(Item.sapphire), 1, 1);
 	public static Block emerald = new BlockOre(32).setName("Emerald Ore Block")
-			.setBlockHardness(10.0f).setLRange(10)
+			.setBlockHardness(10.0f).setLRange(5)
 			.setIconIndex(15, 15).setBlockType(1)
 			.setDroppedItem(new ItemStack(Item.emerald), 1, 1);
 	public static Block opal = new BlockOre(33).setName("Opal Ore Block")
-			.setBlockHardness(10.0f).setLRange(10)
+			.setBlockHardness(10.0f).setLRange(5)
 			.setIconIndex(15, 16).setBlockType(1)
 			.setDroppedItem(new ItemStack(Item.opal), 1, 1);
 	public static Block jasper = new BlockOre(34).setName("Jasper Ore Block")
-			.setBlockHardness(10.0f).setLRange(10)
+			.setBlockHardness(10.0f).setLRange(5)
 			.setIconIndex(15, 17).setBlockType(1)
 			.setDroppedItem(new ItemStack(Item.jasper), 1, 1);
 	public static Block copper = new BlockOre(35).setName("Copper Ore Block")
-			.setBlockHardness(55.0f).setHRange(20).setLRange(0)
+			.setBlockHardness(55.0f).setHRange(25).setLRange(0)
 			.setIconIndex(15, 9).setBlockType(1)
 			.setDroppedItem(new ItemStack(Item.copperOre), 1, 1);
 	public static Block silver = new BlockOre(36).setName("Silver Ore Block")
-			.setBlockHardness(80.0f).setHRange(0).setLRange(5)
+			.setBlockHardness(80.0f).setHRange(0).setLRange(10)
 			.setIconIndex(15, 10).setBlockType(1)
 			.setDroppedItem(new ItemStack(Item.silverOre), 1, 1);
 	public static Block tin = new BlockOre(37).setName("Tin Ore Block")
-			.setBlockHardness(55.0f).setHRange(10).setLRange(0)
+			.setBlockHardness(55.0f).setHRange(20).setLRange(0)
 			.setIconIndex(15, 8).setBlockType(1)
 			.setDroppedItem(new ItemStack(Item.tinOre), 1, 1);
 	public static Block redflower = new Block(38).setName("Red Flower")

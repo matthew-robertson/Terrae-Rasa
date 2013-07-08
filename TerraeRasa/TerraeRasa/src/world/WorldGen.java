@@ -29,14 +29,6 @@ public class WorldGen{
 	}
 	
 	protected void placeChest(World world, Block chest, int x, int y){
-		//Ensure that there is enough space to place the chest.
-		/*for (int i = x; i < x + (chest.getBlockWidth() / 6); i++){
-			for (int j = y; j < y + (chest.getBlockHeight() / 6); j++){
-				if (world.getBlock(i, j).isSolid){
-					return;
-				}
-			}
-		}*/
 		world.placeLargeBlockWorld(x, y, Block.chest);
 		Block active = world.getBlockGenerate(x, y);
 		if (active instanceof BlockChest){
@@ -124,7 +116,7 @@ public class WorldGen{
 					if (world.getBlockGenerate(j, i).getID() == Block.air.getID()){ //If the cell is currently empty
 						choice = (int)(Math.random() * 100 + 1); //select which block
 						if (i > (int)(world.getHeight() / 3 * 2)){	//If the current cell is in the bottom third of the map							
-							if (choice < 75){ //75% chance of stone
+							if (choice < 95){ //95% chance of stone
 								world.setBlockGenerate(Block.stone, j, i); //Fill cell with stone
 							}
 							else{ //25% chance of dirt
@@ -133,10 +125,10 @@ public class WorldGen{
 						}
 						else{ //If the current cell is in the top two thirds
 							if (world.getBlockGenerate(j, i-1).getID() == Block.air.getID()){
-								if (choice < 80){ //80% chance of dirt
+								if (choice < 25){ //25% chance of dirt
 									world.setBlockGenerate(Block.dirt, j, i); //Fill cell with dirt
 								}
-								else{ //20% Chance of stone
+								else{ //75% Chance of stone
 									world.setBlockGenerate(Block.stone, j, i); //Fill cell with stone
 								}
 							}
@@ -242,7 +234,7 @@ public class WorldGen{
 				orec = Block.air;
 				minchance = (int)(Math.random()*1000+1);	//Decide if an ore vein will be placed
 				if (minchance >=988 && world.getBlockGenerate(j, i).getID() == Block.stone.getID()){ // if a vein is to be placed						
-					if (i <= world.getHeight()/10*7){ //if it is placing in the top 7/10's of the map							
+					if (i <= world.getHeight()/4*3){ //if it is placing in the top 3/4's of the map							
 						for (int k = 0; k < placeableOres.length; k++){
 							ore = (int)(Math.random()*100+1); //Determine which ore will be placed
 							if (ore <= placeableOres[k].getHRange()){								
@@ -254,7 +246,7 @@ public class WorldGen{
 							}
 						}							
 					}
-					else if (i >= world.getHeight()/10 * 7){ //If it's instead in the bottom 3/10's
+					else if (i >= world.getHeight()/4 * 3){ //If it's instead in the bottom 1/4's
 						for (int k = 0; k < placeableOres.length; k++){
 							ore = (int)(Math.random()*100+1); //Determine which ore will be placed
 							if (ore <= placeableOres[k].getLRange()){
@@ -278,9 +270,9 @@ public class WorldGen{
 	 * Designed to add individual veins of ores
 	 * @param world - current world
 	 * @param am - addition length of the vein (number from 0 to am -1, + 5 gives total length)
-	 * @param j - x location to start the vien
+	 * @param j - x location to start the vein
 	 * @param i - y location to start the vein
-	 * @param ore - which ore to use (copper, tin, iron, coal, silver, gold, diamond)
+	 * @param ore - which ore to use
 	 */
 	protected void oreplace (World world, int am, int j, int i, Block ore){
 		int solid;

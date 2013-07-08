@@ -1,14 +1,14 @@
-package enums;
+	package enums;
 
 import java.util.EnumSet;
 import java.util.Vector;
 
 public enum EnumWorldSize
 {
-	MINI("Mini", 1200, 800),
-	SMALL("Small", 2400, 1200), 
-	MEDIUM("Medium", 3600, 1800), 
-	LARGE("Large", 4800, 2400); 
+	MINI("Mini", 1200, 1200),
+	SMALL("Small", 2400, 800), 
+	MEDIUM("Medium", 3600, 800), 
+	LARGE("Large", 4800, 800); 
 
 	private int width;
 	private int height;

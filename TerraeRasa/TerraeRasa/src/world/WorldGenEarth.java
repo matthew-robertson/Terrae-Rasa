@@ -52,7 +52,7 @@ public class WorldGenEarth extends WorldGen
 	public World generate(World world, int xLoc, int width, int yLoc, int depth) 
 	{
 		System.gc();
-		Block[] placeableOres = {Block.tin, Block.copper, Block.iron, Block.coal, Block.silver, Block.gold};
+		Block[] placeableOres = {Block.coal, Block.tin, Block.copper, Block.iron, Block.silver, Block.gold};
 		Block[] placeableGems = {Block.diamond, Block.ruby, Block.sapphire, Block.emerald, Block.opal, Block.jasper};
 		Biome[] biomes = generateBiomes(world);
 		assignBiomes(world, biomes);
@@ -62,15 +62,15 @@ public class WorldGenEarth extends WorldGen
 		generateDirt(world, xLoc, width, yLoc, depth);
 		backWalls(world, xLoc, width, yLoc, depth);
 		System.gc();		
-		caves(world, xLoc + 1, (xLoc + width) - 1, yLoc + 445, (yLoc + depth) - 445, 179);
-		cellauto(world, xLoc + 1, (xLoc + width) - 2, yLoc, (yLoc + depth) - 206);
-		cellauto(world, xLoc + 1, (xLoc + width) - 2, yLoc, (yLoc + depth) - 206);
-		cellauto(world, xLoc + 1, (xLoc + width) - 2, yLoc, (yLoc + depth) - 206);
+		caves(world, xLoc + 1, (xLoc + width) - 1, yLoc, (yLoc + depth) - 20, 195);
+		cellauto(world, xLoc + 1, (xLoc + width) - 2, yLoc, (yLoc + depth) - 20);
+		cellauto(world, xLoc + 1, (xLoc + width) - 2, yLoc, (yLoc + depth) - 20);
+		cellauto(world, xLoc + 1, (xLoc + width) - 2, yLoc, (yLoc + depth) - 20);
 		stoneinter(world, xLoc, width, yLoc, depth);
 		cellauto(world, xLoc + 1, (xLoc + width) - 2, yLoc, (yLoc + depth) - 2);
 		ores(world, xLoc + 1, (xLoc + width) - 4, yLoc + 1, (yLoc + depth) - 11, placeableOres);
 		gems(world, xLoc + 1, (xLoc + width) - 4, yLoc + 1, (yLoc + depth) - 11, placeableGems);
-		generateChests(world, Block.chest, xLoc, width - 5, yLoc + 400, depth - 405);
+		generateChests(world, Block.chest, xLoc, width - 5, yLoc, depth - 40);
 		System.gc();
 				
 		Biome biome;
@@ -93,7 +93,9 @@ public class WorldGenEarth extends WorldGen
 		
 		for(int j = (yLoc + depth) - 1; j > yLoc; j--){ //go through the the y-axis of the world
 			for(int k = xLoc + 1; k < (xLoc + width) - 1; k++){ //x-axis
-				if (world.getBlockGenerate(k,j).isSolid){
+				if (world.getBlockGenerate(k,j).isSolid 
+					&& world.getBlockGenerate(k,j).getTileMap() != 'T'
+					&& world.getBlockGenerate(k,j).getTileMap() != 'b'){
 					world.setBitMap(k, j, world.updateBlockBitMap(k, j)); //set the appropriate texture
 				}				
 			}
@@ -123,12 +125,16 @@ public class WorldGenEarth extends WorldGen
 						world.getBlockGenerate(k, j+1).getID() == Block.treetopc1.getID() || world.getBlockGenerate(k, j+1).getID() == Block.treetopc2.getID() ||
 						world.getBlockGenerate(k, j+1).getID() == Block.treetopr1.getID() || world.getBlockGenerate(k, j+1).getID() == Block.treetopr2.getID()) world.setBitMap(k, j+1, 1);
 				
-				else if (world.getBlockGenerate(k, j+1).isSolid){ //If there is a solid block with air above
+				if (world.getBlockGenerate(k, j+1).isSolid){ //If there is a solid block with air above
 					if (world.getBlockGenerate(k, j).isOveridable){
 						world.setBlockGenerate(Block.snowCover, k, j); // If the current block is air or a unneeded plant, replace the block with snow
 					}
 				}
-				if (world.getBlockGenerate(k, j).getID() == Block.grass.getID()) world.setBitMap(k, j, world.getBlockGenerate(k, j).getBitMap() + 16);								
+				if (world.getBlockGenerate(k, j).getID() == Block.grass.getID()){
+					System.out.println(world.getBlockGenerate(k,j).getBitMap());
+					world.setBitMap(k, j, world.getBlockGenerate(k, j).getBitMap() + 16);
+					System.out.println(world.getBlockGenerate(k,j).getBitMap());
+				}
 			}
 		}
 	}
@@ -146,16 +152,16 @@ public class WorldGenEarth extends WorldGen
 				if (world.getBlockGenerate(j, i+1).getID() == Block.grass.getID() && world.getBlockGenerate(j, i).getID() == Block.air.getID()){ //If the block beneath the current cell is grass
 					plant = (int)(Math.random() * 100 + 1); //Decide what plant will be placed									
 					int space = 4;
-					if (plant <= 40 && i <= 450){ //If a tree is to be placed
+					if (plant <= 40){ //If a tree is to be placed
 						world.growTree(space, j, i);							
 					}
-					else if (plant <= 45 && i <=450){ //If a red flower is to be placed
+					else if (plant <= 45){ //If a red flower is to be placed
 						world.setBlockGenerate(Block.redflower, j, i); //Fill the cell with red flower						
 					}
-					else if (plant <= 50 && i <= 450){ //If a yellow flower is to be placed
+					else if (plant <= 50){ //If a yellow flower is to be placed
 						world.setBlockGenerate(Block.yellowflower, j, i); //Fill the cell with yellow flower
 					}
-					else if (i <= 450){ //If tall grass is to be placed
+					else { //If tall grass is to be placed
 						world.setBlockGenerate(Block.tallgrass, j, i); //Fill the cell with tall grass
 					}
 				}
@@ -260,11 +266,11 @@ public class WorldGenEarth extends WorldGen
 		int stone = 0, amount = 0;	
 		for(int i = (y + h) - 10; i > y + 50; i--){
 			for(int k = x + 8; k < (x + w); k++){
-				if (i > (int)(world.getHeight()/3*2)){ //If current cell is in the bottom third of the map
+				if (i > (int)(world.getHeight()/16 * 6)){ //If current cell is in the bottom third of the map
 					stone = (int)(Math.random()*3+1); //Chance of spawning rock is 1 in 2
 				}
 				else{
-					stone = (int)(Math.random()*8+1); //Chance of spawning rock is 1 in 6
+					stone = (int)(Math.random()*6+1); //Chance of spawning rock is 1 in 6
 				}		
 				amount = (int)(Math.random()*6+2); //Select how much rock to place			
 				if (k - amount <= 0 || k + amount >= world.getWidth()){ //If the amount won't fit on the map
