@@ -170,7 +170,7 @@ public class UIInventory extends UIBase
 				chest = (BlockChest)(world.getBlockGenerate(player.viewedChestX - x, player.viewedChestY - y));
 			}	
 			
-			int totalRows = chest.getInventorySize() / 5;
+			int totalRows = chest.getInventorySize() / 4;
 			for(int i = 0; i < chest.getInventorySize(); i++) //for each ItemStack in the chest
 			{
 				int size = 20;

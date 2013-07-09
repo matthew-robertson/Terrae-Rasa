@@ -144,7 +144,13 @@ public class BlockChest extends Block
 	 */
 	public void setInventory(ItemStack[] stacks)
 	{
-		this.mainInventory = stacks;
+		for(int i = 0; i < mainInventory.length; i++)
+		{
+			if(i < stacks.length && stacks[i] != null)
+			{
+				mainInventory[i] = new ItemStack(stacks[i]);
+			}
+		}
 	}
 	
 	/**

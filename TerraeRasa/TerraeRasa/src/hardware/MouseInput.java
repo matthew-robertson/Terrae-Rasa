@@ -32,7 +32,7 @@ public class MouseInput
 			int active = player.selectedSlot;
 			int mouseBX = ((Render.getCameraX() + MathHelper.getCorrectMouseXPosition()) / 6);
 			int mouseBY = ((Render.getCameraY() + MathHelper.getCorrectMouseYPosition()) / 6);
-			
+				
 			if (!Mouse.isButtonDown(0) && !Mouse.isButtonDown(1)){
 				player.setIsMining(false);
 			}
@@ -123,11 +123,11 @@ public class MouseInput
 						
 						if(d <= player.getMaximumBlockPlaceDistance()) //if the click was close enough to place a block, try to place one
 						{
-							if (Block.blocksList[selectedItemID].clone() instanceof BlockBackWall){
-								world.placeBackWall(player, mouseBX, mouseBY, Block.blocksList[player.inventory.getMainInventoryStack(active).getItemID()].clone());
+							if (Block.blocksList[selectedItemID] instanceof BlockBackWall){
+								world.placeBackWall(player, mouseBX, mouseBY, Block.blocksList[player.inventory.getMainInventoryStack(active).getItemID()]);
 							}
 							else {
-								world.placeBlock(player, mouseBX, mouseBY, Block.blocksList[player.inventory.getMainInventoryStack(active).getItemID()].clone());
+								world.placeBlock(player, mouseBX, mouseBY, Block.blocksList[player.inventory.getMainInventoryStack(active).getItemID()]);
 							}
 						}
 					}

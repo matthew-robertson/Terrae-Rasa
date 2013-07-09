@@ -1210,13 +1210,12 @@ public class World
 				{
 					if(block instanceof BlockChest)
 					{
-						BlockChest chest = (BlockChest) block.clone();						
+						BlockChest chest = new BlockChest((BlockChest) block);						
 						setBlock(chest, mx + i, my + j);
 					}
 					else
 					{
 						setBlock(block.clone(), mx + i, my + j);
-						
 					}
 					getBlock(mx + i, my + j).metaData = (short)metadata[i][j];
 				}
@@ -1298,7 +1297,7 @@ public class World
 				{
 					if(block instanceof BlockChest)
 					{
-						BlockChest chest = (BlockChest) block.clone();						
+						BlockChest chest = new BlockChest((BlockChest) block);						
 						setBlock(chest, mx + i, my + j, EnumEventType.EVENT_BLOCK_PLACE);
 					}
 					else
@@ -1358,7 +1357,7 @@ public class World
 			getBlock(mx, my).isSolid)) //can the block be placed
 		{
 			player.inventory.removeItemsFromInventory(this, player, new ItemStack(block, 1)); //remove the items from inventory		
-			setBackBlock(block, mx, my); //place it	
+			setBackBlock(block.clone(), mx, my); //place it	
 		}
 	}
 	
@@ -1800,10 +1799,12 @@ public class World
 		try
 		{
 			MinimalBlock block = getChunks().get(""+(int)(x / Chunk.getChunkWidth())).getBlock((int)x % Chunk.getChunkWidth(), (int)y);
-			return Block.blocksList[block.id].mergeOnto(block);
+			Block tmp = Block.blocksList[block.id].mergeOnto(block);
+			return tmp;
 		}
 		catch (Exception e)
 		{
+			System.out.println(4);
 		}
 		return Block.air;
 	}

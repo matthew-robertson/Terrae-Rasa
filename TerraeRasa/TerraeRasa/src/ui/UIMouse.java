@@ -213,7 +213,7 @@ public class UIMouse extends UIBase
 				chest = (BlockChest)(world.getBlockGenerate(player.viewedChestX - x1, player.viewedChestY - y1));
 			}	
 			
-			int totalRows = chest.getInventorySize() / 5;
+			int totalRows = chest.getInventorySize() / 4;
 			for(int i = 0; i < chest.getInventorySize(); i++) //for each ItemStack in the chest
 			{
 				size = 20;
@@ -737,7 +737,7 @@ public class UIMouse extends UIBase
 			chest = (BlockChest)(world.getBlockGenerate(player.viewedChestX - x1, player.viewedChestY - y1));
 		}	
 		
-		int totalRows = chest.getInventorySize() / 5;
+		int totalRows = chest.getInventorySize() / 4;
 		for(int i = 0; i < chest.getInventorySize(); i++) //for each ItemStack in the chest
 		{
 			int size = 20;
@@ -917,7 +917,7 @@ public class UIMouse extends UIBase
 				chest = (BlockChest)(world.getBlockGenerate(player.viewedChestX - x1, player.viewedChestY - y1));
 			}	
 			
-			int totalRows = chest.getInventorySize() / 5;
+			int totalRows = chest.getInventorySize() / 4;
 			for(int i = 0; i < chest.getInventorySize(); i++) //for each ItemStack in the chest
 			{
 				size = 20;

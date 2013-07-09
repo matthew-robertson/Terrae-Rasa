@@ -197,6 +197,7 @@ public class Block extends ActionbarItem
 	 */
 	public Block(Block block) 
 	{
+		super(block);
 		this.droppedItem = new ItemStack(block.droppedItem);
 		this.maximumDropAmount = block.maximumDropAmount;
 		this.minimumDropAmount = block.minimumDropAmount;
@@ -216,10 +217,12 @@ public class Block extends ActionbarItem
 		this.breakable = block.breakable;
 		this.hardness = block.hardness;
 		this.passable = block.passable;
+		this.isMineable = block.isMineable;
 		this.isSolid = block.isSolid;
 		this.hRange = block.hRange;
-		this.isMineable = block.isMineable;
 		this.lRange = block.lRange;
+		this.lightRadius = block.lightRadius;
+		this.lightStrength = block.lightStrength;
 	}
 	
 	/**
@@ -693,8 +696,9 @@ public class Block extends ActionbarItem
 			.setDroppedItem(new ItemStack(Item.heartCrystal), 1, 1);
 	public static Block chest = new BlockChest(56, 20).setName("Chest")
 			.setBothBlockWidthAndHeight(2, 2).setBlockHardness(40.0f)
-			.setIconIndex(11, 1).setBlockType(2);
-
+			.setIconIndex(11, 1).setBlockType(2).setIsOveridable(false)
+			.setIsSolid(true);
+	
 	// Needs recipe
 	public static Block bookshelf = new Block(57).setName("Bookshelf")
 			.setIconIndex(4, 3).setBlockHardness(20.0f).setBlockType(2);
@@ -737,7 +741,8 @@ public class Block extends ActionbarItem
 			.setBlockHardness(10.0f).setIconIndex(1, 3).setBlockType(1);
 	public static Block ironChest = new BlockChest(80, 40)
 			.setName("Iron Chest").setBothBlockWidthAndHeight(2, 2)
-			.setBlockHardness(40.0f).setIconIndex(11, 1).setBlockType(2);
+			.setBlockHardness(40.0f).setIconIndex(11, 1).setBlockType(2)
+			.setIsOveridable(false).setIsSolid(true);
 	
 	public static Block gemcraftingBench = new Block(81).setName("Gemcrafting table")
 			.setBlockHardness(50.0f).setIconIndex(0, 0).setBlockType(1)

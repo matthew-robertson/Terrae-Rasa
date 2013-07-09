@@ -1,0 +1,38 @@
+package transmission;
+
+import savable.SavableBlock;
+import world.Biome;
+import blocks.MinimalBlock;
+import io.Chunk;
+
+public class ChunkExpander 
+{
+
+	public Chunk expandChunk(SuperCompressedChunk compressedChunk)
+	{
+		Chunk chunk = new Chunk(compressedChunk.biome, compressedChunk.x, compressedChunk.height);
+		chunk.light = compressedChunk.light;
+		chunk.diffuseLight = compressedChunk.diffuseLight;
+		chunk.ambientLight = compressedChunk.ambientLight;
+		chunk.backWalls = expand(compressedChunk.backWalls);
+		chunk.blocks = expand(compressedChunk.blocks);
+		chunk.setChanged(compressedChunk.wasChanged);
+		chunk.setLightUpdated(compressedChunk.lightUpdated);
+		chunk.setFlaggedForLightingUpdate(true);
+		return chunk;
+	}
+	
+	private MinimalBlock[][] expand(SuperCompressedBlock[][] compressed)
+	{
+		MinimalBlock[][] blocks = new MinimalBlock[compressed.length][compressed[0].length];
+		for(int i = 0; i < compressed.length; i++)
+		{
+			for(int k = 0; k < compressed[0].length; k++)
+			{
+				MinimalBlock block = new MinimalBlock(compressed[i][k]);
+				blocks[i][k] = block;			
+			}
+		}
+		return blocks;
+	}
+}
