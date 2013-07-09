@@ -4,6 +4,7 @@ import java.util.Random;
 import java.util.Vector;
 
 import enums.EnumWorldDifficulty;
+import enums.EnumWorldSize;
 
 public class ServerSettings 
 {
@@ -14,6 +15,7 @@ public class ServerSettings
 	public String universeName;
 	public int port;
 	public EnumWorldDifficulty worldDifficulty;
+	public EnumWorldSize worldSize;
 	public int seed;
 	public boolean useWhitelist;
 	public boolean spawnMonsters;
@@ -33,6 +35,7 @@ public class ServerSettings
 		universeName = "World";
 		port = 48615;
 		worldDifficulty = EnumWorldDifficulty.NORMAL;
+		worldSize = EnumWorldSize.MEDIUM;
 		seed = Math.abs(new Random().nextInt());
 		useWhitelist = false;
 		spawnMonsters = true;
@@ -56,7 +59,8 @@ public class ServerSettings
 				"pvp_enabled=" + pvpEnabled,
 				"universe_name=" + universeName,
 				"server_port=" + port,
-				"world_difficulty=" + worldDifficulty.toString(),
+				"world_difficulty=" + worldDifficulty.toString().toLowerCase(),
+				"world_size=" + worldSize.toString().toLowerCase(),
 				"whitelist=" + useWhitelist,
 				"spawn_monsters=" + spawnMonsters,
 				"load_distance=" + loadDistance,

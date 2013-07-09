@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.Vector;
 
 import enums.EnumWorldDifficulty;
+import enums.EnumWorldSize;
 
 //Settings loader might be a more apt name
 public class SettingsIO
@@ -50,22 +51,22 @@ public class SettingsIO
 	
 	private static String[] loadBanned()
 	{
-		return getFileContents(TerraeRasa.basePath + "/banlist.txt");
+		return getFileContents(TerraeRasa.getBasePath() + "/banlist.txt");
 	}
 	
 	private static String[] loadWhiteList()
 	{
-		return getFileContents(TerraeRasa.basePath + "/whitelist.txt");
+		return getFileContents(TerraeRasa.getBasePath() + "/whitelist.txt");
 	}
 	
 	private static String[] loadMods()
 	{
-		return getFileContents(TerraeRasa.basePath + "/mods.txt");
+		return getFileContents(TerraeRasa.getBasePath() + "/mods.txt");
 	}
 	
 	private static String[] loadAdmins()
 	{
-		return getFileContents(TerraeRasa.basePath + "/admins.txt");
+		return getFileContents(TerraeRasa.getBasePath() + "/admins.txt");
 	}
 	
 	public static ServerSettings loadSettings()
@@ -84,7 +85,7 @@ public class SettingsIO
 			settings.admins.add(str);
 		}
 
-		File file = new File(TerraeRasa.basePath + "/server.properties");
+		File file = new File(TerraeRasa.getBasePath() + "/server.properties");
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(file));
 			String line = "";
@@ -145,6 +146,10 @@ public class SettingsIO
 		{
 			settings.worldDifficulty = EnumWorldDifficulty.getDifficulty(remainingLine);
 		}
+		else if(line.startsWith("world_size="))
+		{
+			settings.worldSize = EnumWorldSize.getSize(remainingLine);
+		}
 		else if(line.startsWith("seed="))
 		{
 			settings.seed = Integer.parseInt(remainingLine);
@@ -170,11 +175,11 @@ public class SettingsIO
 	private static void createSettingsFile() 
 			throws IOException
 	{
-		boolean propertiesExist = new File(TerraeRasa.basePath + "/server.properties").exists();
+		boolean propertiesExist = new File(TerraeRasa.getBasePath() + "/server.properties").exists();
 		if(!propertiesExist)
 		{
-			new File(TerraeRasa.basePath + "/server.properties").createNewFile();
-			BufferedWriter writer = new BufferedWriter(new FileWriter(new File(TerraeRasa.basePath + "/server.properties")));
+			new File(TerraeRasa.getBasePath() + "/server.properties").createNewFile();
+			BufferedWriter writer = new BufferedWriter(new FileWriter(new File(TerraeRasa.getBasePath() + "/server.properties")));
 			writer.write("#Terrae Rasa Server Settings" + '\n');
 			writer.write("#Formatting is important! Dont change the order of stuff in this file." + '\n');
 			writer.write("#Make sure values are consistant too, dont replace a number with text!" + '\n');
@@ -185,6 +190,7 @@ public class SettingsIO
 			writer.write("universe_name=World" + '\n');
 			writer.write("server_port=48615" + '\n');
 			writer.write("world_difficulty=normal" + '\n');
+			writer.write("world_size=mini");
 			writer.write("whitelist=false" + '\n');
 			writer.write("spawn_monsters=true" + '\n');
 			writer.write("load_distance=4" + '\n');
@@ -196,11 +202,11 @@ public class SettingsIO
 	public static void saveSettings(ServerSettings settings)
 	{
 		try {
-			writeFile(TerraeRasa.basePath + "/server.properties", settings.toStringArray());
-			writeFile(TerraeRasa.basePath + "/admins.txt", settings.admins);
-			writeFile(TerraeRasa.basePath + "/mods.txt", settings.mods);
-			writeFile(TerraeRasa.basePath + "/banlist.txt", settings.banlist);
-			writeFile(TerraeRasa.basePath + "/whitelist.txt", settings.whitelist);
+			writeFile(TerraeRasa.getBasePath() + "/server.properties", settings.toStringArray());
+			writeFile(TerraeRasa.getBasePath() + "/admins.txt", settings.admins);
+			writeFile(TerraeRasa.getBasePath() + "/mods.txt", settings.mods);
+			writeFile(TerraeRasa.getBasePath() + "/banlist.txt", settings.banlist);
+			writeFile(TerraeRasa.getBasePath() + "/whitelist.txt", settings.whitelist);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

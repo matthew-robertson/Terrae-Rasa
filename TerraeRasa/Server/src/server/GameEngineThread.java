@@ -11,8 +11,7 @@ public class GameEngineThread extends Thread
 	
 	public void run()
 	{
-//		gameEngine.init();
-//		gameEngine.run();
-		
+		gameEngine.init();
+		gameEngine.run();		
 	}
 }

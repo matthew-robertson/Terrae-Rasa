@@ -11,14 +11,15 @@ import java.util.Vector;
 public class TerraeRasa 
 {
 	//http://stackoverflow.com/questions/2914375/getting-file-path-in-java
-	public static String basePath = "/home/alec/terraerasaserver";
-	private final static String VERSION = "Alpha 0.1.3";	
-	ServerSettings settings;
-	Vector<ServerConnectionThread> connections = new Vector<ServerConnectionThread>();
+	private static String basePath = "/home/alec/terraerasaserver";
 	public static boolean done = false;
+	private final static String VERSION = "Alpha 0.1.4";	
+	private ServerSettings settings;
+	private Vector<ServerConnectionThread> connections = new Vector<ServerConnectionThread>();
 	public GameEngine gameEngine;
-	static TerraeRasa terraeRasa;
-	GameEngineThread gameEngineThread;
+	public static TerraeRasa terraeRasa;
+	private GameEngineThread gameEngineThread;
+	private ServerSocket serverSocket;
 	
 	public static void main(String[] args)
 	{
@@ -30,18 +31,15 @@ public class TerraeRasa
 	{
 		settings = SettingsIO.loadSettings();	
 
-		//this.gameEngine = new GameEngine(settings.universeName);
-		//gameEngineThread = new GameEngineThread(gameEngine);
-		//gameEngineThread.start();
+		this.gameEngine = new GameEngine(settings.universeName);
+		gameEngineThread = new GameEngineThread(gameEngine);
+		gameEngineThread.start();
 
-		ServerSocket serverSocket = null;
 		try {
 			serverSocket = new ServerSocket(settings.port);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		SettingsIO.saveSettings(settings);
 		
 		while(!done)
 		{
@@ -118,8 +116,21 @@ public class TerraeRasa
 		return VERSION;
 	}
 
-	public static String getBasePath() {
+	public final static String getBasePath() {
 		return basePath;
+	}
+	
+	
+	public static synchronized void close()
+	{
+		SettingsIO.saveSettings(terraeRasa.settings);
+		//Close connections to clients
+		//close the server socket
+	}
+	
+	public synchronized ServerSettings getSettings()
+	{
+		return settings;
 	}
 
 }
