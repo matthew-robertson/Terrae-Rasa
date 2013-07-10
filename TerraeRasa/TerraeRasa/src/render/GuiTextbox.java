@@ -22,6 +22,7 @@ public class GuiTextbox extends GuiComponent
 	private double textScale;	
 	private boolean isFocused;	
 	private String text;
+	private int ticksActive;
 	
 	/**
 	 * Constructs an instance of GuiTextBox. Initializes the textbox with no text in it, at the specified
@@ -38,13 +39,14 @@ public class GuiTextbox extends GuiComponent
 			trueTypeFont = new TrueTypeFont(new Font("Agent Orange", Font.BOLD, 20), false/*DO NOT use antialiasing*/);
 		}		
 		
+		this.ticksActive = 0;
 		this.x = x;
 		this.y = y;
 		this.width = width;
 		this.height = height;
 		text = "";
 		textScale = 0.85f;
-		MAX_TEXT_CHARACTERS = 20;
+		MAX_TEXT_CHARACTERS = 22;
 	}
 	
 	/**
@@ -58,11 +60,14 @@ public class GuiTextbox extends GuiComponent
 		{
 			y = this.y;
 		}
+		ticksActive++;
+		String underscore = (ticksActive % 40 < 20 && isFocused) ? "_" : "";
+		
 		drawBounds();
 		GL11.glColor4f(1, 1, 1, 1);
 		trueTypeFont.drawString((float)(x + 8),
 				(float)(y + 27), 
-				text + "_", 
+				text + underscore, 
 				(float)textScale, 
 				(float)MathHelper.inverseValue(textScale), 
 				TrueTypeFont.ALIGN_LEFT); //Render the Text
@@ -191,6 +196,7 @@ public class GuiTextbox extends GuiComponent
 	public void setFocused()
 	{
 		isFocused = true;
+		this.ticksActive = 0;
 	}
 	
 	/**
@@ -199,6 +205,7 @@ public class GuiTextbox extends GuiComponent
 	public void freeFocused()
 	{
 		isFocused = false;
+		this.ticksActive = 0;
 	}
 
 	public void onClick(int x, int y) {

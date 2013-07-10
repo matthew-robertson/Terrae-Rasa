@@ -121,7 +121,7 @@ public class TerraeRasa
 		}
 						
 		//Default resolution is 900x500
-		terraeRasa = new TerraeRasa(900, 500);
+		terraeRasa = new TerraeRasa(900, 520);
 		terraeRasa.run(); 
 	}	
 	

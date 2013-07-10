@@ -24,6 +24,8 @@ public class GuiMenu extends GuiComponent
 	private String title;
 	private int highlightedIndex;
 	private boolean visible;
+	private int screenHeight;
+	private int screenWidth;
 	
 	/**
 	 * Constructs a new GuiMenu with the given positions
@@ -42,6 +44,8 @@ public class GuiMenu extends GuiComponent
 		this.y = y;
 		this.width = width;
 		this.height = height;
+		this.screenHeight = Display.getHeight();
+		this.screenWidth = Display.getWidth();
 		this.varyingItems = varyingItems;
 		this.lockedInComponents = lockedInComponents;
 		this.selectedIndex = 0;
@@ -66,7 +70,7 @@ public class GuiMenu extends GuiComponent
 			double y = (this.y * Display.getHeight() * 0.5);
 			double width = this.width * 0.5 * Display.getWidth() * 0.9;
 			double scrollWidth = this.width * 0.5 * Display.getWidth() * 0.1;
-			double scrollHeight = ((int) ((Display.getHeight() * 0.45) / 30) - lockedInComponents.length) * CELL_SIZE - 1;
+			double scrollHeight = ((int) ((Display.getHeight() * 0.45) / 30) - lockedInComponents.length - 1) * CELL_SIZE - 1;
 			double yoff = CELL_SIZE;
 			int totalMenuItems = (int) ((Display.getHeight() * 0.50 - (2 * y)) / 30);
 			
@@ -202,6 +206,12 @@ public class GuiMenu extends GuiComponent
 		{
 			return;
 		}
+		if(this.screenHeight != Display.getHeight() || this.screenWidth != Display.getWidth())
+		{
+			selectedIndex = 0;
+			this.screenHeight = Display.getHeight();
+			this.screenWidth = Display.getWidth();
+		}
 		
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
@@ -268,7 +278,7 @@ public class GuiMenu extends GuiComponent
 		{
 			//Scrollbar on the side
 			double scrollWidth = this.width * 0.5 * Display.getWidth() * 0.1;
-			double scrollHeight = (displayedValues.length - lockedInComponents.length - 1) * CELL_SIZE - 1;
+			double scrollHeight = ((int) ((Display.getHeight() * 0.45) / 30) - lockedInComponents.length - 1) * CELL_SIZE - 1;
 			double yoff = CELL_SIZE;
 			GL11.glColor4d(2.0/3, 2.0/3, 3.0/3, 0.6); 
 			t.startDrawingQuads();
@@ -307,7 +317,7 @@ public class GuiMenu extends GuiComponent
 		{
 			float xScale = 0.5F;
 			float yScale = 0.5F;
-			if(i > varyingItems.length)
+			if(i >= totalMenuItems - lockedInComponents.length)
 			{
 				xScale += 0.1F;
 				yScale += 0.1F;

@@ -128,7 +128,11 @@ public class GameEngine
 		        		//System.out.println("Settings: " + settings.volume + " Music: " + soundEngine.getVolume());
 		        	}
 		        	
-		        	if(settings.menuOpen) //Ingame pause menu - distribute keyboard/mouse input appropriately
+		        	if(TerraeRasa.isMainMenuOpen) //if the main menu is open, render that, otherwise render the game
+			        {
+			        	mainMenu.update(settings);
+				    }
+		        	else if(settings.menuOpen) //Ingame pause menu - distribute keyboard/mouse input appropriately
 		        	{ 
 		        		soundEngine.setCurrentMusic("Main Music");
 		        		renderMenu.mouse(settings);

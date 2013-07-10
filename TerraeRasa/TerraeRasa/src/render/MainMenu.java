@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Random;
 
 import org.lwjgl.LWJGLException;
-import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
@@ -18,6 +17,7 @@ import utils.MainMenuHelper;
 import utils.MathHelper;
 import utils.Particle;
 import utils.Vector2F;
+import client.ServerInfo;
 import client.Settings;
 import client.TerraeRasa;
 import enums.EnumColor;
@@ -40,18 +40,26 @@ public class MainMenu extends Render
 	private String[] mainMenuVarying = { "Single Player", "Multiplayer", "Settings", "Quit" };
 	private String[] playerMenuFooter = { "New Player", "Delete Player", "Back" };
 	private String[] worldMenuFooter = { "New World", "Delete World", "Back" };
+	private String[] multiplayerMenuFooter = { "New", "Edit", "Delete", "Back" };
 	private String[] worldNames;
 	private String[] playerNames;
+	private ServerInfo[] servers;
 	private String selectedPlayerName;
 	private String selectedWorldName;
+	private ServerInfo selectedServer;
 	private boolean isMainMenuOpen;
+	private boolean isMultiplayerMenuOpen;
 	private boolean isPlayerMenuOpen;
 	private boolean isWorldMenuOpen;
+	private boolean isDeleteServerMenuOpen;
+	private boolean isNewServerMenuOpen;
+	private boolean isEditServerMenuOpen;
 	private boolean isDeleteWorldMenuOpen;
 	private boolean isDeletePlayerMenuOpen;
 	private boolean isNewPlayerMenuOpen;
 	private boolean isNewWorldMenuOpen;
 	private boolean isWaitingToDelete;
+	private boolean isWaitingToEdit;
 	private boolean flaggedForWorldGen;
 	private boolean flaggedForGameStart;
 	private List<Particle> stars;
@@ -77,6 +85,19 @@ public class MainMenu extends Render
 	private GuiTitle deletePlayerBack;
 	private GuiTitle deletePlayerConfirm;
 	private GuiTitle deletePlayerMessage;	
+	private GuiTitle deleteServerBack;
+	private GuiTitle deleteServerConfirm;
+	private GuiTitle deleteServerMessage;
+	private GuiTextbox newServerName;
+	private GuiTextbox newServerIP;
+	private GuiTextbox newServerPort;
+	private GuiTitle newServerBack;
+	private GuiTitle newServerConfirm;
+	private GuiTextbox editServerName;
+	private GuiTextbox editServerIP;
+	private GuiTitle editServerBack;
+	private GuiTitle editServerConfirm;
+	private GuiTextbox editServerPort;
 	
 	/**
 	 * Creates a new MainMenu, initializing all the particles and components required.
@@ -88,6 +109,7 @@ public class MainMenu extends Render
 		settingsMenu = new MainSettingsMenu(settings);
 		worldNames = menuHelper.getWorldFileNames();
 		playerNames = menuHelper.getPlayerFileNames();
+		servers = settings.getServersArray();
 		isMainMenuOpen = true;
 		selectedPlayerName = "";
 		selectedWorldName = "";
@@ -132,6 +154,18 @@ public class MainMenu extends Render
 			staticStars.add(star);
 		}
 		
+		//Server Creation Menu:
+		newServerName = (GuiTextbox) new GuiTextbox(0.225, 70, 0.55, 0.1).setStopVerticalScaling(true);
+		newServerIP = (GuiTextbox) new GuiTextbox(0.225, 100, 0.55, 0.1).setStopVerticalScaling(true);
+		newServerPort = (GuiTextbox) new GuiTextbox(0.225, 130, 0.55, 0.1).setStopVerticalScaling(true);
+		newServerBack = (GuiTitle) new GuiTitle("Back", .25, 160, .20, 0.1).setStopVerticalScaling(true);
+		newServerConfirm = (GuiTitle) new GuiTitle("Confirm", 0.55, 160, 0.2, 0.1).setStopVerticalScaling(true);
+		//Edit Server Menu:
+		editServerName = (GuiTextbox) new GuiTextbox(0.225, 70, 0.55, 0.1).setStopVerticalScaling(true);
+		editServerIP = (GuiTextbox) new GuiTextbox(0.225, 100, 0.55, 0.1).setStopVerticalScaling(true);
+		editServerPort = (GuiTextbox) new GuiTextbox(0.225, 130, 0.55, 0.1).setStopVerticalScaling(true);
+		editServerBack = (GuiTitle) new GuiTitle("Back", .25, 160, .20, 0.1).setStopVerticalScaling(true);
+		editServerConfirm = (GuiTitle) new GuiTitle("Confirm", 0.55, 160, 0.2, 0.1).setStopVerticalScaling(true);
 		//Character Creation Menu:
 		characterName = (GuiTextbox) new GuiTextbox(0.225, 70, 0.55, 0.1).setStopVerticalScaling(true);
 		characterName.setRenderTexture(Render.menuButtonBackground);
@@ -152,6 +186,10 @@ public class MainMenu extends Render
 		deleteWorldMessage = new GuiTitle("Are you sure?", 0.3, 0.25, 0.4, 0.1);
 		deleteWorldBack = new GuiTitle("Back", .25, .4, .20, 0.1);
 		deleteWorldConfirm = new GuiTitle("Confirm", 0.55, .4, 0.2, 0.1);
+		//Delete Confirmation Menu(server):
+		deleteServerMessage = new GuiTitle("Are you sure?", 0.3, 0.25, 0.4, 0.1);
+		deleteServerBack = new GuiTitle("Back", .25, .4, .20, 0.1);
+		deleteServerConfirm = new GuiTitle("Confirm", 0.55, .4, 0.2, 0.1);
 		//Delete Confirmation Menu(player):
 		deletePlayerMessage = new GuiTitle("Are you sure?", 0.3, 0.25, 0.4, 0.1);
 		deletePlayerBack = new GuiTitle("Back", .25, .4, .20, 0.1);
@@ -175,7 +213,7 @@ public class MainMenu extends Render
 		{
 			flaggedForWorldGen = false;
 			fileManager.generateAndSaveWorld(worldName.getText(), EnumWorldSize.getSize(worldSize.getValue()), EnumWorldDifficulty.getDifficulty(worldMode.getValue()));
-			updateMenus();
+			updateMenus(settings);
 			isNewWorldMenuOpen = false;
 			worldName.setText("");
 			worldName.freeFocused();
@@ -199,7 +237,7 @@ public class MainMenu extends Render
 		else
 		{
 			keyboard();
-			mouse();
+			mouse(settings);
 		}
 		renderBackground();
 		renderShootingStarAnimation();
@@ -223,15 +261,8 @@ public class MainMenu extends Render
 		GL11.glDisable(GL11.GL_ALPHA_TEST);
 	}
 	
-	/**
-	 * Renders the stars that move around and twinkle in the background
-	 */
-	private void renderStaticStarAnimation()
+	public void update(Settings settings)
 	{
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA); //Re-enable this so the lighting renders properly
-		
-		//Render and update every star
 		for(Particle star : staticStars)
 		{
 			if(!settingsMenu.open)
@@ -245,23 +276,7 @@ public class MainMenu extends Render
 				if(star.index >= 16)
 					star.index = 0;
 			}
-				
-			double width = 13;
-			double height = 13;
-			double xoff = star.x;
-			double yoff = star.y;
-		    
-			Render.starAnimationSheet.bind();
-		    t.startDrawingQuads();
-		    double u = (double)((int)(star.index) * 32) / 512;
-		    double v = 0;
-		    t.setColorRGBA_F((float)star.r, (float)star.g, (float)star.b, (float)star.a * 0.8F);
-		    t.addVertexWithUV(xoff, yoff + height, 0, u, v + 1);
-		    t.addVertexWithUV(xoff + width, yoff + height, 0, u + (32.0 / 512), v + 1);
-		    t.addVertexWithUV(xoff + width, yoff, 0, u + (32.0 / 512), v);
-		    t.addVertexWithUV(xoff, yoff, 0, u, v);
-			t.draw();
-		    
+			
 			//Reset the background star if it's off the screen
 			if(star.life <= 0)
 			{
@@ -282,6 +297,105 @@ public class MainMenu extends Render
 			    star.acceleration = new Vector2F(0, 0);
 				
 			}
+		}	
+		
+		//The shooting star trails
+		Iterator<Particle> iterator = starTrails.iterator();
+		while(iterator.hasNext())
+		{
+			Particle starTrail = iterator.next();
+			if(!settingsMenu.open)
+			{
+				starTrail.integrate();
+			}
+		    if(starTrail.life <= 0)
+		    {
+		    	iterator.remove();
+		    }
+		}
+		
+		//The actual stars
+		for(Particle star : stars)
+		{
+			if(!settingsMenu.open)
+			{
+				star.integrate();
+				double width = 13;
+				double height = 13;
+				
+				//Star Trail particles
+				for(int i = 0; i < 6; i++)
+				{
+					Particle starTrail = new Particle();
+					starTrail.active = true;
+					starTrail.life = 1.0;
+					starTrail.fade = random.nextDouble() / 25 + 0.04;
+					starTrail.texture = Render.starParticleBackground;
+					EnumColor color = fieryColors[random.nextInt(fieryColors.length)];
+					starTrail.r = color.COLOR[0];
+					starTrail.g = color.COLOR[1];
+				    starTrail.b = color.COLOR[2];
+				    starTrail.a = 1;
+				    starTrail.x = star.x - 2 + random.nextInt(4) + (width / 2);
+				    starTrail.y = star.y - 2 + random.nextInt(4) + (height / 2);
+				    starTrail.zrot = random.nextInt(100);
+				    starTrail.velocity = new Vector2F(star.velocity.x * -0.35F, star.velocity.y * -0.35F);
+				    starTrail.acceleration = new Vector2F(star.acceleration.x * -0.35F, star.acceleration.y * -0.35F);
+				    starTrails.add(starTrail);
+				}
+			}
+			
+			//Reset the shooting star if it's off the screen
+			if(star.x > Display.getWidth() * 0.6 || star.y > Display.getHeight() * 0.6)
+			{
+				star.active = true;
+				star.life = 1.0;
+				star.fade = 0.02;
+				star.texture = Render.starParticleBackground;
+			    star.r = 1;
+			    star.g = 1;
+			    star.b = 1;
+			    star.a = 1;
+			    star.x = (-1 * random.nextInt((int)(Display.getWidth() * 0.3)));
+			    star.y = (-1 * random.nextInt((int)(Display.getHeight() * 0.3)));
+			    star.zrot = random.nextInt(100);
+			    float velocityModifier = 1;
+			    if(random.nextInt(6) == 0)
+			    {
+			    	velocityModifier *= 2;
+			    }
+			    star.velocity = new Vector2F(velocityModifier * random.nextFloat() * 3 + 1, velocityModifier * random.nextFloat() * 4);
+			    star.acceleration = new Vector2F(random.nextFloat() / 15, random.nextFloat() / 15);
+			}
+		}	
+	}
+	
+	/**
+	 * Renders the stars that move around and twinkle in the background
+	 */
+	private void renderStaticStarAnimation()
+	{
+		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA); //Re-enable this so the lighting renders properly
+		
+		//Render and update every star
+		for(Particle star : staticStars)
+		{				
+			double width = 13;
+			double height = 13;
+			double xoff = star.x;
+			double yoff = star.y;
+		    
+			Render.starAnimationSheet.bind();
+		    t.startDrawingQuads();
+		    double u = (double)((int)(star.index) * 32) / 512;
+		    double v = 0;
+		    t.setColorRGBA_F((float)star.r, (float)star.g, (float)star.b, (float)star.a * 0.8F);
+		    t.addVertexWithUV(xoff, yoff + height, 0, u, v + 1);
+		    t.addVertexWithUV(xoff + width, yoff + height, 0, u + (32.0 / 512), v + 1);
+		    t.addVertexWithUV(xoff + width, yoff, 0, u + (32.0 / 512), v);
+		    t.addVertexWithUV(xoff, yoff, 0, u, v);
+			t.draw();		    
 		}	
 		
 		GL11.glLoadIdentity();
@@ -308,31 +422,17 @@ public class MainMenu extends Render
 		while(iterator.hasNext())
 		{
 			Particle starTrail = iterator.next();
-			if(!settingsMenu.open)
-			{
-				starTrail.integrate();
-			}
 			t.setColorRGBA_F((float)starTrail.r, (float)starTrail.g, (float)starTrail.b, (float)starTrail.life);
 			t.addVertexWithUV(starTrail.x, starTrail.y + height, 0, 0, 1);
 		    t.addVertexWithUV(starTrail.x + width, starTrail.y + height, 0, 1, 1);
 		    t.addVertexWithUV(starTrail.x + width, starTrail.y, 0, 1, 0);
 		    t.addVertexWithUV(starTrail.x, starTrail.y, 0, 0, 0);
-		    
-		    if(starTrail.life <= 0)
-		    {
-		    	iterator.remove();
-		    }
-		    
 		}
 		t.draw();
 		
 		//The actual stars
 		for(Particle star : stars)
-		{
-			if(!settingsMenu.open)
-			{
-				star.integrate();
-			}
+		{			
 			width = 13;
 			height = 13;
 			double xoff = 0;
@@ -380,29 +480,6 @@ public class MainMenu extends Render
 				    starTrail.acceleration = new Vector2F(star.acceleration.x * -0.35F, star.acceleration.y * -0.35F);
 				    starTrails.add(starTrail);
 				}
-			}
-			
-			//Reset the shooting star if it's off the screen
-			if(star.x > Display.getWidth() * 0.6 || star.y > Display.getHeight() * 0.6)
-			{
-				star.active = true;
-				star.life = 1.0;
-				star.fade = 0.02;
-				star.texture = Render.starParticleBackground;
-			    star.r = 1;
-			    star.g = 1;
-			    star.b = 1;
-			    star.a = 1;
-			    star.x = (-1 * random.nextInt((int)(Display.getWidth() * 0.3)));
-			    star.y = (-1 * random.nextInt((int)(Display.getHeight() * 0.3)));
-			    star.zrot = random.nextInt(100);
-			    float velocityModifier = 1;
-			    if(random.nextInt(6) == 0)
-			    {
-			    	velocityModifier *= 2;
-			    }
-			    star.velocity = new Vector2F(velocityModifier * random.nextFloat() * 2 + 1, velocityModifier * random.nextFloat() * 3);
-			    star.acceleration = new Vector2F(random.nextFloat() / 15, random.nextFloat() / 15);
 			}
 		}	
 		
@@ -452,9 +529,9 @@ public class MainMenu extends Render
 	/**
 	 * Distributes mouse input as appropriate for the menu open
 	 */
-	private void mouse()
+	private void mouse(Settings settings)
 	{
-		if(isMainMenuOpen || isPlayerMenuOpen || isWorldMenuOpen)
+		if(isMainMenuOpen || isPlayerMenuOpen || isWorldMenuOpen || isMultiplayerMenuOpen)
 		{
 			int index = menu.getCellWithoutScroll(MathHelper.getCorrectMouseXPosition(), MathHelper.getCorrectMouseYPosition());
 			menu.setHighlighted(index);
@@ -474,27 +551,41 @@ public class MainMenu extends Render
 			e.printStackTrace();
 		}
 		
-		
-		if(isDeletePlayerMenuOpen)
+		if(isDeleteServerMenuOpen)
 		{
-			mouseMenuDeleteCharacter(x, y);
+			mouseMenuServerDelete(settings, x, y);
+		}
+		else if(isNewServerMenuOpen)
+		{
+			mouseMenuServerNew(settings, x, y);
+		}
+		else if(isEditServerMenuOpen)
+		{
+			mouseMenuServerEdit(settings, x, y);	
+		}
+		else if(isDeletePlayerMenuOpen)
+		{
+			mouseMenuDeleteCharacter(settings, x, y);
 		}
 		else if(isDeleteWorldMenuOpen)
 		{
-			mouseMenuDeleteWorld(x, y);
+			mouseMenuDeleteWorld(settings, x, y);
 		}
 		else if(isNewPlayerMenuOpen)
 		{
-			mouseMenuCreateCharacter(x, y);
+			mouseMenuCreateCharacter(settings, x, y);
 		}
 		else if(isNewWorldMenuOpen)
 		{
-			mouseMenuCreateWorld(x, y);
+			mouseMenuCreateWorld(settings, x, y);
 		}
-		
 		else if(isMainMenuOpen)
 		{
-			mouseMainMenu(x, y);
+			mouseMainMenu(settings, x, y);
+		}
+		else if(isMultiplayerMenuOpen)
+		{
+			mouseMultiplayerMenu(settings, x, y);
 		}
 		else if(isPlayerMenuOpen)
 		{
@@ -512,13 +603,13 @@ public class MainMenu extends Render
 	 * @param mouseX the mouse's X position in ortho units
 	 * @param mouseY the mouse's Y position in ortho units
 	 */
-	private void mouseMenuDeleteCharacter(int mouseX, int mouseY)
+	private void mouseMenuDeleteCharacter(Settings settings, int mouseX, int mouseY)
 	{		
 		//Confirm Button
 		if(deletePlayerConfirm.inBounds(mouseX, mouseY))
 		{
-			deleteCharacter(selectedPlayerName);
-			updateMenus();
+			deleteCharacter(settings, selectedPlayerName);
+			updateMenus(settings);
 			isDeletePlayerMenuOpen = false;
 			isWaitingToDelete = false;
 		}
@@ -536,11 +627,12 @@ public class MainMenu extends Render
 	 * @param mouseX the mouse's X position in ortho units
 	 * @param mouseY the mouse's Y position in ortho units
 	 */
-	private void mouseMenuCreateCharacter(int mouseX, int mouseY)
+	private void mouseMenuCreateCharacter(Settings settings, int mouseX, int mouseY)
 	{
 		//Player name text field
 		if(characterName.inBounds(mouseX, mouseY))
 		{
+			freeFocuses();
 			characterName.setFocused();
 		}			
 		//Player Mode Button
@@ -552,7 +644,7 @@ public class MainMenu extends Render
 		if(createNewCharacter.inBounds(mouseX, mouseY))
 		{
 			fileManager.generateAndSavePlayer(characterName.getText(), EnumPlayerDifficulty.getDifficulty(characterMode.getValue()));
-			updateMenus();
+			updateMenus(settings);
 			isNewPlayerMenuOpen = false;
 			characterName.setText("");
 			characterName.freeFocused();
@@ -572,13 +664,13 @@ public class MainMenu extends Render
 	 * @param mouseX the mouse's X position in ortho units
 	 * @param mouseY the mouse's Y position in ortho units
 	 */
-	private void mouseMenuDeleteWorld(int mouseX, int mouseY)
+	private void mouseMenuDeleteWorld(Settings settings, int mouseX, int mouseY)
 	{
 		//Confirm Button
 		if(deleteWorldConfirm.inBounds(mouseX, mouseY))
 		{
-			deleteWorld(selectedWorldName);
-			updateMenus();
+			deleteWorld(settings, selectedWorldName);
+			updateMenus(settings);
 			isDeleteWorldMenuOpen = false;
 			isWaitingToDelete = false;
 		}
@@ -597,11 +689,12 @@ public class MainMenu extends Render
 	 * @param mouseX the mouse's X position in ortho units
 	 * @param mouseY the mouse's Y position in ortho units
 	 */
-	private void mouseMenuCreateWorld(int mouseX, int mouseY)
+	private void mouseMenuCreateWorld(Settings settings, int mouseX, int mouseY)
 	{
 		//World Name Text Box
 		if(worldName.inBounds(mouseX, mouseY))
 		{
+			freeFocuses();
 			worldName.setFocused();
 		}		
 		//World Mode Button
@@ -634,7 +727,7 @@ public class MainMenu extends Render
 	 * @param mouseX the mouse's X position in ortho units
 	 * @param mouseY the mouse's Y position in ortho units
 	 */
-	private void mouseMainMenu(int mouseX, int mouseY)
+	private void mouseMainMenu(Settings settings, int mouseX, int mouseY)
 	{
 		menu.onClick(mouseX, mouseY);
 		
@@ -649,7 +742,11 @@ public class MainMenu extends Render
 		}
 		if(selectedMenuIndex == 2) //MP
 		{
-			Sys.alert("Feature Not Available", "This feature will be patched in soon. It is currently not available."); 
+			isMultiplayerMenuOpen = true;
+			isMainMenuOpen = false;
+			menu.updateLockedInComponents(multiplayerMenuFooter);
+			menu.updateVaryingItems(serversToString(settings.getServersArray()));
+			menu.updateTitle("Multiplayer");
 		}
 		if(selectedMenuIndex == 3) //Settings
 		{
@@ -658,6 +755,196 @@ public class MainMenu extends Render
 		if(selectedMenuIndex == 4) //Quit
 		{
 			TerraeRasa.done = true;
+		}
+	}
+	
+	/**
+	 * Handles mouse input for the "main" multiplayer part of the menu.
+	 * @param mouseX the mouse's X position in ortho units
+	 * @param mouseY the mouse's Y position in ortho units
+	 */
+	private void mouseMultiplayerMenu(Settings settings, int mouseX, int mouseY)
+	{
+		menu.onClick(mouseX, mouseY);
+		
+		int selectedIndex = menu.getSelectedCell(mouseX, mouseY);
+		if(selectedIndex == menu.getNumberOfItems() - 4)
+		{
+			//New Server
+			isNewServerMenuOpen = true;
+			newServerPort.setText("48615");
+		}
+		else if(selectedIndex == menu.getNumberOfItems() - 3)
+		{
+			//Edit Server
+			isWaitingToDelete = false;
+			isWaitingToEdit = true;			
+		}
+		else if(selectedIndex == menu.getNumberOfItems() - 2)
+		{
+			//Delete Server
+			isWaitingToEdit = false;
+			isWaitingToDelete = true;			
+		}
+		else if(selectedIndex == menu.getNumberOfItems() - 1)
+		{
+			//Back (to main menu)
+			isMainMenuOpen = true;
+			isMultiplayerMenuOpen = false;
+			isWaitingToDelete = false;
+			isWaitingToEdit = false;
+			selectedServer = null;
+			menu.updateLockedInComponents(mainMenuFooter);
+			menu.updateTitle("Main Menu");
+			menu.updateVaryingItems(mainMenuVarying);
+		}
+		else if(selectedIndex > 0 && selectedIndex < menu.getVaryingItems().length + 1)
+		{
+			//If the user wants to delete a server, open that confirm part of the menu,
+			//If the user wants to edit a server, open that part of the menu
+			//If neither of these is met, try to establish a connection
+			if(isWaitingToEdit)
+			{
+				selectedServer = servers[selectedIndex - 1];
+				isEditServerMenuOpen = true;
+				editServerName.setText(selectedServer.getName());
+				editServerIP.setText(selectedServer.getIP());
+				editServerPort.setText(selectedServer.getPort());
+			}
+			else if(isWaitingToDelete)
+			{
+				selectedServer = servers[selectedIndex - 1];
+				isDeleteServerMenuOpen = true;
+				deleteServerMessage.setText("Delete " + selectedServer.toString() + "?");
+			}
+			else
+			{
+				selectedWorldName = menu.getVaryingItems()[selectedIndex - 1];
+				isWorldMenuOpen = false;
+				
+				//Play, sort of. 
+			}
+		}
+	}
+	
+	/**
+	 * Handles mouse input for the server creation menu, which is a part of the multiplayer menu
+	 * @param mouseX the mouse's X position in ortho units
+	 * @param mouseY the mouse's Y position in ortho units
+	 */
+	private void mouseMenuServerNew(Settings settings, int mouseX, int mouseY)
+	{
+		//Server Name text box
+		if(newServerName.inBounds(mouseX, mouseY))
+		{
+			freeFocuses();
+			newServerName.setFocused();
+		}	
+		//IP Text Box
+		if(newServerIP.inBounds(mouseX, mouseY))
+		{
+			freeFocuses();
+			newServerIP.setFocused();
+		}	
+		//Port Text Box
+		if(newServerPort.inBounds(mouseX, mouseY))
+		{
+			freeFocuses();
+			newServerPort.setFocused();
+		}	
+		//Create Server 'confirm' button
+		if(newServerConfirm.inBounds(mouseX, mouseY))
+		{
+			if(!newServerName.getText().equals(""))
+			{
+				settings.registerServer(new ServerInfo(newServerName.getText(), newServerIP.getText(), newServerPort.getText()));
+			}
+			updateMenus(settings);
+			newServerName.setText("");
+			newServerIP.setText("");
+			newServerPort.setText("");
+			isNewServerMenuOpen = false;
+		}
+		//Back button
+		if(newServerBack.inBounds(mouseX, mouseY))
+		{
+			isNewServerMenuOpen = false;
+			newServerName.setText("");
+			newServerIP.setText("");
+			newServerPort.setText("");
+			freeFocuses();
+		}
+	}
+	
+	/**
+	 * Handles mouse input for the server edit menu, which is a part of the multiplayer menu
+	 * @param mouseX the mouse's X position in ortho units
+	 * @param mouseY the mouse's Y position in ortho units
+	 */
+	private void mouseMenuServerEdit(Settings settings, int mouseX, int mouseY)
+	{
+		//Server Name text box
+		if(editServerName.inBounds(mouseX, mouseY))
+		{
+			freeFocuses();
+			editServerName.setFocused();
+		}	
+		//IP Text Box
+		if(editServerIP.inBounds(mouseX, mouseY))
+		{
+			freeFocuses();
+			editServerIP.setFocused();
+		}
+		//Port text box
+		if(editServerPort.inBounds(mouseX, mouseY))
+		{
+			freeFocuses();
+			editServerPort.setFocused();
+		}
+		//Successfully Edit Server 'confirm' button
+		if(editServerConfirm.inBounds(mouseX, mouseY))
+		{
+			if(!editServerName.getText().equals(""))
+			{
+				settings.removeServer(selectedServer);
+				settings.registerServer(new ServerInfo(editServerName.getText(), editServerIP.getText(), editServerPort.getText()));
+			}
+			updateMenus(settings);
+			isEditServerMenuOpen = false;
+			editServerName.setText("");
+			editServerIP.setText("");
+			editServerPort.setText("");
+		}
+		//Back button
+		if(editServerBack.inBounds(mouseX, mouseY))
+		{
+			isEditServerMenuOpen = false;
+			editServerName.setText("");
+			editServerIP.setText("");
+			editServerPort.setText("");
+			freeFocuses();
+		}
+	}
+	
+	/**
+	 * Handles mouse input for the delete server part of the Multiplayer menu.
+	 * @param mouseX the mouse's X position in ortho units
+	 * @param mouseY the mouse's Y position in ortho units
+	 */
+	private void mouseMenuServerDelete(Settings settings, int mouseX, int mouseY)
+	{
+		if(deleteServerConfirm.inBounds(mouseX, mouseY))
+		{
+			deleteServer(settings, selectedServer);
+			updateMenus(settings);
+			isDeleteServerMenuOpen = false;
+			isWaitingToDelete = false;
+		}
+		//Back button
+		if(deleteServerBack.inBounds(mouseX, mouseY))
+		{
+			isDeleteServerMenuOpen = false;
+			isWaitingToDelete = false;
 		}
 	}
 	
@@ -800,6 +1087,30 @@ public class MainMenu extends Render
 			{
 				characterName.updateText(Keyboard.getEventCharacter(), Keyboard.getEventKey());
 			}
+			else if(newServerName.isFocused())
+			{
+				newServerName.updateText(Keyboard.getEventCharacter(), Keyboard.getEventKey());
+			}
+			else if(newServerIP.isFocused())
+			{
+				newServerIP.updateText(Keyboard.getEventCharacter(), Keyboard.getEventKey());
+			}
+			else if(editServerName.isFocused())
+			{
+				editServerName.updateText(Keyboard.getEventCharacter(), Keyboard.getEventKey());
+			}
+			else if(editServerIP.isFocused())
+			{
+				editServerIP.updateText(Keyboard.getEventCharacter(), Keyboard.getEventKey());
+			}
+			else if(editServerPort.isFocused())
+			{
+				editServerPort.updateText(Keyboard.getEventCharacter(), Keyboard.getEventKey());
+			}
+			else if(newServerPort.isFocused())
+			{
+				newServerPort.updateText(Keyboard.getEventCharacter(), Keyboard.getEventKey());
+			}
 			else //otherwise, throw away the input
 			{
 				Keyboard.getEventCharacter();
@@ -813,7 +1124,29 @@ public class MainMenu extends Render
 	 */
 	private void renderComponents()
 	{		
-		if(isDeletePlayerMenuOpen) //character deletion screen
+		if(isNewServerMenuOpen) //new server screen
+		{
+			newServerName.draw();
+			newServerIP.draw();
+			newServerPort.draw();
+			newServerBack.draw();
+			newServerConfirm.draw();
+		}
+		else if(isEditServerMenuOpen) //edit server screen
+		{
+			editServerName.draw();
+			editServerIP.draw();
+			editServerPort.draw();
+			editServerBack.draw();
+			editServerConfirm.draw();
+		}
+		else if(isDeleteServerMenuOpen) //delete server screen
+		{
+			deleteServerBack.draw();
+			deleteServerConfirm.draw();
+			deleteServerMessage.draw();
+		}
+		else if(isDeletePlayerMenuOpen) //character deletion screen
 		{
 			deletePlayerBack.draw();
 			deletePlayerConfirm.draw();
@@ -869,11 +1202,31 @@ public class MainMenu extends Render
 	}
 	
 	/**
+	 * Frees all textbox focuses.
+	 */
+	private void freeFocuses()
+	{
+		worldName.freeFocused();
+		characterName.freeFocused();
+		newServerName.freeFocused();
+		newServerIP.freeFocused();
+		newServerPort.freeFocused();
+		editServerPort.freeFocused();
+		editServerName.freeFocused();
+		editServerIP.freeFocused();
+	}
+	
+	/**
 	 * Updates the contents of the playerNames, and worldNames arrays. Then, if either of those menus are open
 	 * the left-side menu is refreshed.
 	 */
-	private void updateMenus()
+	private void updateMenus(Settings settings)
 	{
+		//Clear focuses
+		freeFocuses();
+		
+		//Update the menus, if applicable
+		servers = settings.getServersArray();
 		worldNames = menuHelper.getWorldFileNames();
 		playerNames = menuHelper.getPlayerFileNames();
 		if(isPlayerMenuOpen)
@@ -888,6 +1241,12 @@ public class MainMenu extends Render
 			menu.updateTitle("Worlds");
 			menu.updateVaryingItems(worldNames);
 		}
+		if(isMultiplayerMenuOpen)
+		{
+			menu.updateLockedInComponents(multiplayerMenuFooter);
+			menu.updateVaryingItems(serversToString(settings.getServersArray()));
+			menu.updateTitle("Multiplayer");
+		}
 	}
 
 	/**
@@ -895,10 +1254,10 @@ public class MainMenu extends Render
 	 * @param name the name of the player to delete
 	 * @return whether or not the operation succeeded
 	 */
-	private boolean deleteCharacter(String name)
+	private boolean deleteCharacter(Settings settings, String name)
 	{
 		boolean success = fileManager.deletefile("/Player Saves/" + name); //delete the file
-		updateMenus();
+		updateMenus(settings);
 		return success;
 	}
 	
@@ -907,11 +1266,23 @@ public class MainMenu extends Render
 	 * @param name the name of the world to delete
 	 * @return whether the operation succeeded or not
 	 */
-	private boolean deleteWorld(String name)
+	private boolean deleteWorld(Settings settings, String name)
 	{
 		boolean success = fileManager.deleteWorldSave("/World Saves/" + name); //try to delete the file
-		updateMenus();
+		updateMenus(settings);
 		return success;
+	}
+	
+	/**
+	 * Removes the specified piece of server information from the settings object
+	 * @param settings the client settings object
+	 * @param name the name of the server
+	 * @return true if the deletion succeeded, otherwise false
+	 */
+	private void deleteServer(Settings settings, ServerInfo info)
+	{
+		settings.removeServer(info);
+		updateMenus(settings);
 	}
 	
 	/**
@@ -992,4 +1363,13 @@ public class MainMenu extends Render
 		
 	}
 	
+	private String[] serversToString(ServerInfo[] servers)
+	{
+		String[] values = new String[servers.length];
+		for(int i = 0; i < values.length; i++)
+		{
+			values[i] = servers[i].getName();
+		}
+		return values;
+	}
 }
