@@ -1,5 +1,7 @@
 package auras;
 
+import java.io.Serializable;
+
 import utils.Damage;
 import utils.InventoryPlayer;
 import world.World;
@@ -27,7 +29,7 @@ import entities.EntityPlayer;
  * @since       1.0
  */
 public class AuraTracker 
-		implements IAura  
+		implements IAura, Serializable  
 {
 	private AuraContainer[] aurasByPiece;	
 	

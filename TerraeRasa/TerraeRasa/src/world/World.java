@@ -21,6 +21,7 @@ import render.Render;
 import savable.SavableWorld;
 import savable.SaveManager;
 import statuseffects.StatusEffectStun;
+import transmission.WorldData;
 import utils.ActionbarItem;
 import utils.ChestLootGenerator;
 import utils.Damage;
@@ -134,7 +135,7 @@ public class World
 		manager = new SpawnManager();
 		lootGenerator = new ChestLootGenerator();
 		utils = new LightUtils();
-		checkChunks();
+//		checkChunks();
 		lightingUpdateRequired = true;
 	}
 	
@@ -169,7 +170,41 @@ public class World
 		chunkHeight = height / height;
 		utils = new LightUtils();
 		lightingUpdateRequired = true;
-		checkChunks();
+//		checkChunks();
+	}
+	
+	public World(WorldData data, Chunk[] chunks)
+	{
+		setChunks(new ConcurrentHashMap<String, Chunk>(10));
+		for(Chunk chunk : chunks)
+		{
+			this.chunks.put(""+chunk.getX(), chunk);
+		}
+		
+		this.width = data.width;
+		this.height = data.height; 
+		this.difficulty = data.difficulty;
+		chunksLoaded= new Hashtable<String, Boolean>(25);
+		
+		this.entityList = data.entityList;
+		this.itemsList = data.itemsList;
+		this.projectileList = data.projectileList;
+		this.npcList = data.npcList;
+		this.temporaryText = data.temporaryText;
+		
+		this.worldName = data.worldName;
+		this.worldTime = data.worldTime;
+		this.previousLightLevel = data.previousLightLevel;
+		this.chunkWidth = data.chunkWidth;
+		this.chunkHeight = data.chunkHeight;
+		this.lightingUpdateRequired = data.lightingUpdateRequired;
+		this.generatedHeightMap = data.generatedHeightMap;
+		this.averageSkyHeight = data.averageSkyHeight;
+		
+		manager = new SpawnManager();
+		lootGenerator = new ChestLootGenerator();
+		utils = new LightUtils();
+		
 	}
 		
 	/**
@@ -2075,17 +2110,16 @@ public class World
 		getChunks().put(""+x, chunk);
 	}
 	
-	private void checkChunks()
-	{
-		for(int i = 0; i < width / Chunk.getChunkWidth(); i++)
-		{
-			if(getChunks().get(""+i) == null)
-			{
-				registerChunk(new Chunk(Biome.forest, i, height), i);
-			}
-			
-		}
-	}
+//	private void checkChunks()
+//	{
+//		for(int i = 0; i < width / Chunk.getChunkWidth(); i++)
+//		{
+//			if(getChunks().get(""+i) == null)
+//			{
+//				registerChunk(new Chunk(Biome.forest, i, height), i);
+//			}
+//		}
+//	}
 	
 	/**
 	 * Gets the biome for the specified chunk value, NOT block value

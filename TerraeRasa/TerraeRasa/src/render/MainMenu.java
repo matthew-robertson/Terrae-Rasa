@@ -1,6 +1,9 @@
 package render;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -12,6 +15,8 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
+import server.ClientConnectionThread;
+import server.ServerConnect;
 import utils.FileManager;
 import utils.MainMenuHelper;
 import utils.MathHelper;
@@ -810,20 +815,61 @@ public class MainMenu extends Render
 				editServerName.setText(selectedServer.getName());
 				editServerIP.setText(selectedServer.getIP());
 				editServerPort.setText(selectedServer.getPort());
+				isWaitingToEdit = false;
 			}
 			else if(isWaitingToDelete)
 			{
 				selectedServer = servers[selectedIndex - 1];
 				isDeleteServerMenuOpen = true;
+				isWaitingToDelete = false;
 				deleteServerMessage.setText("Delete " + selectedServer.toString() + "?");
 			}
 			else
 			{
 				selectedWorldName = menu.getVaryingItems()[selectedIndex - 1];
 				isWorldMenuOpen = false;
-				
-				//Play, sort of. 
+				requestGameConnection();
 			}
+		}
+	}
+	
+	private void startMPGame()
+	{
+		//selectedWorldName, fileManager.loadWorld("Earth", selectedWorldName), fileManager.loadPlayer(selectedPlayerName)
+		TerraeRasa.startMPGame();
+	}
+	
+	private void requestGameConnection()
+	{
+		try {
+			
+			String ip = (selectedServer.getIP()); 
+			int port = Integer.parseInt(selectedServer.getPort());
+			
+			ServerConnect connect = new ServerConnect();
+			String[] stuff = connect.getServerInformation(ip, port);
+			for(String str : stuff)
+			{
+				System.out.println("[Server Info]: " + str);
+			}
+			 
+			String[] message = { "" };
+			Socket socket = new Socket(ip, port);
+			ObjectOutputStream os = null;
+			ObjectInputStream is = null;
+			try {
+				 os = new ObjectOutputStream(socket.getOutputStream());
+				 is = new ObjectInputStream(socket.getInputStream());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			connect.requestGameConnection(message, socket, os, is);
+			ClientConnectionThread thread = new ClientConnectionThread(socket, TerraeRasa.terraeRasa.gameEngine.getEngineLock(), os, is);
+			thread.start();
+			
+			startMPGame();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 	

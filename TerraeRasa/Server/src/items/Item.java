@@ -12,6 +12,7 @@ import passivebonuses.PassiveBonusJumpHeight;
 import passivebonuses.PassiveBonusSpeed;
 import passivebonuses.PassiveBonusStamina;
 import passivebonuses.PassiveBonusStrength;
+import server.Log;
 import utils.ActionbarItem;
 import auras.Aura;
 import auras.AuraHeavensReprieve;
@@ -93,7 +94,7 @@ public class Item extends ActionbarItem
 		
 		if(itemsList[id] != null)
 		{
-			System.out.println(new StringBuilder().append("Conflict@ itemsList").append(id).toString());
+			Log.log("Conflict@ itemsList " + id);
 			throw new RuntimeException(new StringBuilder().append("Conflict@ itemsList").append(id).toString());
 		}
 		itemsList[id] = this;		

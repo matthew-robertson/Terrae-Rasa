@@ -19,9 +19,9 @@ public class NetTest
 		}
 		 
 		String[] message = { "" };
-		Socket socket = connect.requestGameConnection(ip, port, message);
-	//	ClientConnectionThread thread = new ClientConnectionThread(socket);
-		if(socket != null) socket.close();
+		//Socket socket = connect.requestGameConnection(ip, port, message);
+//		ClientConnectionThread thread = new ClientConnectionThread(socket, null);
+//		if(socket != null) socket.close();
 		
 		System.out.println(message[0]);
 		

@@ -8,26 +8,13 @@ import java.net.UnknownHostException;
 
 public class ServerConnect 
 {
-	public Socket requestGameConnection(String ip, int port, String[] message) throws IOException
+	public Socket requestGameConnection(String[] message, Socket socket, ObjectOutputStream os, ObjectInputStream is) throws IOException
 	{
-		Socket socket = new Socket(ip, port);
-		ObjectOutputStream os = null;
-		ObjectInputStream is = null;
-		try {
-			 os = new ObjectOutputStream(socket.getOutputStream());
-			 is = new ObjectInputStream(socket.getInputStream());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
 		os.writeUTF("/connect");
 		os.flush();
 		
 		String response = is.readUTF();
 		message[0] = response;
-
-		os.close();
-		is.close();
 
 		if(!response.equals("connection accepted"))
 		{

@@ -12,6 +12,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Random;
+import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
 import savable.SavableWorld;
@@ -19,6 +20,7 @@ import savable.SaveManager;
 import server.ServerSettings;
 import server.TerraeRasa;
 import statuseffects.StatusEffectStun;
+import transmission.WorldData;
 import utils.ActionbarItem;
 import utils.ChestLootGenerator;
 import utils.Damage;
@@ -98,7 +100,6 @@ public class World
 	
 	private int[] generatedHeightMap;
 	private int averageSkyHeight;
-	private int totalBiomes;
 	private int chunkWidth;
 	private int chunkHeight;
 	public ChunkManager chunkManager;
@@ -156,7 +157,6 @@ public class World
 		chunksLoaded= new Hashtable<String, Boolean>(25);
 		worldTime = (long) (6.5 * GAMETICKSPERHOUR);
 		worldName = "Earth";
-		totalBiomes = 0;
 		previousLightLevel = getLightLevel();
 		this.difficulty = difficulty;
 		manager = new SpawnManager();
@@ -174,6 +174,28 @@ public class World
 	 */
 	public void finishWorldReconstruction(String universeName)
 	{
+	}
+	
+	public WorldData getWorldData()
+	{
+		WorldData data = new WorldData();
+		data.itemsList = this.itemsList;
+		data.temporaryText = this.temporaryText; 
+		data.entityList = this.entityList;
+		data.npcList = this.npcList;
+		data.projectileList = this.projectileList;
+		data.generatedHeightMap = this.generatedHeightMap;
+		data.averageSkyHeight = this.averageSkyHeight;
+		data.chunkWidth = this.chunkWidth;
+		data.chunkHeight = this.chunkHeight;
+		data.difficulty = this.difficulty;
+		data.worldName = this.worldName;
+		data.worldTime = this.worldTime;
+		data.width = this.width; 
+		data.height = this.height;  
+		data.previousLightLevel = this.previousLightLevel;
+		data.lightingUpdateRequired = this.lightingUpdateRequired;
+		return data;
 	}
 	
 	/**
@@ -248,13 +270,29 @@ public class World
 		this.generatedHeightMap = savable.generatedHeightMap;
 		this.worldTime = savable.worldTime;
 		this.worldName = savable.worldName;
-		this.totalBiomes = savable.totalBiomes;
 		this.difficulty = savable.difficulty;
 
 	
 		
 		
 		finishWorldReconstruction(universeName);
+	}
+	
+	public void loadChunks(ServerSettings settings)
+	{
+		final int loadDistanceHorizontally = (settings.loadDistance * Chunk.getChunkWidth() >= 200) ? settings.loadDistance * Chunk.getChunkWidth() : 200;
+		
+		//Where to check, in the chunk map (based off loadDistance variables)
+		int leftOff = (getWorldCenterBlock() - loadDistanceHorizontally) / Chunk.getChunkWidth();
+		int rightOff = (getWorldCenterBlock() + loadDistanceHorizontally) / Chunk.getChunkWidth();
+		
+		for(int i = leftOff; i <= rightOff; i++) //Check for chunks that need loaded
+		{
+			chunkManager.requestChunk(worldName, this, getChunks(), i);
+		}
+		
+		requestRequiredChunks(settings, getWorldCenterBlock(), averageSkyHeight);
+		chunkManager.addAllLoadedChunks_Wait(this, getChunks());
 	}
 	
 	/**
@@ -315,7 +353,7 @@ public class World
 	/**
 	 * Keeps track of the worldtime and updates the light if needed
 	 */
-	public void updateWorldTime(EntityPlayer player)
+	private void updateWorldTime()
 	{
 		//worldTime / GAMETICKSPERHOUR = the hour (from 00:00 to 24:00)
 		worldTime++;
@@ -415,45 +453,64 @@ public class World
 	/**
 	 * Calls all the methods to update the world and its inhabitants
 	 */
-	public void onWorldTick(EntityPlayer player)
+	public void onWorldTick(Vector<EntityPlayer> players)
 	{		
-		spawnMonsters(player);				
-		causeWeather();		
+		//spawnMonsters(player);				
+		//causeWeather();		
+		//TODO: weather
 		//update the player
 		
-		player.onWorldTick(this); 
 		
-		//Update Entities
-		updateMonsters(player); 
-		updateNPCs(player);
-		updateProjectiles(player);
+		for(EntityPlayer player : players)
+		{
+			player.onWorldTick(this); 
+			
+			//Update Entities
+			//TODO: Monsters
+			//updateMonsters(player); 
+			//TODO: NPCs
+			//updateNPCs(player);
+			//TODO: projectiles
+			//updateProjectiles(player);
+			
+			//Hittests
+			//TODO: Player-Monster hittest
+			//performPlayerMonsterHittests(player); 
+			//TODO: Player-projectile hittests
+			//performProjectileHittests(player);
+			//TODO: Player-ItemStack hittests
+			//performPlayerItemHittests(player);
+			//TODO: PlayerTool-Monster hittests
+			//performEnemyToolHittests(player);
+
+		}
+		
+		updateChunks(players);
+		
+		//Not player based stuff -- do this once per game tick
+		updateMonsterStatusEffects();
 		updateTemporaryText();
 		updateEntityLivingItemStacks();
-		//Hittests
-		performPlayerMonsterHittests(player); 
-		performProjectileHittests(player);
-		performPlayerItemHittests(player);
-		performEnemyToolHittests(player);
-		//Update the time
-		updateWorldTime(player);
-		//checkChunks();
-		updateChunks(player);
-		updateMonsterStatusEffects();
-		applyLightingUpdates(player);
+		updateWorldTime();
+		applyLightingUpdates();
 		
-		System.out.println("Doing stuff");
 		if(chunkManager.isAnyLoadOperationDone())
 		{
 			chunkManager.addAllLoadedChunks(this, getChunks());
 		}
+
 //		if (player.inventory.getMainInventoryStack(player.selectedSlot) != null && 
 //				player.inventory.getMainInventoryStack(player.selectedSlot).getItemID() < ActionbarItem.spellIndex && 
 //				Mouse.isButtonDown(0)) 
 //		{ //player mining, if applicable
 //			player.breakBlock(this, ((Render.getCameraX() + MathHelper.getCorrectMouseXPosition()) / 6), ((Render.getCameraY() + MathHelper.getCorrectMouseYPosition()) / 6), (Item.itemsList[player.inventory.getMainInventoryStack(player.selectedSlot).getItemID()]));
 //		}
-		
 		//TODO: re-enable mining
+	}
+	
+	public void forceloadChunk(int x)
+	{
+		chunkManager.requestChunk(worldName, this, getChunks(), x);
 	}
 	
 	/**
@@ -1210,13 +1267,12 @@ public class World
 				{
 					if(block instanceof BlockChest)
 					{
-						BlockChest chest = (BlockChest) block.clone();						
+						BlockChest chest = new BlockChest((BlockChest) block);						
 						setBlock(chest, mx + i, my + j);
 					}
 					else
 					{
 						setBlock(block.clone(), mx + i, my + j);
-						
 					}
 					getBlock(mx + i, my + j).metaData = (short)metadata[i][j];
 				}
@@ -1298,7 +1354,7 @@ public class World
 				{
 					if(block instanceof BlockChest)
 					{
-						BlockChest chest = (BlockChest) block.clone();						
+						BlockChest chest = new BlockChest((BlockChest) block);       					
 						setBlock(chest, mx + i, my + j, EnumEventType.EVENT_BLOCK_PLACE);
 					}
 					else
@@ -1358,7 +1414,7 @@ public class World
 			getBlock(mx, my).isSolid)) //can the block be placed
 		{
 			player.inventory.removeItemsFromInventory(this, player, new ItemStack(block, 1)); //remove the items from inventory		
-			setBackBlock(block, mx, my); //place it	
+			setBackBlock(block.clone(), mx, my); //place it	
 		}
 	}
 	
@@ -1932,10 +1988,15 @@ public class World
 	 * Checks for chunks that need to be loaded or unloaded, based on the player's screen size. The range in which chunks stay loaded increases if the player's 
 	 * screen size is larger. (It's about ((width/2.2), (height/2.2))). 
 	 */
-	private void updateChunks(EntityPlayer player)
+	private void updateChunks(Vector<EntityPlayer> players)
 	{
 		//How far to check for chunks (in blocks)
-		//TODO: This may be broken
+		//TODO: Chunk Issue - This is 100% broken and needs to factor in all players
+		if(players.size() == 0) return;
+		
+		EntityPlayer player = players.get(0);
+		
+		
 		final int loadDistanceHorizontally = TerraeRasa.terraeRasa.getSettings().loadDistance * Chunk.getChunkWidth();//(((int)(Display.getWidth() / 2.2) + 3) > Chunk.getChunkWidth()) ? ((int)(Display.getWidth() / 2.2) + 3) : Chunk.getChunkWidth();
 		//Position to check from
 		final int x = (int) (player.x / 6);
@@ -1975,24 +2036,6 @@ public class World
 			}
 			
 		}
-	}
-	
-	/**
-	 * Sets the total number of biomes the world has. Generally this is advisable only during world generation.
-	 * @param total the value to set totalBiomes to
-	 */
-	public void setTotalBiomes(int total)
-	{
-		totalBiomes = total;
-	}
-	
-	/**
-	 * Gets how many biomes the world has. Merged biomes count as a single biome.
-	 * @return the total biomes in the world
-	 */
-	public int getTotalBiomes()
-	{
-		return totalBiomes;
 	}
 	
 	/**
@@ -2215,7 +2258,7 @@ public class World
 	 * the world has changed, or if the chunk (for whatever reason) has been flagged for a lighting update by a source.
 	 * @param player
 	 */
-	public void applyLightingUpdates(EntityPlayer player)
+	public void applyLightingUpdates()
 	{
 		//If the light level has changed, update the ambient lighting.
 		if(lightingUpdateRequired)

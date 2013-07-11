@@ -1,17 +1,16 @@
 package hardware;
 
-import org.lwjgl.LWJGLException;
+import java.util.Vector;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 
-import utils.Damage;
 import world.World;
 import client.Keybinds;
 import client.Settings;
 import client.TerraeRasa;
 import entities.EntityPlayer;
-import enums.EnumDamageSource;
-import enums.EnumDamageType;
+import enums.EnumHardwareInput;
 
 /**
  * <code>Keys</code> is responsible for handling most keyboard input within the application. Keyboard input
@@ -44,7 +43,7 @@ public class Keys
 	 * @param settings
 	 * @param keybinds
 	 */
-	public static void universalKeyboard(World world, EntityPlayer player, Settings settings, Keybinds keybinds)
+	public static void universalKeyboard(World world, EntityPlayer player, Settings settings, Keybinds keybinds, Vector<EnumHardwareInput> hardwareInput)
 	{
 		//Check for the (left) shift modifier (this may be useful in other parts of the program)
 		lshiftDown = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT);
@@ -58,7 +57,7 @@ public class Keys
 	 * @param player
 	 * @param settings
 	 */
-	public static void keyboard(World world, EntityPlayer player, Settings settings, Keybinds keybinds)
+	public static void keyboard(World world, EntityPlayer player, Settings settings, Keybinds keybinds, Vector<EnumHardwareInput> hardwareInput)
 	{	
 		if(TerraeRasa.initInDebugMode)
 		{
@@ -67,7 +66,7 @@ public class Keys
 				TerraeRasa.done = true;
 			}
 		}
-		
+				
 		if(Keyboard.isKeyDown(Keyboard.KEY_ESCAPE) && !ec && !TerraeRasa.isMainMenuOpen)
 		{
 			ec = true;
@@ -99,16 +98,19 @@ public class Keys
 			//player.x -= 20;
 			player.moveEntityLeft(world);
 			player.isFacingRight = false;
+			hardwareInput.add(EnumHardwareInput.MOVE_LEFT);
 		}
         if(Keyboard.isKeyDown(Keyboard.KEY_D)) //Move Right
         {
 			//player.x += 20;
         	player.moveEntityRight(world);
 			player.isFacingRight = true;
+			hardwareInput.add(EnumHardwareInput.MOVE_RIGHT);
         }
         if(Keyboard.isKeyDown(Keyboard.KEY_SPACE)) //Jump
         {
         	player.tryToJumpAgain(world, player);
+			hardwareInput.add(EnumHardwareInput.JUMP);
         }
         
         final int[] actionKeyValues = 
@@ -146,7 +148,7 @@ public class Keys
 			//Debug inputs
 			if(Keyboard.isKeyDown(Keyboard.KEY_W)) 
 			{
-				player.y -= 7;
+				player.y -= 18;
 			}
 	        if(Keyboard.isKeyDown(Keyboard.KEY_S)) //Broken
 	        {

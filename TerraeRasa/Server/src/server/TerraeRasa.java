@@ -74,35 +74,45 @@ public class TerraeRasa
 		}
 		
 		String val = is.readUTF();
-		System.out.println(val + " From " + socket.getInetAddress());
+		
+		Log.log("[" + socket.getInetAddress() + "] : " + val);
 		
 		if(val.equals("/serverinfo"))
 		{
 			os.writeObject(new String[] { VERSION, connections.size() + "/" + settings.maxPlayers + " Players", settings.serverMessage, "You connected with: " + socket.getInetAddress() });
+			os.flush();
 		}
 		else if(val.equals("/connect"))
 		{
-			boolean allowed = SecurityManager.verifyConnectionIsAllowed(settings, socket);
-			if(allowed)
+			String[] message = { "" };
+			boolean allowed = SecurityManager.verifyConnectionIsAllowed(settings, socket, message);
+			Log.log("[" + socket.getInetAddress() + "] : " + message[0]);
+			
+			if(allowed && connections.size() < settings.maxPlayers)
 			{
 				os.writeUTF("connection accepted");
 				os.flush();
-				registerGameConnectionThread(socket);
+				Log.log("[" + socket.getInetAddress() + "] : " + "connection accepted");
+				registerGameConnectionThread(socket, os, is);
+			}
+			else if(connections.size() >= settings.maxPlayers)
+			{
+				Log.log("[" + socket.getInetAddress() + "] : " + "connection denied: too many players");
+				os.writeUTF("connection denied : too many players.");
+				os.flush();
 			}
 			else
 			{
+				Log.log("[" + socket.getInetAddress() + "] : " + "connection denied");
 				os.writeUTF("connection not allowed");
 				os.flush();
 			}
-		}
-		
-		os.close();
-		is.close();
+		}		
 	}
 	
-	private void registerGameConnectionThread(Socket socket)
+	private void registerGameConnectionThread(Socket socket, ObjectOutputStream os, ObjectInputStream is)
 	{
-		ServerConnectionThread thread = new ServerConnectionThread(new WorldLock(), socket);
+		ServerConnectionThread thread = new ServerConnectionThread(new WorldLock(gameEngine), socket, os, is);
 		connections.add(thread);
 		thread.start();	
 	}
@@ -126,6 +136,7 @@ public class TerraeRasa
 		SettingsIO.saveSettings(terraeRasa.settings);
 		//Close connections to clients
 		//close the server socket
+		System.exit(0);
 	}
 	
 	public synchronized ServerSettings getSettings()

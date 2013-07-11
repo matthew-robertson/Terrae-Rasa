@@ -146,6 +146,11 @@ public class ItemStack
 	
 	public ItemStack(ItemStack stack)
 	{
+		if(stack == null) 
+		{
+			System.err.println("DO NOT COPY A NULL ITEMSTACK.");
+			throw new RuntimeException("Dont do this. It's physically painful to copy a null ItemStack.");
+		}
 		this.itemName = stack.getItemName();
 		this.stackSize = stack.getStackSize();
 		this.itemID = stack.getItemID();

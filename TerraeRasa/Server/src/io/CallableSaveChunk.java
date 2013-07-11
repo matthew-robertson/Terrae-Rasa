@@ -4,9 +4,7 @@ import java.util.concurrent.Callable;
 import savable.SavableBlock;
 import savable.SavableChunk;
 import savable.SaveManager;
-import utils.ItemStack;
-import blocks.Block;
-import blocks.BlockChest;
+import server.Log;
 import blocks.MinimalBlock;
 
 public class CallableSaveChunk implements Callable<Boolean>
@@ -41,7 +39,7 @@ public class CallableSaveChunk implements Callable<Boolean>
 			
 		SaveManager smanager = new SaveManager();
 		smanager.saveCompressedFile(basepath + "/" + x + ".trc", savable);
-		System.out.println("Chunk Saved to: " + basepath + "/" + x + ".trc");
+		Log.log("Chunk Saved to: " + basepath + "/" + x + ".trc");
 		manager.unlockChunk(chunk.getX());
 		this.chunk = null;
 		savable = null;

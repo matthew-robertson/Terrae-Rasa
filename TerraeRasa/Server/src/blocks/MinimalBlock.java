@@ -1,6 +1,7 @@
 package blocks;
 
 import savable.SavableBlock;
+import transmission.SuperCompressedBlock;
 import utils.ItemStack;
 
 /**
@@ -46,13 +47,26 @@ public class MinimalBlock
 	{
 		Block block = Block.blocksList[savedBlock.id].clone();
 		this.id = (short) block.getID();
-		this.metaData = (short) block.metaData;
-		this.mainInventory = (block instanceof BlockChest) ? ((BlockChest)(block)).getMainInventory() : new ItemStack[0];
+		this.metaData = (short) savedBlock.metaData;
+		this.mainInventory = savedBlock.mainInventory; //??????
 		this.hasMetaData = block.hasMetaData;
 		this.isSolid = block.isSolid;
 		this.iconX = (short) block.iconX;
 		this.iconY = (short) block.iconY;
 		this.setBitMap(savedBlock.bitMap);
+	}
+	
+	public MinimalBlock(SuperCompressedBlock compressedBlock)
+	{
+		Block block = Block.blocksList[compressedBlock.id].clone();
+		this.id = (short) block.getID();
+		this.metaData = (short) compressedBlock.metaData;
+		this.mainInventory = compressedBlock.mainInventory; //??????
+		this.hasMetaData = block.hasMetaData;
+		this.isSolid = block.isSolid;
+		this.iconX = (short) block.iconX;
+		this.iconY = (short) block.iconY;
+		this.setBitMap(compressedBlock.bitMap);
 	}
 	
 	public int getID()

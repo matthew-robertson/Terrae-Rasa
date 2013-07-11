@@ -76,7 +76,7 @@ public class WorldGenEarth extends WorldGen
 		Biome biome;
 		world.placeGrass(xLoc, (xLoc + width), yLoc, 460);
 				
-		for(int i = 0; i < world.getTotalBiomes(); i++){
+		for(int i = 0; i < world.getChunkWidth(); i++){
 			biome = biomes[i];			
 			int x = (int)(biome.getX());
 			int w = (int)(biome.getWidth());
@@ -356,9 +356,6 @@ public class WorldGenEarth extends WorldGen
 			System.out.println("Generated Biome " + i + ": " + t_biome.biomeName);
 		}		
 				
-		world.setTotalBiomes(biomes.length);
-		System.out.println("Total Biomes: " + world.getTotalBiomes());
-		
 		return biomes;
 	}
 	

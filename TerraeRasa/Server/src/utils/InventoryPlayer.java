@@ -10,6 +10,7 @@ import items.ItemArmorGloves;
 import items.ItemArmorHelmet;
 import items.ItemArmorPants;
 
+import java.io.Serializable;
 import java.util.Hashtable;
 
 import spells.Spell;
@@ -37,7 +38,7 @@ import entities.EntityPlayer;
  * @since       1.0
  */
 public class InventoryPlayer 
-		 
+		 implements Serializable
 {
 	private Hashtable<String, Integer> inventoryTotals;
 	private ItemStack[] trash;

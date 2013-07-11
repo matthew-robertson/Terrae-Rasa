@@ -13,6 +13,7 @@ import savable.SavableBlock;
 import savable.SavableChunk;
 import savable.SavableWorld;
 import savable.SaveManager;
+import server.Log;
 import server.TerraeRasa;
 import world.World;
 import blocks.MinimalBlock;
@@ -57,7 +58,7 @@ public class ChunkManager
 		if(!file.exists()) 
 		{
 			file.mkdir();
-			System.out.println("[ChunkManager] created directory @" + file.toString());
+			Log.log("[ChunkManager] created directory @" + file.toString());
 		}
 	}
 	
@@ -281,7 +282,6 @@ public class ChunkManager
 			savable.generatedHeightMap = world.getGeneratedHeightMap();
 			savable.worldTime = world.getWorldTime();
 			savable.worldName = world.getWorldName();
-			savable.totalBiomes = world.getTotalBiomes();
 			savable.difficulty = world.getDifficulty();
 
 			SaveManager manager = new SaveManager();
@@ -385,7 +385,7 @@ public class ChunkManager
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.println("Chunk Saved to: " + basepath + "/" + x + ".trc");
+		Log.log("Chunk Saved to: " + basepath + "/" + x + ".trc");
 		unlockChunk(chunk.getX());
 		
 		

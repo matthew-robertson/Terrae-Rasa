@@ -1,16 +1,17 @@
 package server;
 
+import io.Chunk;
 import io.ChunkManager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Vector;
 
 import utils.ErrorUtils;
 import utils.FileManager;
 import world.World;
 import entities.EntityPlayer;
-import enums.EnumWorldSize;
 
 /**
  * <code>GameEngine</code> is the class responsible for running the main game loop, and other core features of multiple worlds.
@@ -37,10 +38,11 @@ public class GameEngine
 	/** The number of game ticks per second - this will always be 20 */
 	public static final int TICKS_PER_SECOND = 20;
 	private World world;
-	private EntityPlayer player;
+	private Vector<EntityPlayer> players = new Vector<EntityPlayer>(10);
 	public ChunkManager chunkManager;
 	private String universeName;
-
+	//private Vector<PlayerIssuedCommand> playerIssuedCommands;
+	
 	/**
 	 * Creates a new instance of GameEngine. This includes setting the renderMode to RENDER_MODE_WORLD_EARTH
 	 * and loading the settings object from disk. If a settings object cannot be found a new one is created. 
@@ -49,7 +51,10 @@ public class GameEngine
 	{
 		this.universeName = universeName;
 		this.chunkManager = new ChunkManager();
+//		playerIssuedCommands = new Vector<PlayerIssuedCommand>();
 	}
+	
+	public World getWorld() { return world; }
 	
 	public void run()
 	{
@@ -72,12 +77,13 @@ public class GameEngine
 		        loops = 0;
 		        while(System.currentTimeMillis() > next_game_tick && loops < MAX_FRAMESKIP) //Update the game 20 times/second 
 		        {
-		        	if(player != null && player.defeated)
-		        	{
-		        		hardcoreDeath();
-		        	}		        	
+//		        	if(player != null && player.defeated)
+//		        	{
+//		        		hardcoreDeath();
+//		        	}	
+		        	//TODO: hardcore
 		        	  		
-		        	world.onWorldTick(player);
+		        	world.onWorldTick(players);
 		        	
 		        	next_game_tick += SKIP_TICKS;
  		            loops++;
@@ -114,6 +120,40 @@ public class GameEngine
 		}
 	}
 	
+	public synchronized void registerPlayer(EntityPlayer player)
+	{
+		players.add(player);
+	}
+	
+	public synchronized void removePlayer(EntityPlayer player)
+	{
+		players.remove(player);
+	}
+
+	public synchronized Chunk requestChunk(int x)
+	{
+		Chunk chunk = world.getChunk(x);
+		if(chunk == null)
+		{
+			world.forceloadChunk(x);
+		}
+		return chunk;
+	}
+
+	//	public synchronized void registerPlayerIssuedCommands(PlayerIssuedCommand command)
+//	{
+//		playerIssuedCommands.add(command);
+//	}
+//	
+//	public synchronized PlayerIssuedCommand[] emptyPlayerIssuedCommands()
+//	{
+//		PlayerIssuedCommand[] commands = new PlayerIssuedCommand[playerIssuedCommands.size()];
+//		playerIssuedCommands.copyInto(commands);
+//		playerIssuedCommands.clear();
+//		return commands;
+//	}
+	
+	
 	/**
 	 * Starts a game from the main menu.
 	 * @param world the world to play on.
@@ -129,48 +169,26 @@ public class GameEngine
 		this.world = world;
 		this.world.chunkManager = chunkManager;
 		this.world.chunkManager.setUniverseName(universeName);
-		this.player = player;
+//		this.player = player;
 //		world.addPlayerToWorld(player);
 //		TerraeRasa.isMainMenuOpen = false;
 //		mainMenu = null;
 	}
-		
-	/**
-	 * Initializes miscellaneous things within the game engine. This should be called after object creation so 
-	 * that the UI thread does not throw an exception while loading textures.
-	 */
-	public void init()
-	{
-		chunkManager = new ChunkManager();
-	}
-		
+			
 	/**
 	 * Initiates a hardcore death - which deletes the player and exits to the main menu. For now.
 	 */
-	public void hardcoreDeath()
+	public synchronized void hardcoreDeath()
 	{
 		//Delete the player
-		FileManager manager = new FileManager();
-		manager.deletefile("/Player Saves/" + player.getName());
-		this.player = null;
+//		FileManager manager = new FileManager();
+//		manager.deletefile("/Player Saves/" + player.getName());
+//		this.player = null;
 
 		//Save the world
-		world.saveRemainingWorld();
-		System.out.println("Game Over.");
-	}
-	
-	public void setWorld(World world)
-	{
-		this.world = world;
-	}
-	
-	/**
-	 * Gets the world object currently in use by the game. This will be null if the main menu is open or something breaks.
-	 * @return the world object for the current game, which may be null if on the main menu
-	 */
-	public World getWorld()
-	{
-		return world;
+//		world.saveRemainingWorld();
+		System.out.println("This doesnt do anything.");
+		//TODO: Hardcore
 	}
 	
 	/**
@@ -187,14 +205,11 @@ public class GameEngine
 	{
 		String worldName = "";
 		
-			world.saveRemainingWorld();
-			world = null;
-				
+		world.saveRemainingWorld();
+		world = null;
 		
 		FileManager manager = new FileManager();
-		
-		
-			manager.loadWorld("Earth", worldName);
+		manager.loadWorld("Earth", worldName);
 		
 	}
 	
@@ -207,12 +222,12 @@ public class GameEngine
 	public void closeGame() 
 			throws FileNotFoundException, IOException
 	{
-		if(!player.defeated)
-		{
-			FileManager manager = new FileManager();
-			manager.savePlayer(player);
-		}		
-		
+//		if(!player.defeated)
+//		{
+//			FileManager manager = new FileManager();
+//			manager.savePlayer(player);
+//		}	
+		//TODO: some sort of player saving
 		world.saveRemainingWorld();
 	}
 	
@@ -224,6 +239,7 @@ public class GameEngine
 		{
 			try {
 				this.world = manager.loadWorld("/Earth", universeName);
+				this.world.chunkManager = this.chunkManager;
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (ClassNotFoundException e) {
@@ -237,8 +253,7 @@ public class GameEngine
 					TerraeRasa.terraeRasa.getSettings().worldDifficulty);
 		}
 		
-		System.out.println(file.toString());
-		System.out.println();
+		Log.log("Loaded Universe: " + universeName);
 		
 	}
 	

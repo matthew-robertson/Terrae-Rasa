@@ -15,7 +15,6 @@ public class SavableWorld
 	public int[] generatedHeightMap;
 	public long worldTime;
 	public String worldName;
-	public int totalBiomes;
 	public EnumWorldDifficulty difficulty;
 	public List<EntityItemStack> itemsList;
 	

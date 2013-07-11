@@ -4,9 +4,8 @@ import java.util.concurrent.Callable;
 import savable.SavableBlock;
 import savable.SavableChunk;
 import savable.SaveManager;
+import server.Log;
 import world.Biome;
-import blocks.Block;
-import blocks.BlockChest;
 import blocks.MinimalBlock;
 
 public class CallableLoadChunk implements Callable<Chunk>
@@ -24,7 +23,7 @@ public class CallableLoadChunk implements Callable<Chunk>
 	
 	public Chunk call() throws Exception
 	{
-		SavableChunk savable = (SavableChunk)new SaveManager().loadCompressedFile(basepath + "/" + x + ".trc");
+		SavableChunk savable = (SavableChunk)new SaveManager().loadCompressedFile("/World/" + basepath + "/" + x + ".trc");
 		Chunk chunk = new Chunk(Biome.getBiomeFromBiomeList(savable.biomeID), savable.x, savable.height);
 		chunk.light = savable.light;
 		chunk.diffuseLight = savable.diffuseLight;
@@ -33,7 +32,7 @@ public class CallableLoadChunk implements Callable<Chunk>
 		chunk.blocks = convertFromSavable(savable.blocks);
 		chunk.setChanged(savable.wasChanged);
 		chunk.setFlaggedForLightingUpdate(true);
-		System.out.println("Chunk Loaded From File Path : " + basepath + "/" + x + ".trc");
+		Log.log("Chunk Loaded From File Path : " + basepath + "/" + x + ".trc");
 		manager.unlockChunk(chunk.getX());
 		return chunk;
 	}

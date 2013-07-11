@@ -1,13 +1,15 @@
 package world;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import entities.EntityNPCEnemy;
 
 public class Biome 
-		 implements Cloneable
+		 implements Cloneable, Serializable
 {
+	private static final long serialVersionUID = 1L;
 	protected int biomeID;
 	protected double x;
 	protected double y;

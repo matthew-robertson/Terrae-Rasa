@@ -22,6 +22,7 @@ import passivebonuses.PassiveBonus;
 import passivebonuses.PassiveBonusContainer;
 import passivebonuses.PassiveBonusFactory;
 import render.Render;
+import transmission.CompressedPlayer;
 import utils.Cooldown;
 import utils.CraftingManager;
 import utils.Damage;
@@ -103,9 +104,9 @@ public class EntityPlayer extends EntityLiving
 	private final String playerName;
 	private boolean inventoryChanged;
 	private final EnumPlayerDifficulty difficulty;
-	private final int MAXIMUM_BASE_MANA;
-	private final int MAXIMUM_BASE_HEALTH;
-	private final int MAX_BLOCK_PLACE_DISTANCE;
+	private final int MAXIMUM_BASE_MANA = 400;
+	private final int MAXIMUM_BASE_HEALTH = 400;
+	private final int MAX_BLOCK_PLACE_DISTANCE = 42;
 	private Hashtable<String, Cooldown> cooldowns;
 	private int baseSpecialEnergy;
 	private Dictionary<String, Boolean> nearBlock;
@@ -196,9 +197,6 @@ public class EntityPlayer extends EntityLiving
 		this.difficulty = difficulty;
 		invincibilityTicks = 10;
 		selectedSlot = 0;
-		MAX_BLOCK_PLACE_DISTANCE = 42;
-		MAXIMUM_BASE_HEALTH = 400;
-		MAXIMUM_BASE_MANA = 200;
 		viewedChestX = 0;
 		viewedChestY = 0;
 		defeated = false;
@@ -1420,5 +1418,227 @@ public class EntityPlayer extends EntityLiving
 	public double getManaPercent() 
 	{
 		return (maxMana == 0) ? 0 : mana / maxMana;
+	}
+	
+	public static CompressedPlayer compress(EntityPlayer player)
+	{
+		CompressedPlayer compressPlayer = new CompressedPlayer();
+		
+		compressPlayer.x = player.x;
+		compressPlayer.y = player.y;
+		compressPlayer.isAffectedByWalls = player.isAffectedByWalls;
+		compressPlayer.isAffectedByGravity = player.isAffectedByGravity;
+		compressPlayer.upwardJumpCounter = player.upwardJumpCounter; 	
+		compressPlayer.canJumpAgain = player.canJumpAgain;
+		compressPlayer.isJumping = player.isJumping;	
+		compressPlayer.upwardJumpHeight = player.upwardJumpHeight; 
+		compressPlayer.jumpSpeed = player.jumpSpeed;	
+		compressPlayer.isStunned = player.isStunned;
+		compressPlayer.ticksFallen = player.ticksFallen;
+		compressPlayer.textureWidth = player.textureWidth;
+		compressPlayer.textureHeight = player.textureHeight;
+		compressPlayer.width = player.width;
+		compressPlayer.height = player.height;
+		compressPlayer.blockWidth = player.blockWidth;
+		compressPlayer.blockHeight = player.blockHeight;
+		compressPlayer.distanceFallen = player.distanceFallen;
+		compressPlayer.maxHeightFallenSafely = player.maxHeightFallenSafely;
+		compressPlayer.baseSpeed = player.baseSpeed;
+		compressPlayer.movementSpeedModifier = player.movementSpeedModifier;
+
+		compressPlayer.isFireImmune = player.isFireImmune;
+		compressPlayer.attackSpeedModifier = player.attackSpeedModifier;
+		compressPlayer.knockbackModifier = player.knockbackModifier;
+		compressPlayer.meleeDamageModifier = player.meleeDamageModifier;
+		compressPlayer.rangeDamageModifier = player.rangeDamageModifier;
+		compressPlayer.magicDamageModifier = player.magicDamageModifier;
+		compressPlayer.allDamageModifier = player.allDamageModifier;	
+		compressPlayer.statusEffects = player.statusEffects;	
+		compressPlayer.criticalStrikeChance = player.criticalStrikeChance; 
+		compressPlayer.dodgeChance = player.dodgeChance;
+		compressPlayer.isImmuneToCrits = player.isImmuneToCrits;
+		compressPlayer.isImmuneToFallDamage = player.isImmuneToFallDamage;
+		compressPlayer.isImmuneToFireDamage = player.isImmuneToFireDamage;
+		compressPlayer.invincibilityTicks = player.invincibilityTicks;	
+		compressPlayer.maxHealth = player.maxHealth;
+		compressPlayer.maxMana = player.maxMana;
+		compressPlayer.mana = player.mana;
+		compressPlayer.defense = player.defense;
+		compressPlayer.health = player.health;
+		compressPlayer.absorbs = player.absorbs;
+		
+		compressPlayer.isSwingingRight = player.isSwingingRight;
+		compressPlayer.hasSwungTool = player.hasSwungTool;
+		compressPlayer.rotateAngle = player.rotateAngle;
+		compressPlayer.armorChanged = player.armorChanged;
+		compressPlayer.ticksSinceLastCast = player.ticksSinceLastCast;
+		compressPlayer.ticksInCombat = player.ticksInCombat;
+		compressPlayer.ticksOfHealthRegen = player.ticksOfHealthRegen;
+		compressPlayer.isInCombat = player.isInCombat;
+		compressPlayer.isMining = player.isMining;
+		compressPlayer.isReloaded = player.isReloaded;
+		compressPlayer.ticksreq = player.ticksreq;
+		compressPlayer.sx = player.sx;
+		compressPlayer.sy = player.sy;		
+		compressPlayer.playerName = player.playerName;
+		compressPlayer.inventoryChanged = player.inventoryChanged;
+		compressPlayer.difficulty = player.difficulty;
+
+		compressPlayer.cooldowns = player.cooldowns;
+		compressPlayer.baseSpecialEnergy = player.baseSpecialEnergy;
+		compressPlayer.nearBlock = player.nearBlock;
+		compressPlayer.currentBonuses = player.currentBonuses; 
+		compressPlayer.auraTracker = player.auraTracker;
+		
+		compressPlayer.strength = player.strength;
+		compressPlayer.dexterity = player.dexterity;
+		compressPlayer.intellect = player.intellect;
+		compressPlayer.stamina = player.stamina;
+		
+		compressPlayer.temporarySpecialEnergy = player.temporarySpecialEnergy;
+		compressPlayer.specialEnergy = player.specialEnergy;
+		compressPlayer.maxSpecialEnergy = player.maxSpecialEnergy;
+		
+		compressPlayer.viewedChestX = player.viewedChestX;
+		compressPlayer.viewedChestY = player.viewedChestY;
+		compressPlayer.isViewingChest = player.isViewingChest;	
+		compressPlayer.baseMaxHealth = player.baseMaxHealth;
+		compressPlayer.temporaryMaxHealth = player.temporaryMaxHealth;
+		compressPlayer.baseMaxMana = player.baseMaxMana;	
+		compressPlayer.temporaryMaxMana = player.temporaryMaxMana;
+		compressPlayer.respawnXPos = player.respawnXPos;
+		compressPlayer.respawnYPos = player.respawnYPos;	
+		
+		compressPlayer.selectedRecipe = player.selectedRecipe;
+		compressPlayer.selectedSlot = player.selectedSlot;
+		compressPlayer.isFacingRight = player.isFacingRight;
+		compressPlayer.isInventoryOpen = player.isInventoryOpen;	
+		compressPlayer.inventory = player.inventory;
+		
+		compressPlayer.healthRegenerationModifier = player.healthRegenerationModifier;
+		compressPlayer.manaRegenerationModifier = player.manaRegenerationModifier;
+		compressPlayer.specialRegenerationModifier = player.specialRegenerationModifier;
+		
+		compressPlayer.pickupRangeModifier = player.pickupRangeModifier;
+		compressPlayer.staminaModifier = player.staminaModifier;
+		compressPlayer.intellectModifier = player.intellectModifier;
+		compressPlayer.dexterityModifier = player.dexterityModifier;
+		compressPlayer.strengthModifier = player.strengthModifier;
+		
+		compressPlayer.defeated = player.defeated;
+		
+		
+		
+		return compressPlayer;
+	}
+	
+	public static EntityPlayer expand(CompressedPlayer compressedPlayer)
+	{
+		EntityPlayer player = new EntityPlayer(compressedPlayer.playerName, compressedPlayer.difficulty);
+		
+		player.x = compressedPlayer.x;
+		player.y = compressedPlayer.y;
+		player.isAffectedByWalls = compressedPlayer.isAffectedByWalls;
+		player.isAffectedByGravity = compressedPlayer.isAffectedByGravity;
+		player.upwardJumpCounter = compressedPlayer.upwardJumpCounter; 	
+		player.canJumpAgain = compressedPlayer.canJumpAgain;
+		player.isJumping = compressedPlayer.isJumping;	
+		player.upwardJumpHeight = compressedPlayer.upwardJumpHeight; 
+		player.jumpSpeed = compressedPlayer.jumpSpeed;	
+		player.isStunned = compressedPlayer.isStunned;
+		player.ticksFallen = compressedPlayer.ticksFallen;
+		player.textureWidth = compressedPlayer.textureWidth;
+		player.textureHeight = compressedPlayer.textureHeight;
+		player.width = compressedPlayer.width;
+		player.height = compressedPlayer.height;
+		player.blockWidth = compressedPlayer.blockWidth;
+		player.blockHeight = compressedPlayer.blockHeight;
+		player.distanceFallen = compressedPlayer.distanceFallen;
+		player.maxHeightFallenSafely = compressedPlayer.maxHeightFallenSafely;
+		player.baseSpeed = compressedPlayer.baseSpeed;
+		player.movementSpeedModifier = compressedPlayer.movementSpeedModifier;
+
+		player.isFireImmune = compressedPlayer.isFireImmune;
+		player.attackSpeedModifier = compressedPlayer.attackSpeedModifier;
+		player.knockbackModifier = compressedPlayer.knockbackModifier;
+		player.meleeDamageModifier = compressedPlayer.meleeDamageModifier;
+		player.rangeDamageModifier = compressedPlayer.rangeDamageModifier;
+		player.magicDamageModifier = compressedPlayer.magicDamageModifier;
+		player.allDamageModifier = compressedPlayer.allDamageModifier;	
+		player.statusEffects = compressedPlayer.statusEffects;	
+		player.criticalStrikeChance = compressedPlayer.criticalStrikeChance; 
+		player.dodgeChance = compressedPlayer.dodgeChance;
+		player.isImmuneToCrits = compressedPlayer.isImmuneToCrits;
+		player.isImmuneToFallDamage = compressedPlayer.isImmuneToFallDamage;
+		player.isImmuneToFireDamage = compressedPlayer.isImmuneToFireDamage;
+		player.invincibilityTicks = compressedPlayer.invincibilityTicks;	
+		player.maxHealth = compressedPlayer.maxHealth;
+		player.maxMana = compressedPlayer.maxMana;
+		player.mana = compressedPlayer.mana;
+		player.defense = compressedPlayer.defense;
+		player.health = compressedPlayer.health;
+		player.absorbs = compressedPlayer.absorbs;
+		
+		player.isSwingingRight = compressedPlayer.isSwingingRight;
+		player.hasSwungTool = compressedPlayer.hasSwungTool;
+		player.rotateAngle = compressedPlayer.rotateAngle;
+		player.armorChanged = compressedPlayer.armorChanged;
+		player.ticksSinceLastCast = compressedPlayer.ticksSinceLastCast;
+		player.ticksInCombat = compressedPlayer.ticksInCombat;
+		player.ticksOfHealthRegen = compressedPlayer.ticksOfHealthRegen;
+		player.isInCombat = compressedPlayer.isInCombat;
+		player.isMining = compressedPlayer.isMining;
+		player.isReloaded = compressedPlayer.isReloaded;
+		player.ticksreq = compressedPlayer.ticksreq;
+		player.sx = compressedPlayer.sx;
+		player.sy = compressedPlayer.sy;		
+		//player.playerName = ;
+		player.inventoryChanged = compressedPlayer.inventoryChanged;
+		//player.difficulty = ;
+
+		player.cooldowns = compressedPlayer.cooldowns;
+		player.baseSpecialEnergy = compressedPlayer.baseSpecialEnergy;
+		player.nearBlock = compressedPlayer.nearBlock;
+		player.currentBonuses = compressedPlayer.currentBonuses; 
+		player.auraTracker = compressedPlayer.auraTracker;
+		
+		player.strength = compressedPlayer.strength;
+		player.dexterity = compressedPlayer.dexterity;
+		player.intellect = compressedPlayer.intellect;
+		player.stamina = compressedPlayer.stamina;
+		
+		player.temporarySpecialEnergy = compressedPlayer.temporarySpecialEnergy;
+		player.specialEnergy = compressedPlayer.specialEnergy;
+		player.maxSpecialEnergy = compressedPlayer.maxSpecialEnergy;
+		
+		player.viewedChestX = compressedPlayer.viewedChestX;
+		player.viewedChestY = compressedPlayer.viewedChestY;
+		player.isViewingChest = compressedPlayer.isViewingChest;	
+		player.baseMaxHealth = compressedPlayer.baseMaxHealth;
+		player.temporaryMaxHealth = compressedPlayer.temporaryMaxHealth;
+		player.baseMaxMana = compressedPlayer.baseMaxMana;	
+		player.temporaryMaxMana = compressedPlayer.temporaryMaxMana;
+		player.respawnXPos = compressedPlayer.respawnXPos;
+		player.respawnYPos = compressedPlayer.respawnYPos;	
+		
+		player.selectedRecipe = compressedPlayer.selectedRecipe;
+		player.selectedSlot = compressedPlayer.selectedSlot;
+		player.isFacingRight = compressedPlayer.isFacingRight;
+		player.isInventoryOpen = compressedPlayer.isInventoryOpen;	
+		player.inventory = compressedPlayer.inventory;
+		
+		player.healthRegenerationModifier = compressedPlayer.healthRegenerationModifier;
+		player.manaRegenerationModifier = compressedPlayer.manaRegenerationModifier;
+		player.specialRegenerationModifier = compressedPlayer.specialRegenerationModifier;
+		
+		player.pickupRangeModifier = compressedPlayer.pickupRangeModifier;
+		player.staminaModifier = compressedPlayer.staminaModifier;
+		player.intellectModifier = compressedPlayer.intellectModifier;
+		player.dexterityModifier = compressedPlayer.dexterityModifier;
+		player.strengthModifier = compressedPlayer.strengthModifier;
+		
+		player.defeated = compressedPlayer.defeated;
+		
+		return player;
 	}
 }

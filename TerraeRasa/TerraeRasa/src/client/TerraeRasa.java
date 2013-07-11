@@ -302,6 +302,11 @@ public class TerraeRasa
 		terraeRasa.gameEngine.startGame(universeName, world, player);
 	}
 	
+	public static void startMPGame()
+	{
+		terraeRasa.gameEngine.startMPGame();
+	}
+	
 	public static final String getOSName()
 	{
 		return osName;

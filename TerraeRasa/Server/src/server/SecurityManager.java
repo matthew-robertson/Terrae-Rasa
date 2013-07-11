@@ -4,36 +4,45 @@ import java.net.Socket;
 
 public class SecurityManager
 {
-	public static boolean verifyConnectionIsAllowed(ServerSettings settings, Socket socket)
+	public static boolean verifyConnectionIsAllowed(ServerSettings settings, Socket socket, String[] message)
 	{
-		String ip = socket.getInetAddress().toString();
-		ip = ip.substring(1);
-		boolean allowed = true;
+		String ip = (socket.getInetAddress().toString()).substring(1);
+
 		if(settings.useWhitelist)
 		{
-			allowed = false;
-			for(String str : settings.whitelist)
-			{
-				if(str.equals(ip))
-				{
-					allowed = true;
-				}
-			}
+			boolean whitelisted = isWhitelisted(settings, ip);
+			message[0] = (whitelisted) ? "Allowed : whitelisted" : "Not Allowed : no-whitelist";
+			return whitelisted;
 		}		
 		else
 		{
-			allowed = true;
-			for(String str : settings.banlist)
-			{
-				if(str.equals(ip))
-				{
-					allowed = false;
-				}
-			}
+			boolean banned = isBanned(settings, ip);
+			message[0] = (!banned) ? "Allowed : no-banned" : "Not Allowed : banned";
+			return !banned;
 		}
-		
-		System.out.println(allowed);
-		return allowed;
 	}
 	
+	private static boolean isWhitelisted(ServerSettings settings, String ip)
+	{
+		for(String str : settings.whitelist)
+		{
+			if(str.equals(ip))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private static boolean isBanned(ServerSettings settings, String ip)
+	{
+		for(String str : settings.banlist)
+		{
+			if(str.equals(ip))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 }

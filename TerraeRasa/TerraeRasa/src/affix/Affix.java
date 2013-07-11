@@ -1,5 +1,6 @@
 package affix;
 
+import java.io.Serializable;
 import java.util.Random;
 import java.util.Vector;
 
@@ -12,8 +13,10 @@ import auras.Aura;
  * @author Matthew Robertson
  *
  */
-public class Affix{
-	
+public class Affix
+		implements Serializable
+{
+	private static final long serialVersionUID = 1L;
 	protected Random rng;
 	private String name;
 	private Vector<PassiveBonus> passives;

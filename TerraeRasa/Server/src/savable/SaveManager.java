@@ -53,7 +53,6 @@ public class SaveManager
 		s.writeObject(object); 
 		byte data[] = bos.toByteArray();
 		fileWriter.write(data, 0, data.length);
-//		System.out.println("Saved to: " + path + " With Initial Size: " + data.length);
 		s.close();
 		bos.close();
 		fileWriter.close();  
@@ -64,7 +63,6 @@ public class SaveManager
 	{
 		ObjectInputStream ois = new ObjectInputStream(new DataInputStream(new GZIPInputStream(new FileInputStream(TerraeRasa.getBasePath() + path)))); //Open an input stream
 		Object obj = ois.readObject(); 
-//	    System.out.println("loaded from: " + path);
 		ois.close();
 		return obj;
 	}
