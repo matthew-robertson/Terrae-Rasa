@@ -48,7 +48,7 @@ public class CraftingManager
 			recipesByBlock.put(block.getName(), allRecipes);
 		}
 		recipesByBlock.put(Block.none.getName(), recipeManager.getRecipesByBlockType(Block.none));
-		System.out.print(' ');
+		
 	}
 
 	private Recipe[] getAllRecipesByBlockType(Block block)

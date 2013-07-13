@@ -2,7 +2,8 @@ package client;
 
 import java.util.Vector;
 
-import transmission.ServerUpdate;
+import transmission.CompressedPlayer;
+import transmission.CompressedServerUpdate;
 import world.World;
 import entities.EntityPlayer;
 import enums.EnumHardwareInput;
@@ -11,7 +12,8 @@ public class EngineLock
 {
 	private Vector<EnumHardwareInput> hardwareInput = new Vector<EnumHardwareInput>();
 	private GameEngine engine;
-	private Vector<ServerUpdate> serverUpdates = new Vector<ServerUpdate>();
+	private Vector<CompressedServerUpdate> serverUpdates = new Vector<CompressedServerUpdate>();
+//	private EntityPlayer relevantPlayer;
 	
 	public EngineLock(GameEngine engine)
 	{
@@ -32,15 +34,15 @@ public class EngineLock
 		return inputs;
 	}
 	
-	public synchronized void addUpdate(ServerUpdate update)
+	public synchronized void addUpdate(CompressedServerUpdate update)
 	{
 		serverUpdates.add(update);
 	}
 	
 	//Deletes too
-	public synchronized ServerUpdate[] yieldServerUpdates()
+	public synchronized CompressedServerUpdate[] yieldServerUpdates()
 	{
-		ServerUpdate[] updates = new ServerUpdate[serverUpdates.size()];
+		CompressedServerUpdate[] updates = new CompressedServerUpdate[serverUpdates.size()];
 		serverUpdates.copyInto(updates);
 		serverUpdates.clear();
 		return updates;
@@ -56,7 +58,17 @@ public class EngineLock
 		return hardwareInput.size() > 0;
 	}
 		
-	public synchronized EntityPlayer getPlayer()
+	public synchronized void setPlayer(EntityPlayer player)
+	{
+		engine.setPlayer(player);
+	}
+	
+	public synchronized void updatePlayer(CompressedPlayer player)
+	{
+		engine.getPlayer().mergeOnto(player);
+	}
+	
+	public synchronized EntityPlayer getRelevantPlayer()
 	{
 		return engine.getPlayer();
 	}

@@ -302,6 +302,34 @@ public class EntityPlayer extends EntityLiving
 		}
 	}
 	
+	public void onClientTick(World world)
+	{
+//		invincibilityTicks = (invincibilityTicks > 0) ? --invincibilityTicks : 0;
+//		ticksSinceLastCast++;
+//		if(armorChanged)
+//		{
+//			refreshPassiveBonuses();
+//			recalculateStats();
+//		}		
+//		checkForCombatStatus();
+//		checkAndUpdateStatusEffects(world);
+//		applyGravity(world); //Apply Gravity to the player (and jumping)
+//		applyHealthRegen(world);
+//		applyManaRegen(world);
+//		applySpecialRegen(world);
+		checkForNearbyBlocks(world);	
+		verifyChestRange();
+//		updateCooldowns();
+//		auraTracker.update(world, this);
+//		auraTracker.onTick(world, this);
+//		if(isDead())
+//		{
+//			onDeath(world);
+//		}
+
+	
+	}
+	
 	/**
 	 * Updates time in combat, and if the time has exceeded 120 ticks (6 seconds) since the last combat action, combat status is removed.
 	 */
@@ -1640,5 +1668,107 @@ public class EntityPlayer extends EntityLiving
 		player.defeated = compressedPlayer.defeated;
 		
 		return player;
+	}
+	
+	public void mergeOnto(CompressedPlayer player)
+	{
+		this.x = player.x;
+		this.y = player.y;
+		this.isAffectedByWalls = player.isAffectedByWalls;
+		this.isAffectedByGravity = player.isAffectedByGravity;
+		this.upwardJumpCounter = player.upwardJumpCounter; 	
+		this.canJumpAgain = player.canJumpAgain;
+		this.isJumping = player.isJumping;	
+		this.upwardJumpHeight = player.upwardJumpHeight; 
+		this.jumpSpeed = player.jumpSpeed;	
+		this.isStunned = player.isStunned;
+		this.ticksFallen = player.ticksFallen;
+		this.textureWidth = player.textureWidth;
+		this.textureHeight = player.textureHeight;
+		this.width = player.width;
+		this.height = player.height;
+		this.blockWidth = player.blockWidth;
+		this.blockHeight = player.blockHeight;
+		this.distanceFallen = player.distanceFallen;
+		this.maxHeightFallenSafely = player.maxHeightFallenSafely;
+		this.baseSpeed = player.baseSpeed;
+		this.movementSpeedModifier = player.movementSpeedModifier;
+
+		this.isFireImmune = player.isFireImmune;
+		this.attackSpeedModifier = player.attackSpeedModifier;
+		this.knockbackModifier = player.knockbackModifier;
+		this.meleeDamageModifier = player.meleeDamageModifier;
+		this.rangeDamageModifier = player.rangeDamageModifier;
+		this.magicDamageModifier = player.magicDamageModifier;
+		this.allDamageModifier = player.allDamageModifier;	
+		this.statusEffects = player.statusEffects;	
+		this.criticalStrikeChance = player.criticalStrikeChance; 
+		this.dodgeChance = player.dodgeChance;
+		this.isImmuneToCrits = player.isImmuneToCrits;
+		this.isImmuneToFallDamage = player.isImmuneToFallDamage;
+		this.isImmuneToFireDamage = player.isImmuneToFireDamage;
+		this.invincibilityTicks = player.invincibilityTicks;	
+		this.maxHealth = player.maxHealth;
+		this.maxMana = player.maxMana;
+		this.mana = player.mana;
+		this.defense = player.defense;
+		this.health = player.health;
+		this.absorbs = player.absorbs;
+		
+		this.isSwingingRight = player.isSwingingRight;
+		this.hasSwungTool = player.hasSwungTool;
+		this.rotateAngle = player.rotateAngle;
+		this.armorChanged = player.armorChanged;
+		this.ticksSinceLastCast = player.ticksSinceLastCast;
+		this.ticksInCombat = player.ticksInCombat;
+		this.ticksOfHealthRegen = player.ticksOfHealthRegen;
+		this.isInCombat = player.isInCombat;
+		this.isMining = player.isMining;
+		this.isReloaded = player.isReloaded;
+		this.ticksreq = player.ticksreq;
+		this.sx = player.sx;
+		this.sy = player.sy;		
+		this.inventoryChanged = player.inventoryChanged;
+
+		this.cooldowns = player.cooldowns;
+		this.baseSpecialEnergy = player.baseSpecialEnergy;
+		this.currentBonuses = player.currentBonuses; 
+		this.auraTracker = player.auraTracker;
+		
+		this.strength = player.strength;
+		this.dexterity = player.dexterity;
+		this.intellect = player.intellect;
+		this.stamina = player.stamina;
+		
+		this.temporarySpecialEnergy = player.temporarySpecialEnergy;
+		this.specialEnergy = player.specialEnergy;
+		this.maxSpecialEnergy = player.maxSpecialEnergy;
+		
+		//this.viewedChestX = player.viewedChestX;
+		//this.viewedChestY = player.viewedChestY;
+		this.isViewingChest = player.isViewingChest;	
+		this.baseMaxHealth = player.baseMaxHealth;
+		this.temporaryMaxHealth = player.temporaryMaxHealth;
+		this.baseMaxMana = player.baseMaxMana;	
+		this.temporaryMaxMana = player.temporaryMaxMana;
+		this.respawnXPos = player.respawnXPos;
+		this.respawnYPos = player.respawnYPos;	
+		
+		this.inventory = player.inventory;
+		
+		this.healthRegenerationModifier = player.healthRegenerationModifier;
+		this.manaRegenerationModifier = player.manaRegenerationModifier;
+		this.specialRegenerationModifier = player.specialRegenerationModifier;
+		
+		this.pickupRangeModifier = player.pickupRangeModifier;
+		this.staminaModifier = player.staminaModifier;
+		this.intellectModifier = player.intellectModifier;
+		this.dexterityModifier = player.dexterityModifier;
+		this.strengthModifier = player.strengthModifier;
+		
+		this.defeated = player.defeated;
+		
+		
+		
 	}
 }

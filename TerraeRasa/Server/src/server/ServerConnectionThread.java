@@ -9,9 +9,13 @@ import java.net.Socket;
 
 import transmission.ChunkCompressor;
 import transmission.CompressedPlayer;
+import transmission.CompressedServerUpdate;
+import transmission.GZIPHelper;
+import transmission.ServerUpdate;
 import transmission.SuperCompressedChunk;
 import transmission.WorldData;
 import entities.EntityPlayer;
+import enums.EnumHardwareInput;
 
 public class ServerConnectionThread extends Thread
 {
@@ -20,6 +24,7 @@ public class ServerConnectionThread extends Thread
 	private boolean open;
 	private ObjectOutputStream os;
 	private ObjectInputStream is;
+	private GZIPHelper gzipHelper;
 	
 	public ServerConnectionThread(WorldLock lock, Socket socket, ObjectOutputStream os, ObjectInputStream is)
 	{
@@ -29,16 +34,67 @@ public class ServerConnectionThread extends Thread
 		open = true;
 		this.is = is;
 		this.os = os;
+		gzipHelper = new GZIPHelper();
+	}
+	
+	public void registerWorldUpdate(ServerUpdate update)
+	{
+		worldLock.addUpdate(update);
 	}
 	
 	public void run()
 	{	
-		try {
+		handleInitialData();
+		
+		while(open)
+		{
+			try {
+				String message = is.readUTF();
+				if(message.equals("/clientinput"))
+				{
+					EnumHardwareInput[] clientInput = (EnumHardwareInput[])(gzipHelper.expand((byte[])is.readObject()));
+					worldLock.registerPlayerInput(clientInput);
+				}
+				//TODO: Maybe? this may or may not be reckless.
+				
+				CompressedServerUpdate[] updates = worldLock.yieldServerUpdates();
+	        	os.writeObject(gzipHelper.compress(updates));
+	        	os.flush();
+	        	
+//	        	os.writeObject(gzipHelper.compress(EntityPlayer.compress(worldLock.getRelevantPlayer())));
+//	        	os.flush();
+	        	//Update cycle done.
+			} catch (IOException e) {
+				e.printStackTrace();
+				break;
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+				break;
+			}
 			
+			
+			
+			
+			
+		}
+		
+		
+		
+		try {
+			os.close();
+			is.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}		
+	}
+	
+	private void handleInitialData()
+	{
+		try {
 			String message = is.readUTF();
 			if(message.equals("/sendplayer"))
 			{
-				EntityPlayer player = EntityPlayer.expand((CompressedPlayer)is.readObject());
+				EntityPlayer player = EntityPlayer.expand((CompressedPlayer)(gzipHelper.expand((byte[])is.readObject())));
 				worldLock.addPlayerToWorld(player);
 			}
 			
@@ -52,7 +108,7 @@ public class ServerConnectionThread extends Thread
 				{
 					scc[i] = ChunkCompressor.compressChunk(chunks[i]);
 				}				
-				os.writeObject(scc);
+				os.writeObject(gzipHelper.compress(scc));
 				os.flush();
 			}
 						
@@ -60,40 +116,13 @@ public class ServerConnectionThread extends Thread
 			if(message.equals("/initialgamedata"))
 			{
 				WorldData data = worldLock.getWorldData();
-				os.writeObject(data);
+				os.writeObject(gzipHelper.compress(data));
 				os.flush();
 			}
-		
-		
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-		
-		
-		
-		
-		
-		
-		while(open)
-		{
-			System.out.println("Here");
-			try {
-				Thread.sleep(10000000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			//do stuff
-		}
-		
-		
-		
-		try {
-			os.close();
-			is.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}		
 	}
 }

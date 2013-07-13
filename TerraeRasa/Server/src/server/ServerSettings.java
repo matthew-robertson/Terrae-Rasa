@@ -8,6 +8,8 @@ import enums.EnumWorldSize;
 
 public class ServerSettings 
 {
+	private static int entityID = 0;
+	
 	public boolean forcePlayerDifficultiesNormal;
 	public int maxPlayers;
 	public int spawnProtectionRange;
@@ -108,5 +110,8 @@ public class ServerSettings
 		admins.remove(name);
 	}
 	
-	
+	public static int getEntityID()
+	{
+		return entityID++;
+	}
 }

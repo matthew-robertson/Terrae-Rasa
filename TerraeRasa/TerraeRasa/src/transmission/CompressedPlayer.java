@@ -18,7 +18,6 @@ public class CompressedPlayer
 {
 	public static final long serialVersionUID = 1L;
 	
-	
 	public double x;
 	public double y;
 	public boolean isAffectedByWalls;

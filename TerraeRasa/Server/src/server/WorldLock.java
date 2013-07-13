@@ -4,40 +4,49 @@ import io.Chunk;
 
 import java.util.Vector;
 
+import transmission.CompressedServerUpdate;
+import transmission.PositionUpdate;
+import transmission.ServerUpdate;
+import transmission.SuperCompressedChunk;
 import transmission.WorldData;
 import entities.EntityPlayer;
+import enums.EnumHardwareInput;
 
 public class WorldLock 
 {
 	private GameEngine engine;
+	private Vector<CompressedServerUpdate> serverUpdates = new Vector<CompressedServerUpdate>();
+	private EntityPlayer relevantPlayer;
 	
 	public WorldLock(GameEngine engine)
 	{
 		this.engine = engine;
 	}
 	
-	public void issueConsoleCommand(EntityPlayer associatedPlayer, String command)
+	public synchronized void issueConsoleCommand(EntityPlayer associatedPlayer, String command)
 	{
 		//TODO: console commands
 	}
 	
 	//This can be null. Indicates chunk load failure.
-	public Chunk requestChunk(int x)
+	public synchronized Chunk requestChunk(int x)
 	{
 		return engine.requestChunk(x);
 	}
 	
-	public WorldData getWorldData()
+	public synchronized WorldData getWorldData()
 	{
 		return engine.getWorld().getWorldData();
 	}
 	
-	public void addPlayerToWorld(EntityPlayer player)
+	public synchronized void addPlayerToWorld(EntityPlayer player)
 	{
 		engine.getWorld().addPlayerToWorld(TerraeRasa.terraeRasa.getSettings(), player);
+		engine.registerPlayer(player);
+		relevantPlayer = player;
 	}
 	
-	public Chunk[] getChunks(int[] req)
+	public synchronized Chunk[] getChunks(int[] req)
 	{
 		Chunk[] chunks = new Chunk[req.length];
 		for(int i = 0; i < chunks.length; i++)
@@ -47,7 +56,7 @@ public class WorldLock
 		return chunks;
 	}
 	
-	public Chunk[] getInitialChunks()
+	public synchronized Chunk[] getInitialChunks()
 	{
 		ServerSettings settings = TerraeRasa.terraeRasa.getSettings();
 		final int loadDistanceHorizontally = (settings.loadDistance * Chunk.getChunkWidth() >= 200) ? settings.loadDistance * Chunk.getChunkWidth() : 200;
@@ -64,5 +73,38 @@ public class WorldLock
 		Chunk[] c = new Chunk[chunks.size()];
 		chunks.copyInto(c);
 		return c;
+	}
+	
+	public synchronized void addUpdate(ServerUpdate update)
+	{
+		if(getRelevantPlayer() != null)
+		{
+			CompressedServerUpdate compressedUpdate = new CompressedServerUpdate();
+			compressedUpdate.values = update.getValues();
+			compressedUpdate.chunks = new SuperCompressedChunk[]{ };
+			compressedUpdate.player = null;
+			compressedUpdate.update = new PositionUpdate(getRelevantPlayer().x, getRelevantPlayer().y);
+			serverUpdates.add(compressedUpdate);
+		}
+	}
+	
+	//Deletes too
+	public synchronized CompressedServerUpdate[] yieldServerUpdates()
+	{
+		CompressedServerUpdate[] updates = new CompressedServerUpdate[serverUpdates.size()];
+		serverUpdates.copyInto(updates);
+		serverUpdates.clear();
+		return updates;
+	}
+	
+	public synchronized EntityPlayer getRelevantPlayer()
+	{
+		return relevantPlayer;
+	}
+	
+	public synchronized void registerPlayerInput(EnumHardwareInput[] clientInput)
+	{
+		PlayerInput input = new PlayerInput(relevantPlayer, clientInput);
+		engine.getWorld().registerPlayerMovement(input);
 	}
 }

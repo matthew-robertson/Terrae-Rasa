@@ -1,5 +1,6 @@
 package entities;
 
+import server.ServerSettings;
 import utils.MathHelper;
 import world.World;
 import blocks.Block;
@@ -18,6 +19,8 @@ import blocks.Block;
 public class Entity 
 		 
 {
+	public final int entityID;
+	
 	/** The x position of the entity in pixels. */
 	public double x;
 	/** The y position of the entity in pixels. */
@@ -69,7 +72,8 @@ public class Entity
 		textureWidth = 16;
 		textureHeight = 16;
 		blockWidth = 2;
-		blockHeight = 3;		
+		blockHeight = 3;	
+		entityID = ServerSettings.getEntityID();
 	}	
 		
 	/**
@@ -99,6 +103,7 @@ public class Entity
 		this.setBaseSpeed(entity.getBaseSpeed());
 		this.setMovementSpeedModifier(entity.getMovementSpeedModifier());
 		this.ticksFallen = entity.ticksFallen;
+		this.entityID = entity.entityID;
 	}
 	
 	public Entity setPosition(int i, int j)

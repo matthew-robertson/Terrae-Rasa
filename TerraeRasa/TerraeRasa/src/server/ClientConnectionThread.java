@@ -8,12 +8,15 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 import transmission.ChunkExpander;
+import transmission.CompressedServerUpdate;
+import transmission.GZIPHelper;
 import transmission.SuperCompressedChunk;
 import transmission.WorldData;
 import world.World;
 import client.EngineLock;
 import client.GameEngine;
 import entities.EntityPlayer;
+import enums.EnumHardwareInput;
 
 public class ClientConnectionThread extends Thread
 {
@@ -22,6 +25,7 @@ public class ClientConnectionThread extends Thread
 	private EngineLock engineLock;
 	private ObjectOutputStream os;
 	private ObjectInputStream is;
+	private GZIPHelper gzipHelper;
 	
 	public ClientConnectionThread(Socket socket, EngineLock lock, ObjectOutputStream os, ObjectInputStream is)
 	{
@@ -30,6 +34,7 @@ public class ClientConnectionThread extends Thread
 		this.engineLock = lock;
 		this.os = os;
 		this.is = is;
+		gzipHelper = new GZIPHelper();
 	}
 	
 	public void run()
@@ -47,6 +52,30 @@ public class ClientConnectionThread extends Thread
 	        while(System.currentTimeMillis() > next_game_tick && loops < MAX_FRAMESKIP) //Update the game 20 times/second 
 	        {
 	        	//The update cycle things
+	        	EnumHardwareInput[] input = engineLock.yieldHardwareInput();
+	        	try {
+	        		os.writeUTF("/clientinput");
+	        		os.flush();
+					os.writeObject(gzipHelper.compress(input));
+		        	os.flush();
+		        	
+		        	//gzipHelper.expand((byte[])
+		        	
+		        	CompressedServerUpdate[] updates = (CompressedServerUpdate[])(gzipHelper.expand((byte[])is.readObject()));
+		        	for(CompressedServerUpdate update : updates)
+		        	{
+		        		engineLock.addUpdate(update);
+		        	}	
+		        	
+//		        	CompressedPlayer player = (CompressedPlayer) (gzipHelper.expand((byte[])is.readObject()));
+//		        	engineLock.updatePlayer(player);
+		        	//Cycle done
+	        	} catch (IOException e) {
+					e.printStackTrace();
+				} catch (ClassNotFoundException e) {
+					e.printStackTrace();
+				}
+	        	
 	        	
 	        	//Write hardware IO and wait for a response in the form of a server object
 	        	
@@ -69,15 +98,15 @@ public class ClientConnectionThread extends Thread
 	{
 		try {
 			os.writeUTF("/sendplayer");
-			//This will fail
-			os.writeObject(EntityPlayer.compress(engineLock.getPlayer()));
+			byte[] bytes = gzipHelper.compress(EntityPlayer.compress(engineLock.getRelevantPlayer()));
+			os.writeObject(bytes);
+			
 			os.flush();
 			
 			os.writeUTF("/requestinitChunks");
-			
 			os.flush();
 			
-			SuperCompressedChunk[] scc = (SuperCompressedChunk[])(is.readObject());
+			SuperCompressedChunk[] scc = (SuperCompressedChunk[])(gzipHelper.expand((byte[])is.readObject()));
 			Chunk[] chunks = new Chunk[scc.length];
 			for(int i = 0; i < chunks.length; i++)
 			{
@@ -87,7 +116,7 @@ public class ClientConnectionThread extends Thread
 			os.writeUTF("/initialgamedata");
 			os.flush();
 			
-			WorldData data = (WorldData)is.readObject();
+			WorldData data = (WorldData)(gzipHelper.expand((byte[])is.readObject()));
 			World world = new World(data, chunks);
 			engineLock.setWorld(world);
 		} catch (IOException e) {

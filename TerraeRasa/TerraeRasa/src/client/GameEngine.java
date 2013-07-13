@@ -17,7 +17,7 @@ import render.Render;
 import render.RenderGlobal;
 import render.RenderMenu;
 import spells.Spell;
-import transmission.ServerUpdate;
+import transmission.CompressedServerUpdate;
 import utils.ErrorUtils;
 import utils.FileManager;
 import utils.ItemStack;
@@ -164,20 +164,20 @@ public class GameEngine
 		        		Keys.keyboard(world, getPlayer(), settings, settings.keybinds, hardwareInput);	            
 		        		MouseInput.mouse(world, getPlayer());
 		        		
-		        		/////////
+		        		//Client player tick
+		        		player.onClientTick(world);
+		        		
+		        		//
 		        		engineLock.addHardwareInput(hardwareInput);
 		        		if(engineLock.hasUpdates())
 		        		{
 		        			//Process the outputs
-		        			ServerUpdate[] updates = engineLock.yieldServerUpdates();
-		        			System.out.print(updates);
-		        		}
-		        		
-		        		
+		        			CompressedServerUpdate[] updates = engineLock.yieldServerUpdates();
+		        			processUpdates(updates);
+		        		}		        		
 		        	}
 		        	
-		        	TerraeRasa.terraeRasa.checkWindowSize();
-		        	 
+		        	TerraeRasa.terraeRasa.checkWindowSize();		        	 
 		        	next_game_tick += SKIP_TICKS;
  		            loops++;
 		        }
@@ -256,6 +256,14 @@ public class GameEngine
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	private void processUpdates(CompressedServerUpdate[] updates)
+	{
+		for(CompressedServerUpdate update : updates)
+		{
+			player.setPosition(update.update.x, update.update.y);			
+		}		
 	}
 	
 	public static void flagAsMPPlayable()
@@ -349,7 +357,7 @@ public class GameEngine
 //		//	world.assessForAverageSky();
 //			LightUtils utils = new LightUtils();
 //			utils.applyAmbient(world);
-			getPlayer().setAffectedByWalls(false);
+		//	getPlayer().setAffectedByWalls(false);
 //			
 			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Item.goldSword));
 			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Item.godminiumPickaxe));
@@ -633,7 +641,7 @@ public class GameEngine
 		return player;
 	}
 
-	private void setPlayer(EntityPlayer player) {
+	void setPlayer(EntityPlayer player) {
 		this.player = player;
 	}
 }

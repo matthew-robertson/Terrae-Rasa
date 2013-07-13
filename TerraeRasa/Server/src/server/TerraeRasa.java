@@ -7,6 +7,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Vector;
 
+import transmission.ServerUpdate;
+
 
 public class TerraeRasa 
 {
@@ -29,6 +31,8 @@ public class TerraeRasa
 	
 	public void run()
 	{
+		Log.log("Terrae Rasa Server " + VERSION);
+		Log.log("Edit the server.properties file for advanced configurations.");
 		settings = SettingsIO.loadSettings();	
 
 		this.gameEngine = new GameEngine(settings.universeName);
@@ -130,6 +134,13 @@ public class TerraeRasa
 		return basePath;
 	}
 	
+	public synchronized static void addWorldUpdate(ServerUpdate update)
+	{
+		for(ServerConnectionThread thread : terraeRasa.connections)
+		{
+			thread.registerWorldUpdate(update);
+		}
+	}
 	
 	public static synchronized void close()
 	{

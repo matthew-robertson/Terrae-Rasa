@@ -17,9 +17,13 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import savable.SavableWorld;
 import savable.SaveManager;
+import server.Log;
+import server.PlayerInput;
 import server.ServerSettings;
 import server.TerraeRasa;
 import statuseffects.StatusEffectStun;
+import transmission.PositionUpdate;
+import transmission.ServerUpdate;
 import transmission.WorldData;
 import utils.ActionbarItem;
 import utils.ChestLootGenerator;
@@ -115,6 +119,7 @@ public class World
 	private EntityNPCEnemy[] spawnList;
 	private LightUtils utils;
 	private boolean lightingUpdateRequired;
+	private Vector<PlayerInput> playerInputs;
 	
 	/**
 	 * Reconstructs a world from a save file. This is the first step.
@@ -133,6 +138,7 @@ public class World
 		utils = new LightUtils();
 		checkChunks();
 		lightingUpdateRequired = true;
+		playerInputs = new Vector<PlayerInput>();
 	}
 	
 	/**
@@ -165,17 +171,10 @@ public class World
 		chunkHeight = height / height;
 		utils = new LightUtils();
 		lightingUpdateRequired = true;
+		playerInputs = new Vector<PlayerInput>();
 		checkChunks();
 	}
 		
-	/**
-	 * Finishes reconstructing a world object from disk. This is the 3rd and final step where anything dependent on
-	 * variables saved to disk should be created/executed.
-	 */
-	public void finishWorldReconstruction(String universeName)
-	{
-	}
-	
 	public WorldData getWorldData()
 	{
 		WorldData data = new WorldData();
@@ -273,9 +272,6 @@ public class World
 		this.difficulty = savable.difficulty;
 
 	
-		
-		
-		finishWorldReconstruction(universeName);
 	}
 	
 	public void loadChunks(ServerSettings settings)
@@ -302,8 +298,9 @@ public class World
 	public void addPlayerToWorld(ServerSettings settings, EntityPlayer player)
 	{
 		requestRequiredChunks(settings, getWorldCenterBlock(), averageSkyHeight);
-		chunkManager.addAllLoadedChunks_Wait(this, getChunks());
-		player = spawnPlayer(settings, player);
+		//chunkManager.addAllLoadedChunks_Wait(this, getChunks());
+		spawnPlayer(settings, player);
+		Log.log(player.getName() + " joined the game. ");
 	}
 	
 	/**
@@ -450,10 +447,24 @@ public class World
 		temporaryText.add(new WorldText(message, x, y, ticksLeft, color, true));
 	}
 	
+	private synchronized void handlePlayerMovement()
+	{
+		for(PlayerInput input : playerInputs)
+		{
+			input.handle(this);
+		}
+		playerInputs.clear();
+	}
+	
+	public synchronized void registerPlayerMovement(PlayerInput input)
+	{
+		playerInputs.add(input);
+	}
+	
 	/**
 	 * Calls all the methods to update the world and its inhabitants
 	 */
-	public void onWorldTick(Vector<EntityPlayer> players)
+	public void onWorldTick(ServerUpdate update, Vector<EntityPlayer> players)
 	{		
 		//spawnMonsters(player);				
 		//causeWeather();		
@@ -464,6 +475,7 @@ public class World
 		for(EntityPlayer player : players)
 		{
 			player.onWorldTick(this); 
+			
 			
 			//Update Entities
 			//TODO: Monsters
@@ -493,12 +505,15 @@ public class World
 		updateEntityLivingItemStacks();
 		updateWorldTime();
 		applyLightingUpdates();
-		
+
+		handlePlayerMovement();
+				
 		if(chunkManager.isAnyLoadOperationDone())
 		{
 			chunkManager.addAllLoadedChunks(this, getChunks());
 		}
 
+		
 //		if (player.inventory.getMainInventoryStack(player.selectedSlot) != null && 
 //				player.inventory.getMainInventoryStack(player.selectedSlot).getItemID() < ActionbarItem.spellIndex && 
 //				Mouse.isButtonDown(0)) 

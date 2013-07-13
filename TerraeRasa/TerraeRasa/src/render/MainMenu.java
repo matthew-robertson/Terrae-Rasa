@@ -826,6 +826,7 @@ public class MainMenu extends Render
 			}
 			else
 			{
+				selectedServer = servers[selectedIndex - 1];
 				selectedWorldName = menu.getVaryingItems()[selectedIndex - 1];
 				isWorldMenuOpen = false;
 				requestGameConnection();

@@ -94,22 +94,17 @@ public class Keys
 		}
 		
 		if(Keyboard.isKeyDown(Keyboard.KEY_A)) //Move Left
-        {
-			//player.x -= 20;
-			player.moveEntityLeft(world);
+        {			
 			player.isFacingRight = false;
 			hardwareInput.add(EnumHardwareInput.MOVE_LEFT);
 		}
         if(Keyboard.isKeyDown(Keyboard.KEY_D)) //Move Right
         {
-			//player.x += 20;
-        	player.moveEntityRight(world);
 			player.isFacingRight = true;
 			hardwareInput.add(EnumHardwareInput.MOVE_RIGHT);
         }
         if(Keyboard.isKeyDown(Keyboard.KEY_SPACE)) //Jump
         {
-        	player.tryToJumpAgain(world, player);
 			hardwareInput.add(EnumHardwareInput.JUMP);
         }
         
@@ -141,61 +136,6 @@ public class Keys
         	{
         		actionKeys[i] = false;
         	}
-        }
-		
-		if(TerraeRasa.initInDebugMode)
-		{
-			//Debug inputs
-			if(Keyboard.isKeyDown(Keyboard.KEY_W)) 
-			{
-				player.y -= 18;
-			}
-	        if(Keyboard.isKeyDown(Keyboard.KEY_S)) //Broken
-	        {
-				player.y += 18;			
-	        } 
-	        if (Keyboard.isKeyDown(Keyboard.KEY_F))
-			{
-	        //	player.damage(world, new Damage(10.0, new EnumDamageType[] { EnumDamageType.NONE }, EnumDamageSource.UNDEFINED), false);
-	        	
-	        	//player.launchProjectile(world, player.x, player.y, Item.snowball);
-				/*EntityProjectile.woodenArrow.clone().setXLocAndYLoc(world.player.x, world.player.y).setDirection(count));
-				count++;
-				if (count == 360) count = 0;*/
-			}	
-	        if (Keyboard.isKeyDown(Keyboard.KEY_G))
-			{
-	        	//player.launchProjectile( world, player.x, player.y, Item.magicMissileSpell);
-	        	/*world.addEntityToProjectileList(EntityProjectile.magicMissile.clone().setXLocAndYLoc(world.player.x, world.player.y).setDirection(count));
-				count++;
-				if (count == 360) count = 0;*/
-			}	 
-	        if(Keyboard.isKeyDown(Keyboard.KEY_P)) //Broken
-	        {
-	        	//for(int i = 0; i < 3;i++){
-	        	//player.registerStatusEffect(new StatusEffectStun(5, 1));
-//	        	EntityNPCEnemy enemy = new EntityNPCEnemy(EntityNPCEnemy.slime);//EntityNPC.test.clone();
-//				enemy.setPosition((int)player.x, (int)player.y);
-//				world.addEntityToEnemyList(enemy);	
-	        	//}
-	        	
-//	        	if(engine.renderMode != GameEngine.RENDER_MODE_WORLD_HELL)
-//	        	{
-//	        		try {
-//						engine.changeWorld(GameEngine.RENDER_MODE_WORLD_HELL);
-//					} catch (IOException e) {
-//						e.printStackTrace();
-//					} catch (ClassNotFoundException e) {
-//						e.printStackTrace();
-//					}
-//	        	}
-	        }   
-	        if(!Keyboard.isKeyDown(Keyboard.KEY_L))
-	        {
-	        	
-	        }
-	        
-			//End debug inputs\             
-		}		
+        }			
 	}	
 }

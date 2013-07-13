@@ -8,6 +8,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Vector;
 
+import transmission.ServerUpdate;
+import transmission.SuperCompressedChunk;
 import utils.ErrorUtils;
 import utils.FileManager;
 import world.World;
@@ -82,8 +84,10 @@ public class GameEngine
 //		        		hardcoreDeath();
 //		        	}	
 		        	//TODO: hardcore
-		        	  		
-		        	world.onWorldTick(players);
+		        
+		        	ServerUpdate update = new ServerUpdate();
+		        	world.onWorldTick(update, players);
+		        	TerraeRasa.addWorldUpdate(update);
 		        	
 		        	next_game_tick += SKIP_TICKS;
  		            loops++;

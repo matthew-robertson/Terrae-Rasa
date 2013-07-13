@@ -18,6 +18,8 @@ import blocks.Block;
 public class Entity 
 		 
 {
+	public final int entityID;
+	
 	/** The x position of the entity in pixels. */
 	public double x;
 	/** The y position of the entity in pixels. */
@@ -70,6 +72,7 @@ public class Entity
 		textureHeight = 16;
 		blockWidth = 2;
 		blockHeight = 3;		
+		entityID = -1; //TODO: Client-side this is an issue ==> ENTITY_ID
 	}	
 		
 	/**
@@ -99,12 +102,13 @@ public class Entity
 		this.setBaseSpeed(entity.getBaseSpeed());
 		this.setMovementSpeedModifier(entity.getMovementSpeedModifier());
 		this.ticksFallen = entity.ticksFallen;
+		entityID = -1; //TODO: Client-side this is an issue ==> ENTITY_ID
 	}
 	
-	public Entity setPosition(int i, int j)
+	public Entity setPosition(double x, double y)
 	{
-		this.x = i;
-		this.y = j;
+		this.x = x;
+		this.y = y;
 		return this;
 	}
 	
