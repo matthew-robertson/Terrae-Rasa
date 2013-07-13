@@ -5,6 +5,8 @@ import world.World;
 
 public class EntityNPC extends EntityLiving 
 {
+	private static final long serialVersionUID = 1L;
+
 	protected String name;
 	protected int npcID;
 	protected int iconX;

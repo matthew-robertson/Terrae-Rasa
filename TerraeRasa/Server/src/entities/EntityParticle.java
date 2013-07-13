@@ -6,6 +6,8 @@ import world.World;
 
 public class EntityParticle extends EntityLiving
 {
+	private static final long serialVersionUID = 1L;
+
 	protected Vector2F velocity;
 	protected Vector2F acceleration;
 	protected int ticksActive;

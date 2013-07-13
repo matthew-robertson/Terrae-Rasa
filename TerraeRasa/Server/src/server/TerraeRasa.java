@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.util.Vector;
 
 import transmission.ServerUpdate;
+import entities.EntityPlayer;
 
 
 public class TerraeRasa 
@@ -114,7 +115,7 @@ public class TerraeRasa
 		}		
 	}
 	
-	private void registerGameConnectionThread(Socket socket, ObjectOutputStream os, ObjectInputStream is)
+	private synchronized void registerGameConnectionThread(Socket socket, ObjectOutputStream os, ObjectInputStream is)
 	{
 		ServerConnectionThread thread = new ServerConnectionThread(new WorldLock(gameEngine), socket, os, is);
 		connections.add(thread);
@@ -134,9 +135,14 @@ public class TerraeRasa
 		return basePath;
 	}
 	
+	public synchronized Vector<ServerConnectionThread> getConnections()
+	{
+		return connections;
+	}
+	
 	public synchronized static void addWorldUpdate(ServerUpdate update)
 	{
-		for(ServerConnectionThread thread : terraeRasa.connections)
+		for(ServerConnectionThread thread : terraeRasa.getConnections())
 		{
 			thread.registerWorldUpdate(update);
 		}
@@ -155,4 +161,10 @@ public class TerraeRasa
 		return settings;
 	}
 
+	public static synchronized void closeClientConnection(ServerConnectionThread connection, EntityPlayer player)
+	{
+		terraeRasa.connections.remove(connection);
+		terraeRasa.gameEngine.removePlayer(player);
+		Log.log(player.getName() + " has left the game.");
+	}
 }

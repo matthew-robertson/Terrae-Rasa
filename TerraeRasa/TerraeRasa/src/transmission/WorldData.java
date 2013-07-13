@@ -2,11 +2,13 @@ package transmission;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Vector;
 
 import utils.WorldText;
 import entities.EntityItemStack;
 import entities.EntityNPC;
 import entities.EntityNPCEnemy;
+import entities.EntityPlayer;
 import entities.EntityProjectile;
 import enums.EnumWorldDifficulty;
 
@@ -36,4 +38,5 @@ public class WorldData
 	public double previousLightLevel;
 	public EntityNPCEnemy[] spawnList;
 	public boolean lightingUpdateRequired;
+	public CompressedPlayer[] otherplayers;
 }

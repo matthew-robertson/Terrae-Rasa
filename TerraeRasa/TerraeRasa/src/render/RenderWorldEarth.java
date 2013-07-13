@@ -22,7 +22,10 @@ public class RenderWorldEarth extends RenderWorld
 		renderBlocks.render(world, player);	
 		renderEntities.renderWorldEntityList(world);
 		renderEntities.renderWorldProjectileList(world);
-		renderEntities.renderPlayer(world, player); 		
+		for(EntityPlayer aPlayer : world.otherPlayers)
+		{
+			renderEntities.renderPlayer(world, aPlayer); 		
+		}
 		renderEntities.renderItems(world);
 		renderEntities.renderNPCs(world);
 		renderEntities.renderTemperaryText(world);		

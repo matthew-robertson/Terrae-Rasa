@@ -11,34 +11,13 @@ import statuseffects.StatusEffectAbsorb;
 import utils.Cooldown;
 import utils.InventoryPlayer;
 import auras.AuraTracker;
+import entities.Entity;
 import enums.EnumPlayerDifficulty;
 
-public class CompressedPlayer 
+public class CompressedPlayer extends Entity
 		implements Serializable
 {
 	public static final long serialVersionUID = 1L;
-	
-	public double x;
-	public double y;
-	public boolean isAffectedByWalls;
-	public boolean isAffectedByGravity;
-	public double upwardJumpCounter; 	
-	public boolean canJumpAgain;
-	public boolean isJumping;	
-	public double upwardJumpHeight; 
-	public double jumpSpeed;	
-	public boolean isStunned;
-	public int ticksFallen;
-	public int textureWidth;
-	public int textureHeight;
-	public double width;
-	public double height;
-	public double blockWidth;
-	public double blockHeight;
-	public double distanceFallen;
-	public double maxHeightFallenSafely;
-	public double baseSpeed;
-	public double movementSpeedModifier;
 
 	public boolean isFireImmune;
 	public double attackSpeedModifier;

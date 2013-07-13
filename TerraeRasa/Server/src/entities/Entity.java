@@ -1,5 +1,7 @@
 package entities;
 
+import java.io.Serializable;
+
 import server.ServerSettings;
 import utils.MathHelper;
 import world.World;
@@ -17,9 +19,11 @@ import blocks.Block;
  * @since       1.0
  */
 public class Entity 
-		 
+		 implements Serializable
 {
-	public final int entityID;
+	private static final long serialVersionUID = 1L;
+
+	public  int entityID;
 	
 	/** The x position of the entity in pixels. */
 	public double x;
@@ -103,7 +107,13 @@ public class Entity
 		this.setBaseSpeed(entity.getBaseSpeed());
 		this.setMovementSpeedModifier(entity.getMovementSpeedModifier());
 		this.ticksFallen = entity.ticksFallen;
-		this.entityID = entity.entityID;
+		this.entityID = ServerSettings.getEntityID();
+	}
+	
+	public Entity setEntityID(int id)
+	{
+		this.entityID = id;
+		return this;
 	}
 	
 	public Entity setPosition(int i, int j)

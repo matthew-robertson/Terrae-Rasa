@@ -34,6 +34,8 @@ import enums.EnumMonsterType;
  */
 public class EntityNPCEnemy extends EntityNPC 
 {	
+	private static final long serialVersionUID = 1L;
+
 	public String type;
 	public String time;
 	protected final Random random = new Random();

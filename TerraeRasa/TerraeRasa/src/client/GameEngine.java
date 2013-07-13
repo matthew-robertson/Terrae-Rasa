@@ -17,7 +17,10 @@ import render.Render;
 import render.RenderGlobal;
 import render.RenderMenu;
 import spells.Spell;
+import transmission.CompressedPlayer;
 import transmission.CompressedServerUpdate;
+import transmission.EntityUpdate;
+import transmission.PositionUpdate;
 import utils.ErrorUtils;
 import utils.FileManager;
 import utils.ItemStack;
@@ -67,7 +70,7 @@ public class GameEngine
 	private World world;
 	private WorldHell worldHell;
 	private WorldSky worldSky;
-	private EntityPlayer player;
+	private EntityPlayer sentPlayer;
 	private Settings settings;
 	private SoundEngine soundEngine;
 	private RenderMenu renderMenu;
@@ -75,6 +78,7 @@ public class GameEngine
 	private String universeName;
 	private EngineLock engineLock;
 	private static boolean canPlayMP;
+	private int activePlayerID = -1;
 	
 	public EngineLock getEngineLock()
 	{
@@ -118,23 +122,39 @@ public class GameEngine
 			start = System.currentTimeMillis();
 			
 			///////
-			setPlayer(new FileManager().loadPlayer("Debug_Player"));
-			player.x = 3600;
-			player.y = 1200;
+			setSentPlayer(new FileManager().loadPlayer("Debug_Player"));
+			sentPlayer.x = 3600;
+			sentPlayer.y = 1200;
 			///////
 			Vector<EnumHardwareInput> hardwareInput = new Vector<EnumHardwareInput>(10);
 		    while(!TerraeRasa.done) //Main Game Loop
 		    {
+		    	EntityPlayer player = null;
+		    	try {
+			    	if(activePlayerID != -1 && world.entitiesByID.get(""+activePlayerID) != null)
+			    	{
+			    		player = (EntityPlayer) world.getEntityByID(activePlayerID);
+			    	}
+			    	//TODO: make more elegant
+		        	if(activePlayerID != -1 && world.entitiesByID.get(""+activePlayerID) == null)
+		        	{
+		        		sentPlayer.entityID = activePlayerID;
+		        		world.entitiesByID.put(""+activePlayerID, sentPlayer);
+		        	}
+		    	} catch(NullPointerException e) {
+		    		
+		    	}
+		    	
 		    	loops = 0;
 		        while(System.currentTimeMillis() > next_game_tick && loops < MAX_FRAMESKIP) //Update the game 20 times/second 
 		        {
-		        	if(getPlayer() != null && getPlayer().defeated)
-		        	{
-		        		hardcoreDeath();
-		        	}
+//		        	if(getPlayer() != null && getPlayer().defeated)
+//		        	{
+//		        		hardcoreDeath();
+//		        	}
 		        	
 		        	hardwareInput.clear();
-		        	Keys.universalKeyboard(world, getPlayer(), settings, settings.keybinds, hardwareInput);
+		        	Keys.universalKeyboard(world, player, settings, settings.keybinds, hardwareInput);
 		        	
 		        	//If the music is already playing,set the volume to whatever the settings say it is
 		        	if (soundEngine.getCurrentMusic() != null){
@@ -154,15 +174,15 @@ public class GameEngine
 		        	}
 		        	else if(!TerraeRasa.isMainMenuOpen) //Handle game inputs if the main menu isnt open (aka the game is being played)
 		        	{
-		        		if(!canPlayMP)
+		        		if(!canPlayMP || player == null)
 				    	{
 				    		Thread.sleep(100);
-				    		continue;
+				    		break;
 				    	}
 		        		
 		        		soundEngine.setCurrentMusic("Pause Music");
-		        		Keys.keyboard(world, getPlayer(), settings, settings.keybinds, hardwareInput);	            
-		        		MouseInput.mouse(world, getPlayer());
+		        		Keys.keyboard(world, player, settings, settings.keybinds, hardwareInput);	            
+		        		MouseInput.mouse(world, player);
 		        		
 		        		//Client player tick
 		        		player.onClientTick(world);
@@ -202,22 +222,24 @@ public class GameEngine
 			    }
 		        else
 		        {
-		        	if(!canPlayMP)
+		        	if(!canPlayMP || player == null)
 			    	{
 			    		Thread.sleep(100);
 			    		continue;
 			    	}
+		        	
+		        	
 		        	if(renderMode == RENDER_MODE_WORLD_EARTH)
 		    		{
-		        	 	RenderGlobal.render(world, getPlayer(), renderMode, settings); //Renders Everything on the screen for the game
+		        	 	RenderGlobal.render(world, player, renderMode, settings); //Renders Everything on the screen for the game
 		     		}
 		    		else if(renderMode == RENDER_MODE_WORLD_HELL)
 		    		{
-		    		 	RenderGlobal.render(worldHell, getPlayer(), renderMode, settings); //Renders Everything on the screen for the game
+		    		 	RenderGlobal.render(worldHell, player, renderMode, settings); //Renders Everything on the screen for the game
 		    		}
 		    		else if(renderMode == RENDER_MODE_WORLD_SKY)
 		    		{
-		    		 	RenderGlobal.render(worldSky, getPlayer(), renderMode, settings); //Renders Everything on the screen for the game
+		    		 	RenderGlobal.render(worldSky, player, renderMode, settings); //Renders Everything on the screen for the game
 		    		}
 		        	fps++;
 		        }
@@ -258,11 +280,50 @@ public class GameEngine
 		}
 	}
 	
+	public void setActivePlayerID(int id)
+	{
+		this.activePlayerID = id;
+	}
+	
 	private void processUpdates(CompressedServerUpdate[] updates)
 	{
-		for(CompressedServerUpdate update : updates)
+		for(CompressedServerUpdate serverupdate : updates)
 		{
-			player.setPosition(update.update.x, update.update.y);			
+			for(EntityUpdate update : serverupdate.entityUpdates)
+			{
+				if(update.type == 5)
+				{
+					EntityPlayer player = EntityPlayer.expand((CompressedPlayer)update.updatedEntity);
+				
+					if(update.action == 'r') {
+						world.removeEntityByID(player.entityID);
+					}
+					else if(update.action == 'c') {
+						world.overwriteEntityByID(player.entityID, player);
+					}
+					else if(update.action == 'a') {
+						world.addPlayer(player);
+					}
+				}
+				else //TODO: other entity types
+				{
+					if(update.action == 'r') {
+						world.removeEntityByID(update.updatedEntity.entityID);
+					}
+					else if(update.action == 'c') {
+						world.overwriteEntityByID(update.updatedEntity.entityID, update.updatedEntity);
+					}
+					else if(update.action == 'a') {
+						
+					}
+				}
+			}
+			for(PositionUpdate position : serverupdate.positionUpdates)
+			{
+			
+				world.getEntityByID(position.entityID).setPosition(position.x, position.y);			
+				
+			}
 		}		
 	}
 	
@@ -294,7 +355,7 @@ public class GameEngine
 		this.world.chunkManager = chunkManager;
 		this.world.chunkManager.setUniverseName(universeName);
 		this.world.initSoundEngine(soundEngine);
-		this.setPlayer(player);
+		this.setSentPlayer(player);
 		world.addPlayerToWorld(player);
 		TerraeRasa.isMainMenuOpen = false;
 		mainMenu = null;
@@ -352,30 +413,30 @@ public class GameEngine
 //			world.initSoundEngine(soundEngine);
 //			world.chunkManager = chunkManager;
 //			world.chunkManager.setUniverseName("World");
-			setPlayer(fileManager.generateAndSavePlayer("Debug_Player", EnumPlayerDifficulty.HARD));//new EntityLivingPlayer("Test player", EnumDifficulty.NORMAL);
+			setSentPlayer(fileManager.generateAndSavePlayer("Debug_Player", EnumPlayerDifficulty.HARD));//new EntityLivingPlayer("Test player", EnumDifficulty.NORMAL);
 //			world.addPlayerToWorld(player);
 //		//	world.assessForAverageSky();
 //			LightUtils utils = new LightUtils();
 //			utils.applyAmbient(world);
 		//	getPlayer().setAffectedByWalls(false);
 //			
-			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Item.goldSword));
-			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Item.godminiumPickaxe));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Item.goldSword));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Item.godminiumPickaxe));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldPickaxe));
-			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Item.goldAxe));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Item.goldAxe));
 
-			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Block.stone, 100));
-			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Block.torch, 100));
-			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Block.chest, 100));
-			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Block.ironChest, 100));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Block.stone, 100));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Block.torch, 100));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Block.chest, 100));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Block.ironChest, 100));
 			
-			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Item.steadfastShield));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Item.steadfastShield));
 			
-			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Item.woodenBow));
-			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Item.absorbPotion2, 50));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Item.woodenBow));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Item.absorbPotion2, 50));
 			
-			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Item.goldIngot, 100));
-			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Item.silverIngot, 100));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Item.goldIngot, 100));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Item.silverIngot, 100));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.healthPotion1, 100));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.healthPotion2, 100));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.manaPotion1, 100));
@@ -417,14 +478,14 @@ public class GameEngine
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldBoots));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldBelt));
 
-			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Item.jasper, 50));
-			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Item.sapphire, 50));
-			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Item.emerald, 50));
-			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Item.ruby, 50));
-			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Item.diamond, 50));
-			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Item.opal, 50));
-			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Item.goldRing, 6));
-			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Item.berserkersEssence));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Item.jasper, 50));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Item.sapphire, 50));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Item.emerald, 50));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Item.ruby, 50));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Item.diamond, 50));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Item.opal, 50));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Item.goldRing, 6));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Item.berserkersEssence));
 			
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.glass, 40));
 
@@ -452,22 +513,22 @@ public class GameEngine
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.copperAxe));
 //			
 			
-			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Item.opHelmet));
-			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Item.opBody));
-			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Item.opPants));
-			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Item.opGloves));
-			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Item.opBoots));
-			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Item.opBelt));
-			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Item.lunariumHelmet).setAffix(new AffixSturdy()));
-			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Item.lunariumBody));
-			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Item.lunariumPants));
-			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Item.lunariumGloves));
-			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Item.lunariumBoots));
-			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Item.lunariumBelt));
-			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Block.gemcraftingBench));
-			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Block.alchemyStation));
-			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Item.eaglesFeather));
-			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Item.woodenArrow, 50));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Item.opHelmet));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Item.opBody));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Item.opPants));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Item.opGloves));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Item.opBoots));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Item.opBelt));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Item.lunariumHelmet).setAffix(new AffixSturdy()));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Item.lunariumBody));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Item.lunariumPants));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Item.lunariumGloves));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Item.lunariumBoots));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Item.lunariumBelt));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Block.gemcraftingBench));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Block.alchemyStation));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Item.eaglesFeather));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Item.woodenArrow, 50));
 			
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.gemSmartheal1, 40));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.gemDefense1, 40));
@@ -503,11 +564,11 @@ public class GameEngine
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.regenerationPotion2, 200));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.attackSpeedPotion1, 200));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.manaRegenerationPotion2, 200));
-			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Spell.rejuvenate));
-			getPlayer().inventory.pickUpItemStack(world, getPlayer(), new ItemStack(Spell.bulwark));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Spell.rejuvenate));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Spell.bulwark));
 			
 			try {
-				fileManager.savePlayer(getPlayer());
+				fileManager.savePlayer(sentPlayer);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -521,19 +582,20 @@ public class GameEngine
 	 */
 	public void hardcoreDeath()
 	{
+		//TODO: broke client side hardcore mode.
 		//Delete the player
-		FileManager manager = new FileManager();
-		manager.deletefile("/Player Saves/" + getPlayer().getName());
-		this.setPlayer(null);
-		//Save the world
-		if(renderMode == RENDER_MODE_WORLD_EARTH)
-		{
-			world.saveRemainingWorld();
-		}
-		//Reset to the main menu
-		resetMainMenu();
-		TerraeRasa.isMainMenuOpen = true; //Sets menu open
-		System.out.println("Game Over.");
+//		FileManager manager = new FileManager();
+//		manager.deletefile("/Player Saves/" + getPlayer().getName());
+//		this.setPlayer(null);
+//		//Save the world
+//		if(renderMode == RENDER_MODE_WORLD_EARTH)
+//		{
+//			world.saveRemainingWorld();
+//		}
+//		//Reset to the main menu
+//		resetMainMenu();
+//		TerraeRasa.isMainMenuOpen = true; //Sets menu open
+//		System.out.println("Game Over.");
 	}
 	
 	public void setWorld(World world)
@@ -606,27 +668,28 @@ public class GameEngine
 	public void closeGameToMenu() 
 			throws FileNotFoundException, IOException
 	{
-		if(!getPlayer().defeated)
-		{
-			FileManager manager = new FileManager();
-			manager.savePlayer(getPlayer());
-		}
-		
-		if(renderMode == RENDER_MODE_WORLD_EARTH)
-		{
-			world.saveRemainingWorld();
-		}
-		else if(renderMode == RENDER_MODE_WORLD_HELL)
-		{
-			world.saveRemainingWorld();
-		}
-		else if(renderMode == RENDER_MODE_WORLD_SKY)
-		{
-			world.saveRemainingWorld();
-		}
-		
-		TerraeRasa.isMainMenuOpen = true;
-		resetMainMenu();
+		//TODO: Make close work.
+//		if(!getPlayer().defeated)
+//		{
+//			FileManager manager = new FileManager();
+//			manager.savePlayer(getPlayer());
+//		}
+//		
+//		if(renderMode == RENDER_MODE_WORLD_EARTH)
+//		{
+//			world.saveRemainingWorld();
+//		}
+//		else if(renderMode == RENDER_MODE_WORLD_HELL)
+//		{
+//			world.saveRemainingWorld();
+//		}
+//		else if(renderMode == RENDER_MODE_WORLD_SKY)
+//		{
+//			world.saveRemainingWorld();
+//		}
+//		
+//		TerraeRasa.isMainMenuOpen = true;
+//		resetMainMenu();
 	}
 	
 	/**
@@ -637,11 +700,11 @@ public class GameEngine
 		mainMenu = new MainMenu(settings);
 	}
 
-	public EntityPlayer getPlayer() {
-		return player;
+	public EntityPlayer getSentPlayer() {
+		return sentPlayer;
 	}
 
-	void setPlayer(EntityPlayer player) {
-		this.player = player;
+	private void setSentPlayer(EntityPlayer player) {
+		this.sentPlayer = player;
 	}
 }

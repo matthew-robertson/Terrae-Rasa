@@ -4,8 +4,8 @@ import io.Chunk;
 
 import java.util.Vector;
 
+import transmission.CompressedPlayer;
 import transmission.CompressedServerUpdate;
-import transmission.PositionUpdate;
 import transmission.ServerUpdate;
 import transmission.SuperCompressedChunk;
 import transmission.WorldData;
@@ -82,8 +82,10 @@ public class WorldLock
 			CompressedServerUpdate compressedUpdate = new CompressedServerUpdate();
 			compressedUpdate.values = update.getValues();
 			compressedUpdate.chunks = new SuperCompressedChunk[]{ };
-			compressedUpdate.player = null;
-			compressedUpdate.update = new PositionUpdate(getRelevantPlayer().x, getRelevantPlayer().y);
+		//	compressedUpdate.player = null;
+			compressedUpdate.entityUpdates = update.getUpdates();
+			compressedUpdate.positionUpdates = update.getPositionUpdates();
+		//	compressedUpdate.update = new PositionUpdate(getRelevantPlayer().entityID, getRelevantPlayer().x, getRelevantPlayer().y);
 			serverUpdates.add(compressedUpdate);
 		}
 	}
@@ -107,4 +109,16 @@ public class WorldLock
 		PlayerInput input = new PlayerInput(relevantPlayer, clientInput);
 		engine.getWorld().registerPlayerMovement(input);
 	}
+
+	public synchronized CompressedPlayer[] requestOtherPlayers()
+	{
+		EntityPlayer[] players = engine.getPlayersArray();
+		CompressedPlayer[] compPlayers = new CompressedPlayer[players.length];
+		for(int i = 0; i < compPlayers.length; i++)
+		{
+			compPlayers[i] = EntityPlayer.compress(players[i]);
+		}		
+		return compPlayers;
+	}
+
 }

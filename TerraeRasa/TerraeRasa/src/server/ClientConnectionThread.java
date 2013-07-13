@@ -98,10 +98,12 @@ public class ClientConnectionThread extends Thread
 	{
 		try {
 			os.writeUTF("/sendplayer");
-			byte[] bytes = gzipHelper.compress(EntityPlayer.compress(engineLock.getRelevantPlayer()));
-			os.writeObject(bytes);
-			
+			byte[] bytes = gzipHelper.compress(EntityPlayer.compress(engineLock.getSentPlayer()));
+			os.writeObject(bytes);			
 			os.flush();
+			
+			int id = is.readInt();
+			engineLock.setActivePlayerID(id);
 			
 			os.writeUTF("/requestinitChunks");
 			os.flush();
@@ -119,6 +121,7 @@ public class ClientConnectionThread extends Thread
 			WorldData data = (WorldData)(gzipHelper.expand((byte[])is.readObject()));
 			World world = new World(data, chunks);
 			engineLock.setWorld(world);
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {

@@ -41,6 +41,8 @@ import world.World;
  */
 public class EntityLiving extends Entity
 {
+	private static final long serialVersionUID = 1L;
+
 	/** The flat damage reduction provided by 1 point of defense */
 	public final static double DEFENSE_REDUCTION_FLAT = 0.375F;
 	/** The percent of damage reduction provided by 1 point of defense (from 0-1F, where 1F is 100%)*/

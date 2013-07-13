@@ -10,7 +10,6 @@ import utils.MonsterDrop;
 import utils.Texture;
 import world.World;
 import enums.EnumDamageSource;
-import enums.EnumDamageType;
 import enums.EnumMonsterType;
 
 /**
@@ -37,6 +36,8 @@ import enums.EnumMonsterType;
  */
 public class EntityNPCEnemy extends EntityNPC 
 {	
+	private static final long serialVersionUID = 1L;
+
 	public String type;
 	public String time;
 	protected final Random random = new Random();

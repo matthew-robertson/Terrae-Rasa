@@ -8,8 +8,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Vector;
 
+import transmission.EntityUpdate;
 import transmission.ServerUpdate;
-import transmission.SuperCompressedChunk;
 import utils.ErrorUtils;
 import utils.FileManager;
 import world.World;
@@ -44,6 +44,7 @@ public class GameEngine
 	public ChunkManager chunkManager;
 	private String universeName;
 	//private Vector<PlayerIssuedCommand> playerIssuedCommands;
+	private Vector<EntityUpdate> extraEntityUpdates = new Vector<EntityUpdate>();
 	
 	/**
 	 * Creates a new instance of GameEngine. This includes setting the renderMode to RENDER_MODE_WORLD_EARTH
@@ -87,6 +88,12 @@ public class GameEngine
 		        
 		        	ServerUpdate update = new ServerUpdate();
 		        	world.onWorldTick(update, players);
+		        	for(EntityUpdate up : extraEntityUpdates)
+		        	{
+		        		update.addEntityUpdate(up);
+		        	}
+		        	extraEntityUpdates.clear();
+		        	
 		        	TerraeRasa.addWorldUpdate(update);
 		        	
 		        	next_game_tick += SKIP_TICKS;
@@ -124,14 +131,37 @@ public class GameEngine
 		}
 	}
 	
+	
+	
+	public synchronized EntityPlayer[] getPlayersArray()
+	{
+		//TODO: make references safer, I think? IE same-tick leaving of the server may be problematic.
+		EntityPlayer[] players = new EntityPlayer[this.players.size()];
+		this.players.copyInto(players);
+		return players;
+	}
+	
 	public synchronized void registerPlayer(EntityPlayer player)
 	{
 		players.add(player);
+		EntityUpdate update = new EntityUpdate();
+		update.entityID = player.entityID;
+		update.updatedEntity = EntityPlayer.compress(player);
+		update.action = 'a';
+		update.type = 5;
+		extraEntityUpdates.add(update);
 	}
 	
 	public synchronized void removePlayer(EntityPlayer player)
 	{
 		players.remove(player);
+		EntityUpdate update = new EntityUpdate();
+		update.entityID = player.entityID;
+		update.updatedEntity = null;
+		update.action = 'r';
+		update.type = 5;
+		extraEntityUpdates.add(update);
+		world.entitiesByID.remove(""+player.entityID);
 	}
 
 	public synchronized Chunk requestChunk(int x)

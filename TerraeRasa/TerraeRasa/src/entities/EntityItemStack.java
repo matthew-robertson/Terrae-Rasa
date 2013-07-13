@@ -18,6 +18,8 @@ import utils.ItemStack;
  */
 public class EntityItemStack extends EntityParticle
 {
+	private static final long serialVersionUID = 1L;
+
 	private int ticksBeforePickup;
 	private ItemStack stack;
 	

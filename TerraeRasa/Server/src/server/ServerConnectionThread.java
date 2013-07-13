@@ -25,6 +25,7 @@ public class ServerConnectionThread extends Thread
 	private ObjectOutputStream os;
 	private ObjectInputStream is;
 	private GZIPHelper gzipHelper;
+	private final int connectionID;
 	
 	public ServerConnectionThread(WorldLock lock, Socket socket, ObjectOutputStream os, ObjectInputStream is)
 	{
@@ -35,6 +36,7 @@ public class ServerConnectionThread extends Thread
 		this.is = is;
 		this.os = os;
 		gzipHelper = new GZIPHelper();
+		connectionID = ServerSettings.getConnectionID();
 	}
 	
 	public void registerWorldUpdate(ServerUpdate update)
@@ -44,11 +46,12 @@ public class ServerConnectionThread extends Thread
 	
 	public void run()
 	{	
-		handleInitialData();
-		
-		while(open)
+		try 
 		{
-			try {
+			handleInitialData();
+			
+			while(open)
+			{
 				String message = is.readUTF();
 				if(message.equals("/clientinput"))
 				{
@@ -60,43 +63,43 @@ public class ServerConnectionThread extends Thread
 				CompressedServerUpdate[] updates = worldLock.yieldServerUpdates();
 	        	os.writeObject(gzipHelper.compress(updates));
 	        	os.flush();
-	        	
-//	        	os.writeObject(gzipHelper.compress(EntityPlayer.compress(worldLock.getRelevantPlayer())));
-//	        	os.flush();
 	        	//Update cycle done.
-			} catch (IOException e) {
-				e.printStackTrace();
-				break;
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-				break;
 			}
 			
-			
-			
-			
-			
-		}
-		
-		
-		
-		try {
-			os.close();
-			is.close();
 		} catch (IOException e) {
+			System.err.println("Fatal error to connection thread with ID " + connectionID + " caused by: ");
 			e.printStackTrace();
-		}		
+		} catch (ClassNotFoundException e) {
+			System.err.println("Fatal error to connection thread with ID " + connectionID + " caused by: ");
+			e.printStackTrace();
+		} catch (Exception e) { //This is likely an IOException, but in the event it isnt, account for everything
+			System.err.println("Fatal error to connection thread with ID " + connectionID + " caused by: ");
+			e.printStackTrace();
+		} finally {
+			try {
+				os.close();
+				is.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			TerraeRasa.closeClientConnection(this, worldLock.getRelevantPlayer());
+		}
 	}
 	
 	private void handleInitialData()
 	{
 		try {
 			String message = is.readUTF();
+			int playerID = ServerSettings.getEntityID();
 			if(message.equals("/sendplayer"))
 			{
 				EntityPlayer player = EntityPlayer.expand((CompressedPlayer)(gzipHelper.expand((byte[])is.readObject())));
+				player.setEntityID(playerID);
 				worldLock.addPlayerToWorld(player);
 			}
+			
+			os.writeInt(playerID);
+			os.flush();
 			
 			message = is.readUTF();
 			if(message.equals("/requestinitChunks"))
@@ -116,6 +119,7 @@ public class ServerConnectionThread extends Thread
 			if(message.equals("/initialgamedata"))
 			{
 				WorldData data = worldLock.getWorldData();
+				data.otherplayers = worldLock.requestOtherPlayers();
 				os.writeObject(gzipHelper.compress(data));
 				os.flush();
 			}

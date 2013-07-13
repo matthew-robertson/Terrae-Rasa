@@ -8,6 +8,7 @@ import items.ItemTool;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
@@ -40,6 +41,7 @@ import blocks.BlockChest;
 import blocks.BlockGrass;
 import blocks.BlockPillar;
 import blocks.MinimalBlock;
+import entities.Entity;
 import entities.EntityItemStack;
 import entities.EntityNPC;
 import entities.EntityNPCEnemy;
@@ -94,11 +96,11 @@ public class World
 	public Hashtable<String, Boolean> chunksLoaded;
 	
 	public Weather weather;
-	public List<EntityItemStack> itemsList;
-	public List<WorldText> temporaryText; 
-	public List<EntityNPCEnemy> entityList;
-	public List<EntityNPC> npcList;
-	public List<EntityProjectile> projectileList;
+	private List<EntityItemStack> itemsList;
+	private List<WorldText> temporaryText; 
+	private List<EntityNPCEnemy> entityList;
+	private List<EntityNPC> npcList;
+	private List<EntityProjectile> projectileList;
 	public SpawnManager manager;
 	public ChestLootGenerator lootGenerator;
 	
@@ -120,6 +122,8 @@ public class World
 	private LightUtils utils;
 	private boolean lightingUpdateRequired;
 	private Vector<PlayerInput> playerInputs;
+	
+	public Dictionary<String, Entity> entitiesByID = new Hashtable<String, Entity>();
 	
 	/**
 	 * Reconstructs a world from a save file. This is the first step.
@@ -195,6 +199,63 @@ public class World
 		data.previousLightLevel = this.previousLightLevel;
 		data.lightingUpdateRequired = this.lightingUpdateRequired;
 		return data;
+	}
+	
+	public Entity getEntityByID(int id)
+	{
+		return entitiesByID.get(""+id);
+	}
+	
+	public void overwriteEntityByID(int id, Entity newEntity)
+	{
+		Entity entity = entitiesByID.get(""+id);
+		if(entity instanceof EntityItemStack)
+		{
+			itemsList.remove(entity);
+		}
+		else if(entity instanceof EntityProjectile)
+		{
+			projectileList.remove(entity);
+		}
+		else if(entity instanceof EntityNPCEnemy)
+		{
+			entityList.remove(entity);
+		}
+		else if(entity instanceof EntityNPC) //Friendly?
+		{
+			npcList.remove(entity);
+		}
+		else if(entity instanceof EntityPlayer)
+		{
+			//TODO: figure out wtf to do with this
+		}
+		entitiesByID.put(""+id, newEntity);		
+	}
+	
+	public void removeEntityByID(int id)
+	{
+		Entity entity = entitiesByID.get(""+id);
+		if(entity instanceof EntityItemStack)
+		{
+			itemsList.remove(entity);
+		}
+		else if(entity instanceof EntityProjectile)
+		{
+			projectileList.remove(entity);
+		}
+		else if(entity instanceof EntityNPCEnemy)
+		{
+			entityList.remove(entity);
+		}
+		else if(entity instanceof EntityNPC) //Friendly?
+		{
+			npcList.remove(entity);
+		}
+		else if(entity instanceof EntityPlayer)
+		{
+			//TODO: figure out wtf to do with this
+		}
+		entitiesByID.put(""+id, null);
 	}
 	
 	/**
@@ -300,7 +361,7 @@ public class World
 		requestRequiredChunks(settings, getWorldCenterBlock(), averageSkyHeight);
 		//chunkManager.addAllLoadedChunks_Wait(this, getChunks());
 		spawnPlayer(settings, player);
-		Log.log(player.getName() + " joined the game. ");
+		Log.log(player.getName() + " joined the game with entityID " + player.entityID);
 	}
 	
 	/**
@@ -404,6 +465,7 @@ public class World
 	public void addEntityToEnemyList(EntityNPCEnemy enemy)
 	{
 		entityList.add(enemy);
+		entitiesByID.put(""+enemy.entityID, enemy);
 	}
 	
 	/**
@@ -413,6 +475,7 @@ public class World
 	public void addEntityToNPCList(EntityNPC npc)
 	{
 		npcList.add(npc);
+		entitiesByID.put(""+npc.entityID, npc);
 	}
 	
 	/**
@@ -422,6 +485,7 @@ public class World
 	public void addEntityToProjectileList(EntityProjectile projectile)
 	{
 		projectileList.add(projectile);
+		entitiesByID.put(""+projectile.entityID, projectile);
 	}
 
 	/**
@@ -431,6 +495,7 @@ public class World
 	public void addItemStackToItemList(EntityItemStack stack)
 	{
 		itemsList.add(stack);
+		entitiesByID.put(""+stack.entityID, stack);
 	}
 	
 	/**
@@ -447,11 +512,12 @@ public class World
 		temporaryText.add(new WorldText(message, x, y, ticksLeft, color, true));
 	}
 	
-	private synchronized void handlePlayerMovement()
+	private synchronized void handlePlayerMovement(ServerUpdate update)
 	{
 		for(PlayerInput input : playerInputs)
 		{
 			input.handle(this);
+			update.addPositionUpdate(new PositionUpdate(input.getAssociatedID(), input.newX(), input.newY()));
 		}
 		playerInputs.clear();
 	}
@@ -477,13 +543,7 @@ public class World
 			player.onWorldTick(this); 
 			
 			
-			//Update Entities
-			//TODO: Monsters
-			//updateMonsters(player); 
-			//TODO: NPCs
-			//updateNPCs(player);
-			//TODO: projectiles
-			//updateProjectiles(player);
+			
 			
 			//Hittests
 			//TODO: Player-Monster hittest
@@ -506,7 +566,14 @@ public class World
 		updateWorldTime();
 		applyLightingUpdates();
 
-		handlePlayerMovement();
+		//Update Entities
+		//TODO: Monsters
+		//updateMonsters(player); 
+		//TODO: NPCs
+		//updateNPCs(player);
+		//TODO: projectiles
+		//updateProjectiles(player);
+		handlePlayerMovement(update);
 				
 		if(chunkManager.isAnyLoadOperationDone())
 		{

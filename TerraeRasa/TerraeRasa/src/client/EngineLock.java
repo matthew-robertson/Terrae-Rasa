@@ -60,22 +60,29 @@ public class EngineLock
 		
 	public synchronized void setPlayer(EntityPlayer player)
 	{
-		engine.setPlayer(player);
+		engine.setActivePlayerID(player.entityID);
 	}
 	
 	public synchronized void updatePlayer(CompressedPlayer player)
 	{
-		engine.getPlayer().mergeOnto(player);
+		throw new RuntimeException("NYI");
+		//TODO: EngineLock.updatePlayer() does not work at all
+	//	engine.getPlayer().mergeOnto(player);
 	}
 	
-	public synchronized EntityPlayer getRelevantPlayer()
+	public synchronized EntityPlayer getSentPlayer()
 	{
-		return engine.getPlayer();
+		return engine.getSentPlayer();
 	}
 	
 	public synchronized void setWorld(World world)
 	{
 		engine.setWorld(world);
 		GameEngine.flagAsMPPlayable();
+	}
+	
+	public synchronized void setActivePlayerID(int id)
+	{
+		engine.setActivePlayerID(id);
 	}
 }

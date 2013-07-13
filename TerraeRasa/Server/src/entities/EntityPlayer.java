@@ -70,6 +70,8 @@ import enums.EnumPlayerDifficulty;
  */
 public class EntityPlayer extends EntityLiving
 {
+	private static final long serialVersionUID = 1L;
+
 	/** This value apparently has to be negative. */
 	private static final double leftSwingBound = MathHelper.degreeToRadian(-135); 
 	private static final double rightSwingBound = MathHelper.degreeToRadian(55);
@@ -1420,7 +1422,7 @@ public class EntityPlayer extends EntityLiving
 	public static CompressedPlayer compress(EntityPlayer player)
 	{
 		CompressedPlayer compressPlayer = new CompressedPlayer();
-		
+		compressPlayer.entityID = player.entityID;
 		compressPlayer.x = player.x;
 		compressPlayer.y = player.y;
 		compressPlayer.isAffectedByWalls = player.isAffectedByWalls;
@@ -1532,7 +1534,7 @@ public class EntityPlayer extends EntityLiving
 	public static EntityPlayer expand(CompressedPlayer compressedPlayer)
 	{
 		EntityPlayer player = new EntityPlayer(compressedPlayer.playerName, compressedPlayer.difficulty);
-		
+		player.entityID = compressedPlayer.entityID;
 		player.x = compressedPlayer.x;
 		player.y = compressedPlayer.y;
 		player.isAffectedByWalls = compressedPlayer.isAffectedByWalls;

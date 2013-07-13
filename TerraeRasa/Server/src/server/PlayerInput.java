@@ -7,6 +7,8 @@ import enums.EnumHardwareInput;
 public class PlayerInput {
 	private EntityPlayer associatedPlayer;
 	private EnumHardwareInput[] inputs;
+	private double newX;
+	private double newY;
 	
 	public PlayerInput(EntityPlayer player, EnumHardwareInput[] inputs)
 	{
@@ -33,9 +35,24 @@ public class PlayerInput {
 			else if(input == EnumHardwareInput.JUMP)
 			{
 				associatedPlayer.tryToJumpAgain(world, associatedPlayer);
-				
 			}			
 		}
-		
+		newX = associatedPlayer.x;
+		newY = associatedPlayer.y;
+	}
+	
+	public int getAssociatedID()
+	{
+		return associatedPlayer.entityID;
+	}
+	
+	public double newX()
+	{
+		return newX;
+	}
+	
+	public double newY()
+	{
+		return newY;
 	}
 }

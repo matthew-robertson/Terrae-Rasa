@@ -8,9 +8,11 @@ public class PositionUpdate
 	private static final long serialVersionUID = 1L;
 	public double x;
 	public double y;
+	public int entityID;
 	
-	public PositionUpdate(double x, double y)
+	public PositionUpdate(int entityID, double x, double y)
 	{
+		this.entityID = entityID;
 		this.x = x;
 		this.y = y;
 	}

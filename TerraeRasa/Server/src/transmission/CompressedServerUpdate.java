@@ -1,6 +1,7 @@
 package transmission;
 
 import java.io.Serializable;
+import java.util.Vector;
 
 public class CompressedServerUpdate 
 		implements Serializable
@@ -8,10 +9,9 @@ public class CompressedServerUpdate
 	private static final long serialVersionUID = 1L;
 	public String[] values;
 	public SuperCompressedChunk[] chunks; 
-	public CompressedPlayer player;
-	public PositionUpdate update;
+	//public CompressedPlayer player;
+	//public PositionUpdate update;
+	public EntityUpdate[] entityUpdates;
+	public PositionUpdate[] positionUpdates;
 	
-	public CompressedServerUpdate()
-	{
-	}
 }

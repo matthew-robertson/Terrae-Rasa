@@ -278,7 +278,7 @@ public class ChunkManager
 			savable.width = world.getWidth();
 			savable.height = world.getHeight();
 			savable.chunkWidth = world.getChunkWidth();
-			savable.chunkHeight = world.getChunkHeight();
+			savable.chunkHeight = 1;
 			savable.averageSkyHeight = world.getAverageSkyHeight();
 			savable.generatedHeightMap = world.getGeneratedHeightMap();
 			savable.worldTime = world.getWorldTime();

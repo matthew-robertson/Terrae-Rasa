@@ -9,6 +9,7 @@ import enums.EnumWorldSize;
 public class ServerSettings 
 {
 	private static int entityID = 0;
+	private static int connectionID = 0;
 	
 	public boolean forcePlayerDifficultiesNormal;
 	public int maxPlayers;
@@ -113,5 +114,10 @@ public class ServerSettings
 	public static int getEntityID()
 	{
 		return entityID++;
+	}
+	
+	public static int getConnectionID()
+	{
+		return connectionID++;
 	}
 }

@@ -8,6 +8,7 @@ import items.ItemTool;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
@@ -21,6 +22,7 @@ import render.Render;
 import savable.SavableWorld;
 import savable.SaveManager;
 import statuseffects.StatusEffectStun;
+import transmission.CompressedPlayer;
 import transmission.WorldData;
 import utils.ActionbarItem;
 import utils.ChestLootGenerator;
@@ -38,6 +40,7 @@ import blocks.BlockChest;
 import blocks.BlockGrass;
 import blocks.BlockPillar;
 import blocks.MinimalBlock;
+import entities.Entity;
 import entities.EntityItemStack;
 import entities.EntityNPC;
 import entities.EntityNPCEnemy;
@@ -105,9 +108,7 @@ public class World
 	private int averageSkyHeight;
 	private int totalBiomes;
 	private int chunkWidth;
-	private int chunkHeight;
 	public ChunkManager chunkManager;
-	private boolean weatherFinished;
 	private EnumWorldDifficulty difficulty;
 	private final Random random = new Random();
 	protected String worldName;
@@ -116,9 +117,12 @@ public class World
 	private int width; //Width in blocks, not pixels
 	private int height; //Height in blocks, not pixels
 	private double previousLightLevel;
-	private EntityNPCEnemy[] spawnList;
 	private LightUtils utils;
 	private boolean lightingUpdateRequired;
+	
+	public List<EntityPlayer> otherPlayers = new ArrayList<EntityPlayer>();
+	
+	public Dictionary<String, Entity> entitiesByID = new Hashtable<String, Entity>();
 	
 	/**
 	 * Reconstructs a world from a save file. This is the first step.
@@ -137,6 +141,68 @@ public class World
 		utils = new LightUtils();
 //		checkChunks();
 		lightingUpdateRequired = true;
+	}
+	
+	public Entity getEntityByID(int id)
+	{
+		return entitiesByID.get(""+id);
+	}
+	
+	public void overwriteEntityByID(int id, Entity newEntity)
+	{
+		Entity entity = entitiesByID.get(""+id);
+		if(entity instanceof EntityItemStack)
+		{
+			itemsList.remove(entity);
+			itemsList.add((EntityItemStack) newEntity);
+		}
+		else if(entity instanceof EntityProjectile)
+		{
+			projectileList.remove(entity);
+			projectileList.add((EntityProjectile) newEntity);
+		}
+		else if(entity instanceof EntityNPCEnemy)
+		{
+			entityList.remove(entity);
+			entityList.add((EntityNPCEnemy) newEntity);
+		}
+		else if(entity instanceof EntityNPC) //Friendly?
+		{
+			npcList.remove(entity);
+			npcList.add((EntityNPC) newEntity);
+		}
+		else if(entity instanceof EntityPlayer)
+		{
+			otherPlayers.remove(entity);
+			otherPlayers.add((EntityPlayer) newEntity);
+		}
+		entitiesByID.put(""+id, newEntity);		
+	}
+	
+	public void removeEntityByID(int id)
+	{
+		Entity entity = entitiesByID.get(""+id);
+		if(entity instanceof EntityItemStack)
+		{
+			itemsList.remove(entity);
+		}
+		else if(entity instanceof EntityProjectile)
+		{
+			projectileList.remove(entity);
+		}
+		else if(entity instanceof EntityNPCEnemy)
+		{
+			entityList.remove(entity);
+		}
+		else if(entity instanceof EntityNPC) //Friendly?
+		{
+			npcList.remove(entity);
+		}
+		else if(entity instanceof EntityPlayer)
+		{
+			otherPlayers.remove(entity);
+		}
+		entitiesByID.put(""+id, null);
 	}
 	
 	/**
@@ -167,7 +233,6 @@ public class World
 		manager = new SpawnManager();
 		lootGenerator = new ChestLootGenerator();
 		chunkWidth = width / Chunk.getChunkWidth();
-		chunkHeight = height / height;
 		utils = new LightUtils();
 		lightingUpdateRequired = true;
 //		checkChunks();
@@ -196,25 +261,21 @@ public class World
 		this.worldTime = data.worldTime;
 		this.previousLightLevel = data.previousLightLevel;
 		this.chunkWidth = data.chunkWidth;
-		this.chunkHeight = data.chunkHeight;
 		this.lightingUpdateRequired = data.lightingUpdateRequired;
 		this.generatedHeightMap = data.generatedHeightMap;
 		this.averageSkyHeight = data.averageSkyHeight;
+		
+		for(CompressedPlayer player : data.otherplayers)
+		{
+			addPlayer(EntityPlayer.expand(player));
+		}
 		
 		manager = new SpawnManager();
 		lootGenerator = new ChestLootGenerator();
 		utils = new LightUtils();
 		
 	}
-		
-	/**
-	 * Finishes reconstructing a world object from disk. This is the 3rd and final step where anything dependent on
-	 * variables saved to disk should be created/executed.
-	 */
-	public void finishWorldReconstruction(String universeName)
-	{
-	}
-	
+			
 	/**
 	 * Puts the player at the highest YPosition for the spawn XPosition 
 	 * @param player the player to be added
@@ -274,26 +335,18 @@ public class World
 	public void loadAndApplyWorldData(final String BASE_PATH, String universeName, String dir)
 			throws FileNotFoundException, IOException, ClassNotFoundException
 	{
-		//Open an input stream for the file
-	
-		SaveManager manager = new SaveManager();
-	
+		//Open an input stream for the file	
+		SaveManager manager = new SaveManager();	
 		SavableWorld savable = (SavableWorld)(manager.loadFile("/World Saves/" + universeName + "/" + dir + "/worlddata.xml"));
 		this.width = savable.width;
 		this.height = savable.height;
 		this.chunkWidth = savable.chunkWidth;
-		this.chunkHeight = savable.chunkHeight;
 		this.averageSkyHeight = savable.averageSkyHeight;
 		this.generatedHeightMap = savable.generatedHeightMap;
 		this.worldTime = savable.worldTime;
 		this.worldName = savable.worldName;
 		this.totalBiomes = savable.totalBiomes;
 		this.difficulty = savable.difficulty;
-
-	
-		
-		
-		finishWorldReconstruction(universeName);
 	}
 	
 	/**
@@ -356,14 +409,7 @@ public class World
 	 * Keeps track of the worldtime and updates the light if needed
 	 */
 	public void updateWorldTime(EntityPlayer player)
-	{
-		//worldTime / GAMETICKSPERHOUR = the hour (from 00:00 to 24:00)
-		worldTime++;
-		if(worldTime >= GAMETICKSPERDAY)//If the time exceeds 24:00, reset it to 0:00
-		{
-			worldTime = 0;
-		}
-		
+	{		
 		if(getLightLevel() != previousLightLevel) //if the sunlight has changed, update it
 		{
 			previousLightLevel = getLightLevel();
@@ -409,6 +455,7 @@ public class World
 	public void addEntityToEnemyList(EntityNPCEnemy enemy)
 	{
 		entityList.add(enemy);
+		entitiesByID.put(""+enemy.entityID, enemy);
 	}
 	
 	/**
@@ -418,6 +465,7 @@ public class World
 	public void addEntityToNPCList(EntityNPC npc)
 	{
 		npcList.add(npc);
+		entitiesByID.put(""+npc.entityID, npc);
 	}
 	
 	/**
@@ -427,6 +475,7 @@ public class World
 	public void addEntityToProjectileList(EntityProjectile projectile)
 	{
 		projectileList.add(projectile);
+		entitiesByID.put(""+projectile.entityID, projectile);
 	}
 
 	/**
@@ -436,6 +485,13 @@ public class World
 	public void addItemStackToItemList(EntityItemStack stack)
 	{
 		itemsList.add(stack);
+		entitiesByID.put(""+stack.entityID, stack);
+	}
+	
+	public void addPlayer(EntityPlayer player)
+	{
+		otherPlayers.add(player);
+		entitiesByID.put(""+player.entityID, player);
 	}
 	
 	/**
@@ -455,37 +511,19 @@ public class World
 	/**
 	 * Calls all the methods to update the world and its inhabitants
 	 */
-	public void onWorldTick(EntityPlayer player)
+	public void onClientWorldTick(EntityPlayer player)
 	{		
-		spawnMonsters(player);				
-		causeWeather();		
-		//update the player
-		
 		player.onWorldTick(this); 
 		
-		//Update Entities
-		updateMonsters(player); 
-		updateNPCs(player);
-		updateProjectiles(player);
 		updateTemporaryText();
-		updateEntityLivingItemStacks();
-		//Hittests
-		performPlayerMonsterHittests(player); 
-		performProjectileHittests(player);
-		performPlayerItemHittests(player);
-		performEnemyToolHittests(player);
+		
 		//Update the time
 		updateWorldTime(player);
 		//checkChunks();
 		updateChunks(player);
-		updateMonsterStatusEffects();
 		applyLightingUpdates(player);
 		
 		
-		if(chunkManager.isAnyLoadOperationDone())
-		{
-			chunkManager.addAllLoadedChunks(this, getChunks());
-		}
 		if (player.inventory.getMainInventoryStack(player.selectedSlot) != null && 
 				player.inventory.getMainInventoryStack(player.selectedSlot).getItemID() < ActionbarItem.spellIndex && 
 				Mouse.isButtonDown(0)) 
@@ -493,17 +531,6 @@ public class World
 			player.breakBlock(this, ((Render.getCameraX() + MathHelper.getCorrectMouseXPosition()) / 6), ((Render.getCameraY() + MathHelper.getCorrectMouseYPosition()) / 6), (Item.itemsList[player.inventory.getMainInventoryStack(player.selectedSlot).getItemID()]));
 		}
 	}
-	
-	/**
-	 * Updates (and possibly removes) monster status effects previously registered
-	 */
-	private void updateMonsterStatusEffects()
-	{
-		for(int i = 0; i < entityList.size(); i++)
-		{
-			entityList.get(i).checkAndUpdateStatusEffects(this);
-		}
-	}	
 		
 	/**
 	 * Gets how many horizontal chunks the world has. This is equal to (width / Chunk.getChunkWidth())
@@ -513,125 +540,13 @@ public class World
 	{
 		return chunkWidth;
 	}
-	
-	/**
-	 * Gets how many vertical chunks the world has. This is equal to (height / height)
-	 * @return the number of vertical chunks the world has
-	 */
-	public int getChunkHeight()
-	{
-		return chunkHeight;
-	}
-	
-	/**
-	 * Applies gravity to all itemstacks entities
-	 */
-	private void updateEntityLivingItemStacks()
-	{
-		for(int i = 0; i < itemsList.size(); i++)
-		{
-			try {
-				itemsList.get(i).move(this);
-			} catch (NullPointerException e) {
-				e.printStackTrace();
-			}
-		}		
-	}
-	
-	/**
-	 * Picks up itemstacks that the player is standing on (or very near to)
-	 */
-	private void performPlayerItemHittests(EntityPlayer player)
-	{
-		final double PLAYER_X_CENTER = player.x + (player.width / 2);
-		final double PLAYER_Y_CENTER = player.y + (player.height / 2);
 		
-		for(int i = 0; i < itemsList.size(); i++)
-		{
-			double distance = MathHelper.distanceBetweenTwoPoints(itemsList.get(i).x + (itemsList.get(i).width / 2), 
-					itemsList.get(i).y + (itemsList.get(i).height / 2),
-					PLAYER_X_CENTER, 
-					PLAYER_Y_CENTER);
-			//Check if the itemstack is near the player and able to be picked up
-			if(distance <= itemsList.get(i).width * 2 * player.pickupRangeModifier && itemsList.get(i).canBePickedUp()) 
-			{
-				ItemStack stack = player.inventory.pickUpItemStack(this, player, itemsList.get(i).getStack()); //if so try to pick it up
-				
-				if(stack == null) //nothing's left, remove the null element
-				{
-					itemsList.remove(i);
-				}
-				else //otherwise, put back what's left
-				{
-					itemsList.get(i).setStack(stack);				
-				}
-			}
-			else
-			{
-				itemsList.get(i).update(); 
-			}	
-		}
-	}
-	
-	/**
-	 * applies AI to npcs
-	 */
-	private void updateNPCs(EntityPlayer player){
-		for (int i = 0; i < npcList.size(); i++){
-			if (npcList.get(i).isDead()){
-				npcList.remove(i);
-				continue;
-			}
-			npcList.get(i).applyAI(this, player, player);
-			
-			if(npcList.get(i).inBounds(player.x, player.y, player.width, player.height)){
-				npcList.get(i).onPlayerNear();
-			}
-			npcList.get(i).applyGravity(this);
-		}
-	}
-	
-	/**
-	 * 
-	 * @param player
-	 */
-	private void updateMonsters(EntityPlayer player)
-	{
-		final int OUT_OF_RANGE = (int) ((Display.getHeight() > Display.getWidth()) ? Display.getHeight() * 0.75 : Display.getWidth() * 0.75);
-		for(int i = 0; i < entityList.size(); i++)
-		{
-			if(entityList.get(i).isDead()) //if the monster is dead, try to drop items
-			{
-				ItemStack[] drops = entityList.get(i).getDrops(); //get possible drops
-				if(drops != null) //if there're drops
-				{
-					for(ItemStack stack : drops) //drop each of them
-					{
-						addItemStackToItemList(new EntityItemStack(entityList.get(i).x - 1, entityList.get(i).y - 1, stack));
-					}
-				}
-				entityList.remove(i);
-				continue;
-			}
-			else if((MathHelper.distanceBetweenTwoPoints(player.x, player.y, entityList.get(i).x, entityList.get(i).y) > OUT_OF_RANGE && !entityList.get(i).isBoss))
-			{ //If the monster is dead, or too far away, remove it
-				entityList.remove(i);
-				//System.out.println("Entity Removed @" + i);
-				continue;
-			}
-			entityList.get(i).invincibilityTicks--;
-			//System.out.println(entityList.get(i).invincibilityTicks);
-			entityList.get(i).applyAI(this, player, player); //otherwise apply AI
-		}
-	}
-	
 	/**
 	 * Method designed to handle the updating of all blocks
 	 * @param x - x location in the world
 	 * @param y - location in the world
 	 * @return - updated bitmap
-	 */
-	
+	 */	
 	public int updateBlockBitMap(int x, int y){
 		int bit = getBlockGenerate(x,y).getBitMap();
 		//If the block is standard
@@ -699,95 +614,7 @@ public class World
 		}
 		return bit;
 	}	
-	
-	/**
-	 * Updates (and possibly removes) projectiles
-	 * @param player - player to compare distances against
-	 */
-	private void updateProjectiles(EntityPlayer player)
-	{
-		final int OUT_OF_RANGE = (int) ((Display.getHeight() > Display.getWidth()) ? Display.getHeight() * 0.75 : Display.getWidth() * 0.75);
-		for(int i = 0; i < projectileList.size(); i++)
-		{
-			if (projectileList.get(i).active){
-				projectileList.get(i).moveProjectile(this);
-			}
-			else if (!projectileList.get(i).active){
-				projectileList.get(i).ticksNonActive++;
-			}
-			
-			//If the projectile is too far away, remove it
-			if(((MathHelper.distanceBetweenTwoPoints(player.x, player.y, projectileList.get(i).x, projectileList.get(i).y) > OUT_OF_RANGE) || 
-					projectileList.get(i).ticksNonActive > 80))
-			{ 
-				if (projectileList.get(i).ticksNonActive > 1 && projectileList.get(i).getDrop() != null){
-					addItemStackToItemList(new EntityItemStack(projectileList.get(i).x - 1, projectileList.get(i).y - 1, projectileList.get(i).getDrop()));
-				}
-				projectileList.remove(i);
-				continue;
-			}
-			else if (((MathHelper.distanceBetweenTwoPoints(player.x, player.y, projectileList.get(i).x, projectileList.get(i).y) > OUT_OF_RANGE) || 
-					projectileList.get(i).ticksNonActive > 1)) 
-			{
-				projectileList.remove(i);
-				continue;
-			}
-		}
-	}
-	
-	/**
-	 * Sees if any monsters have hit (are in range of) the player
-	 */
-	private void performPlayerMonsterHittests(EntityPlayer player)
-	{
-		for(int i = 0; i < entityList.size(); i++)
-		{
-			if(player.inBounds(entityList.get(i).x, entityList.get(i).y, entityList.get(i).width, entityList.get(i).height))
-			{ //If the player is in bounds of the monster, damage them
-				player.damage(this, 
-						new Damage(entityList.get(i).damageDone * difficulty.getDamageModifier(),
-								new EnumDamageType[] { EnumDamageType.NONE }, 
-								EnumDamageSource.MELEE)
-								.setIsCrit(((Math.random() < entityList.get(i).criticalStrikeChance) ? true : false)), 
-						true);
-			}
-		}
-	}
-	
-	/**
-	 * Sees if any projectiles have hit (are in range of) players or npcs
-	 */
-	private void performProjectileHittests(EntityPlayer player)
-	{
-		for (int i = 0; i < projectileList.size(); i++){
-			if (projectileList.get(i).isFriendly){
-				for(int j = 0; j < entityList.size(); j++)
-				{
-					if(entityList.get(j).inBounds(projectileList.get(i).x, projectileList.get(i).y, projectileList.get(i).width, projectileList.get(i).height))
-					{ //If the projectile is in bounds of the monster, damage them
-						entityList.get(j).damage(this, 
-								new Damage(projectileList.get(i).damage, 
-										new EnumDamageType[] { EnumDamageType.NONE }, 
-										EnumDamageSource.RANGE)
-										.setIsCrit(((Math.random() < projectileList.get(i).criticalStrikeChance) ? true : false)), 
-								true);
-					}
-				}
-			}
-			if (projectileList.get(i).isHostile){
-				if(player.inBounds(projectileList.get(i).x, projectileList.get(i).y, projectileList.get(i).width, projectileList.get(i).height))
-				{ //If the projectile is in bounds of the player, damage them
-					player.damage(this, 
-							new Damage(projectileList.get(i).damage * difficulty.getDamageModifier(), 
-									new EnumDamageType[] { EnumDamageType.NONE }, 
-									EnumDamageSource.RANGE)
-									.setIsCrit(((Math.random() < projectileList.get(i).criticalStrikeChance) ? true : false)), 
-							true);
-				}
-			}
-		}
-	}
-	
+		
 	/**
 	 * Displays all temporary text in the world, or remove it if it's past its life time
 	 */
@@ -802,272 +629,7 @@ public class World
 			}
 		}
 	}
-	
-	/**
-	 * Attempts to spawn monsters, based on random numbers
-	 * @return number of monsters successfully spawned
-	 */
-	private int spawnMonsters(EntityPlayer player)
-	{
-		int totalTries = 2 + random.nextInt(4);
-		//int totalTries = 500;		
-		//WARNING, THE LINE ABOVE IS VERY, VERY AGGRESSIVE SPAWNING. NOT INTENDED FOR RELEASE BUT TESTING INSTEAD
 		
-		double time = (double)(worldTime) / GAMETICKSPERHOUR; 
-		if(time < 4 || time > 20) //spawn more at night
-		{
-			totalTries += (3 + random.nextInt(3));
-		}	
-		
-		String active = "";
-		int counter = 0;
-		int entitych = 0;
-		
-		for(int i = 0; i < totalTries; i++) 
-		{
-			if(entityList.size() > 255) //too many monsters spawned
-			{
-				return counter;
-			}			
-			
-			int xoff = 0;
-			int yoff = 0;
-			int xscreensize_b = (Display.getWidth() / 22) + 5;
-			int yscreensize_b = (Display.getHeight() / 22) + 5;		
-			
-			//how far away the monster will spawn from the player:
-			if(random.nextInt(2) == 0) //spawn to the left
-			{ 
-				xoff = MathHelper.returnIntegerInWorldMapBounds_X(this, (int)(player.x / 6) - random.nextInt(100) - xscreensize_b);
-			}
-			else //spawn to the right
-			{
-				xoff = MathHelper.returnIntegerInWorldMapBounds_X(this, (int)(player.x / 6) + random.nextInt(100) + xscreensize_b);
-			}
-			if(random.nextInt(2) == 0) //spawn above 
-			{
-				yoff = MathHelper.returnIntegerInWorldMapBounds_Y(this, (int)(player.y / 6) - random.nextInt(100) - yscreensize_b);
-			}
-			else //spawn below
-			{
-				yoff = MathHelper.returnIntegerInWorldMapBounds_Y(this, (int)(player.y / 6) + random.nextInt(60) + yscreensize_b);
-			}
-			
-			active = getBiomeColumn(""+(int)(xoff));
-			
-			if(active == null) //Should indicate the chunk isnt loaded (good failsafe)
-			{
-				continue;
-			}
-			
-			active = active.toLowerCase();
-			
-			if (active.equals("forest")){
-				if (time < 4 || time > 20){
-					spawnList = manager.getForestNightEnemiesAsArray();
-				}
-				
-				else {
-					spawnList = manager.getForestDayEnemiesAsArray();
-				}
-			}
-			
-			else if (active.equals("desert")){
-				if (time < 4 || time > 20){
-					spawnList = manager.getDesertNightEnemiesAsArray();
-				}
-				
-				else {
-					spawnList = manager.getDesertDayEnemiesAsArray();
-				}
-			}
-			
-			else if (active.equals("arctic")){
-			//	System.out.println("hey!");
-				if (time < 4 || time > 20){
-					spawnList = manager.getArcticNightEnemiesAsArray();
-				}
-				
-				else {
-					spawnList = manager.getArcticDayEnemiesAsArray();
-				}
-			}
-			entitych = (int)random.nextInt(spawnList.length);
-			//System.out.println(spawnList[entitych].getEnemyName());
-			try
-			{				
-				for(int j = 0; j <spawnList[entitych].getBlockHeight(); j++)//Y
-				{
-					for(int k = 0; k < spawnList[entitych].getBlockWidth(); k++)//X
-					{
-						if(getBlock(xoff + k, yoff + j).isSolid)
-						{
-							throw new RuntimeException("Dummy");
-						}
-					}
-				}
-			}
-			catch (Exception e) //if this gets hit, the entity cant actually spawn
-			{
-				continue;
-			}
-			
-			//So the entity can spawn...
-			
-			try
-			{
-				//Ground Entity:
-				if((getBlock(xoff, (yoff + 3)).isSolid || getBlock(xoff + 1, (yoff + 3)).isSolid)) //make sure there's actually ground to spawn on
-				{
-					EntityNPCEnemy enemy = new EntityNPCEnemy(spawnList[entitych]);
-					enemy.setPosition(xoff * 6, yoff * 6);
-					entityList.add(enemy);
-					counter++;
-				}	
-			}
-			catch(Exception e)
-			{
-			}
-		}
-		
-		return counter;
-	}
-	
-	/**
-	 * Tries to make weather happen on each game tick
-	 */
-	private void causeWeather()
-	{
-		if(weatherFinished) //clear finished weather
-		{
-			weather = null;
-		}
-		if(weather != null) //If there's weather
-		{
-			if(--weather.ticksLeft <= 0) //decrease time left
-			{
-				disableWeather();
-			}
-		}
-	
-		for(ConcurrentHashMap.Entry<String, Chunk> entry: getChunks().entrySet())
-		{
-			Biome biome = entry.getValue().getBiome();			
-			if(biome != null && biome.biomeID == Biome.arctic.biomeID) //if the biome is arctic
-			{
-				if(random.nextInt(150000) == 0) //and a random chance is met
-				{
-					if(weather == null) //and it's null (not in use)
-					{
-						weather = new WeatherSnow(this, biome, averageSkyHeight); //cause weather!
-						weatherFinished = false;
-					}
-				}
-			}
-		}	
-	}
-	
-	/**
-	 * 
-    nvert: Number of vertices in the polygon. Whether to repeat the first vertex at the end.
-    vertx, verty: Arrays containing the x- and y-coordinates of the polygon's vertices.
-    testx, testy: X- and y-coordinate of the test point.
-
-	 * @param nvert
-	 * @param vertx
-	 * @param verty
-	 * @param testx
-	 * @param testy
-	 * @return
-	 */
-	boolean pnpoly(int nvert, double vertx[], double verty[], double testx, double testy)
-	{
-	  int i, j;
-	  boolean c = false;
-	  for (i = 0, j = nvert-1; i < nvert; j = i++) {
-	    if ( ((verty[i]>testy) != (verty[j]>testy)) &&
-	     (testx < (vertx[j]-vertx[i]) * (testy-verty[i]) / (verty[j]-verty[i]) + vertx[i]) )
-	       c = !c;
-	  }
-	  return c;
-	}
-	
-	/**
-	 * Performs a hittest between the player's tool and monsters. 
-	 * @param player
-	 */
-	private void performEnemyToolHittests(EntityPlayer player) 
-	{
-		//Conditions which indicate the player is not swinging or able to swing
-		if(player.inventory.getMainInventoryStack(player.selectedSlot) == null ||
-				player.inventory.getMainInventoryStack(player.selectedSlot).getItemID() >= ActionbarItem.spellIndex ||
-				!player.isSwingingTool() || 
-				(player.inventory.getMainInventoryStack(player.selectedSlot) == null) || 
-				!(Item.itemsList[player.inventory.getMainInventoryStack(player.selectedSlot).getItemID()] instanceof ItemTool))
-		{
-			return;
-		}
-		
-		ItemTool heldItem = ((ItemTool)(Item.itemsList[player.inventory.getMainInventoryStack(player.selectedSlot).getItemID()]));
-		double size = heldItem.size;		     
-		double angle = player.getToolRotationAngle();		
-		double const_ = 9;
-		double[] x_bounds = heldItem.xBounds;
-		double[] y_bounds = heldItem.yBounds;
-		Vector2F[] scaled_points = new Vector2F[x_bounds.length];
-		for(int i = 0; i < scaled_points.length; i++)
-		{
-			scaled_points[i] = new Vector2F((float)(size * x_bounds[i]), (float)(size * ((float)y_bounds[i])) - (float)size );
-		}
-		double[] x_points = new double[scaled_points.length];
-		double[] y_points = new double[scaled_points.length];
-		
-		//Rotate the points
-		for(int i = 0; i < scaled_points.length; i++)
-		{
-			x_points[i] =  player.x + const_ + (scaled_points[i].x * Math.cos(angle)) - 
-					(scaled_points[i].y * Math.sin(angle));
-			y_points[i] = player.y + const_ + (scaled_points[i].x * Math.sin(angle)) + 
-					( scaled_points[i].y * Math.cos(angle));
-		}
-		
-		for(int i = 0; i < entityList.size(); i++)
-		{
-			if(entityList.get(i).isImmuneToDamage())
-			{
-				continue;
-			}	
-			
-			if(pnpoly(scaled_points.length, 
-					x_points, y_points, 
-					entityList.get(i).x + entityList.get(i).width, 
-					entityList.get(i).y + entityList.get(i).height)
-			){	
-				Damage damage = new Damage(heldItem.getDamageDone() * player.allDamageModifier * player.meleeDamageModifier, 
-						new EnumDamageType[] { EnumDamageType.NONE },
-						EnumDamageSource.MELEE)
-						.setIsCrit(((Math.random() < player.criticalStrikeChance) ? true : false));
-				player.inflictedDamageToMonster(this, damage);
-				entityList.get(i).damage(this, damage, true);
-				
-				int knockBackValue = (int) (player.knockbackModifier * 12);
-				String direction = player.getDirectionOfQuadRelativeToEntityPosition(entityList.get(i).x, entityList.get(i).y, entityList.get(i).width, entityList.get(i).height);
-				
-				if(direction.equals("right"))
-				{
-					entityList.get(i).moveEntityRight(this, knockBackValue);	
-				}
-				else
-				{
-					entityList.get(i).moveEntityLeft(this, knockBackValue);
-				}
-				entityList.get(i).registerStatusEffect(this, new StatusEffectStun(0.45, 1, 1, 1));
-			}
-		}
-		
-		player.updateSwing();
-	}
-	
 	/**
 	 * Handles block break events, based on what the block is
 	 * @param mx x position in the 'world map'
@@ -1514,15 +1076,7 @@ public class World
 			my--;
 		}
 	}
-		
-	/**
-	 * Makes the weather field null, to stop weather
-	 */
-	public void disableWeather()
-	{
-		weatherFinished = true;
-	}
-	
+			
 	/**
 	 * Provides access to handlBackBlockBreakEvent() because that method is private and has a bizzare name, that's hard to both find and
 	 * remember
