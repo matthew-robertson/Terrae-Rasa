@@ -96,6 +96,17 @@ public class ChestLootGenerator
 	}
 	
 	/**
+	 * Uses a custom loot table to generate loot.
+	 * @param table the custom loot table to use
+	 * @param numberOfStacks the number of items to generate from that loot table
+	 * @return an ItemStack[] of size numberOfStacks, containing randomly generated loot from the give loot table
+	 */
+	public ItemStack[] getLootWithCustomTable(ChestLootTable table, int numberOfStacks)
+	{
+		return getChestLoot(table, numberOfStacks);
+	}
+	
+	/**
 	 * Gets an ItemStack[] based on the given ChestLootTable of length totalLootStacks. This is composed of a pseudo-random selection
 	 * of loot from the ChestLootTable, based on probability_weights
 	 * @param possibleLoot a ChestLootTable containing possible loot

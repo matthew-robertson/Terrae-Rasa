@@ -2,13 +2,10 @@ package transmission;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Vector;
 
-import utils.WorldText;
 import entities.EntityItemStack;
 import entities.EntityNPC;
 import entities.EntityNPCEnemy;
-import entities.EntityPlayer;
 import entities.EntityProjectile;
 import enums.EnumWorldDifficulty;
 
@@ -21,7 +18,6 @@ public class WorldData
 	
 	private static final long serialVersionUID = 1L;
 	public List<EntityItemStack> itemsList;
-	public List<WorldText> temporaryText; 
 	public List<EntityNPCEnemy> entityList;
 	public List<EntityNPC> npcList;
 	public List<EntityProjectile> projectileList;

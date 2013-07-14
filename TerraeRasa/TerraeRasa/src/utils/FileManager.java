@@ -3,21 +3,13 @@ package utils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Vector;
 
 import savable.SaveManager;
 import world.World;
-import world.WorldGenEarth;
-import world.WorldGenHell;
-import world.WorldGenSky;
-import world.WorldHell;
-import world.WorldSky;
 import client.Settings;
 import client.TerraeRasa;
 import entities.EntityPlayer;
 import enums.EnumPlayerDifficulty;
-import enums.EnumWorldDifficulty;
-import enums.EnumWorldSize;
 
 
 public class FileManager
@@ -28,54 +20,7 @@ public class FileManager
 	{
 		BASE_PATH = TerraeRasa.getBasePath();
 	}
-	
-	/**
-	 * Gets a new world, with specified settings, and saves it to file before returning it.
-	 * @param name the name of the world to create
-	 * @param worldSize the Enum used to indicate the world's size
-	 * @param difficulty the Enum used to indicate the world's difficulty
-	 * @return the newly generated world or in case of failure, null
-	 */
-	public World generateAndSaveWorld(String name, EnumWorldSize worldSize, EnumWorldDifficulty difficulty)
-	{
-		World world = generateNewWorld(name, worldSize.getWidth(), worldSize.getHeight(), difficulty);
-		verifyDirectoriesExist();
-		new File(TerraeRasa.getBasePath() + "/World Saves/" + name).mkdir();
-		new File(TerraeRasa.getBasePath() + "/World Saves/" + name + "/Earth").mkdir();
-		world.chunkManager = TerraeRasa.terraeRasa.gameEngine.chunkManager;
-		world.chunkManager.setUniverseName(name);
-		world.saveRemainingWorld();	
-		return world;
-	}
-	
-	/**
-	 * Gets a new WorldHell, with specified settings, and saves it to file before returning it.
-	 * @param name the name of the WorldHell to create
-	 * @param worldSize the Enum used to indicate the WorldHell's size
-	 * @param difficulty the Enum used to indicate the WorldHell's difficulty
-	 * @return the newly generated WorldHell or in case of failure, null
-	 */
-	public WorldHell generateAndSaveWorldHell(String name, EnumWorldSize worldSize, EnumWorldDifficulty difficulty)
-	{
-		WorldHell worldHell = generateNewWorldHell(name, worldSize.getWidth(), worldSize.getHeight(), difficulty);
-		worldHell.saveRemainingWorld();
-		return worldHell;
-	}
-	
-	/**
-	 * Gets a new WorldSky, with specified settings, and saves it to file before returning it.
-	 * @param name the name of the WorldSky to create
-	 * @param worldSize the Enum used to indicate the WorldSky's size
-	 * @param difficulty the Enum used to indicate the WorldSky's difficulty
-	 * @return the newly generated WorldSky or in case of failure, null
-	 */
-	public WorldSky generateAndSaveWorldSky(String name, EnumWorldSize worldSize, EnumWorldDifficulty difficulty)
-	{
-		WorldSky worldSky = generateNewWorldSky(name, worldSize.getWidth(), worldSize.getHeight(), difficulty);
-		worldSky.saveRemainingWorld();
-		return worldSky;
-	}
-	
+		
 	/**
 	 * Loads the specified world from the ~/World Saves/ Directory
 	 * @param name the name of the world to load
@@ -90,52 +35,7 @@ public class FileManager
 		world.loadAndApplyWorldData(BASE_PATH, universeName, dir);
 		return world;
 	}
-		
-	/**
-	 * Creates a new world, complete with worldgen, and ready to use
-	 * @param name the world's name
-	 * @param w the width of the world
-	 * @param h the height of the world
-	 * @param difficulty the difficulty setting of the world (easy, medium, hardcore)
-	 * @return the newly created world
-	 */
-	public World generateNewWorld(String name, int w, int h, EnumWorldDifficulty difficulty)
-	{
-		World world = new WorldGenEarth().generate(new World(name, w, h, difficulty), 0, w, 0, h);
-	//LightingEngine.applySunlight(world);
-		return world;
-	}
-	
-	/**
-	 * Creates a new WorldHell, complete with worldgen, and ready to use
-	 * @param name the WorldHell's name
-	 * @param w the width of the WorldHell
-	 * @param h the height of the WorldHell
-	 * @param difficulty the difficulty setting of the WorldHell (easy, medium, hardcore)
-	 * @return the newly created WorldHell
-	 */
-	public WorldHell generateNewWorldHell(String name, int w, int h, EnumWorldDifficulty difficulty)
-	{
-		WorldHell worldHell = (WorldHell) new WorldGenHell().generate(new WorldHell(name, w, h, difficulty), 0, w, 0, h);
-	//	LightingEngine.applySunlight(worldHell);
-		return worldHell;
-	}
-	
-	/**
-	 * Creates a new WorldSky, complete with worldgen, and ready to use
-	 * @param name the WorldSky's name
-	 * @param w the width of the WorldSky
-	 * @param h the height of the WorldSky
-	 * @param difficulty the difficulty setting of the WorldSky (easy, medium, hardcore)
-	 * @return the newly created WorldSky
-	 */
-	public WorldSky generateNewWorldSky(String name, int w, int h, EnumWorldDifficulty difficulty)
-	{
-		WorldSky world = (WorldSky) new WorldGenSky().generate(new World(name, w, h, difficulty), 0, w, 0, h);
-	//	LightingEngine.applySunlight(world);
-		return world;
-	}
-	
+			
 	/**
 	 * Creates a new player and saves it to file immediately before returning that new player
 	 * @param name Name of the player being created

@@ -40,6 +40,7 @@ import entities.EntityPlayer;
 public class InventoryPlayer 
 		 implements Serializable
 {
+	private static final long serialVersionUID = 1L;
 	private Hashtable<String, Integer> inventoryTotals;
 	private ItemStack[] trash;
 	private ItemStack[] mainInventory;
@@ -450,7 +451,7 @@ public class InventoryPlayer
 	 * @param stack stack to try to remove (including # to remove)
 	 * @return success of the removal
 	 */
-	public boolean removeItemsFromInventory(World world, EntityPlayer player, ItemStack stack)
+	public boolean removeItemsFromInventory(EntityPlayer player, ItemStack stack)
 	{
 		int quantity = stack.getStackSize();
 		boolean[] nullSlots = new boolean[mainInventory.length];

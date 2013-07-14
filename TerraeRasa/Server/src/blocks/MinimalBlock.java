@@ -18,8 +18,6 @@ public class MinimalBlock
 	public short id;
 	public short metaData;
 	public short bitMap;
-	public short iconX;
-	public short iconY;
 	public boolean hasMetaData;
 	public boolean isSolid;
 	
@@ -32,8 +30,6 @@ public class MinimalBlock
 		this.id = (short) block.getID();
 		this.metaData = (short) block.metaData;
 		this.mainInventory = (block instanceof BlockChest) ? ((BlockChest)(block)).getMainInventory() : new ItemStack[0];
-		this.iconX = (short) block.iconX;
-		this.iconY = (short) block.iconY;
 		this.setBitMap(block.getBitMap());
 		this.hasMetaData = block.hasMetaData;
 		this.isSolid = block.isSolid;
@@ -51,8 +47,6 @@ public class MinimalBlock
 		this.mainInventory = savedBlock.mainInventory; //??????
 		this.hasMetaData = block.hasMetaData;
 		this.isSolid = block.isSolid;
-		this.iconX = (short) block.iconX;
-		this.iconY = (short) block.iconY;
 		this.setBitMap(savedBlock.bitMap);
 	}
 	
@@ -64,8 +58,6 @@ public class MinimalBlock
 		this.mainInventory = compressedBlock.mainInventory; //??????
 		this.hasMetaData = block.hasMetaData;
 		this.isSolid = block.isSolid;
-		this.iconX = (short) block.iconX;
-		this.iconY = (short) block.iconY;
 		this.setBitMap(compressedBlock.bitMap);
 	}
 	
@@ -81,46 +73,7 @@ public class MinimalBlock
 	 */
 	public MinimalBlock setBitMap(int i) 
 	{
-		char tilemap = Block.blocksList[id].getTileMap(); 
-		bitMap = (short)i;
-		// If the block is a general case
-		if (tilemap == 'g') {
-			if (i <= 15) {
-				this.setIconIndex(i, this.iconY);
-			} else {
-				this.setIconIndex(i - 16, this.iconY + 1);
-			}
-		}
-		// If the block is a pillar
-		else if (tilemap == 'p') {
-			this.setIconIndex(i, this.iconY);
-		}
-		// If the block is a tree
-		else if (tilemap == 't') {
-			this.setIconIndex(i, this.iconY);
-		}
-		// If the block is a branch
-		else if (tilemap == 'b') {
-			// If the branch is a regular branch
-			if (i <= 11) {
-				this.setIconIndex(4 + i, this.iconY);
-			}
-			// If the branch is covered in snow
-			else {
-				this.setIconIndex(4 + (i - 12), this.iconY + 1);
-			}
-		}
-		// If the block is a treetop
-		else if (tilemap == 'T') {
-			this.setIconIndex(this.iconX + 3 * i, this.iconY);
-		}
-		return this;
-	}
-	
-	protected MinimalBlock setIconIndex(int x, int y) 
-	{
-		iconY = (short)y;
-		iconX = (short)x;
+		bitMap = (short)i;		
 		return this;
 	}
 }

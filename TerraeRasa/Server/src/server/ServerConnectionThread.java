@@ -8,6 +8,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 import transmission.ChunkCompressor;
+import transmission.CompressedClientUpdate;
 import transmission.CompressedPlayer;
 import transmission.CompressedServerUpdate;
 import transmission.GZIPHelper;
@@ -48,24 +49,16 @@ public class ServerConnectionThread extends Thread
 	{	
 		try 
 		{
-			handleInitialData();
-			
+			handleInitialData();			
 			while(open)
 			{
-				String message = is.readUTF();
-				if(message.equals("/clientinput"))
-				{
-					EnumHardwareInput[] clientInput = (EnumHardwareInput[])(gzipHelper.expand((byte[])is.readObject()));
-					worldLock.registerPlayerInput(clientInput);
-				}
+				CompressedClientUpdate[] clientUpdate = (CompressedClientUpdate[])(gzipHelper.expand((byte[])is.readObject()));
+				worldLock.registerPlayerUpdate(clientUpdate);
 				//TODO: Maybe? this may or may not be reckless.
-				
 				CompressedServerUpdate[] updates = worldLock.yieldServerUpdates();
 	        	os.writeObject(gzipHelper.compress(updates));
 	        	os.flush();
-	        	//Update cycle done.
-			}
-			
+			}			
 		} catch (IOException e) {
 			System.err.println("Fatal error to connection thread with ID " + connectionID + " caused by: ");
 			e.printStackTrace();

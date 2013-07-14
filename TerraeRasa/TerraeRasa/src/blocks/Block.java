@@ -540,7 +540,6 @@ public class Block extends ActionbarItem
 
 	public Block mergeOnto(MinimalBlock block)
 	{
-		setBitMap(block.bitMap);
 		this.id = block.id;
 		this.metaData = block.metaData;
 		this.iconX = (int) block.iconX;
@@ -550,6 +549,7 @@ public class Block extends ActionbarItem
 		{
 			((BlockChest)(this)).setInventory(block.mainInventory);
 		}
+		setBitMap(block.bitMap);
 		return this;
 	}
 	

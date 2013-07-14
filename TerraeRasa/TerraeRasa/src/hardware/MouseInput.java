@@ -6,6 +6,8 @@ import items.ItemRanged;
 import items.ItemThrown;
 import items.ItemTool;
 
+import java.util.Vector;
+
 import org.lwjgl.input.Mouse;
 
 import render.Render;
@@ -17,12 +19,13 @@ import blocks.Block;
 import blocks.BlockBackWall;
 import blocks.BlockChest;
 import entities.EntityPlayer;
+import enums.EnumHardwareInput;
 
 public class MouseInput 
 {	
 	private static boolean mouseLock = false;
 	
-	public static void mouse(World world, EntityPlayer player)
+	public static void mouse(World world, EntityPlayer player, Vector<String> clientCommands, Vector<EnumHardwareInput> hardwareInput)
 	{
 		try {
 			if(player.isStunned())
@@ -33,8 +36,11 @@ public class MouseInput
 			int mouseBX = ((Render.getCameraX() + MathHelper.getCorrectMouseXPosition()) / 6);
 			int mouseBY = ((Render.getCameraY() + MathHelper.getCorrectMouseYPosition()) / 6);
 				
-			if (!Mouse.isButtonDown(0) && !Mouse.isButtonDown(1)){
-				player.setIsMining(false);
+			if (!Mouse.isButtonDown(0) && !Mouse.isButtonDown(1) && player.getIsMining()){
+				String command = "/mine stop " + player.entityID;
+				clientCommands.add(command);
+				///mine continue playerid x y activeslot 
+				
 			}
 			if(Mouse.isButtonDown(0) && player.inventory.getMainInventoryStack(active) != null) //Left Mouse Down && Actionbar slot isnt empty
 			{			
@@ -45,12 +51,16 @@ public class MouseInput
 					{
 						Item item = Item.itemsList[selectedItemID];
 						//Try to mine a block
-						player.breakBlock(world, mouseBX, mouseBY, Item.itemsList[player.inventory.getMainInventoryStack(active).getItemID()]);
+						//player.breakBlock(world, mouseBX, mouseBY, Item.itemsList[player.inventory.getMainInventoryStack(active).getItemID()]);
+						String command = "/mine frontcontinue " + player.entityID + " " + mouseBX + " " + mouseBY + " " + active;
+						clientCommands.add(command);
 						
 						if(!player.isSwingingTool() && item instanceof ItemTool) //If the player isn't swinging a tool, start swinging
 						{
 							ItemTool tool = (ItemTool) item;
-							player.startSwingingTool(player.isFacingRight);
+							command = "";
+							clientCommands.add(command);
+							
 							if (player.getIsMining()){
 								world.soundEngine.playSoundEffect(tool.hitSound);
 							}				
@@ -124,10 +134,14 @@ public class MouseInput
 						if(d <= player.getMaximumBlockPlaceDistance()) //if the click was close enough to place a block, try to place one
 						{
 							if (Block.blocksList[selectedItemID] instanceof BlockBackWall){
-								world.placeBackWall(player, mouseBX, mouseBY, Block.blocksList[player.inventory.getMainInventoryStack(active).getItemID()]);
+								String command = "/placebackblock " + mouseBX + " " + mouseBY + " " + player.entityID + " " + player.inventory.getMainInventoryStack(active).getItemID() + " " + active;
+								//world.placeBackWall(player, mouseBX, mouseBY, Block.blocksList[player.inventory.getMainInventoryStack(active).getItemID()]);
+								clientCommands.add(command);
 							}
 							else {
-								world.placeBlock(player, mouseBX, mouseBY, Block.blocksList[player.inventory.getMainInventoryStack(active).getItemID()]);
+								String command = "/placefrontblock " + mouseBX + " " + mouseBY + " " + player.entityID + " " + player.inventory.getMainInventoryStack(active).getItemID() + " " + active;
+								//world.placeBlock(player, mouseBX, mouseBY, Block.blocksList[player.inventory.getMainInventoryStack(active).getItemID()]);
+								clientCommands.add(command);
 							}
 						}
 					}
@@ -153,7 +167,9 @@ public class MouseInput
 						Item item = Item.itemsList[selectedItemID];
 						
 						//Mine the backwall
-						player.breakBackBlock(world, mouseBX, mouseBY, Item.itemsList[player.inventory.getMainInventoryStack(active).getItemID()]);
+						//player.breakBackBlock(world, mouseBX, mouseBY, Item.itemsList[player.inventory.getMainInventoryStack(active).getItemID()]);
+						String command = "/mine backcontinue " + player.entityID + " " + mouseBX + " " + mouseBY + " " + active;
+						clientCommands.add(command);
 						
 						if(!player.isSwingingTool() && item instanceof ItemTool) //If the player isn't swinging a tool, start swinging
 						{

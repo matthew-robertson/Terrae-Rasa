@@ -216,8 +216,9 @@ public class MainMenu extends Render
 
 		if(flaggedForWorldGen)
 		{
+			System.out.println("This doesnt actually do anything now.");
 			flaggedForWorldGen = false;
-			fileManager.generateAndSaveWorld(worldName.getText(), EnumWorldSize.getSize(worldSize.getValue()), EnumWorldDifficulty.getDifficulty(worldMode.getValue()));
+			//fileManager.generateAndSaveWorld(worldName.getText(), EnumWorldSize.getSize(worldSize.getValue()), EnumWorldDifficulty.getDifficulty(worldMode.getValue()));
 			updateMenus(settings);
 			isNewWorldMenuOpen = false;
 			worldName.setText("");
@@ -846,13 +847,13 @@ public class MainMenu extends Render
 			
 			String ip = (selectedServer.getIP()); 
 			int port = Integer.parseInt(selectedServer.getPort());
-			
+
 			ServerConnect connect = new ServerConnect();
-			String[] stuff = connect.getServerInformation(ip, port);
-			for(String str : stuff)
-			{
-				System.out.println("[Server Info]: " + str);
-			}
+//			String[] stuff = connect.getServerInformation(ip, port);
+//			for(String str : stuff)
+//			{
+//				System.out.println("[Server Info]: " + str);
+//			}
 			 
 			String[] message = { "" };
 			Socket socket = new Socket(ip, port);

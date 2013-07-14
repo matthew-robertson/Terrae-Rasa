@@ -8,12 +8,16 @@ import items.ItemTool;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -24,9 +28,11 @@ import server.PlayerInput;
 import server.ServerSettings;
 import server.TerraeRasa;
 import statuseffects.StatusEffectStun;
+import transmission.BlockUpdate;
 import transmission.EntityUpdate;
 import transmission.PositionUpdate;
 import transmission.ServerUpdate;
+import transmission.SuperCompressedBlock;
 import transmission.WorldData;
 import utils.ActionbarItem;
 import utils.ChestLootGenerator;
@@ -99,8 +105,8 @@ public class World
 	
 	public Weather weather;
 	private List<EntityItemStack> itemsList;
-	private List<WorldText> temporaryText; 
 	private List<EntityNPCEnemy> entityList;
+	public List<WorldText> temporaryText; 
 	private List<EntityNPC> npcList;
 	private List<EntityProjectile> projectileList;
 	public SpawnManager manager;
@@ -184,7 +190,6 @@ public class World
 	{
 		WorldData data = new WorldData();
 		data.itemsList = this.itemsList;
-		data.temporaryText = this.temporaryText; 
 		data.entityList = this.entityList;
 		data.npcList = this.npcList;
 		data.projectileList = this.projectileList;
@@ -204,36 +209,46 @@ public class World
 	
 	public Entity getEntityByID(int id)
 	{
-		return entitiesByID.get(""+id);
+		try {
+			return entitiesByID.get(""+id);
+		} catch(NullPointerException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
-	
-	public void overwriteEntityByID(int id, Entity newEntity)
+		
+	public void overwriteEntityByID(Vector<EntityPlayer> players, int id, Entity newEntity)
 	{
 		Entity entity = entitiesByID.get(""+id);
 		if(entity instanceof EntityItemStack)
 		{
 			itemsList.remove(entity);
+			itemsList.add((EntityItemStack) newEntity);
 		}
 		else if(entity instanceof EntityProjectile)
 		{
 			projectileList.remove(entity);
+			projectileList.add((EntityProjectile) newEntity);
 		}
 		else if(entity instanceof EntityNPCEnemy)
 		{
 			entityList.remove(entity);
+			entityList.add((EntityNPCEnemy) newEntity);
 		}
 		else if(entity instanceof EntityNPC) //Friendly?
 		{
 			npcList.remove(entity);
+			npcList.add((EntityNPC) newEntity);
 		}
 		else if(entity instanceof EntityPlayer)
 		{
-			//TODO: figure out wtf to do with this
+			players.remove(entity);
+			players.add((EntityPlayer) newEntity);
 		}
 		entitiesByID.put(""+id, newEntity);		
 	}
 	
-	public void removeEntityByID(int id)
+	public void removeEntityByID(Vector<EntityPlayer> players, int id)
 	{
 		Entity entity = entitiesByID.get(""+id);
 		if(entity instanceof EntityItemStack)
@@ -254,9 +269,9 @@ public class World
 		}
 		else if(entity instanceof EntityPlayer)
 		{
-			//TODO: figure out wtf to do with this
+			players.remove(entity);
 		}
-		entitiesByID.put(""+id, null);
+		entitiesByID.remove(""+id);
 	}
 	
 	/**
@@ -265,15 +280,7 @@ public class World
 	 * @return the player with updated position (x, y)
 	 */
 	public EntityPlayer spawnPlayer(ServerSettings settings, EntityPlayer player) 
-	{
-		if(player.inventory.isEmpty())
-		{
-			player.inventory.pickUpItemStack(this, player, new ItemStack(Item.copperSword));
-			player.inventory.pickUpItemStack(this, player, new ItemStack(Item.copperPickaxe));
-			player.inventory.pickUpItemStack(this, player, new ItemStack(Item.copperAxe));
-			player.inventory.pickUpItemStack(this, player, new ItemStack(Block.craftingTable));
-		}
-		
+	{		
 		player.respawnXPos = getWorldCenterOrtho();
 		
 		//requestRequiredChunks((int)(player.respawnXPos / 6), (int)(player.y / 6));
@@ -318,10 +325,8 @@ public class World
 	public void loadAndApplyWorldData(final String BASE_PATH, String universeName, String dir)
 			throws FileNotFoundException, IOException, ClassNotFoundException
 	{
-		//Open an input stream for the file
-	
-		SaveManager manager = new SaveManager();
-	
+		//Open an input stream for the file	
+		SaveManager manager = new SaveManager();	
 		SavableWorld savable = (SavableWorld)(manager.loadFile("/" + universeName + "/" + dir + "/worlddata.xml"));
 		this.width = savable.width;
 		this.height = savable.height;
@@ -331,9 +336,7 @@ public class World
 		this.generatedHeightMap = savable.generatedHeightMap;
 		this.worldTime = savable.worldTime;
 		this.worldName = savable.worldName;
-		this.difficulty = savable.difficulty;
-
-	
+		this.difficulty = savable.difficulty;	
 	}
 	
 	public void loadChunks(ServerSettings settings)
@@ -383,32 +386,7 @@ public class World
 			chunkManager.requestChunk(worldName, this, getChunks(), i);
 		}
 	}
-	
-	/**
-	 * Clears all monsters from entityList, generally invoked after a single player death to provide some mercy to the player.
-	 */
-	public void clearEntityList()
-	{
-//		entityList.clear();
-		entityList = new ArrayList<EntityNPCEnemy>(255);
-	}
-	
-	/**
-	 * Clears all projectiles from projectileList
-	 */
-	public void clearProjectileList()
-	{
-		projectileList.clear();
-	}
-	
-	/**
-	 * Clears all NPCs from npcList
-	 */
-	public void clearNPCList()
-	{
-		npcList.clear();
-	}
-	
+		
 	/**
 	 * Keeps track of the worldtime and updates the light if needed
 	 */
@@ -459,6 +437,34 @@ public class World
 		return width * 3;
 	}
 	
+	public void addUnspecifiedEntity(Entity entity)
+	{
+		if(getEntityByID(entity.entityID) != null)
+		{
+			return;
+		}
+		if(entity instanceof EntityNPCEnemy)
+		{
+			entityList.add((EntityNPCEnemy) entity);
+			entitiesByID.put(""+entity.entityID, entity);
+		}
+		else if(entity instanceof EntityNPC)
+		{
+			npcList.add((EntityNPC) entity);
+			entitiesByID.put(""+entity.entityID, entity);
+		}
+		else if(entity instanceof EntityItemStack)
+		{
+			itemsList.add((EntityItemStack) entity);
+			entitiesByID.put(""+entity.entityID, entity);
+		}
+		else if(entity instanceof EntityProjectile)
+		{
+			projectileList.add((EntityProjectile) entity);
+			entitiesByID.put(""+entity.entityID, entity);
+		}		
+	}
+	
 	/**
 	 * Adds an EntityNPCEnemy to the entityList in this instance of World
 	 * @param enemy the enemy to add to entityList
@@ -499,6 +505,11 @@ public class World
 		entitiesByID.put(""+stack.entityID, stack);
 	}
 	
+	public void addPlayer(EntityPlayer player)
+	{		
+		entitiesByID.put(""+player.entityID, player);
+	}
+	
 	/**
 	 * Adds a piece of temporary text to the temporaryText ArrayList. This text is rendered until its time left runs out.
 	 * This text is generally from healing, damage, (combat)
@@ -535,17 +546,12 @@ public class World
 	{		
 		spawnMonsters(update, players);				
 		//causeWeather();		
-		//TODO: weather
+		//TODO: weather		
+		
 		//update the player
-		
-		
 		for(EntityPlayer player : players)
 		{
-			player.onWorldTick(this); 
-			
-			
-			
-			
+			player.onWorldTick(this); 			
 			//Hittests
 			//TODO: Player-Monster hittest
 			//performPlayerMonsterHittests(player); 
@@ -555,14 +561,12 @@ public class World
 			//performPlayerItemHittests(player);
 			//TODO: PlayerTool-Monster hittests
 			//performEnemyToolHittests(player);
-
 		}
 		
 		updateChunks(players);
 		
 		//Not player based stuff -- do this once per game tick
 		updateMonsterStatusEffects();
-		updateTemporaryText();
 		updateEntityLivingItemStacks();
 		updateWorldTime();
 		applyLightingUpdates();
@@ -580,19 +584,17 @@ public class World
 		
 		handlePlayerMovement(update);
 				
+		for(WorldText text : temporaryText)
+		{
+			String command = "/worldtext " + text.x + " " + text.y + " " + text.message + " " + text.color.toString();
+			update.addValue(command);
+		}	
+		temporaryText.clear();
+		
 		if(chunkManager.isAnyLoadOperationDone())
 		{
 			chunkManager.addAllLoadedChunks(this, getChunks());
 		}
-
-		
-//		if (player.inventory.getMainInventoryStack(player.selectedSlot) != null && 
-//				player.inventory.getMainInventoryStack(player.selectedSlot).getItemID() < ActionbarItem.spellIndex && 
-//				Mouse.isButtonDown(0)) 
-//		{ //player mining, if applicable
-//			player.breakBlock(this, ((Render.getCameraX() + MathHelper.getCorrectMouseXPosition()) / 6), ((Render.getCameraY() + MathHelper.getCorrectMouseYPosition()) / 6), (Item.itemsList[player.inventory.getMainInventoryStack(player.selectedSlot).getItemID()]));
-//		}
-		//TODO: re-enable mining
 	}
 	
 	public void forceloadChunk(int x)
@@ -952,28 +954,13 @@ public class World
 	}
 	
 	/**
-	 * Displays all temporary text in the world, or remove it if it's past its life time
-	 */
-	private void updateTemporaryText()
-	{
-		for(int i = 0; i < temporaryText.size(); i++)
-		{
-			temporaryText.get(i).ticksLeft--; //reduce time remaining
-			if(temporaryText.get(i).ticksLeft <= 0)
-			{ //remove obsolete text
-				temporaryText.remove(i);
-			}
-		}
-	}
-	
-	/**
 	 * Attempts to spawn monsters, based on random numbers
 	 */
 	private void spawnMonsters(ServerUpdate update, Vector<EntityPlayer> players)
 	{
 		double hour = (double)(worldTime) / GAMETICKSPERHOUR; 
 		boolean isNight = (hour < 4 || hour > 20) ? true : false;
-		double spawnChance = 1.0 / 100;
+		double spawnChance = 1.0 / 250;
 		
 		playerLoop:
 		for(EntityPlayer player : players)
@@ -983,7 +970,7 @@ public class World
 				forcedSpawnLoop:
 				while(true)
 				{
-					if(entityList.size() > 15) //too many monsters spawned151
+					if(entityList.size() > 15) //too many monsters spawned
 					{
 						return;
 					}			
@@ -1064,9 +1051,7 @@ public class World
 						int spawnX = xoff;
 						int spawnY = yoff;
 						
-						//Ground Entity
-//						(getBlock(spawnX, (yoff + 3)).isSolid || getBlock(xoff + 1, (yoff + 3)).isSolid)
-						
+						//Ground Entity						
 						for(int y = spawnY; y < height; y++)
 						{
 							for(int x = spawnX; x < spawnX + spawnList[entityChoice].blockWidth; x++)
@@ -1082,8 +1067,7 @@ public class World
 									entityUpdate.type = 1; 
 									entityUpdate.updatedEntity = enemy;
 									update.addEntityUpdate(entityUpdate);
-									entityList.add(enemy);
-									System.out.println("Spawn @" + enemy.x + "," + enemy.y);
+									addEntityToEnemyList(enemy);
 									break forcedSpawnLoop;
 								}			
 							}
@@ -1235,7 +1219,7 @@ public class World
 	 * @param mx x position in the 'world map'
 	 * @param my y position in the 'world map'
 	 */
-	private void handleBlockBreakEvent(EntityPlayer player, int mx, int my)
+	private void handleBlockBreakEvent(ServerUpdate update, EntityPlayer player, int mx, int my)
 	{
 		Block block = getBlockGenerate(mx, my);
 		if(!getBlock(mx, my).hasMetaData) //normal block
@@ -1243,19 +1227,35 @@ public class World
 			ItemStack stack = block.getDroppedItem();
 			if(stack != null) //if there's an item to drop, add it to the list of dropped items
 			{
-				addItemStackToItemList(new EntityItemStack((mx * 6) - 1, (my * 6) - 2, stack));
+				EntityItemStack entityItemStack = new EntityItemStack((mx * 6) - 1, (my * 6) - 2, stack);
+				addItemStackToItemList(entityItemStack);
+				EntityUpdate entityUpdate = new EntityUpdate();
+				entityUpdate.action = 'a';
+				entityUpdate.type = 3;
+				entityUpdate.entityID = entityItemStack.entityID;
+				entityUpdate.updatedEntity = entityItemStack;
+				update.addEntityUpdate(entityUpdate);
 			}
 			
 			if(block.lightStrength > 0)
 			{
 				//removeLightSource(player, mx, my, ((BlockLight)(getBlock(mx, my))).lightRadius, ((BlockLight)(getBlock(mx, my))).lightStrength);
 				setBlock(Block.air, mx, my, EnumEventType.EVENT_BLOCK_BREAK_LIGHT); //replace it with air
+				BlockUpdate blockUpdate = new BlockUpdate();
+				blockUpdate.x = mx;
+				blockUpdate.y = (short) my;
+				blockUpdate.block = new SuperCompressedBlock(Block.air);
+				update.addBlockUpdate(blockUpdate);
 			}
 			else
 			{
 				setBlock(Block.air, mx, my, EnumEventType.EVENT_BLOCK_BREAK); //replace it with air
-			}
-			
+				BlockUpdate blockUpdate = new BlockUpdate();
+				blockUpdate.x = mx;
+				blockUpdate.y = (short) my;
+				blockUpdate.block = new SuperCompressedBlock(Block.air);
+				update.addBlockUpdate(blockUpdate);
+			}			
 		}
 		else
 		{
@@ -1294,7 +1294,15 @@ public class World
 				{
 					if(stacks[i] != null)
 					{
-						addItemStackToItemList(new EntityItemStack((mx * 6) + random.nextInt(8) - 2, (my * 6) + random.nextInt(8) - 2, stacks[i])); //drop the item into the world
+						//drop the item into the world
+						EntityItemStack entityItemStack = new EntityItemStack((mx * 6) + random.nextInt(8) - 2, (my * 6) + random.nextInt(8) - 2, stacks[i]);
+						addItemStackToItemList(entityItemStack);
+						EntityUpdate entityUpdate = new EntityUpdate();
+						entityUpdate.action = 'a';
+						entityUpdate.type = 3;
+						entityUpdate.entityID = entityItemStack.entityID;
+						entityUpdate.updatedEntity = entityItemStack;
+						update.addEntityUpdate(entityUpdate);
 					}
 				}
 				
@@ -1332,10 +1340,22 @@ public class World
 					for(int j = 0; j < metaHeight; j++)
 					{
 						setBlock(Block.air, mx + i + xOffset, my + j + yOffset, EnumEventType.EVENT_BLOCK_BREAK);
+						BlockUpdate blockUpdate = new BlockUpdate();
+						blockUpdate.x = mx + i + xOffset;
+						blockUpdate.y = (short) (my + j + yOffset);
+						blockUpdate.block = new SuperCompressedBlock(Block.air);
+						update.addBlockUpdate(blockUpdate);
 					}					
 				}
 				
-				addItemStackToItemList(new EntityItemStack((mx * 6) - 1, (my * 6) - 2, stack)); //drop the item into the world
+				EntityItemStack entityItemStack = new EntityItemStack((mx * 6) - 1, (my * 6) - 2, stack);
+				addItemStackToItemList(entityItemStack);
+				EntityUpdate entityUpdate = new EntityUpdate();
+				entityUpdate.action = 'a';
+				entityUpdate.type = 3;
+				entityUpdate.entityID = entityItemStack.entityID;
+				entityUpdate.updatedEntity = entityItemStack;
+				update.addEntityUpdate(entityUpdate);
 			}
 		}		
 		setBitMap(mx-1,my, updateBlockBitMap(mx-1, my));
@@ -1352,14 +1372,27 @@ public class World
 	 * @param mx x position in the 'world map'
 	 * @param my y position in the 'world map'
 	 */
-	private void handleBackBlockBreakEvent(EntityPlayer player, int mx, int my)
+	private void handleBackBlockBreakEvent(ServerUpdate update, EntityPlayer player, int mx, int my)
 	{
 		ItemStack stack = getBackBlock(mx, my).getDroppedItem();
 		if(stack != null) //if there's an item to drop, add it to the list of dropped items
 		{
-			addItemStackToItemList(new EntityItemStack((mx * 6) - 1, (my * 6) - 2, stack));
+			EntityItemStack entityItemStack = new EntityItemStack((mx * 6) - 1, (my * 6) - 2, stack);
+			addItemStackToItemList(entityItemStack);
+			EntityUpdate entityUpdate = new EntityUpdate();
+			entityUpdate.action = 'a';
+			entityUpdate.type = 3;
+			entityUpdate.entityID = entityItemStack.entityID;
+			entityUpdate.updatedEntity = entityItemStack;
+			update.addEntityUpdate(entityUpdate);
 		}
 		setBackBlock(Block.backAir, mx, my); //replace it with air
+		BlockUpdate blockUpdate = new BlockUpdate();
+		blockUpdate.x = mx;
+		blockUpdate.type = 1;
+		blockUpdate.y = (short) my;
+		blockUpdate.block = new SuperCompressedBlock(Block.backAir);
+		update.addBlockUpdate(blockUpdate);
 	}
 	
 	/**
@@ -1426,7 +1459,7 @@ public class World
 	 * @param my y position in the worldmap array, of the block being placed
 	 * @param block the block to be placed
 	 */
-	public void placeBlock(EntityPlayer player, int mx, int my, Block block)
+	public boolean placeBlock(EntityPlayer player, int mx, int my, Block block)
 	{
 		if(block.hasMetaData) //if the block is large
 		{
@@ -1440,7 +1473,7 @@ public class World
 				{
 					if(getBlock(mx + i, my + j).id != Block.air.id && !getBlockGenerate(mx + i, my + j).getIsOveridable())
 					{
-						return;
+						return false;
 					}
 				}
 			}
@@ -1485,7 +1518,7 @@ public class World
 			
 			if(!canBePlaced) //If it cant be placed, then give up trying right here
 			{
-				return;
+				return false;
 			}
 			
 			for(int i = 0; i < metadata.length; i++) //place the block(s)
@@ -1500,13 +1533,19 @@ public class World
 					else
 					{
 						setBlock(block.clone(), mx + i, my + j, EnumEventType.EVENT_BLOCK_PLACE);
-						
 					}
 					getBlock(mx + i, my + j).metaData = (short)metadata[i][j];
 				}
 			}
+			
+			setBitMap(mx-1,my, updateBlockBitMap(mx-1, my));
+			setBitMap(mx,my-1, updateBlockBitMap(mx, my-1));
+			setBitMap(mx,my, updateBlockBitMap(mx, my));
+			setBitMap(mx+1,my, updateBlockBitMap(mx+1, my));
+			setBitMap(mx,my+1, updateBlockBitMap(mx, my+1));
+			return true;
 			//Make more generic later
-			player.inventory.removeItemsFromInventory(this, player, new ItemStack(block, 1)); //take the item from the player's inventory
+		//	player.inventory.removeItemsFromInventory(player, new ItemStack(block, 1)); //take the item from the player's inventory
 		}
 		else
 		{
@@ -1514,13 +1553,12 @@ public class World
 				(getBlock(mx-1, my).isSolid || getBlock(mx, my-1).isSolid || getBlock(mx, my+1).isSolid || getBlock(mx+1, my).isSolid ||
 				getBackBlock(mx, my).getIsSolid())) //can the block be placed
 			{
-				player.inventory.removeItemsFromInventory(this, player, new ItemStack(block, 1)); //remove the items from inventory	
-			
+				//player.inventory.removeItemsFromInventory(player, new ItemStack(block, 1)); //remove the items from inventory	
 				
 				if(block.lightStrength > 0)
 				{
 					setBlock(block, mx, my, EnumEventType.EVENT_BLOCK_PLACE_LIGHT); //place it
-			//		applyLightSource(player, block, mx, my, ((BlockLight)(block)).lightRadius,  ((BlockLight)(block)).lightStrength);
+					//		applyLightSource(player, block, mx, my, ((BlockLight)(block)).lightRadius,  ((BlockLight)(block)).lightStrength);
 				}
 				else
 				{
@@ -1528,16 +1566,17 @@ public class World
 					//	setBlock(block, mx, my, EnumEventType.EVENT_BLOCK_PLACE); //place it
 				}
 				
-				
+				setBitMap(mx-1,my, updateBlockBitMap(mx-1, my));
+				setBitMap(mx,my-1, updateBlockBitMap(mx, my-1));
+				setBitMap(mx,my, updateBlockBitMap(mx, my));
+				setBitMap(mx+1,my, updateBlockBitMap(mx+1, my));
+				setBitMap(mx,my+1, updateBlockBitMap(mx, my+1));
+				return true;
 			}
 		}
-		setBitMap(mx-1,my, updateBlockBitMap(mx-1, my));
-		setBitMap(mx,my-1, updateBlockBitMap(mx, my-1));
-		setBitMap(mx,my, updateBlockBitMap(mx, my));
-		setBitMap(mx+1,my, updateBlockBitMap(mx+1, my));
-		setBitMap(mx,my+1, updateBlockBitMap(mx, my+1));
-	
 		
+	
+		return false;
 		
 	}
 	
@@ -1547,15 +1586,17 @@ public class World
 	 * @param my y position in the worldmap array, of the block being placed
 	 * @param block the block to be placed
 	 */
-	public void placeBackWall(EntityPlayer player, int mx, int my, Block block)
+	public boolean placeBackWall(EntityPlayer player, int mx, int my, Block block)
 	{
 		if ((getBackBlock(mx, my).getIsOveridable() == true || getBackBlock(mx, my).getID() == Block.backAir.getID()) && 
 			(getBackBlock(mx-1, my).getIsSolid() || getBackBlock(mx, my-1).getIsSolid() || getBackBlock(mx, my+1).getIsSolid() || getBackBlock(mx+1, my).getIsSolid() || 
 			getBlock(mx, my).isSolid)) //can the block be placed
 		{
-			player.inventory.removeItemsFromInventory(this, player, new ItemStack(block, 1)); //remove the items from inventory		
+			player.inventory.removeItemsFromInventory(player, new ItemStack(block, 1)); //remove the items from inventory		
 			setBackBlock(block.clone(), mx, my); //place it	
+			return true;
 		}
+		return false;
 	}
 	
 	/**
@@ -1573,7 +1614,7 @@ public class World
 	 * @param mx x position in worldmap array, of the BlockWood
 	 * @param my y position in the worldmap array, of the BlockWood
 	 */
-	public void breakTree(EntityPlayer player, int mx, int my){
+	public void breakTree(ServerUpdate update, EntityPlayer player, int mx, int my){
 		
 		//Loop as long as part of the tree is above
 		while(my >= 1 && getBlock(mx, my-1).getID() == Block.tree.getID() || 
@@ -1582,30 +1623,30 @@ public class World
 			if(my >= 1)
 			{
 				if (getBlock(mx, my-1).getID() == Block.tree.getID()){ //If there's a tree above, break it
-					handleBlockBreakEvent(player, mx, my-1);
+					handleBlockBreakEvent(update, player, mx, my-1);
 				}
 			}
 			if(mx >= 1)
 			{
 				if (getBlock(mx-1, my).getID() == Block.treebranch.getID() || getBlock(mx-1, my).getID() == Block.treebase.getID()){
-					handleBlockBreakEvent(player, mx - 1, my); //If there is a left branch/base on the same level, break it
+					handleBlockBreakEvent(update, player, mx - 1, my); //If there is a left branch/base on the same level, break it
 				}
 			}
 			if(mx + 1 < width)
 			{
 				if (getBlock(mx+1, my).getID() == Block.treebranch.getID() || getBlock(mx+1, my).getID() == Block.treebase.getID()){
-					handleBlockBreakEvent(player, mx + 1, my); //Same for right branches/bases
+					handleBlockBreakEvent(update, player, mx + 1, my); //Same for right branches/bases
 				}
 			}
 			if(mx + 1 < width && mx >= 1 && my >= 1)
 			{
 				if (getBlock(mx, my - 1).getID() == Block.treetopc2.getID()){
-					handleBlockBreakEvent(player, mx + 1, my - 1); //Break a canopy
-					handleBlockBreakEvent(player, mx + 1, my - 2);
-					handleBlockBreakEvent(player, mx, my - 1);
-					handleBlockBreakEvent(player, mx, my - 2);
-					handleBlockBreakEvent(player, mx - 1, my - 1);
-					handleBlockBreakEvent(player, mx - 1, my - 2);
+					handleBlockBreakEvent(update, player, mx + 1, my - 1); //Break a canopy
+					handleBlockBreakEvent(update, player, mx + 1, my - 2);
+					handleBlockBreakEvent(update, player, mx, my - 1);
+					handleBlockBreakEvent(update, player, mx, my - 2);
+					handleBlockBreakEvent(update, player, mx - 1, my - 1);
+					handleBlockBreakEvent(update, player, mx - 1, my - 2);
 				}
 			}
 			my--; //Move the check upwards 1 block
@@ -1668,11 +1709,11 @@ public class World
 	 * @param mx the x position of the first block in worldMap
 	 * @param my the y position of the first block in worldMap
 	 */
-	public void breakCactus(EntityPlayer player, int mx, int my)
+	public void breakCactus(ServerUpdate update, EntityPlayer player, int mx, int my)
 	{
 		while(getBlock(mx, my-1).getID() == Block.cactus.getID())
 		{
-			handleBlockBreakEvent(player, mx, my-1);
+			handleBlockBreakEvent(update, player, mx, my-1);
 			my--;
 		}
 	}
@@ -1691,9 +1732,9 @@ public class World
 	 * @param x the x position of the block to break (in the 'world map')
 	 * @param y the y position of the block to break (in the 'world map')
 	 */
-	public void breakBackBlock(EntityPlayer player, int x, int y)
+	public void breakBackBlock(ServerUpdate update, EntityPlayer player, int x, int y)
 	{
-		handleBackBlockBreakEvent(player, x, y);
+		handleBackBlockBreakEvent(update, player, x, y);
 	}
 	
 	/**
@@ -1702,11 +1743,11 @@ public class World
 	 * @param x the x position of the block to break (in the 'world map')
 	 * @param y the y position of the block to break (in the 'world map')
 	 */
-	public void breakBlock(EntityPlayer player, int x, int y)
+	public void breakBlock(ServerUpdate update, EntityPlayer player, int x, int y)
 	{
-		handleBlockBreakEvent(player, x, y);
-		breakCactus(player, x, y);
-		breakTree(player, x, y);
+		handleBlockBreakEvent(update, player, x, y);
+		breakCactus(update, player, x, y);
+		breakTree(update, player, x, y);
 	}
 
 	/**
@@ -2130,52 +2171,96 @@ public class World
 	 */
 	private void updateChunks(Vector<EntityPlayer> players)
 	{
+		List<String> requiredChunks = new ArrayList<String>();
+		List<String> removedChunks = new ArrayList<String>();
 		//How far to check for chunks (in blocks)
-		//TODO: Chunk Issue - This is 100% broken and needs to factor in all players
-		if(players.size() == 0) return;
+		final int loadDistanceHorizontally = TerraeRasa.terraeRasa.getSettings().loadDistance * Chunk.getChunkWidth();
 		
-		EntityPlayer player = players.get(0);
-		
-		
-		final int loadDistanceHorizontally = TerraeRasa.terraeRasa.getSettings().loadDistance * Chunk.getChunkWidth();//(((int)(Display.getWidth() / 2.2) + 3) > Chunk.getChunkWidth()) ? ((int)(Display.getWidth() / 2.2) + 3) : Chunk.getChunkWidth();
-		//Position to check from
-		final int x = (int) (player.x / 6);
-		//Where to check, in the chunk map (based off loadDistance variables)
-		int leftOff = (x - loadDistanceHorizontally) / Chunk.getChunkWidth();
-		int rightOff = (x + loadDistanceHorizontally) / Chunk.getChunkWidth();
-		//Bounds checking
-		if(leftOff < 0) leftOff = 0;
-		if(rightOff > (width / Chunk.getChunkWidth())) rightOff = width / Chunk.getChunkWidth();
-		
-		Enumeration<String> keys = chunksLoaded.keys();
-        while (keys.hasMoreElements()) 
-        {
-            Object key = keys.nextElement();
-            String strKey = (String) key;
-            boolean loaded = chunksLoaded.get(strKey);
-           
-            int cx = Integer.parseInt(strKey);
-            
-            if(loaded && (cx < leftOff || cx > rightOff) && x != leftOff && x != rightOff)
-			{
-				//If a chunk isnt needed, request a save.
-				chunkManager.saveChunk(worldName, chunks, cx);
-				chunksLoaded.put(""+cx, false);
-			}
-            
-		}
-		for(int i = leftOff; i <= rightOff; i++) //Check for chunks that need loaded
+		Iterator<EntityPlayer> it = players.iterator();
+		while(it.hasNext())
 		{
-			if(i >= 0 && chunksLoaded.get(""+i) == null)
-			{
-				chunksLoaded.put(""+i, false);
-			}
-			if(chunksLoaded.get(""+i) != null && !chunksLoaded.get(""+i)) //If a needed chunk isnt loaded, request it.
-			{
-				chunkManager.requestChunk(worldName, this, chunks, i);
-			}
+			EntityPlayer player = it.next();
 			
+			//Position to check from
+			int x = (int) (player.x / 6);
+			//Where to check, in the chunk map (based off loadDistance variables)
+			int leftOff = (x - loadDistanceHorizontally) / Chunk.getChunkWidth();
+			int rightOff = (x + loadDistanceHorizontally) / Chunk.getChunkWidth();
+			//Bounds checking
+			if(leftOff < 0) leftOff = 0;
+			if(rightOff > (width / Chunk.getChunkWidth())) rightOff = width / Chunk.getChunkWidth();
+			
+			Enumeration<String> keys = chunksLoaded.keys();
+	        while (keys.hasMoreElements()) 
+	        {
+	            String key = (String) keys.nextElement();
+	            int cx = Integer.parseInt(key);
+	            if(chunksLoaded.get(key) && (cx < leftOff || cx > rightOff) && x != leftOff && x != rightOff)
+				{
+	            	removedChunks.add(key);
+				}
+			}
+			for(int i = leftOff; i <= rightOff; i++) //Check for chunks that need loaded
+			{
+				if(i >= 0 && chunksLoaded.get(""+i) == null)
+				{
+					chunksLoaded.put(""+i, false);
+				}
+				if(!chunksLoaded.get(""+i)) //If a needed chunk isnt loaded, request it.
+				{
+					requiredChunks.add(""+i);	
+				}
+			}	
 		}
+		
+		String[] sortedChunkRequirement = removeDuplicates(requiredChunks);
+		String[] sortedRemoveRequirement = removeDuplicates(removedChunks);
+		List<String> list = Arrays.asList(sortedChunkRequirement);
+		
+        for(String str : sortedRemoveRequirement) 
+        {
+        	if(!list.contains(sortedRemoveRequirement))
+        	{
+        		//If a chunk isnt needed, request a save.
+    			chunkManager.saveChunk(worldName, chunks, Integer.parseInt(str));
+    			chunksLoaded.put(str, false);
+            }
+        }
+	
+		for(String str : sortedChunkRequirement) //Check for chunks that need loaded
+		{
+			if(!chunksLoaded.get(str)) //If a needed chunk isnt loaded, request it.
+			{
+				chunkManager.requestChunk(worldName, this, chunks, Integer.parseInt(str));
+			}			
+		}
+		
+	}
+	
+	/**
+	 * Removes all the duplicates from a List<String> then returns a sorted String[] containing the non-duplicate values.
+	 * @param l the List<String> to remove duplicates from 
+	 * @return a sorted String[] containing all the non-duplicates in the given List<String>
+	 */
+	public static String[] removeDuplicates(List<String> l) {
+	    Set<Object> s = new TreeSet<Object>(new Comparator<Object>() {
+	        @Override
+	        public int compare(Object o1, Object o2) {
+	        	if(o1.equals(o2)) {	
+	        		return 0;
+	        	}
+	        	return 1;
+	        }
+	    });
+	    
+	    s.addAll(l);
+	    List<Object> res = Arrays.asList(s.toArray());
+	    String[] objs = new String[res.size()];
+	    for(int i = 0; i < res.size(); i++) {
+	    	objs[i] = (String)res.get(i);
+	    }
+	    Arrays.sort(objs);
+	    return objs;
 	}
 	
 	/**

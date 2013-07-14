@@ -22,6 +22,7 @@ import passivebonuses.PassiveBonus;
 import passivebonuses.PassiveBonusContainer;
 import passivebonuses.PassiveBonusFactory;
 import render.Render;
+import transmission.CompressedInventory;
 import transmission.CompressedPlayer;
 import utils.Cooldown;
 import utils.CraftingManager;
@@ -151,6 +152,7 @@ public class EntityPlayer extends EntityLiving
 	public double dexterityModifier;
 	public double strengthModifier;
 	
+	public boolean inventoryNeedsResent;
 	
 	/** A flag indicating if the player has been forever defeated. If they have, they will not be saved to disk.*/
 	public boolean defeated;
@@ -678,8 +680,18 @@ public class EntityPlayer extends EntityLiving
 	public void onInventoryChange()
 	{
 		inventoryChanged = true; 
+		inventoryNeedsResent = true;
 	}
 
+	public CompressedInventory getCompressedInventory()
+	{
+		CompressedInventory inv = new CompressedInventory();
+		inv.mainInventory = inventory.getMainInventory();
+		inv.armorInventory = inventory.getArmorInventory();
+		inv.quiver = inventory.getQuiver();
+		return inv;
+	}
+	
 	/**
 	 * Recreates the allPossibleRecipes[] based on what the player is standing by.
 	 */

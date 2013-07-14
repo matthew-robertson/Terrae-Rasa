@@ -6,6 +6,9 @@ import items.ItemMagic;
 import items.ItemRanged;
 import items.ItemThrown;
 import items.ItemTool;
+import items.ItemToolAxe;
+import items.ItemToolHammer;
+import items.ItemToolPickaxe;
 
 import java.util.Dictionary;
 import java.util.Enumeration;
@@ -18,6 +21,7 @@ import passivebonuses.PassiveBonusContainer;
 import passivebonuses.PassiveBonusFactory;
 import server.TerraeRasa;
 import transmission.CompressedPlayer;
+import transmission.ServerUpdate;
 import utils.Cooldown;
 import utils.Damage;
 import utils.GemSocket;
@@ -34,6 +38,7 @@ import enums.EnumColor;
 import enums.EnumDamageSource;
 import enums.EnumDamageType;
 import enums.EnumPlayerDifficulty;
+import enums.EnumToolMaterial;
 
 /**
  * <br><br>
@@ -238,7 +243,6 @@ public class EntityPlayer extends EntityLiving
 		viewedChestY = 0;
 		isViewingChest = false;
 		isMining = false;
-		inventory.initializeInventoryTotals(isReloaded);
 		inventoryChanged = true;	
 		selectedRecipe = 0;
 		nearBlock = new Hashtable<String, Boolean>();
@@ -562,7 +566,6 @@ public class EntityPlayer extends EntityLiving
 		}
 		health = maxHealth;
 		clearStatusEffects(world);
-		world.clearEntityList();
 		world.spawnPlayer(TerraeRasa.terraeRasa.getSettings(), this);	
 	}
 	
@@ -754,67 +757,69 @@ public class EntityPlayer extends EntityLiving
 	 * @param my y position in the worldmap array, of the block being mined
 	 * @param item the tool mining the block
 	 */
-	public void breakBlock (World world, int mx, int my, Item item)
+	public void breakBlock (ServerUpdate update, World world, int mx, int my, Item item)
 	{
 		//TODO: FIX
-		world.breakBlock(this, mx, my);
-//		Block block = world.getBlockGenerate(mx,  my);
-//		if (world.getBlock(mx, my).getID() != Block.air.getID()){
-//			if (((item instanceof ItemToolPickaxe && block.getBlockType() == 1) 
-//			  || (item instanceof ItemToolAxe && block.getBlockType() == 2) 
-//			  || (item instanceof ItemToolHammer && block.getBlockType() == 3) 
-//		      || block.getBlockType() == 0) && Mouse.isButtonDown(0))
-//			{ //If the left-mouse button is pressed && they have the correct tool to mine
-//				EnumToolMaterial material;
-//				if (item instanceof ItemTool)
-//				{
-//					material = item.getToolMaterial();
-//				}
-//				else
-//				{
-//					material = EnumToolMaterial.FIST;
-//				}
-//				double distance = MathHelper.distanceBetweenTwoPoints((MathHelper.getCorrectMouseXPosition() + Render.getCameraX()), (MathHelper.getCorrectMouseYPosition() + Render.getCameraY()), (this.x + ((isFacingRight) ? 9 : 3)), (this.y + 9));
-//					      
-//				if(distance <= material.getDistance()){
-//					if (material.getToolTier() >= block.getBlockTier()) //If the block is within range
-//						{ 	
-//						if(ticksreq == 0 || world.getBlock(mx, my) != world.getBlock(sx, sy)) //the mouse has moved or they arent mining anything
-//						{				
-//							isMining = false;
-//							sx = mx; //save the co-ords
-//							sy = my;
-//							ticksreq = (int) (block.getBlockHardness() / material.getStrength()) + 1; //Determine how long to break
-//							
-//						}	
-//						else if(ticksreq == 1 && Mouse.isButtonDown(0) && block.getIsMineable()) //If the block should break
-//						{
-//							isMining = false;
-//							if(block.id == Block.cactus.getID()) 
-//							{
-//								world.breakCactus(this, mx, my);
-//							}
-//							else if(block.id == Block.tree.getID())
-//							{
-//								world.breakTree(this, mx, my);					
-//							}
-//							world.breakBlock(this, mx, my);
-//							
-//							//Overwrite snow/flowers/etc...
-//							if (world.getBlockGenerate(mx, my-1).getIsOveridable() == true && world.getBlock(mx, my-1).id != Block.air.getID())
-//							{
-//								world.breakBlock(this, mx, my-1);
-//							}
-//						}		
-//						else if (Mouse.isButtonDown(0)) //mining is in progress, decrease remaining time.
-//						{
-//							isMining = true;
-//							ticksreq--;			
-//						}	
-//					}
-//				}
-//			}
-//		}
+	//	world.breakBlock(this, mx, my);
+		
+		Block block = world.getBlockGenerate(mx,  my);
+		//Check If the left-mouse button is pressed && they have the correct tool to mine
+		if (world.getBlock(mx, my).getID() != Block.air.getID()){
+			if (((item instanceof ItemToolPickaxe && block.getBlockType() == 1) //TODO: Magic number fix @ block types
+			  || (item instanceof ItemToolAxe && block.getBlockType() == 2) 
+			  || (item instanceof ItemToolHammer && block.getBlockType() == 3) 
+		      || block.getBlockType() == 0))
+			{	
+				EnumToolMaterial material;
+				if (item instanceof ItemTool)
+				{
+					material = item.getToolMaterial();
+				}
+				else
+				{
+					material = EnumToolMaterial.FIST;
+				}
+				
+				double distance = MathHelper.distanceBetweenTwoPoints(mx * 6, my * 6, (this.x + ((isFacingRight) ? 9 : 3)), (this.y + 9));
+				if(distance <= material.getDistance())
+				{
+					if(material.getToolTier() >= block.getBlockTier()) //If the block is within range
+					{ 	
+						if(ticksreq == 0 || world.getBlock(mx, my) != world.getBlock(sx, sy)) //the mouse has moved or they arent mining anything
+						{				
+							isMining = false;
+							sx = mx; //save the co-ords
+							sy = my;
+							ticksreq = (int) (block.getBlockHardness() / material.getStrength()) + 1; //Determine how long to break
+						}	
+						else if(ticksreq == 1 && block.getIsMineable()) //If the block should break
+						{
+							isMining = false;
+							if(block.id == Block.cactus.getID()) 
+							{
+								world.breakCactus(update, this, mx, my);
+							}
+							else if(block.id == Block.tree.getID())
+							{
+								world.breakTree(update, this, mx, my);					
+							}
+							world.breakBlock(update, this, mx, my);
+							
+							//Overwrite snow/flowers/etc...
+							if (world.getBlockGenerate(mx, my-1).getIsOveridable() == true && world.getBlock(mx, my-1).id != Block.air.getID())
+							{
+								world.breakBlock(update, this, mx, my-1);
+							}
+						}		
+						else //mining is in progress, decrease remaining time.
+						{
+							isMining = true;
+							ticksreq--;			
+						}	
+					}
+				}
+			}
+		}
 	}	
 	
 	/**
@@ -823,62 +828,65 @@ public class EntityPlayer extends EntityLiving
 	 * @param my y position in the worldmap array, of the block being mined
 	 * @param item the tool mining the block
 	 */
-	public void breakBackBlock (World world, int mx, int my, Item item)
+	public void breakBackBlock (ServerUpdate update, World world, int mx, int my, Item item)
 	{
 		//TODO: FIX
-		world.breakBackBlock(this, mx, my);
+		//world.breakBackBlock(update, this, mx, my);
 		
-//		if (world.getBackBlock(mx, my).getID() != Block.backAir.getID()){
-//			if (((item instanceof ItemToolPickaxe && world.getBackBlock(mx, my).getBlockType() == 1) 
-//			  || (item instanceof ItemToolAxe && world.getBackBlock(mx, my).getBlockType() == 2) 
-//			  || (item instanceof ItemToolHammer && world.getBackBlock(mx, my).getBlockType() == 3) 
-//		      || world.getBackBlock(mx, my).getBlockType() == 0) && Mouse.isButtonDown(1))
-//			{ //If the right-mouse button is pressed && they have the correct tool to mine
-//				EnumToolMaterial material;
-//				if (item instanceof ItemTool)
-//				{
-//					material = item.getToolMaterial();
-//				}
-//				else
-//				{
-//					material = EnumToolMaterial.FIST;
-//				}
-//				double distance = MathHelper.distanceBetweenTwoPoints((MathHelper.getCorrectMouseXPosition() + Render.getCameraX()), (MathHelper.getCorrectMouseYPosition() + Render.getCameraY()), (this.x + ((isFacingRight) ? 9 : 3)), (this.y + 9));
-//					      
-//				if(distance <= material.getDistance() && (!world.getBackBlock(mx, my-1).isSolid ||
-//						!world.getBackBlock(mx, my+1).isSolid || !world.getBackBlock(mx - 1, my).isSolid ||
-//						!world.getBackBlock(mx + 1, my).isSolid)){
-//					if (material.getToolTier() >= world.getBackBlock(mx, my).getBlockTier()) //If the block is within range and at an edge
-//						{ 	
-//						if(ticksreq == 0 || world.getBackBlock(mx, my) != world.getBackBlock(sx, sy)) //the mouse has moved or they arent mining anything
-//						{				
-//							isMining = false;
-//							sx = mx; //save the co-ords
-//							sy = my;
-//							ticksreq = (int) (world.getBackBlock(mx, my).getBlockHardness() / material.getStrength()) + 1; //Determine how long to break
-//							
-//						}	
-//						else if(ticksreq == 1 && Mouse.isButtonDown(1) && world.getBackBlock(mx,  my).getIsMineable()) //If the block should break
-//						{
-//							isMining = false;
-//							
-//							world.breakBackBlock(this, mx, my);
-//							
-//							//Overwrite snow/flowers/etc...
-//							if (world.getBackBlock(mx, my-1).getIsOveridable() == true && world.getBackBlock(mx, my-1) != Block.air)
-//							{
-//								world.breakBlock(this, mx, my-1);
-//							}
-//						}		
-//						else if (Mouse.isButtonDown(1)) //mining is in progress, decrease remaining time.
-//						{
-//							isMining = true;
-//							ticksreq--;			
-//						}	
-//					}
-//				}
-//			}
-//		}
+		if (world.getBackBlock(mx, my).getID() != Block.backAir.getID()){
+			if (((item instanceof ItemToolPickaxe && world.getBackBlock(mx, my).getBlockType() == 1) 
+			  || (item instanceof ItemToolAxe && world.getBackBlock(mx, my).getBlockType() == 2) 
+			  || (item instanceof ItemToolHammer && world.getBackBlock(mx, my).getBlockType() == 3) 
+		      || world.getBackBlock(mx, my).getBlockType() == 0))
+			{ 
+				//If the right-mouse button is pressed && they have the correct tool to mine
+				EnumToolMaterial material;
+				if (item instanceof ItemTool)
+				{
+					material = item.getToolMaterial();
+				}
+				else
+				{
+					material = EnumToolMaterial.FIST;
+				}
+
+				double distance = MathHelper.distanceBetweenTwoPoints(mx * 6, my * 6, (this.x + ((isFacingRight) ? 9 : 3)), (this.y + 9));
+				if(distance <= material.getDistance() && 
+						(!world.getBackBlock(mx, my-1).isSolid ||
+						!world.getBackBlock(mx, my+1).isSolid || 
+						!world.getBackBlock(mx - 1, my).isSolid ||
+						!world.getBackBlock(mx + 1, my).isSolid))
+				{
+					if (material.getToolTier() >= world.getBackBlock(mx, my).getBlockTier()) //If the block is within range and at an edge
+					{ 	
+						if(ticksreq == 0 || world.getBackBlock(mx, my) != world.getBackBlock(sx, sy)) //the mouse has moved or they arent mining anything
+						{				
+							isMining = false;
+							sx = mx; //save the co-ords
+							sy = my;
+							ticksreq = (int) (world.getBackBlock(mx, my).getBlockHardness() / material.getStrength()) + 1; //Determine how long to break
+						}	
+						else if(ticksreq == 1 && world.getBackBlock(mx,  my).getIsMineable()) //If the block should break
+						{
+							isMining = false;
+							
+							world.breakBackBlock(update, this, mx, my);
+							
+							//Overwrite snow/flowers/etc...
+							if (world.getBackBlock(mx, my-1).getIsOveridable() == true && world.getBackBlock(mx, my-1) != Block.air)
+							{
+								world.breakBlock(update, this, mx, my-1);
+							}
+						}		
+						else //mining is in progress, decrease remaining time.
+						{
+							isMining = true;
+							ticksreq--;			
+						}	
+					}
+				}
+			}
+		}
 	}	
 	
 	/**

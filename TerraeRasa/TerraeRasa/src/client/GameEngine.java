@@ -17,6 +17,8 @@ import render.Render;
 import render.RenderGlobal;
 import render.RenderMenu;
 import spells.Spell;
+import transmission.BlockUpdate;
+import transmission.CompressedClientUpdate;
 import transmission.CompressedPlayer;
 import transmission.CompressedServerUpdate;
 import transmission.EntityUpdate;
@@ -30,9 +32,11 @@ import world.WorldSky;
 import affix.AffixSturdy;
 import audio.SoundEngine;
 import blocks.Block;
+import blocks.MinimalBlock;
 import entities.EntityNPCEnemy;
 import entities.EntityNPCFriendly;
 import entities.EntityPlayer;
+import enums.EnumColor;
 import enums.EnumHardwareInput;
 import enums.EnumPlayerDifficulty;
 
@@ -127,6 +131,8 @@ public class GameEngine
 			sentPlayer.y = 1200;
 			///////
 			Vector<EnumHardwareInput> hardwareInput = new Vector<EnumHardwareInput>(10);
+			Vector<String> clientCommands = new Vector<String>();
+			
 		    while(!TerraeRasa.done) //Main Game Loop
 		    {
 		    	EntityPlayer player = null;
@@ -149,6 +155,9 @@ public class GameEngine
 		    		Thread.sleep(100);
 		    		continue;
 		    	}
+		    	
+		    	clientCommands.clear();
+		    	hardwareInput.clear();
 		    	
 		    	loops = 0;
 		        while(System.currentTimeMillis() > next_game_tick && loops < MAX_FRAMESKIP) //Update the game 20 times/second 
@@ -180,19 +189,34 @@ public class GameEngine
 		        	else if(!TerraeRasa.isMainMenuOpen) //Handle game inputs if the main menu isnt open (aka the game is being played)
 		        	{		        		
 		        		soundEngine.setCurrentMusic("Pause Music");
+		        		
+		        		CompressedClientUpdate update = new CompressedClientUpdate();
 		        		Keys.keyboard(world, player, settings, settings.keybinds, hardwareInput);	            
-		        		MouseInput.mouse(world, player);
+		        		MouseInput.mouse(world, player, clientCommands, hardwareInput);
 		        		
 		        		//Client player tick
-		        		player.onClientTick(world);
+		        		world.onClientWorldTick(player);
 		        		
-		        		//
-		        		engineLock.addHardwareInput(hardwareInput);
+		        		EnumHardwareInput[] inputsArray = new EnumHardwareInput[hardwareInput.size()];
+		        		hardwareInput.copyInto(inputsArray);
+		        		update.clientInput = inputsArray;
+		        		
+		        		if(player.inventoryNeedsResent)
+		        		{
+		        			player.inventoryNeedsResent = false;
+		        			update.newInventory = player.getCompressedInventory();
+		        		}
+		        		update.playerID = activePlayerID;
+		        		String[] clientUpdates = new String[clientCommands.size()];
+		        		clientCommands.copyInto(clientUpdates);
+		        		update.commands = clientUpdates;
+		        		
+		        		engineLock.addClientUpdate(update);
 		        		if(engineLock.hasUpdates())
 		        		{
 		        			//Process the outputs
 		        			CompressedServerUpdate[] updates = engineLock.yieldServerUpdates();
-		        			processUpdates(updates);
+		        			processUpdates(player, updates);
 		        		}		        		
 		        	}
 		        	
@@ -277,10 +301,25 @@ public class GameEngine
 		this.activePlayerID = id;
 	}
 	
-	private void processUpdates(CompressedServerUpdate[] updates)
+	private void processUpdates(EntityPlayer clientPlayer, CompressedServerUpdate[] updates)
 	{
 		for(CompressedServerUpdate serverupdate : updates)
 		{
+			for(String command : serverupdate.values)
+			{
+				processCommand(clientPlayer, command);
+			}
+			for(BlockUpdate update : serverupdate.blockUpdates)
+			{
+				if(update.type == 0)
+				{
+					world.setBlock(Block.blocksList[update.block.id].clone().mergeOnto(new MinimalBlock(update.block)), update.x, update.y);
+				}
+				else 
+				{
+					world.setBackBlock(Block.blocksList[update.block.id].clone().mergeOnto(new MinimalBlock(update.block)), update.x, update.y);
+				}
+			}
 			for(EntityUpdate update : serverupdate.entityUpdates)
 			{
 				if(update.type == 5) { //Player
@@ -358,6 +397,35 @@ public class GameEngine
 				}
 			}
 		}		
+	}
+	
+	private void processCommand(EntityPlayer player, String command)
+	{
+		if(command.startsWith("/placefrontblock"))
+		{
+			String[] split = command.split(" ");
+			if(Boolean.parseBoolean(split[6]) && Integer.parseInt(split[3]) == activePlayerID)
+			{
+				player.inventory.removeItemsFromInventory(player, new ItemStack(Integer.parseInt(split[4]), 1)); //take the item from the player's inventory
+				player.onInventoryChange();
+			}
+		}
+		else if(command.startsWith("/placebackblock"))
+		{
+			String[] split = command.split(" ");
+			if(Boolean.parseBoolean(split[6]) && Integer.parseInt(split[3]) == activePlayerID)
+			{
+				player.inventory.removeItemsFromInventory(player, new ItemStack(Integer.parseInt(split[4]), 1)); //take the item from the player's inventory
+				player.onInventoryChange();
+			}
+			
+		}
+		else if(command.startsWith("/worldtext"))
+		{
+			String[] split = command.split(" ");
+			world.addTemporaryText(split[3], Integer.parseInt(split[1]), Integer.parseInt(split[2]), 20, EnumColor.get(split[4]));
+		}
+		
 	}
 	
 	public static void flagAsMPPlayable()
@@ -454,6 +522,7 @@ public class GameEngine
 		//	getPlayer().setAffectedByWalls(false);
 //			
 			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Item.goldSword));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Item.copperPickaxe));
 			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Item.godminiumPickaxe));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.goldPickaxe));
 			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Item.goldAxe));

@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Iterator;
 import java.util.Vector;
 
 import transmission.ServerUpdate;
@@ -118,8 +119,13 @@ public class TerraeRasa
 	private synchronized void registerGameConnectionThread(Socket socket, ObjectOutputStream os, ObjectInputStream is)
 	{
 		ServerConnectionThread thread = new ServerConnectionThread(new WorldLock(gameEngine), socket, os, is);
-		connections.add(thread);
+		addConnection(thread);
 		thread.start();	
+	}
+	
+	public synchronized void addConnection(ServerConnectionThread thread)
+	{
+		connections.add(thread);
 	}
 			
 	/**
@@ -142,8 +148,10 @@ public class TerraeRasa
 	
 	public synchronized static void addWorldUpdate(ServerUpdate update)
 	{
-		for(ServerConnectionThread thread : terraeRasa.getConnections())
+		Iterator<ServerConnectionThread> it = terraeRasa.getConnections().iterator();
+		while(it.hasNext())
 		{
+			ServerConnectionThread thread = it.next();
 			thread.registerWorldUpdate(update);
 		}
 	}

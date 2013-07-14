@@ -4,6 +4,7 @@ import io.Chunk;
 
 import java.util.Vector;
 
+import transmission.CompressedClientUpdate;
 import transmission.CompressedPlayer;
 import transmission.CompressedServerUpdate;
 import transmission.ServerUpdate;
@@ -17,6 +18,7 @@ public class WorldLock
 	private GameEngine engine;
 	private Vector<CompressedServerUpdate> serverUpdates = new Vector<CompressedServerUpdate>();
 	private EntityPlayer relevantPlayer;
+	private Vector<CompressedClientUpdate> clientUpdates = new Vector<CompressedClientUpdate>();
 	
 	public WorldLock(GameEngine engine)
 	{
@@ -83,6 +85,7 @@ public class WorldLock
 			compressedUpdate.values = update.getValues();
 			compressedUpdate.chunks = new SuperCompressedChunk[]{ };
 		//	compressedUpdate.player = null;
+			compressedUpdate.blockUpdates = update.getBlockUpdates();
 			compressedUpdate.entityUpdates = update.getUpdates();
 			compressedUpdate.positionUpdates = update.getPositionUpdates();
 		//	compressedUpdate.update = new PositionUpdate(getRelevantPlayer().entityID, getRelevantPlayer().x, getRelevantPlayer().y);
@@ -104,10 +107,14 @@ public class WorldLock
 		return relevantPlayer;
 	}
 	
-	public synchronized void registerPlayerInput(EnumHardwareInput[] clientInput)
+	public synchronized void registerPlayerUpdate(CompressedClientUpdate[] updates)
 	{
-		PlayerInput input = new PlayerInput(relevantPlayer, clientInput);
-		engine.getWorld().registerPlayerMovement(input);
+		for(CompressedClientUpdate update : updates)
+		{
+			PlayerInput input = new PlayerInput(relevantPlayer, update.clientInput);
+			engine.getWorld().registerPlayerMovement(input);
+			engine.registerClientUpdate(update);
+		}
 	}
 
 	public synchronized CompressedPlayer[] requestOtherPlayers()

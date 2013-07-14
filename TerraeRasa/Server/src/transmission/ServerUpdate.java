@@ -7,12 +7,14 @@ public class ServerUpdate
 	private Vector<String> values; 
 	private Vector<EntityUpdate> entityUpdates;
 	private Vector<PositionUpdate> positionUpdates;
+	private Vector<BlockUpdate> blockUpdates;
 	
 	public ServerUpdate()
 	{
 		this.values = new Vector<String>();
 		this.entityUpdates = new Vector<EntityUpdate>();
 		this.positionUpdates = new Vector<PositionUpdate>();
+		this.blockUpdates = new Vector<BlockUpdate>();
 	}
 	
 	public synchronized void addValue(String val)
@@ -49,5 +51,17 @@ public class ServerUpdate
 		PositionUpdate[] updates = new PositionUpdate[positionUpdates.size()];
 		positionUpdates.copyInto(updates);
 		return updates;
+	}
+	
+	public synchronized void addBlockUpdate(BlockUpdate update)
+	{
+		this.blockUpdates.add(update);
+	}
+	
+	public synchronized BlockUpdate[] getBlockUpdates()
+	{
+		BlockUpdate[] vals = new BlockUpdate[blockUpdates.size()];
+		blockUpdates.copyInto(vals);
+		return vals;
 	}
 }

@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Vector;
 
+import transmission.CompressedClientUpdate;
 import transmission.EntityUpdate;
 import transmission.ServerUpdate;
 import utils.ErrorUtils;
@@ -45,6 +46,8 @@ public class GameEngine
 	private String universeName;
 	//private Vector<PlayerIssuedCommand> playerIssuedCommands;
 	private Vector<EntityUpdate> extraEntityUpdates = new Vector<EntityUpdate>();
+	private Vector<CompressedClientUpdate> clientUpdates = new Vector<CompressedClientUpdate>(); 
+	private Vector<String> commandUpdates = new Vector<String>();
 	
 	/**
 	 * Creates a new instance of GameEngine. This includes setting the renderMode to RENDER_MODE_WORLD_EARTH
@@ -57,16 +60,26 @@ public class GameEngine
 //		playerIssuedCommands = new Vector<PlayerIssuedCommand>();
 	}
 	
+	public synchronized CompressedClientUpdate[] yieldClientUpdates()
+	{
+		CompressedClientUpdate[] updates = new CompressedClientUpdate[clientUpdates.size()];
+		clientUpdates.copyInto(updates);
+		clientUpdates.clear();
+		return updates;
+	}
+	
+	public synchronized void registerClientUpdate(CompressedClientUpdate update)
+	{
+		clientUpdates.add(update);
+	}
+	
 	public World getWorld() { return world; }
 	
 	public void run()
 	{
-		try
-		{
-			//Variables for the gameloop cap (20 times / second)
-	        
-			loadWorld();
-			
+		try {
+			loadWorld();			
+			//Variables for the gameloop cap (20 times / second)	
 			final int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
 			final int MAX_FRAMESKIP = 5;
 			long next_game_tick = System.currentTimeMillis();
@@ -86,13 +99,23 @@ public class GameEngine
 //		        	}	
 		        	//TODO: hardcore
 		        
+		        	
 		        	ServerUpdate update = new ServerUpdate();
+	
+		        	CompressedClientUpdate[] updates = yieldClientUpdates();
+		        	handleClientUpdates(update, updates);
+		        	
 		        	world.onWorldTick(update, players);
 		        	for(EntityUpdate up : extraEntityUpdates)
 		        	{
 		        		update.addEntityUpdate(up);
 		        	}
 		        	extraEntityUpdates.clear();
+		        	String[] values = yieldCommandUpdates();
+		        	for(String val : values)
+		        	{
+		        		update.addValue(val);
+		        	}
 		        	
 		        	TerraeRasa.addWorldUpdate(update);
 		        	
@@ -106,32 +129,56 @@ public class GameEngine
 		        {
 		        	next_game_tick = System.currentTimeMillis();
 		        }
-		        
-		        
-		   
 		        if(System.currentTimeMillis() - start >= 5000)
 		        {
 		        	start = System.currentTimeMillis();
 	        		end = System.currentTimeMillis();     
 	        		fps = 0;
 		    	}
-	        	//     System.out.println(end - start);
+//	        	System.out.println(end - start);
 		    }     
-		}
-		catch(Exception e) //Fatal error catching
-		{
+		} catch(Exception e) {
+			//Fatal error catching
 			e.printStackTrace();			
 			ErrorUtils errorUtils = new ErrorUtils();
 			errorUtils.writeErrorToFile(e, true);			
-		}
-		finally
-		{
+		} finally {
 			TerraeRasa.done = true;
 			//issue some sort of cease and desist to the main thread and clients
 		}
+	}	
+	
+	private void handleClientUpdates(ServerUpdate serverUpdate, CompressedClientUpdate[] updates)
+	{
+		for(CompressedClientUpdate update : updates)
+		{
+			if(update.newInventory != null)
+			{
+				((EntityPlayer)(world.getEntityByID(update.playerID))).inventory.set(update.newInventory);
+			}
+			for(String command : update.commands)
+			{
+				String result = Commands.processClientCommand(serverUpdate, world, this, players, command);
+				if(!result.equals(""))
+				{
+					commandUpdates.add(result);
+				}
+			}
+		}
 	}
 	
+	public synchronized String[] yieldCommandUpdates()
+	{
+		String[] updates = new String[commandUpdates.size()];
+		commandUpdates.copyInto(updates);
+		commandUpdates.clear();
+		return updates;
+	}
 	
+	public synchronized void addCommandUpdate(String command)
+	{
+		commandUpdates.add(command);
+	}
 	
 	public synchronized EntityPlayer[] getPlayersArray()
 	{
@@ -150,6 +197,7 @@ public class GameEngine
 		update.action = 'a';
 		update.type = 5;
 		extraEntityUpdates.add(update);
+		world.addPlayer(player);
 	}
 	
 	public synchronized void removePlayer(EntityPlayer player)
@@ -175,7 +223,7 @@ public class GameEngine
 		return chunk;
 	}
 
-	//	public synchronized void registerPlayerIssuedCommands(PlayerIssuedCommand command)
+//	public synchronized void registerPlayerIssuedCommands(PlayerIssuedCommand command)
 //	{
 //		playerIssuedCommands.add(command);
 //	}
@@ -187,28 +235,6 @@ public class GameEngine
 //		playerIssuedCommands.clear();
 //		return commands;
 //	}
-	
-	
-	/**
-	 * Starts a game from the main menu.
-	 * @param world the world to play on.
-	 * @param player the player to play on.
-	 */
-	public void startGame(String universeName, World world, EntityPlayer player)
-	{
-//		if(this.world != null)
-//		{
-//			throw new RuntimeException("World already exists!");
-//		}
-		this.universeName = universeName;
-		this.world = world;
-		this.world.chunkManager = chunkManager;
-		this.world.chunkManager.setUniverseName(universeName);
-//		this.player = player;
-//		world.addPlayerToWorld(player);
-//		TerraeRasa.isMainMenuOpen = false;
-//		mainMenu = null;
-	}
 			
 	/**
 	 * Initiates a hardcore death - which deletes the player and exits to the main menu. For now.

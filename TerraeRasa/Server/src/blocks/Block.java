@@ -541,8 +541,6 @@ public class Block extends ActionbarItem
 		setBitMap(block.bitMap);
 		this.id = block.id;
 		this.metaData = block.metaData;
-		this.iconX = (int) block.iconX;
-		this.iconY = (int) block.iconY;
 		this.hasMetaData = block.hasMetaData;
 		if(this instanceof BlockChest)
 		{

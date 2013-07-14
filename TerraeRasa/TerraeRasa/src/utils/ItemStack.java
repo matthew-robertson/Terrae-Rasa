@@ -408,4 +408,9 @@ public class ItemStack
 		}
 		return allBonuses;
 	}
+	
+	public String toString()
+	{
+		return "ItemStack of " + itemID + " " + itemName;
+	}
 }

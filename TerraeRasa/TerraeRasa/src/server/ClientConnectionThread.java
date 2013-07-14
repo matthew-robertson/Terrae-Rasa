@@ -8,6 +8,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 import transmission.ChunkExpander;
+import transmission.CompressedClientUpdate;
 import transmission.CompressedServerUpdate;
 import transmission.GZIPHelper;
 import transmission.SuperCompressedChunk;
@@ -39,23 +40,21 @@ public class ClientConnectionThread extends Thread
 	
 	public void run()
 	{
-		requestBasicData();
-		
-		final int SKIP_TICKS = 1000 / GameEngine.TICKS_PER_SECOND;
-		final int MAX_FRAMESKIP = 5;
-		long next_game_tick = System.currentTimeMillis();
-		int loops;
-		
-		while(!done)
-		{
-		    loops = 0;
-	        while(System.currentTimeMillis() > next_game_tick && loops < MAX_FRAMESKIP) //Update the game 20 times/second 
-	        {
-	        	//The update cycle things
-	        	EnumHardwareInput[] input = engineLock.yieldHardwareInput();
-	        	try {
-	        		os.writeUTF("/clientinput");
-	        		os.flush();
+		try {
+			requestBasicData();
+			
+			final int SKIP_TICKS = 1000 / GameEngine.TICKS_PER_SECOND;
+			final int MAX_FRAMESKIP = 5;
+			long next_game_tick = System.currentTimeMillis();
+			int loops;
+			
+			while(!done)
+			{
+			    loops = 0;
+		        while(System.currentTimeMillis() > next_game_tick && loops < MAX_FRAMESKIP) //Update the game 20 times/second 
+		        {
+		        	//The update cycle things
+		        	CompressedClientUpdate[] input = engineLock.yieldClientUpdates();        		
 					os.writeObject(gzipHelper.compress(input));
 		        	os.flush();
 		        	
@@ -67,31 +66,25 @@ public class ClientConnectionThread extends Thread
 		        		engineLock.addUpdate(update);
 		        	}	
 		        	
-//		        	CompressedPlayer player = (CompressedPlayer) (gzipHelper.expand((byte[])is.readObject()));
-//		        	engineLock.updatePlayer(player);
-		        	//Cycle done
-	        	} catch (IOException e) {
-					e.printStackTrace();
-				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
-				}
-	        	
-	        	
-	        	//Write hardware IO and wait for a response in the form of a server object
-	        	
-	        	
-		        next_game_tick += SKIP_TICKS;
-			    loops++;
-	        }
-			
-	        //Make sure the game loop doesn't fall very far behind and have to accelerate the 
-	        //game for an extended period of time
-	        if(System.currentTimeMillis() - next_game_tick > 1000)
-	        {
-	        	next_game_tick = System.currentTimeMillis();
-	        }
-	        
+		        	
+			        next_game_tick += SKIP_TICKS;
+				    loops++;
+		        }
+				
+		        //Make sure the game loop doesn't fall very far behind and have to accelerate the 
+		        //game for an extended period of time
+		        if(System.currentTimeMillis() - next_game_tick > 1000)
+		        {
+		        	next_game_tick = System.currentTimeMillis();
+		        }
+		        
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
 		}
+		
 	}
 	
 	private void requestBasicData()

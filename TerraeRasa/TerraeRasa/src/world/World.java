@@ -3,7 +3,6 @@ package world;
 import io.Chunk;
 import io.ChunkManager;
 import items.Item;
-import items.ItemTool;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -21,18 +20,14 @@ import org.lwjgl.opengl.Display;
 import render.Render;
 import savable.SavableWorld;
 import savable.SaveManager;
-import statuseffects.StatusEffectStun;
 import transmission.CompressedPlayer;
 import transmission.WorldData;
 import utils.ActionbarItem;
-import utils.ChestLootGenerator;
-import utils.Damage;
 import utils.ItemStack;
 import utils.LightUtils;
 import utils.MathHelper;
 import utils.MetaDataHelper;
 import utils.SpawnManager;
-import utils.Vector2F;
 import utils.WorldText;
 import audio.SoundEngine;
 import blocks.Block;
@@ -48,8 +43,6 @@ import entities.EntityNPCFriendly;
 import entities.EntityPlayer;
 import entities.EntityProjectile;
 import enums.EnumColor;
-import enums.EnumDamageSource;
-import enums.EnumDamageType;
 import enums.EnumEventType;
 import enums.EnumWorldDifficulty;
 
@@ -103,7 +96,6 @@ public class World
 	public List<EntityProjectile> projectileList;
 	public SpawnManager manager;
 	public SoundEngine soundEngine;
-	public ChestLootGenerator lootGenerator;
 	
 	private int[] generatedHeightMap;
 	private int averageSkyHeight;
@@ -138,7 +130,6 @@ public class World
 		itemsList = new ArrayList<EntityItemStack>(250);
 		chunksLoaded= new Hashtable<String, Boolean>(25);
 		manager = new SpawnManager();
-		lootGenerator = new ChestLootGenerator();
 		utils = new LightUtils();
 //		checkChunks();
 		lightingUpdateRequired = true;
@@ -237,7 +228,6 @@ public class World
 		previousLightLevel = getLightLevel();
 		this.difficulty = difficulty;
 		manager = new SpawnManager();
-		lootGenerator = new ChestLootGenerator();
 		chunkWidth = width / Chunk.getChunkWidth();
 		utils = new LightUtils();
 		lightingUpdateRequired = true;
@@ -255,7 +245,7 @@ public class World
 		this.width = data.width;
 		this.height = data.height; 
 		this.difficulty = data.difficulty;
-		chunksLoaded= new Hashtable<String, Boolean>(25);	
+		chunksLoaded = new Hashtable<String, Boolean>(25);	
 		
 		this.entityList = new ArrayList<EntityNPCEnemy>();
 		for(EntityNPCEnemy enemy : data.entityList)
@@ -271,7 +261,7 @@ public class World
 		}		
 		this.itemsList = data.itemsList;
 		this.projectileList = data.projectileList;
-		this.temporaryText = data.temporaryText;
+		this.temporaryText = new ArrayList<WorldText>();
 		
 		this.worldName = data.worldName;
 		this.worldTime = data.worldTime;
@@ -284,12 +274,9 @@ public class World
 		for(CompressedPlayer player : data.otherplayers)
 		{
 			addPlayer(EntityPlayer.expand(player));
-		}
-		
+		}		
 		manager = new SpawnManager();
-		lootGenerator = new ChestLootGenerator();
-		utils = new LightUtils();
-		
+		utils = new LightUtils();		
 	}
 			
 	/**
@@ -499,7 +486,6 @@ public class World
 	 */
 	public void addEntityToEnemyList(EntityNPCEnemy enemy)
 	{
-		System.out.println("Add " + enemy.entityID);
 		entityList.add(enemy);
 		entitiesByID.put(""+enemy.entityID, enemy);
 	}
@@ -566,23 +552,17 @@ public class World
 	 */
 	public void onClientWorldTick(EntityPlayer player)
 	{		
-		player.onWorldTick(this); 
+		player.onClientTick(this); 
 		
 		updateTemporaryText();
 		
 		//Update the time
 		updateWorldTime(player);
 		//checkChunks();
-		updateChunks(player);
-		applyLightingUpdates(player);
-		
-		
-		if (player.inventory.getMainInventoryStack(player.selectedSlot) != null && 
-				player.inventory.getMainInventoryStack(player.selectedSlot).getItemID() < ActionbarItem.spellIndex && 
-				Mouse.isButtonDown(0)) 
-		{ //player mining, if applicable
-			player.breakBlock(this, ((Render.getCameraX() + MathHelper.getCorrectMouseXPosition()) / 6), ((Render.getCameraY() + MathHelper.getCorrectMouseYPosition()) / 6), (Item.itemsList[player.inventory.getMainInventoryStack(player.selectedSlot).getItemID()]));
-		}
+		//TODO client chunk request
+		//updateChunks(player);
+		//TODO client side light
+		//applyLightingUpdates(player);
 	}
 		
 	/**
@@ -871,144 +851,6 @@ public class World
 				}
 			}
 		}	
-	}
-	
-	/**
-	 * Handles player block placement
-	 * @param mx x position in worldmap array, of the block being placed
-	 * @param my y position in the worldmap array, of the block being placed
-	 * @param block the block to be placed
-	 */
-	public void placeBlock(EntityPlayer player, int mx, int my, Block block)
-	{
-		if(block.hasMetaData) //if the block is large
-		{
-			double blockWidth = block.getBlockWidth() / 6;
-			double blockHeight = block.getBlockHeight() / 6;
-			int[][] metadata = MetaDataHelper.getMetaDataArray((int)blockWidth, (int)blockHeight);
-			
-			for(int i = 0; i < blockWidth; i++) //is it possible to place the block?
-			{
-				for(int j = 0; j < blockHeight; j++)
-				{
-					if(getBlock(mx + i, my + j).id != Block.air.id && !getBlockGenerate(mx + i, my + j).getIsOveridable())
-					{
-						return;
-					}
-				}
-			}
-			
-			boolean canBePlaced = false;
-			//Check for at least one solid block on some side of the placement:
-			for(int i = 0; i < blockWidth; i++) //Top
-			{
-				if(getBlock(mx + i, my - 1).isSolid)
-				{
-					canBePlaced = true;
-				}
-			}
-			for(int i = 0; i < blockWidth; i++) //Bottom
-			{
-				if(getBlock(mx + i, my + blockHeight).isSolid)
-				{
-					canBePlaced = true;
-				}
-			}
-			for(int i = 0; i < blockHeight; i++) //Left
-			{
-				if(getBlock(mx - 1, my + i).isSolid)
-				{
-					canBePlaced = true;
-				}
-			}
-			for(int i = 0; i < blockHeight; i++) //Right
-			{
-				if(getBlock(mx + blockWidth, my + i).isSolid)
-				{
-					canBePlaced = true;
-				}
-			}
-			for (int i = 0; i < blockHeight; i++){
-				for (int j = 0; j < blockWidth; j++){
-					if (getBackBlock(mx + j, my + i).getIsSolid()){
-						canBePlaced = true;
-					}
-				}
-			}
-			
-			if(!canBePlaced) //If it cant be placed, then give up trying right here
-			{
-				return;
-			}
-			
-			for(int i = 0; i < metadata.length; i++) //place the block(s)
-			{
-				for(int j = 0; j < metadata[0].length; j++)
-				{
-					if(block instanceof BlockChest)
-					{
-						BlockChest chest = new BlockChest((BlockChest) block);						
-						setBlock(chest, mx + i, my + j, EnumEventType.EVENT_BLOCK_PLACE);
-					}
-					else
-					{
-						setBlock(block.clone(), mx + i, my + j, EnumEventType.EVENT_BLOCK_PLACE);
-						
-					}
-					getBlock(mx + i, my + j).metaData = (short)metadata[i][j];
-				}
-			}
-			//Make more generic later
-			player.inventory.removeItemsFromInventory(this, player, new ItemStack(block, 1)); //take the item from the player's inventory
-		}
-		else
-		{
-			if ((getBlockGenerate(mx, my).getIsOveridable() == true || getBlock(mx, my).id == Block.air.id) && 
-				(getBlock(mx-1, my).isSolid || getBlock(mx, my-1).isSolid || getBlock(mx, my+1).isSolid || getBlock(mx+1, my).isSolid ||
-				getBackBlock(mx, my).getIsSolid())) //can the block be placed
-			{
-				player.inventory.removeItemsFromInventory(this, player, new ItemStack(block, 1)); //remove the items from inventory	
-			
-				
-				if(block.lightStrength > 0)
-				{
-					setBlock(block, mx, my, EnumEventType.EVENT_BLOCK_PLACE_LIGHT); //place it
-			//		applyLightSource(player, block, mx, my, ((BlockLight)(block)).lightRadius,  ((BlockLight)(block)).lightStrength);
-				}
-				else
-				{
-					setBlock(block, mx, my, EnumEventType.EVENT_BLOCK_PLACE); //place it
-					//	setBlock(block, mx, my, EnumEventType.EVENT_BLOCK_PLACE); //place it
-				}
-				
-				
-			}
-		}
-		setBitMap(mx-1,my, updateBlockBitMap(mx-1, my));
-		setBitMap(mx,my-1, updateBlockBitMap(mx, my-1));
-		setBitMap(mx,my, updateBlockBitMap(mx, my));
-		setBitMap(mx+1,my, updateBlockBitMap(mx+1, my));
-		setBitMap(mx,my+1, updateBlockBitMap(mx, my+1));
-	
-		
-		
-	}
-	
-	/**
-	 * Handles player back wall placement
-	 * @param mx x position in worldmap array, of the block being placed
-	 * @param my y position in the worldmap array, of the block being placed
-	 * @param block the block to be placed
-	 */
-	public void placeBackWall(EntityPlayer player, int mx, int my, Block block)
-	{
-		if ((getBackBlock(mx, my).getIsOveridable() == true || getBackBlock(mx, my).getID() == Block.backAir.getID()) && 
-			(getBackBlock(mx-1, my).getIsSolid() || getBackBlock(mx, my-1).getIsSolid() || getBackBlock(mx, my+1).getIsSolid() || getBackBlock(mx+1, my).getIsSolid() || 
-			getBlock(mx, my).isSolid)) //can the block be placed
-		{
-			player.inventory.removeItemsFromInventory(this, player, new ItemStack(block, 1)); //remove the items from inventory		
-			setBackBlock(block.clone(), mx, my); //place it	
-		}
 	}
 	
 	/**

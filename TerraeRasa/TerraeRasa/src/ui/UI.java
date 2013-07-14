@@ -174,7 +174,7 @@ public class UI extends UIBase
 			{
 				for(int i = 0; i < whatToCraft.getRecipe().length; i++) //remove the items from the inventory
 				{
-					player.inventory.removeItemsFromInventory(world, player, whatToCraft.getRecipe()[i]);
+					player.inventory.removeItemsFromInventory(player, whatToCraft.getRecipe()[i]);
 				}
 				mouseItem.addToStack(whatToCraft.getResult().getStackSize()); //pick up the item
 			}
@@ -183,7 +183,7 @@ public class UI extends UIBase
 		{
 			for(int i = 0; i < whatToCraft.getRecipe().length; i++) //remove items from inventory
 			{
-				player.inventory.removeItemsFromInventory(world, player, whatToCraft.getRecipe()[i]);
+				player.inventory.removeItemsFromInventory(player, whatToCraft.getRecipe()[i]);
 			}
 			
 			mouseXOffset = xoff;
