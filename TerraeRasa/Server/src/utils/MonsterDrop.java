@@ -1,5 +1,7 @@
 package utils;
 
+import java.io.Serializable;
+
 
 /**
  * MonsterDrop implements a simple way to store a drop for a monster. 
@@ -31,7 +33,9 @@ package utils;
  * @since       1.0
  */
 public class MonsterDrop
+		implements Serializable
 {	
+	private static final long serialVersionUID = 1L;
 	private int rollMaximum;
 	private int minimum;
 	private int maximum;

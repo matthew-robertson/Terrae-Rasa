@@ -44,6 +44,7 @@ import entities.Entity;
 import entities.EntityItemStack;
 import entities.EntityNPC;
 import entities.EntityNPCEnemy;
+import entities.EntityNPCFriendly;
 import entities.EntityPlayer;
 import entities.EntityProjectile;
 import enums.EnumColor;
@@ -145,9 +146,14 @@ public class World
 	
 	public Entity getEntityByID(int id)
 	{
-		return entitiesByID.get(""+id);
+		try {
+			return entitiesByID.get(""+id);
+		} catch(NullPointerException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
-	
+		
 	public void overwriteEntityByID(int id, Entity newEntity)
 	{
 		Entity entity = entitiesByID.get(""+id);
@@ -202,7 +208,7 @@ public class World
 		{
 			otherPlayers.remove(entity);
 		}
-		entitiesByID.put(""+id, null);
+		entitiesByID.remove(""+id);
 	}
 	
 	/**
@@ -249,12 +255,22 @@ public class World
 		this.width = data.width;
 		this.height = data.height; 
 		this.difficulty = data.difficulty;
-		chunksLoaded= new Hashtable<String, Boolean>(25);
+		chunksLoaded= new Hashtable<String, Boolean>(25);	
 		
-		this.entityList = data.entityList;
+		this.entityList = new ArrayList<EntityNPCEnemy>();
+		for(EntityNPCEnemy enemy : data.entityList)
+		{
+			enemy.setTexture(EntityNPCEnemy.enemyList[enemy.getNPCID()].getTexture());
+			addEntityToEnemyList(enemy);
+		}
+		this.npcList = new ArrayList<EntityNPC>();
+		for(EntityNPC friendly : data.npcList)
+		{
+			friendly .setTexture(EntityNPCFriendly.npcList[friendly.getNPCID()].getTexture());
+			addEntityToNPCList(friendly);
+		}		
 		this.itemsList = data.itemsList;
 		this.projectileList = data.projectileList;
-		this.npcList = data.npcList;
 		this.temporaryText = data.temporaryText;
 		
 		this.worldName = data.worldName;
@@ -448,12 +464,42 @@ public class World
 		return width * 3;
 	}
 	
+	public void addUnspecifiedEntity(Entity entity)
+	{
+		if(getEntityByID(entity.entityID) != null)
+		{
+			return;
+		}
+		if(entity instanceof EntityNPCEnemy)
+		{
+			entityList.add((EntityNPCEnemy) entity);
+			entitiesByID.put(""+entity.entityID, entity);
+		}
+		else if(entity instanceof EntityNPC)
+		{
+			npcList.add((EntityNPC) entity);
+			entitiesByID.put(""+entity.entityID, entity);
+		}
+		else if(entity instanceof EntityItemStack)
+		{
+			itemsList.add((EntityItemStack) entity);
+			entitiesByID.put(""+entity.entityID, entity);
+		}
+		else if(entity instanceof EntityProjectile)
+		{
+			projectileList.add((EntityProjectile) entity);
+			entitiesByID.put(""+entity.entityID, entity);
+		}
+		
+	}
+	
 	/**
 	 * Adds an EntityNPCEnemy to the entityList in this instance of World
 	 * @param enemy the enemy to add to entityList
 	 */
 	public void addEntityToEnemyList(EntityNPCEnemy enemy)
 	{
+		System.out.println("Add " + enemy.entityID);
 		entityList.add(enemy);
 		entitiesByID.put(""+enemy.entityID, enemy);
 	}
@@ -490,6 +536,13 @@ public class World
 	
 	public void addPlayer(EntityPlayer player)
 	{
+		for(EntityPlayer p : otherPlayers)
+		{
+			if(player.entityID == p.entityID)
+			{
+				return;
+			}
+		}
 		otherPlayers.add(player);
 		entitiesByID.put(""+player.entityID, player);
 	}

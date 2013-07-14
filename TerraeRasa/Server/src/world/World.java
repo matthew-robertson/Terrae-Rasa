@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Vector;
@@ -23,6 +24,7 @@ import server.PlayerInput;
 import server.ServerSettings;
 import server.TerraeRasa;
 import statuseffects.StatusEffectStun;
+import transmission.EntityUpdate;
 import transmission.PositionUpdate;
 import transmission.ServerUpdate;
 import transmission.WorldData;
@@ -118,7 +120,6 @@ public class World
 	private int width; //Width in blocks, not pixels
 	private int height; //Height in blocks, not pixels
 	private double previousLightLevel;
-	private EntityNPCEnemy[] spawnList;
 	private LightUtils utils;
 	private boolean lightingUpdateRequired;
 	private Vector<PlayerInput> playerInputs;
@@ -532,7 +533,7 @@ public class World
 	 */
 	public void onWorldTick(ServerUpdate update, Vector<EntityPlayer> players)
 	{		
-		//spawnMonsters(player);				
+		spawnMonsters(update, players);				
 		//causeWeather();		
 		//TODO: weather
 		//update the player
@@ -568,11 +569,15 @@ public class World
 
 		//Update Entities
 		//TODO: Monsters
-		//updateMonsters(player); 
+		if(worldTime % 20 == 0) {
+			checkForMonsterRemoval(update, players);
+		}
+		updateMonsters(update); 
 		//TODO: NPCs
-		//updateNPCs(player);
+		updateNPCs(update);
 		//TODO: projectiles
-		//updateProjectiles(player);
+		updateProjectiles(update);
+		
 		handlePlayerMovement(update);
 				
 		if(chunkManager.isAnyLoadOperationDone())
@@ -677,28 +682,60 @@ public class World
 	/**
 	 * applies AI to npcs
 	 */
-	private void updateNPCs(EntityPlayer player){
+	private void updateNPCs(ServerUpdate update){
 		for (int i = 0; i < npcList.size(); i++){
 			if (npcList.get(i).isDead()){
+				EntityUpdate entityUpdate = new EntityUpdate();
+				entityUpdate.action = 'r';
+				entityUpdate.entityID = npcList.get(i).entityID;
+				entityUpdate.type = 2; 
+				entityUpdate.updatedEntity = null;
+				update.addEntityUpdate(entityUpdate);
 				npcList.remove(i);
 				continue;
 			}
-			npcList.get(i).applyAI(this, player, player);
 			
-			if(npcList.get(i).inBounds(player.x, player.y, player.width, player.height)){
-				npcList.get(i).onPlayerNear();
-			}
+			npcList.get(i).applyAI(this);
+			
+			//TODO re-enable onPlayerNear() for NPCs and possibly fixates for NPCS
+//			if(npcList.get(i).inBounds(player.x, player.y, player.width, player.height)){
+//				npcList.get(i).onPlayerNear();
+//			}
 			npcList.get(i).applyGravity(this);
+			update.addPositionUpdate(new PositionUpdate(entityList.get(i).entityID, entityList.get(i).x, entityList.get(i).y));
 		}
 	}
 	
-	/**
-	 * 
-	 * @param player
-	 */
-	private void updateMonsters(EntityPlayer player)
+	private void checkForMonsterRemoval(ServerUpdate update, Vector<EntityPlayer> players)
 	{
-		final int OUT_OF_RANGE = 1200;//IE 200 blocks ;//(int) ((Display.getHeight() > Display.getWidth()) ? Display.getHeight() * 0.75 : Display.getWidth() * 0.75);
+		final int OUT_OF_RANGE = 600;
+//		if(players.size() == 0)
+//		{
+//			entityList.clear();
+//		}
+		for(EntityPlayer player : players)
+		{
+			Iterator<EntityNPCEnemy> it = entityList.iterator();			
+			while(it.hasNext())
+			{
+				EntityNPCEnemy monster = it.next();
+				if(!monster.isBoss && (MathHelper.distanceBetweenTwoPoints(player.x, player.y, monster.x, monster.y) > OUT_OF_RANGE))
+				{ 
+					EntityUpdate entityUpdate = new EntityUpdate();
+					entityUpdate.action = 'r';
+					entityUpdate.entityID = monster.entityID;
+					entityUpdate.type = 1; 
+					entityUpdate.updatedEntity = null;
+					update.addEntityUpdate(entityUpdate);
+					it.remove();
+					continue;
+				}
+			}
+		}
+	}
+	
+	private void updateMonsters(ServerUpdate update)
+	{
 		for(int i = 0; i < entityList.size(); i++)
 		{
 			if(entityList.get(i).isDead()) //if the monster is dead, try to drop items
@@ -708,21 +745,29 @@ public class World
 				{
 					for(ItemStack stack : drops) //drop each of them
 					{
-						addItemStackToItemList(new EntityItemStack(entityList.get(i).x - 1, entityList.get(i).y - 1, stack));
+						EntityItemStack entityStack = new EntityItemStack(entityList.get(i).x - 1, entityList.get(i).y - 1, stack);
+						addItemStackToItemList(entityStack);
+						EntityUpdate entityUpdate = new EntityUpdate();
+						entityUpdate.action = 'a';
+						entityUpdate.entityID = entityStack.entityID;
+						entityUpdate.type = 3; 
+						entityUpdate.updatedEntity = entityStack;
+						update.addEntityUpdate(entityUpdate);
 					}
 				}
+				EntityUpdate entityUpdate = new EntityUpdate();
+				entityUpdate.action = 'r';
+				entityUpdate.entityID = entityList.get(i).entityID;
+				entityUpdate.type = 1; 
+				entityUpdate.updatedEntity = null;
+				update.addEntityUpdate(entityUpdate);
 				entityList.remove(i);
 				continue;
 			}
-			else if((MathHelper.distanceBetweenTwoPoints(player.x, player.y, entityList.get(i).x, entityList.get(i).y) > OUT_OF_RANGE && !entityList.get(i).isBoss))
-			{ //If the monster is dead, or too far away, remove it
-				entityList.remove(i);
-				//System.out.println("Entity Removed @" + i);
-				continue;
-			}
+			
 			entityList.get(i).invincibilityTicks--;
-			//System.out.println(entityList.get(i).invincibilityTicks);
-			entityList.get(i).applyAI(this, player, player); //otherwise apply AI
+			entityList.get(i).applyAI(this); //otherwise apply AI
+			update.addPositionUpdate(new PositionUpdate(entityList.get(i).entityID, entityList.get(i).x, entityList.get(i).y));
 		}
 	}
 	
@@ -805,31 +850,48 @@ public class World
 	 * Updates (and possibly removes) projectiles
 	 * @param player - player to compare distances against
 	 */
-	private void updateProjectiles(EntityPlayer player)
+	private void updateProjectiles(ServerUpdate update)
 	{
-		final int OUT_OF_RANGE = 1200;//(int) ((Display.getHeight() > Display.getWidth()) ? Display.getHeight() * 0.75 : Display.getWidth() * 0.75);
+		//final int OUT_OF_RANGE = 1200;//(int) ((Display.getHeight() > Display.getWidth()) ? Display.getHeight() * 0.75 : Display.getWidth() * 0.75);
 		for(int i = 0; i < projectileList.size(); i++)
 		{
 			if (projectileList.get(i).active){
 				projectileList.get(i).moveProjectile(this);
+				update.addPositionUpdate(new PositionUpdate(projectileList.get(i).entityID, projectileList.get(i).x, projectileList.get(i).y));
 			}
 			else if (!projectileList.get(i).active){
 				projectileList.get(i).ticksNonActive++;
 			}
 			
 			//If the projectile is too far away, remove it
-			if(((MathHelper.distanceBetweenTwoPoints(player.x, player.y, projectileList.get(i).x, projectileList.get(i).y) > OUT_OF_RANGE) || 
-					projectileList.get(i).ticksNonActive > 80))
+			if(projectileList.get(i).ticksNonActive > 80)
 			{ 
 				if (projectileList.get(i).ticksNonActive > 1 && projectileList.get(i).getDrop() != null){
-					addItemStackToItemList(new EntityItemStack(projectileList.get(i).x - 1, projectileList.get(i).y - 1, projectileList.get(i).getDrop()));
+					EntityItemStack entityStack = new EntityItemStack(projectileList.get(i).x - 1, projectileList.get(i).y - 1, projectileList.get(i).getDrop());
+					addItemStackToItemList(entityStack);
+					EntityUpdate entityUpdate = new EntityUpdate();
+					entityUpdate.action = 'a';
+					entityUpdate.entityID = entityStack.entityID;
+					entityUpdate.type = 3; 
+					entityUpdate.updatedEntity = entityStack;
 				}
+				EntityUpdate entityUpdate = new EntityUpdate();
+				entityUpdate.action = 'r';
+				entityUpdate.entityID = projectileList.get(i).entityID;
+				entityUpdate.type = 4; 
+				entityUpdate.updatedEntity = null;
+				update.addEntityUpdate(entityUpdate);
 				projectileList.remove(i);
 				continue;
 			}
-			else if (((MathHelper.distanceBetweenTwoPoints(player.x, player.y, projectileList.get(i).x, projectileList.get(i).y) > OUT_OF_RANGE) || 
-					projectileList.get(i).ticksNonActive > 1)) 
+			else if (projectileList.get(i).ticksNonActive > 1) 
 			{
+				EntityUpdate entityUpdate = new EntityUpdate();
+				entityUpdate.action = 'r';
+				entityUpdate.entityID = projectileList.get(i).entityID;
+				entityUpdate.type = 4; 
+				entityUpdate.updatedEntity = null;
+				update.addEntityUpdate(entityUpdate);
 				projectileList.remove(i);
 				continue;
 			}
@@ -906,135 +968,131 @@ public class World
 	
 	/**
 	 * Attempts to spawn monsters, based on random numbers
-	 * @return number of monsters successfully spawned
 	 */
-	private int spawnMonsters(EntityPlayer player)
+	private void spawnMonsters(ServerUpdate update, Vector<EntityPlayer> players)
 	{
-		return 0;
-		//TODO: FIX
+		double hour = (double)(worldTime) / GAMETICKSPERHOUR; 
+		boolean isNight = (hour < 4 || hour > 20) ? true : false;
+		double spawnChance = 1.0 / 100;
 		
-//		int totalTries = 2 + random.nextInt(4);
-//		//int totalTries = 500;		
-//		//WARNING, THE LINE ABOVE IS VERY, VERY AGGRESSIVE SPAWNING. NOT INTENDED FOR RELEASE BUT TESTING INSTEAD
-//		
-//		double time = (double)(worldTime) / GAMETICKSPERHOUR; 
-//		if(time < 4 || time > 20) //spawn more at night
-//		{
-//			totalTries += (3 + random.nextInt(3));
-//		}	
-//		
-//		String active = "";
-//		int counter = 0;
-//		int entitych = 0;
-//		
-//		for(int i = 0; i < totalTries; i++) 
-//		{
-//			if(entityList.size() > 255) //too many monsters spawned
-//			{
-//				return counter;
-//			}			
-//			
-//			int xoff = 0;
-//			int yoff = 0;
-//			int xscreensize_b = (Display.getWidth() / 22) + 5;
-//			int yscreensize_b = (Display.getHeight() / 22) + 5;		
-//			
-//			//how far away the monster will spawn from the player:
-//			if(random.nextInt(2) == 0) //spawn to the left
-//			{ 
-//				xoff = MathHelper.returnIntegerInWorldMapBounds_X(this, (int)(player.x / 6) - random.nextInt(100) - xscreensize_b);
-//			}
-//			else //spawn to the right
-//			{
-//				xoff = MathHelper.returnIntegerInWorldMapBounds_X(this, (int)(player.x / 6) + random.nextInt(100) + xscreensize_b);
-//			}
-//			if(random.nextInt(2) == 0) //spawn above 
-//			{
-//				yoff = MathHelper.returnIntegerInWorldMapBounds_Y(this, (int)(player.y / 6) - random.nextInt(100) - yscreensize_b);
-//			}
-//			else //spawn below
-//			{
-//				yoff = MathHelper.returnIntegerInWorldMapBounds_Y(this, (int)(player.y / 6) + random.nextInt(60) + yscreensize_b);
-//			}
-//			
-//			active = getBiomeColumn(""+(int)(xoff));
-//			
-//			if(active == null) //Should indicate the chunk isnt loaded (good failsafe)
-//			{
-//				continue;
-//			}
-//			
-//			active = active.toLowerCase();
-//			
-//			if (active.equals("forest")){
-//				if (time < 4 || time > 20){
-//					spawnList = manager.getForestNightEnemiesAsArray();
-//				}
-//				
-//				else {
-//					spawnList = manager.getForestDayEnemiesAsArray();
-//				}
-//			}
-//			
-//			else if (active.equals("desert")){
-//				if (time < 4 || time > 20){
-//					spawnList = manager.getDesertNightEnemiesAsArray();
-//				}
-//				
-//				else {
-//					spawnList = manager.getDesertDayEnemiesAsArray();
-//				}
-//			}
-//			
-//			else if (active.equals("arctic")){
-//			//	System.out.println("hey!");
-//				if (time < 4 || time > 20){
-//					spawnList = manager.getArcticNightEnemiesAsArray();
-//				}
-//				
-//				else {
-//					spawnList = manager.getArcticDayEnemiesAsArray();
-//				}
-//			}
-//			entitych = (int)random.nextInt(spawnList.length);
-//			//System.out.println(spawnList[entitych].getEnemyName());
-//			try
-//			{				
-//				for(int j = 0; j <spawnList[entitych].getBlockHeight(); j++)//Y
-//				{
-//					for(int k = 0; k < spawnList[entitych].getBlockWidth(); k++)//X
-//					{
-//						if(getBlock(xoff + k, yoff + j).isSolid)
-//						{
-//							throw new RuntimeException("Dummy");
-//						}
-//					}
-//				}
-//			}
-//			catch (Exception e) //if this gets hit, the entity cant actually spawn
-//			{
-//				continue;
-//			}
-//			
-//			//So the entity can spawn...
-//			
-//			try
-//			{
-//				//Ground Entity:
-//				if((getBlock(xoff, (yoff + 3)).isSolid || getBlock(xoff + 1, (yoff + 3)).isSolid)) //make sure there's actually ground to spawn on
-//				{
-//					EntityNPCEnemy enemy = new EntityNPCEnemy(spawnList[entitych]);
-//					enemy.setPosition(xoff * 6, yoff * 6);
-//					entityList.add(enemy);
-//					counter++;
-//				}	
-//			}
-//			catch(Exception e)
-//			{
-//			}
-//		}
-//		
-//		return counter;
+		playerLoop:
+		for(EntityPlayer player : players)
+		{
+			if(random.nextDouble() <= spawnChance) //Spawn at 0.5% chance per player
+			{
+				forcedSpawnLoop:
+				while(true)
+				{
+					if(entityList.size() > 15) //too many monsters spawned151
+					{
+						return;
+					}			
+					
+					int xoff = 0;
+					int yoff = 0;				
+					//how far away the monster will spawn from the player:
+					if(random.nextInt(2) == 0) 
+					{ 
+						//spawn to the left
+						xoff = MathHelper.returnIntegerInWorldMapBounds_X(this, (int)(player.x / 6) - random.nextInt(100));
+					}
+					else
+					{
+						//spawn to the right
+						xoff = MathHelper.returnIntegerInWorldMapBounds_X(this, (int)(player.x / 6) + random.nextInt(100));
+					}
+					if(random.nextInt(2) == 0) 
+					{
+						//spawn above 
+						yoff = MathHelper.returnIntegerInWorldMapBounds_Y(this, (int)(player.y / 6) - random.nextInt(100));
+					} 
+					else 
+					{
+						//spawn below
+						yoff = MathHelper.returnIntegerInWorldMapBounds_Y(this, (int)(player.y / 6) + random.nextInt(60));
+					}
+					
+					String active = getBiomeColumn(""+(int)(xoff));
+					if(active == null) //Should indicate the chunk isnt loaded (good failsafe)
+					{
+						continue;
+					}
+					active = active.toLowerCase();
+	
+					EntityNPCEnemy[] spawnList = null;
+					if (active.equals("forest")){
+						if (isNight){
+							spawnList = manager.getForestNightEnemiesAsArray();
+						}
+						else {
+							spawnList = manager.getForestDayEnemiesAsArray();
+						}
+					}
+					else if (active.equals("desert")){
+						if (isNight){
+							spawnList = manager.getDesertNightEnemiesAsArray();
+						}					
+						else {
+							spawnList = manager.getDesertDayEnemiesAsArray();
+						}
+					}
+					else if (active.equals("arctic")){
+						if (isNight){
+							spawnList = manager.getArcticNightEnemiesAsArray();
+						}					
+						else {
+							spawnList = manager.getArcticDayEnemiesAsArray();
+						}
+					}
+					
+					int entityChoice = random.nextInt(spawnList.length);
+					for(int j = 0; j < spawnList[entityChoice].getBlockHeight(); j++)//Y
+					{
+						for(int k = 0; k < spawnList[entityChoice].getBlockWidth(); k++)//X
+						{
+							if(getBlock(xoff + k, yoff + j).isSolid)
+							{
+								//Spawn is illegal
+								continue playerLoop; 
+							}
+						}
+					}
+					
+					//The entity can spawn somewhere in the that area. Determine where the ground is for a ground entity
+					try
+					{
+						int spawnX = xoff;
+						int spawnY = yoff;
+						
+						//Ground Entity
+//						(getBlock(spawnX, (yoff + 3)).isSolid || getBlock(xoff + 1, (yoff + 3)).isSolid)
+						
+						for(int y = spawnY; y < height; y++)
+						{
+							for(int x = spawnX; x < spawnX + spawnList[entityChoice].blockWidth; x++)
+							{
+								if(getBlock(x, y + spawnList[entityChoice].blockHeight).isSolid)
+								{	
+									//legit spawn position
+									EntityNPCEnemy enemy = new EntityNPCEnemy(spawnList[entityChoice]);
+									enemy.setPosition(x * 6, y * 6);
+									EntityUpdate entityUpdate = new EntityUpdate();
+									entityUpdate.action = 'a';
+									entityUpdate.entityID = enemy.entityID;
+									entityUpdate.type = 1; 
+									entityUpdate.updatedEntity = enemy;
+									update.addEntityUpdate(entityUpdate);
+									entityList.add(enemy);
+									System.out.println("Spawn @" + enemy.x + "," + enemy.y);
+									break forcedSpawnLoop;
+								}			
+							}
+						}
+					} catch(Exception e) {
+					}
+				}				
+			}		
+		}
 	}
 	
 	/**

@@ -34,7 +34,7 @@ public class PlayerInput {
 			}
 			else if(input == EnumHardwareInput.JUMP)
 			{
-				associatedPlayer.tryToJumpAgain(world, associatedPlayer);
+				associatedPlayer.tryToJumpAgain(world);
 			}			
 		}
 		newX = associatedPlayer.x;

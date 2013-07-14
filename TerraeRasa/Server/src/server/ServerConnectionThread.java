@@ -91,9 +91,10 @@ public class ServerConnectionThread extends Thread
 		try {
 			String message = is.readUTF();
 			int playerID = ServerSettings.getEntityID();
+			EntityPlayer player = null;
 			if(message.equals("/sendplayer"))
 			{
-				EntityPlayer player = EntityPlayer.expand((CompressedPlayer)(gzipHelper.expand((byte[])is.readObject())));
+				player = EntityPlayer.expand((CompressedPlayer)(gzipHelper.expand((byte[])is.readObject())));
 				player.setEntityID(playerID);
 				worldLock.addPlayerToWorld(player);
 			}

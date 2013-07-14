@@ -113,7 +113,7 @@ public class EntityNPCEnemy extends EntityNPC
 		return this;
 	}
 	
-	protected EntityNPCEnemy setTexture(Texture tex)
+	public EntityNPCEnemy setTexture(Texture tex)
 	{
 		texture = tex;
 		return this;

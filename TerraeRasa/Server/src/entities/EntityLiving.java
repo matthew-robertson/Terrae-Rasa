@@ -444,24 +444,13 @@ public class EntityLiving extends Entity
 	/**
 	 * Sees if it's possible to jump. If so then the jump will be performed
 	 */
-	public void tryToJumpAgain(World world, EntityPlayer player)
+	public void tryToJumpAgain(World world)
 	{
 		if(canJumpAgain)// If the entity can jump, let them
 		{
 			isJumping = true;
 			upwardJumpCounter = 0;
-			canJumpAgain = false;
-			
-			if (this != player){	
-				double distance = MathHelper.distanceBetweenTwoPoints(this.x, this.y, player.x, player.y) / (12);
-				double percentageVolume = 0;
-				if (distance > 80){
-					percentageVolume = 0;
-				}
-				if (percentageVolume < 0.001){
-					percentageVolume = 0;
-				}
-			}
+			canJumpAgain = false;			
 		}	
 	}
 	

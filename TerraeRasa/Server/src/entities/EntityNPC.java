@@ -18,6 +18,7 @@ public class EntityNPC extends EntityLiving
 	public int wanderLeft;
 	public int wanderRight;
 	public boolean alert;	
+	public EntityLiving fixation;
 	
 	/**
 	 * Creates a new EntityNPC, assigning it an ID and name.
@@ -72,18 +73,23 @@ public class EntityNPC extends EntityLiving
 	 * @param world - current world
 	 * @param target - entity to chase/retreat from
 	 */
-	public void applyAI(World world, EntityPlayer player, EntityPlayer target){
+	public void applyAI(World world){
 		if(!isStunned()){
-			if (alert){
-				AIManager.AIChaseAndRetreat(world, player, this, target, true );
+			if (alert && fixation != null){
+				AIManager.AIChaseAndRetreat(world, this, fixation, true );
 			}
 			else {
-				AIManager.AIWander(world, player, this);
+				AIManager.AIWander(world, this);
 			}
 		}
 		
 		applyGravity(world);	
 	}	
+	
+	public void setFixation(EntityLiving entity)
+	{
+		this.fixation = entity;
+	}
 	
 	/**
 	 * triggers when the actor approaches a player.

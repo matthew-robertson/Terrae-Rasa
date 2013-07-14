@@ -162,6 +162,7 @@ public class GameEngine
 		update.type = 5;
 		extraEntityUpdates.add(update);
 		world.entitiesByID.remove(""+player.entityID);
+		player = null;
 	}
 
 	public synchronized Chunk requestChunk(int x)

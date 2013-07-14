@@ -12,7 +12,7 @@ public class EntityUpdate
 	public Entity updatedEntity; //set null if remove
 	//'a' = add; 'c' = change(basically replace); 'r' = remove
 	public char action;
-	//1-enemy; 2-friendly; 3-itemstack; 4-projectile, 5- player
+	/**1-enemy; 2-friendly; 3-itemstack; 4-projectile, 5- player */
 	public byte type;
 	public int entityID;
 	

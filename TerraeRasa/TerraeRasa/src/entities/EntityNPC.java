@@ -109,7 +109,7 @@ public class EntityNPC extends EntityLiving
 		return this;
 	}
 	
-	protected EntityNPC setTexture(Texture t){
+	public EntityNPC setTexture(Texture t){
 		texture = t;
 		return this;
 	}
@@ -275,6 +275,11 @@ public class EntityNPC extends EntityLiving
 		}
 		//Else return false
 		return false;
+	}
+	
+	public int getNPCID()
+	{
+		return npcID;
 	}
 
 }

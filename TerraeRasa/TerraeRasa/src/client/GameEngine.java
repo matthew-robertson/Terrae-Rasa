@@ -30,6 +30,8 @@ import world.WorldSky;
 import affix.AffixSturdy;
 import audio.SoundEngine;
 import blocks.Block;
+import entities.EntityNPCEnemy;
+import entities.EntityNPCFriendly;
 import entities.EntityPlayer;
 import enums.EnumHardwareInput;
 import enums.EnumPlayerDifficulty;
@@ -109,10 +111,8 @@ public class GameEngine
 	
 	public void run()
 	{
-		try
-		{
-			//Variables for the gameloop cap (20 times / second)
-	        
+		try {
+			//Variables for the gameloop cap (20 times / second)	        
 			final int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
 			final int MAX_FRAMESKIP = 5;
 			long next_game_tick = System.currentTimeMillis();
@@ -141,8 +141,13 @@ public class GameEngine
 		        		sentPlayer.entityID = activePlayerID;
 		        		world.entitiesByID.put(""+activePlayerID, sentPlayer);
 		        	}
-		    	} catch(NullPointerException e) {
-		    		
+		    	} catch(NullPointerException e) {		    		
+		    	}
+		    	
+		    	if(!TerraeRasa.isMainMenuOpen && (!canPlayMP || player == null))
+		    	{
+		    		Thread.sleep(100);
+		    		continue;
 		    	}
 		    	
 		    	loops = 0;
@@ -173,13 +178,7 @@ public class GameEngine
 		        		renderMenu.keyboard(settings);
 		        	}
 		        	else if(!TerraeRasa.isMainMenuOpen) //Handle game inputs if the main menu isnt open (aka the game is being played)
-		        	{
-		        		if(!canPlayMP || player == null)
-				    	{
-				    		Thread.sleep(100);
-				    		break;
-				    	}
-		        		
+		        	{		        		
 		        		soundEngine.setCurrentMusic("Pause Music");
 		        		Keys.keyboard(world, player, settings, settings.keybinds, hardwareInput);	            
 		        		MouseInput.mouse(world, player);
@@ -221,14 +220,7 @@ public class GameEngine
 		        	mainMenu.render(settings);
 			    }
 		        else
-		        {
-		        	if(!canPlayMP || player == null)
-			    	{
-			    		Thread.sleep(100);
-			    		continue;
-			    	}
-		        	
-		        	
+		        {		        
 		        	if(renderMode == RENDER_MODE_WORLD_EARTH)
 		    		{
 		        	 	RenderGlobal.render(world, player, renderMode, settings); //Renders Everything on the screen for the game
@@ -261,9 +253,9 @@ public class GameEngine
 		    	}
 	        	//     System.out.println(end - start);
 		    }     
-		}
-		catch(Exception e) //Fatal error catching
-		{
+		} catch(Exception e) {
+			//Fatal error catching
+			System.err.println("Fatal client error caused by: ");
 			e.printStackTrace();			
 			ErrorUtils errorUtils = new ErrorUtils();
 			errorUtils.writeErrorToFile(e, true);			
@@ -291,12 +283,10 @@ public class GameEngine
 		{
 			for(EntityUpdate update : serverupdate.entityUpdates)
 			{
-				if(update.type == 5)
-				{
+				if(update.type == 5) { //Player
 					EntityPlayer player = EntityPlayer.expand((CompressedPlayer)update.updatedEntity);
-				
 					if(update.action == 'r') {
-						world.removeEntityByID(player.entityID);
+						world.removeEntityByID(update.entityID);
 					}
 					else if(update.action == 'c') {
 						world.overwriteEntityByID(player.entityID, player);
@@ -305,24 +295,67 @@ public class GameEngine
 						world.addPlayer(player);
 					}
 				}
-				else //TODO: other entity types
-				{
+				else if(update.type == 4) { //Projectile
 					if(update.action == 'r') {
-						world.removeEntityByID(update.updatedEntity.entityID);
+						world.removeEntityByID(update.entityID);
 					}
 					else if(update.action == 'c') {
 						world.overwriteEntityByID(update.updatedEntity.entityID, update.updatedEntity);
 					}
 					else if(update.action == 'a') {
-						
+						world.addUnspecifiedEntity(update.updatedEntity);
+					}
+				}
+				else if(update.type == 3) { //ItemStack
+					if(update.action == 'r') {
+						world.removeEntityByID(update.entityID);
+					}
+					else if(update.action == 'c') {
+						world.overwriteEntityByID(update.updatedEntity.entityID, update.updatedEntity);
+					}
+					else if(update.action == 'a') {
+						world.addUnspecifiedEntity(update.updatedEntity);
+					}
+				}
+				else if(update.type == 2) { //Friendly
+					if(update.action == 'r') {
+						world.removeEntityByID(update.entityID);
+					}
+					else if(update.action == 'c') {
+						EntityNPCFriendly npc = (EntityNPCFriendly)update.updatedEntity;
+						npc.setTexture(EntityNPCFriendly.npcList[npc.getNPCID()].getTexture());
+						world.overwriteEntityByID(update.updatedEntity.entityID, npc);
+					}
+					else if(update.action == 'a') {
+						EntityNPCFriendly npc = (EntityNPCFriendly)update.updatedEntity;
+						npc.setTexture(EntityNPCFriendly.npcList[npc.getNPCID()].getTexture());
+						world.addUnspecifiedEntity(npc);
+					}
+				}
+				else if(update.type == 1) { //Enemy
+					if(update.action == 'r') {
+						world.removeEntityByID(update.entityID);
+					}
+					else if(update.action == 'c') {
+						EntityNPCEnemy enemy = (EntityNPCEnemy)update.updatedEntity;
+						enemy.setTexture(EntityNPCEnemy.enemyList[enemy.getNPCID()].getTexture());
+						world.overwriteEntityByID(update.updatedEntity.entityID, enemy);
+					}
+					else if(update.action == 'a') {
+						EntityNPCEnemy enemy = (EntityNPCEnemy)update.updatedEntity;
+						enemy.setTexture(EntityNPCEnemy.enemyList[enemy.getNPCID()].getTexture());
+						world.addUnspecifiedEntity(enemy);
 					}
 				}
 			}
 			for(PositionUpdate position : serverupdate.positionUpdates)
 			{
-			
+				try {
 				world.getEntityByID(position.entityID).setPosition(position.x, position.y);			
-				
+				} catch (Exception e)
+				{
+					e.printStackTrace();
+				}
 			}
 		}		
 	}
