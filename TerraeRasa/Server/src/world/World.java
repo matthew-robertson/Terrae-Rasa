@@ -38,7 +38,6 @@ import utils.ActionbarItem;
 import utils.ChestLootGenerator;
 import utils.Damage;
 import utils.ItemStack;
-import utils.LightUtils;
 import utils.MathHelper;
 import utils.MetaDataHelper;
 import utils.SpawnManager;
@@ -126,7 +125,6 @@ public class World
 	private int width; //Width in blocks, not pixels
 	private int height; //Height in blocks, not pixels
 	private double previousLightLevel;
-	private LightUtils utils;
 	private boolean lightingUpdateRequired;
 	private Vector<PlayerInput> playerInputs;
 	
@@ -146,7 +144,6 @@ public class World
 		chunksLoaded= new Hashtable<String, Boolean>(25);
 		manager = new SpawnManager();
 		lootGenerator = new ChestLootGenerator();
-		utils = new LightUtils();
 		checkChunks();
 		lightingUpdateRequired = true;
 		playerInputs = new Vector<PlayerInput>();
@@ -180,7 +177,6 @@ public class World
 		lootGenerator = new ChestLootGenerator();
 		chunkWidth = width / Chunk.getChunkWidth();
 		chunkHeight = height / height;
-		utils = new LightUtils();
 		lightingUpdateRequired = true;
 		playerInputs = new Vector<PlayerInput>();
 		checkChunks();
@@ -551,14 +547,14 @@ public class World
 		//update the player
 		for(EntityPlayer player : players)
 		{
-			player.onWorldTick(this); 			
+			player.onWorldTick(update, this); 			
 			//Hittests
 			//TODO: Player-Monster hittest
 			//performPlayerMonsterHittests(player); 
 			//TODO: Player-projectile hittests
 			//performProjectileHittests(player);
 			//TODO: Player-ItemStack hittests
-			//performPlayerItemHittests(player);
+			performPlayerItemHittests(update, player);
 			//TODO: PlayerTool-Monster hittests
 			//performEnemyToolHittests(player);
 		}
@@ -567,9 +563,8 @@ public class World
 		
 		//Not player based stuff -- do this once per game tick
 		updateMonsterStatusEffects();
-		updateEntityLivingItemStacks();
+		updateEntityLivingItemStacks(update);
 		updateWorldTime();
-		applyLightingUpdates();
 
 		//Update Entities
 		//TODO: Monsters
@@ -634,49 +629,73 @@ public class World
 	/**
 	 * Applies gravity to all itemstacks entities
 	 */
-	private void updateEntityLivingItemStacks()
+	private void updateEntityLivingItemStacks(ServerUpdate update)
 	{
 		for(int i = 0; i < itemsList.size(); i++)
 		{
-			try {
-				itemsList.get(i).move(this);
-			} catch (NullPointerException e) {
-				e.printStackTrace();
-			}
+			itemsList.get(i).move(this);
+			PositionUpdate positionUpdate = new PositionUpdate(itemsList.get(i).entityID, itemsList.get(i).x, itemsList.get(i).y);
+			update.addPositionUpdate(positionUpdate);			
 		}		
 	}
 	
 	/**
 	 * Picks up itemstacks that the player is standing on (or very near to)
 	 */
-	private void performPlayerItemHittests(EntityPlayer player)
+	private void performPlayerItemHittests(ServerUpdate update, EntityPlayer player)
 	{
 		final double PLAYER_X_CENTER = player.x + (player.width / 2);
 		final double PLAYER_Y_CENTER = player.y + (player.height / 2);
 		
-		for(int i = 0; i < itemsList.size(); i++)
+		Iterator<EntityItemStack> it = itemsList.iterator();
+		while(it.hasNext())
 		{
-			double distance = MathHelper.distanceBetweenTwoPoints(itemsList.get(i).x + (itemsList.get(i).width / 2), 
-					itemsList.get(i).y + (itemsList.get(i).height / 2),
+			EntityItemStack stack = it.next();
+			double distance = MathHelper.distanceBetweenTwoPoints(stack.x + (stack.width / 2), 
+					stack.y + (stack.height / 2),
 					PLAYER_X_CENTER, 
 					PLAYER_Y_CENTER);
 			//Check if the itemstack is near the player and able to be picked up
-			if(distance <= itemsList.get(i).width * 2 * player.pickupRangeModifier && itemsList.get(i).canBePickedUp()) 
+			if(distance <= stack.width * 2 * player.pickupRangeModifier && stack.canBePickedUp()) 
 			{
-				ItemStack stack = player.inventory.pickUpItemStack(this, player, itemsList.get(i).getStack()); //if so try to pick it up
+				int originalSize = stack.getStack().getStackSize();
+				ItemStack remainingStack = player.inventory.pickUpItemStack(this, player, stack.getStack()); //if so try to pick it up
 				
-				if(stack == null) //nothing's left, remove the null element
+				if(remainingStack == null) //nothing's left, remove the null element
 				{
-					itemsList.remove(i);
+					EntityUpdate entityUpdate = new EntityUpdate();
+					entityUpdate.type = 3;
+					entityUpdate.action = 'r';
+					entityUpdate.entityID = stack.entityID;
+					entityUpdate.updatedEntity = null;
+					update.addEntityUpdate(entityUpdate);
+					String command = "/pickup " + player.entityID + " " + stack.entityID + " " + originalSize;
+					update.addValue(command);
+					it.remove();
 				}
 				else //otherwise, put back what's left
 				{
-					itemsList.get(i).setStack(stack);				
+					if(originalSize != stack.getStack().getStackSize())
+					{
+						String command = "/pickup " + player.entityID + " " + stack.entityID + " " + (originalSize - stack.getStack().getStackSize());
+						update.addValue(command);
+					}
+					stack.setStack(remainingStack);				
 				}
 			}
 			else
 			{
-				itemsList.get(i).update(); 
+				stack.update(); 
+				if(stack.isDead())
+				{
+					EntityUpdate entityUpdate = new EntityUpdate();
+					entityUpdate.type = 3;
+					entityUpdate.action = 'r';
+					entityUpdate.entityID = stack.entityID;
+					entityUpdate.updatedEntity = null;
+					update.addEntityUpdate(entityUpdate);
+					it.remove();
+				}
 			}	
 		}
 	}
@@ -1447,7 +1466,7 @@ public class World
 					{
 						setBlock(block.clone(), mx + i, my + j);
 					}
-					getBlock(mx + i, my + j).metaData = (short)metadata[i][j];
+					getBlock(mx + i, my + j).metaData = (byte)metadata[i][j];
 				}
 			}
 		}	
@@ -1534,7 +1553,7 @@ public class World
 					{
 						setBlock(block.clone(), mx + i, my + j, EnumEventType.EVENT_BLOCK_PLACE);
 					}
-					getBlock(mx + i, my + j).metaData = (short)metadata[i][j];
+					getBlock(mx + i, my + j).metaData = (byte)metadata[i][j];
 				}
 			}
 			
@@ -2144,26 +2163,6 @@ public class World
 			e.printStackTrace();
 		}
 	}
-		
-	/**
-	 * Gets the lighting value of the indicated Block. This may fail if the chunk requested isn't loaded into memory or doesnt exist.
-	 * In this case, a lighting value of 1.0f will be returned. All Exceptions are handled in this method.
-	 * @param x the x position of the Block to check for light in the world map
-	 * @param y the y position of the Block to check for light in the world map
-	 * @return the light value of that square, or 1.0f if that square is null or doesnt exist.
-	 */
-	public double getLight(int x, int y)
-	{
-		try
-		{
-			return getChunks().get(""+(int)(x / Chunk.getChunkWidth())).getLight((int)x % Chunk.getChunkWidth(), (int)y);
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-		return 1.0f;
-	}
 	
 	/**
 	 * Checks for chunks that need to be loaded or unloaded, based on the player's screen size. The range in which chunks stay loaded increases if the player's 
@@ -2397,71 +2396,7 @@ public class World
 		MinimalBlock block = getChunks().get(""+(int)(x / Chunk.getChunkWidth())).getBlock((int)x % Chunk.getChunkWidth(), (int)y);
 		return Block.blocksList[block.id].mergeOnto(block);
 	}
-	
-	public void setAmbientLight(double x, double y, double strength)
-	{
-		try
-		{
-			getChunks().get(""+(int)(x / Chunk.getChunkWidth())).setAmbientLight(strength, (int)x % Chunk.getChunkWidth(), (int)y);
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
-		
-	public void setDiffuseLight(double x, double y, double strength)
-	{
-		try
-		{
-			getChunks().get(""+(int)(x / Chunk.getChunkWidth())).setDiffuseLight(strength, (int)x % Chunk.getChunkWidth(), (int)y);
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
-
-	public double getAmbientLight(int x, int y)
-	{
-		try
-		{
-			return getChunks().get(""+(int)(x / Chunk.getChunkWidth())).getAmbientLight((int)x % Chunk.getChunkWidth(), (int)y);
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-		return 1.0f;
-	}
-	
-	public double getDiffuseLight(int x, int y)
-	{
-		try
-		{
-			return getChunks().get(""+(int)(x / Chunk.getChunkWidth())).getDiffuseLight((int)x % Chunk.getChunkWidth(), (int)y);
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-		return 1.0f;
-	}
-	
-	/**
-	 * Updates the ambient lighting based on the world time and light level (from getLightLevel())
-	 */
-	public void updateAmbientLighting()
-	{
-		Enumeration<String> keys = chunks.keys();
-		//Update the lighting in all the chunks (this is now efficient enough to work)
-		while (keys.hasMoreElements()) 
-        {
-            Chunk chunk = chunks.get((String)keys.nextElement());
-        	utils.applyAmbientChunk(this, chunk);
-    	}
-	}
-	
+			
 	/**
 	 * Sets the block and applies relevant lighting to the area nearby. Includes an EnumEventType to describe the event, although
 	 * it is currently not used for anything.
@@ -2472,49 +2407,9 @@ public class World
 	 */
 	public void setBlock(Block block, int x, int y, EnumEventType eventType)
 	{
-		utils.fixDiffuseLightRemove(this, x, y);
 		setBlock(block, x, y);
-		utils.blockUpdateAmbient(this, x, y, eventType);		
-		utils.fixDiffuseLightApply(this, x, y);
 	}
-	
-	/**
-	 * Called on world tick. Updates the lighting if it's appropriate to do so. It is considered appropriate if the light level of
-	 * the world has changed, or if the chunk (for whatever reason) has been flagged for a lighting update by a source.
-	 * @param player
-	 */
-	public void applyLightingUpdates()
-	{
-		//If the light level has changed, update the ambient lighting.
-		if(lightingUpdateRequired)
-		{
-			updateAmbientLighting();
-			lightingUpdateRequired = false;
-		}
-		
-		Enumeration<String> keys = chunks.keys();
-        while (keys.hasMoreElements()) 
-        {
-            Object key = keys.nextElement();
-            String str = (String) key;
-            Chunk chunk = chunks.get(str);
-                        
-            //If the chunk has been flagged for an ambient lighting update, update the lighting
-            if(chunk.isFlaggedForLightingUpdate())
-            {
-            	utils.applyAmbientChunk(this, chunk);
-            	chunk.setFlaggedForLightingUpdate(false);
-            }
-                    
-            //If the light in the chunk has changed, update the light[][] used for rendering
-            if(!chunk.isLightUpdated())
-            {
-            	chunk.updateChunkLight();
-            	chunk.setLightUpdated(true);
-            }
-        }
-	}
-	
+			
 	/** 
 	 * Launches a projectile
 	 * @param world - current world

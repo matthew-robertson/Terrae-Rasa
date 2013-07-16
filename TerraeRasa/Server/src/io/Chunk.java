@@ -31,12 +31,6 @@ public class Chunk
 		 
 {
 	private Biome biome;
-	/** Light is the total of ambient and diffuse light. This value is inverted (0.0F becomes 1.0F, etc) to optimize rendering */
-	public float[][] light;
-	/** Diffuse light is light from light sources*/
-	public float[][] diffuseLight;
-	/** Ambient light is light from the sun */
-	public float[][] ambientLight;
 	public MinimalBlock[][] backWalls;
 	public MinimalBlock[][] blocks;
 	private final int x;
@@ -70,9 +64,6 @@ public class Chunk
 		}
 		
 		setFlaggedForLightingUpdate(false);
-		light = new float[CHUNK_WIDTH][height];
-		diffuseLight = new float[CHUNK_WIDTH][height];
-		ambientLight = new float[CHUNK_WIDTH][height];
 		this.x = x;
 	}
 	
@@ -114,15 +105,6 @@ public class Chunk
 	}
 	
 	/**
-	 * Gets the light[][] stored in this instanceof Chunk
-	 * @return the light array for this Chunk
-	 */
-	public final float[][] getLight()
-	{
-		return light;
-	}
-	
-	/**
 	 * Gets the block at position (x,y) of the chunk, NOT the world 
 	 * @param x the x position of the block requested
 	 * @param y the y position of the block requested
@@ -143,19 +125,7 @@ public class Chunk
 	{
 		return backWalls[x][y];
 	}
-	
-	/**
-	 * Gets the currently calculated light value for the block at position (x,y) in the chunk. A value of
-	 * 1.0F is full darkness, 0.0F is full light (this reversal is an optimization for rendering)
-	 * @param x a value from 0 to ChunkWidth, to retrieve from the light[][]
-	 * @param y a value from 0 to ChunkHeight, to retrieve from the light[][]
-	 * @return the currently calculated light value of light[x][y]
-	 */
-	public final double getLight(int x, int y)
-	{
-		return light[x][y];
-	}
-	
+		
 	/**
 	 * Gets whether or not this Chunk has been flagged as having been changed, for some reason. This is generally not very descriptive
 	 * and may not even happen at all. 
@@ -187,29 +157,7 @@ public class Chunk
 	{
 		blocks[x][y] = new MinimalBlock(block.clone());
 	}
-	
-	/**
-	 * Sets the diffuseLight[x][y] value to the given strength. 
-	 * @param strength a value from 0.0F to 1.0F, indicating the % of diffuse light strength
-	 * @param x a value from 0 to ChunkWidth	
-	 * @param y a value from 0 to ChunkHeight
-	 */
-	public synchronized void setDiffuseLight(double strength, int x, int y)
-	{
-		diffuseLight[x][y] = (float) strength;
-	}
-	
-	/**
-	 * Sets the ambientLight[x][y] value to the given strength. 
-	 * @param strength a value from 0.0F to 1.0F, indicating the % of ambient light strength
-	 * @param x a value from 0 to ChunkWidth	 
-	 * @param y a value from 0 to ChunkHeight
-	 */
-	public synchronized void setAmbientLight(double strength, int x, int y)
-	{
-		ambientLight[x][y] = (float) strength;
-	}
-	
+		
 	/**
 	 * Sets the wasChanged variable of this chunk to the given boolean
 	 * @param flag the new value for this Chunk's wasChanged field
@@ -228,59 +176,6 @@ public class Chunk
 		return x;
 	}
 	
-	/**
-	 * Gets the diffuse (artificial) light value from diffuseLight[x][y]. A value of 1.0F is full light, 
-	 * 0.0F is no light (This value may exceed 1.0F, in which case it is simply full light).
-	 * @param x a value from 0 to ChunkWidth
-	 * @param y a value from 0 to ChunkHeight
-	 * @return the diffuse light value from diffuseLight[x][y]
-	 */
-	public final double getDiffuseLight(int x, int y)
-	{
-		return diffuseLight[x][y];
-	}
-
-	/**
-	 * Gets the ambient(sun) light value from ambientLight[x][y]. A value of 1.0F is full light, 
-	 * 0.0F is no light (This value may not 1.0F, unlike diffuse light values).
-	 * @param x a value from 0 to ChunkWidth
-	 * @param y a value from 0 to ChunkHeight
-	 * @return the diffuse light value from ambientLight[x][y]
-	 */
-	public final double getAmbientLight(int x, int y)
-	{
-		return ambientLight[x][y];
-	}
-	
-	/**
-	 * Updates the light[][] for rendering. A value of 0.0F is full light, 1.0F is full darkness. This is inverted 
-	 * for optimization reasons.
-	 */
-	public synchronized void updateChunkLight()
-	{
-		for(int i = 0; i < CHUNK_WIDTH; i++)
-		{
-			for(int k = 0; k < height; k++)
-			{
-				light[i][k] = (float) MathHelper.sat(1.0F - ambientLight[i][k] - diffuseLight[i][k]);
-			}
-		}	
-	}
-	
-	/**
-	 * Sets all the ambientlight[][] to 0.0F (no light)
-	 */
-	public synchronized void clearAmbientLight()
-	{
-		for(int i = 0; i < CHUNK_WIDTH; i++)
-		{
-			for(int k = 0; k < height; k++)
-			{
-				ambientLight[i][k] = 0.0F;
-			}
-		}	
-	}
-
 	/**
 	 * Gets the Chunk's flaggedForLightUpdate field
 	 * @return this Chunk's flaggedForLightUpdate field

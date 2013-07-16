@@ -18,11 +18,13 @@ import render.RenderGlobal;
 import render.RenderMenu;
 import spells.Spell;
 import transmission.BlockUpdate;
+import transmission.ClientUpdate;
 import transmission.CompressedClientUpdate;
 import transmission.CompressedPlayer;
 import transmission.CompressedServerUpdate;
 import transmission.EntityUpdate;
 import transmission.PositionUpdate;
+import transmission.StatUpdate;
 import utils.ErrorUtils;
 import utils.FileManager;
 import utils.ItemStack;
@@ -33,10 +35,12 @@ import affix.AffixSturdy;
 import audio.SoundEngine;
 import blocks.Block;
 import blocks.MinimalBlock;
+import entities.EntityItemStack;
 import entities.EntityNPCEnemy;
 import entities.EntityNPCFriendly;
 import entities.EntityPlayer;
 import enums.EnumColor;
+import enums.EnumEventType;
 import enums.EnumHardwareInput;
 import enums.EnumPlayerDifficulty;
 
@@ -132,6 +136,7 @@ public class GameEngine
 			///////
 			Vector<EnumHardwareInput> hardwareInput = new Vector<EnumHardwareInput>(10);
 			Vector<String> clientCommands = new Vector<String>();
+			ClientUpdate update = new ClientUpdate();
 			
 		    while(!TerraeRasa.done) //Main Game Loop
 		    {
@@ -156,8 +161,6 @@ public class GameEngine
 		    		continue;
 		    	}
 		    	
-		    	clientCommands.clear();
-		    	hardwareInput.clear();
 		    	
 		    	loops = 0;
 		        while(System.currentTimeMillis() > next_game_tick && loops < MAX_FRAMESKIP) //Update the game 20 times/second 
@@ -190,34 +193,40 @@ public class GameEngine
 		        	{		        		
 		        		soundEngine.setCurrentMusic("Pause Music");
 		        		
-		        		CompressedClientUpdate update = new CompressedClientUpdate();
+		        		
 		        		Keys.keyboard(world, player, settings, settings.keybinds, hardwareInput);	            
 		        		MouseInput.mouse(world, player, clientCommands, hardwareInput);
 		        		
 		        		//Client player tick
-		        		world.onClientWorldTick(player);
+		        		world.onClientWorldTick(update, player);
 		        		
+		        		
+
+				        
+		        		CompressedClientUpdate compUpdate = new CompressedClientUpdate();
+		        		compUpdate.playerID = activePlayerID;
+		        		//Hardware IO
 		        		EnumHardwareInput[] inputsArray = new EnumHardwareInput[hardwareInput.size()];
 		        		hardwareInput.copyInto(inputsArray);
-		        		update.clientInput = inputsArray;
-		        		
-		        		if(player.inventoryNeedsResent)
-		        		{
-		        			player.inventoryNeedsResent = false;
-		        			update.newInventory = player.getCompressedInventory();
-		        		}
-		        		update.playerID = activePlayerID;
+		        		compUpdate.clientInput = inputsArray;
+		        		hardwareInput.clear();
+		        		//Client Updates (String stuff)
 		        		String[] clientUpdates = new String[clientCommands.size()];
 		        		clientCommands.copyInto(clientUpdates);
-		        		update.commands = clientUpdates;
+		        		compUpdate.commands = clientUpdates;
+		        		clientCommands.clear();
+		        		//Special updates
+		        		compUpdate.objectUpdates = update.getObjectUpdates();		        		
 		        		
-		        		engineLock.addClientUpdate(update);
+		        		engineLock.addClientUpdate(compUpdate);
+		        		
 		        		if(engineLock.hasUpdates())
 		        		{
 		        			//Process the outputs
 		        			CompressedServerUpdate[] updates = engineLock.yieldServerUpdates();
 		        			processUpdates(player, updates);
 		        		}		        		
+		        		update = new ClientUpdate();
 		        	}
 		        	
 		        	TerraeRasa.terraeRasa.checkWindowSize();		        	 
@@ -245,18 +254,18 @@ public class GameEngine
 			    }
 		        else
 		        {		        
-		        	if(renderMode == RENDER_MODE_WORLD_EARTH)
-		    		{
-		        	 	RenderGlobal.render(world, player, renderMode, settings); //Renders Everything on the screen for the game
-		     		}
-		    		else if(renderMode == RENDER_MODE_WORLD_HELL)
-		    		{
-		    		 	RenderGlobal.render(worldHell, player, renderMode, settings); //Renders Everything on the screen for the game
-		    		}
-		    		else if(renderMode == RENDER_MODE_WORLD_SKY)
-		    		{
-		    		 	RenderGlobal.render(worldSky, player, renderMode, settings); //Renders Everything on the screen for the game
-		    		}
+//		        	if(renderMode == RENDER_MODE_WORLD_EARTH)
+//		    		{
+		        	 	RenderGlobal.render(update, world, player, renderMode, settings); //Renders Everything on the screen for the game
+//		     		}
+//		    		else if(renderMode == RENDER_MODE_WORLD_HELL)
+//		    		{
+//		    		 	RenderGlobal.render(worldHell, player, renderMode, settings); //Renders Everything on the screen for the game
+//		    		}
+//		    		else if(renderMode == RENDER_MODE_WORLD_SKY)
+//		    		{
+//		    		 	RenderGlobal.render(worldSky, player, renderMode, settings); //Renders Everything on the screen for the game
+//		    		}
 		        	fps++;
 		        }
 		        
@@ -264,6 +273,7 @@ public class GameEngine
 		        {
 		        	renderMenu.render(world, settings);
 		        }
+		        
 		        
 		        GL11.glPopMatrix();		        
 		        Display.swapBuffers(); //allows the display to update when using VBO's, probably
@@ -296,15 +306,17 @@ public class GameEngine
 		}
 	}
 	
-	public void setActivePlayerID(int id)
-	{
-		this.activePlayerID = id;
-	}
-	
 	private void processUpdates(EntityPlayer clientPlayer, CompressedServerUpdate[] updates)
 	{
 		for(CompressedServerUpdate serverupdate : updates)
 		{
+			for(StatUpdate update : serverupdate.statUpdates)
+			{
+				if(activePlayerID == update.entityID)
+				{
+					((EntityPlayer)(world.getEntityByID(activePlayerID))).setStats(update);
+				}
+			}
 			for(String command : serverupdate.values)
 			{
 				processCommand(clientPlayer, command);
@@ -313,7 +325,11 @@ public class GameEngine
 			{
 				if(update.type == 0)
 				{
-					world.setBlock(Block.blocksList[update.block.id].clone().mergeOnto(new MinimalBlock(update.block)), update.x, update.y);
+					Block block = Block.blocksList[update.block.id].clone().mergeOnto(new MinimalBlock(update.block));
+					if(block.lightStrength > 0)
+						world.setBlock(block, update.x, update.y, EnumEventType.EVENT_BLOCK_PLACE_LIGHT);
+					else
+						world.setBlock(block, update.x, update.y, EnumEventType.EVENT_BLOCK_PLACE_LIGHT);
 				}
 				else 
 				{
@@ -390,9 +406,8 @@ public class GameEngine
 			for(PositionUpdate position : serverupdate.positionUpdates)
 			{
 				try {
-				world.getEntityByID(position.entityID).setPosition(position.x, position.y);			
-				} catch (Exception e)
-				{
+					world.getEntityByID(position.entityID).setPosition(position.x, position.y);			
+				} catch (NullPointerException e) {
 					e.printStackTrace();
 				}
 			}
@@ -425,7 +440,33 @@ public class GameEngine
 			String[] split = command.split(" ");
 			world.addTemporaryText(split[3], Integer.parseInt(split[1]), Integer.parseInt(split[2]), 20, EnumColor.get(split[4]));
 		}
-		
+		else if(command.startsWith("/pickup"))
+		{
+			String[] split = command.split(" ");
+			if(Integer.parseInt(split[1]) != activePlayerID)
+			{
+				return;
+			}
+			ItemStack stack = ((EntityItemStack)(world.getEntityByID(Integer.parseInt(split[2])))).getStack();
+			player.inventory.pickUpItemStack(world, player, new ItemStack(stack).setStackSize(Integer.parseInt(split[3])));
+			stack.removeFromStack(Integer.parseInt(split[3]));
+		}
+		else if(command.startsWith("/player"))
+		{
+			String[] split = command.split(" ");
+			if(!(activePlayerID == Integer.parseInt(split[1])))
+			{
+				return;
+			}
+			if(split[2].equals("quiverremove"))
+			{
+				player.inventory.removeItemsFromQuiverStack(player, Integer.parseInt(split[4]), Integer.parseInt(split[3]));
+			}
+			else if(split[2].equals("inventoryremove"))
+			{
+				player.inventory.removeItemsFromInventoryStack(player, Integer.parseInt(split[4]), Integer.parseInt(split[3]));
+			}
+		}
 	}
 	
 	public static void flagAsMPPlayable()
@@ -438,6 +479,11 @@ public class GameEngine
 		TerraeRasa.isMainMenuOpen = false;
 		mainMenu = null;
 		
+	}
+	
+	public void setActivePlayerID(int id)
+	{
+		this.activePlayerID = id;
 	}
 	
 	/**
@@ -591,7 +637,7 @@ public class GameEngine
 			
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Block.glass, 40));
 
-//			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.snowball, 100));
+			sentPlayer.inventory.pickUpItemStack(world, sentPlayer, new ItemStack(Item.snowball, 100));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.vialEmpty, 100));
 //			player.inventory.pickUpItemStack(world, player, new ItemStack(Item.vialOfWater, 100));
 			

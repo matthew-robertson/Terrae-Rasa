@@ -14,24 +14,20 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 
-import render.Render;
 import savable.SavableWorld;
 import savable.SaveManager;
+import transmission.ClientUpdate;
 import transmission.CompressedPlayer;
 import transmission.WorldData;
-import utils.ActionbarItem;
 import utils.ItemStack;
 import utils.LightUtils;
 import utils.MathHelper;
-import utils.MetaDataHelper;
 import utils.SpawnManager;
 import utils.WorldText;
 import audio.SoundEngine;
 import blocks.Block;
-import blocks.BlockChest;
 import blocks.BlockGrass;
 import blocks.BlockPillar;
 import blocks.MinimalBlock;
@@ -413,6 +409,12 @@ public class World
 	 */
 	public void updateWorldTime(EntityPlayer player)
 	{		
+		worldTime++;
+		if(worldTime >= GAMETICKSPERDAY)//If the time exceeds 24:00, reset it to 0:00
+		{
+			worldTime = 0;
+		}
+		
 		if(getLightLevel() != previousLightLevel) //if the sunlight has changed, update it
 		{
 			previousLightLevel = getLightLevel();
@@ -550,9 +552,9 @@ public class World
 	/**
 	 * Calls all the methods to update the world and its inhabitants
 	 */
-	public void onClientWorldTick(EntityPlayer player)
+	public void onClientWorldTick(ClientUpdate update, EntityPlayer player)
 	{		
-		player.onClientTick(this); 
+		player.onClientTick(update, this); 
 		
 		updateTemporaryText();
 		
@@ -562,7 +564,7 @@ public class World
 		//TODO client chunk request
 		//updateChunks(player);
 		//TODO client side light
-		//applyLightingUpdates(player);
+		applyLightingUpdates(player);
 	}
 		
 	/**
@@ -664,196 +666,6 @@ public class World
 	}
 		
 	/**
-	 * Handles block break events, based on what the block is
-	 * @param mx x position in the 'world map'
-	 * @param my y position in the 'world map'
-	 */
-	private void handleBlockBreakEvent(EntityPlayer player, int mx, int my)
-	{
-		Block block = getBlockGenerate(mx, my);
-		if(!getBlock(mx, my).hasMetaData) //normal block
-		{
-			ItemStack stack = block.getDroppedItem();
-			if(stack != null) //if there's an item to drop, add it to the list of dropped items
-			{
-				addItemStackToItemList(new EntityItemStack((mx * 6) - 1, (my * 6) - 2, stack));
-			}
-			
-			if(block.lightStrength > 0)
-			{
-				//removeLightSource(player, mx, my, ((BlockLight)(getBlock(mx, my))).lightRadius, ((BlockLight)(getBlock(mx, my))).lightStrength);
-				setBlock(Block.air, mx, my, EnumEventType.EVENT_BLOCK_BREAK_LIGHT); //replace it with air
-			}
-			else
-			{
-				setBlock(Block.air, mx, my, EnumEventType.EVENT_BLOCK_BREAK); //replace it with air
-			}
-			
-		}
-		else
-		{
-			if(block instanceof BlockChest)
-			{
-				BlockChest chest = ((BlockChest)(block));
-				if(chest.metaData != 1)
-				{
-					int[][] metadata = MetaDataHelper.getMetaDataArray((int)(Block.blocksList[getBlock(mx, my).id].blockWidth / 6), 
-							(int)(Block.blocksList[getBlock(mx, my).id].blockHeight / 6)); //metadata used by the block of size (x,y)
-					int metaWidth = metadata.length; 
-					int metaHeight = metadata[0].length;	
-					int x1 = 0;
-					int y1 = 0;				
-					
-					for(int i = 0; i < metaWidth; i++) 
-					{
-						for(int j = 0; j < metaHeight; j++)
-						{
-							if(metadata[i][j] == getBlock(mx - x1, my - y1).metaData)
-							{
-								x1 = i; 
-								y1 = j;
-								break;
-							}
-						}
-					}			
-					
-					chest = (BlockChest)(getBlockGenerate(mx - x1, my - y1));
-					mx -= x1;
-					my -= y1;
-				}	
-				
-				ItemStack[] stacks = chest.getMainInventory();
-				for(int i = 0; i < stacks.length; i++)
-				{
-					if(stacks[i] != null)
-					{
-						addItemStackToItemList(new EntityItemStack((mx * 6) + random.nextInt(8) - 2, (my * 6) + random.nextInt(8) - 2, stacks[i])); //drop the item into the world
-					}
-				}
-				
-				player.clearViewedChest();
-			}
-			
-			ItemStack stack = block.getDroppedItem(); //the item dropped by the block
-			if(stack != null)
-			{			
-				int[][] metadata = MetaDataHelper.getMetaDataArray((int)(Block.blocksList[getBlock(mx, my).id].blockWidth / 6),
-						(int)(Block.blocksList[getBlock(mx, my).id].blockHeight / 6)); //metadata used by the block of size (x,y)
-				int metaWidth = metadata.length; //width of the metadata
-				int metaHeight = metadata[0].length; //height of the metadata
-	
-				int x = 0;
-				int y = 0;				
-				for(int i = 0; i < metaWidth; i++) //cycle through the metadata until the value of the broken block is matched
-				{
-					for(int j = 0; j < metaHeight; j++)
-					{
-						if(metadata[i][j] == getBlock(mx, my).metaData)
-						{
-							x = i; 
-							y = j;
-							break;
-						}
-					}
-				}
-				
-				int xOffset = x * -1; //how far over in the block the player in mining
-				int yOffset = y * -1; 
-							
-				for(int i = 0; i < metaWidth; i++) //break the block
-				{
-					for(int j = 0; j < metaHeight; j++)
-					{
-						setBlock(Block.air, mx + i + xOffset, my + j + yOffset, EnumEventType.EVENT_BLOCK_BREAK);
-					}					
-				}
-				
-				addItemStackToItemList(new EntityItemStack((mx * 6) - 1, (my * 6) - 2, stack)); //drop the item into the world
-			}
-		}		
-		setBitMap(mx-1,my, updateBlockBitMap(mx-1, my));
-		setBitMap(mx,my-1, updateBlockBitMap(mx, my-1));
-		setBitMap(mx,my, updateBlockBitMap(mx, my));
-		setBitMap(mx+1,my, updateBlockBitMap(mx+1, my));
-		setBitMap(mx,my+1, updateBlockBitMap(mx, my+1));
-		player.resetMiningVariables();
-		//LightingEngine.applySunlight(this);
-	}
-	
-	/**
-	 * Handles block break events, based on what the block is
-	 * @param mx x position in the 'world map'
-	 * @param my y position in the 'world map'
-	 */
-	private void handleBackBlockBreakEvent(EntityPlayer player, int mx, int my)
-	{
-		ItemStack stack = getBackBlock(mx, my).getDroppedItem();
-		if(stack != null) //if there's an item to drop, add it to the list of dropped items
-		{
-			addItemStackToItemList(new EntityItemStack((mx * 6) - 1, (my * 6) - 2, stack));
-		}
-		setBackBlock(Block.backAir, mx, my); //replace it with air
-	}
-	
-	/**
-	 * Handles player block placement
-	 * @param mx x position in worldmap array, of the block being placed
-	 * @param my y position in the worldmap array, of the block being placed
-	 * @param block the block to be placed
-	 */
-	public void placeLargeBlockWorld(int mx, int my, Block block)
-	{
-		if(block.hasMetaData) //if the block is large
-		{
-			double blockWidth = block.getBlockWidth() / 6;
-			double blockHeight = block.getBlockHeight() / 6;
-			int[][] metadata = MetaDataHelper.getMetaDataArray((int)blockWidth, (int)blockHeight);
-			
-			for(int i = 0; i < blockWidth; i++) //is it possible to place the block?
-			{
-				for(int j = 0; j < blockHeight; j++)
-				{
-					if(getBlock(mx + i, my + j).id != Block.air.id && !getBlockGenerate(mx + i, my + j).getIsOveridable())
-					{
-						return;
-					}
-				}
-			}
-			
-			boolean canBePlaced = false;
-			//Check for at least one solid block on some side of the placement:
-			for(int i = 0; i < blockWidth; i++) //Bottom
-			{
-				if(getBlock(mx + i, my + blockHeight).isSolid)
-				{
-					canBePlaced = true;
-				}
-			}					
-			if(!canBePlaced) //If it cant be placed, then give up trying right here
-			{
-				return;
-			}
-			
-			for(int i = 0; i < metadata.length; i++) //place the block(s)
-			{
-				for(int j = 0; j < metadata[0].length; j++)
-				{
-					if(block instanceof BlockChest)
-					{
-						BlockChest chest = new BlockChest((BlockChest) block);						
-						setBlock(chest, mx + i, my + j);
-					}
-					else
-					{
-						setBlock(block.clone(), mx + i, my + j);
-					}
-					getBlock(mx + i, my + j).metaData = (short)metadata[i][j];
-				}
-			}
-		}	
-	}
-	
-	/**
 	 * Gets the world object's name. worldName is a final field of world and is always the same. It 
 	 * describes whether the world is 'Earth', 'Sky', etc.
 	 * @return the world's name
@@ -861,50 +673,6 @@ public class World
 	public final String getWorldName()
 	{
 		return worldName;
-	}
-	
-	/**
-	 * Cuts down a tree, if a log was broken
-	 * @param mx x position in worldmap array, of the BlockWood
-	 * @param my y position in the worldmap array, of the BlockWood
-	 */
-	public void breakTree(EntityPlayer player, int mx, int my){
-		
-		//Loop as long as part of the tree is above
-		while(my >= 1 && getBlock(mx, my-1).getID() == Block.tree.getID() || 
-				getBlock(mx, my-1).getID() == Block.treetopc2.getID())
-		{
-			if(my >= 1)
-			{
-				if (getBlock(mx, my-1).getID() == Block.tree.getID()){ //If there's a tree above, break it
-					handleBlockBreakEvent(player, mx, my-1);
-				}
-			}
-			if(mx >= 1)
-			{
-				if (getBlock(mx-1, my).getID() == Block.treebranch.getID() || getBlock(mx-1, my).getID() == Block.treebase.getID()){
-					handleBlockBreakEvent(player, mx - 1, my); //If there is a left branch/base on the same level, break it
-				}
-			}
-			if(mx + 1 < width)
-			{
-				if (getBlock(mx+1, my).getID() == Block.treebranch.getID() || getBlock(mx+1, my).getID() == Block.treebase.getID()){
-					handleBlockBreakEvent(player, mx + 1, my); //Same for right branches/bases
-				}
-			}
-			if(mx + 1 < width && mx >= 1 && my >= 1)
-			{
-				if (getBlock(mx, my - 1).getID() == Block.treetopc2.getID()){
-					handleBlockBreakEvent(player, mx + 1, my - 1); //Break a canopy
-					handleBlockBreakEvent(player, mx + 1, my - 2);
-					handleBlockBreakEvent(player, mx, my - 1);
-					handleBlockBreakEvent(player, mx, my - 2);
-					handleBlockBreakEvent(player, mx - 1, my - 1);
-					handleBlockBreakEvent(player, mx - 1, my - 2);
-				}
-			}
-			my--; //Move the check upwards 1 block
-		}	
 	}
 
 	/**
@@ -957,45 +725,7 @@ public class World
 			weather = weatherSnow;
 		}
 	}
-		
-	/**
-	 * Breaks a cactus, from bottom to top.
-	 * @param mx the x position of the first block in worldMap
-	 * @param my the y position of the first block in worldMap
-	 */
-	public void breakCactus(EntityPlayer player, int mx, int my)
-	{
-		while(getBlock(mx, my-1).getID() == Block.cactus.getID())
-		{
-			handleBlockBreakEvent(player, mx, my-1);
-			my--;
-		}
-	}
-			
-	/**
-	 * Provides access to handlBackBlockBreakEvent() because that method is private and has a bizzare name, that's hard to both find and
-	 * remember
-	 * @param x the x position of the block to break (in the 'world map')
-	 * @param y the y position of the block to break (in the 'world map')
-	 */
-	public void breakBackBlock(EntityPlayer player, int x, int y)
-	{
-		handleBackBlockBreakEvent(player, x, y);
-	}
 	
-	/**
-	 * Provides access to handlBlockBreakEvent() because that method is private and has a bizzare name, that's hard to both find and
-	 * remember
-	 * @param x the x position of the block to break (in the 'world map')
-	 * @param y the y position of the block to break (in the 'world map')
-	 */
-	public void breakBlock(EntityPlayer player, int x, int y)
-	{
-		handleBlockBreakEvent(player, x, y);
-		breakCactus(player, x, y);
-		breakTree(player, x, y);
-	}
-
 	/**
 	 * Gets the world's width. This field is a final Integer and will never change.
 	 * @return the world's width

@@ -14,6 +14,6 @@ public class ItemPotionDamageBuff extends ItemPotion
 	public void onRightClick(World world, EntityPlayer player)
 	{
 		player.registerStatusEffect(world, new StatusEffectDamageBuff(durationSeconds, tier, power, ticksBetweenEffect));
-		player.inventory.removeItemsFromInventoryStack(1, player.selectedSlot);
+		player.inventory.removeItemsFromInventoryStack(player, 1, player.selectedSlot);
 	}
 }

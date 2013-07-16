@@ -31,9 +31,6 @@ public class SavableChunk
 {
 	private static final long serialVersionUID = 1L;
 	public int biomeID;
-	public float[][] light;
-	public float[][] diffuseLight;
-	public float[][] ambientLight;
 	public SavableBlock[][] backWalls;
 	public SavableBlock[][] blocks;
 	public int x;

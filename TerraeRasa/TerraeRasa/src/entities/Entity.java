@@ -22,8 +22,7 @@ public class Entity
 {
 	private static final long serialVersionUID = 1L;
 
-	public int entityID;
-	
+	public int entityID;	
 	/** The x position of the entity in pixels. */
 	public double x;
 	/** The y position of the entity in pixels. */

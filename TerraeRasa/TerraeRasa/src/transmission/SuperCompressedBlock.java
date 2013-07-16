@@ -14,8 +14,8 @@ public class SuperCompressedBlock
 	private static final long serialVersionUID = 1L;
 	public ItemStack[] mainInventory;
 	public short id;
-	public short metaData;
-	public short bitMap;
+	public byte metaData;
+	public byte bitMap;
 	
 	public SuperCompressedBlock()
 	{
@@ -25,8 +25,8 @@ public class SuperCompressedBlock
 	public SuperCompressedBlock(Block block)
 	{
 		this.id = (short) block.id;
-		this.metaData = (short) block.metaData;
-		this.bitMap = (short) block.getBitMap();
+		this.metaData = (byte) block.metaData;
+		this.bitMap = (byte) block.getBitMap();
 		mainInventory = (block instanceof BlockChest) ? ((BlockChest)(block)).getMainInventory() : new ItemStack[0];
 	}
 }

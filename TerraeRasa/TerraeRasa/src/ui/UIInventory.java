@@ -755,7 +755,7 @@ public class UIInventory extends UIBase
 				
 				if(player.inventory.getQuiverStack(index) == null) //There's nothing there, so the mouse doesnt have to pickup something
 				{
-					player.inventory.setQuiverStack(new ItemStack(mouseItem).setStackSize(1), index);
+					player.inventory.setQuiverStack(player, new ItemStack(mouseItem).setStackSize(1), index);
 					mouseItem.removeFromStack(1);
 					if(mouseItem.getStackSize() <= 0)
 					{
@@ -817,7 +817,7 @@ public class UIInventory extends UIBase
 					{
 						mouseItem.removeFromStack((player.inventory.getMainInventoryStack(index).getMaxStackSize() - 
 								player.inventory.getMainInventoryStack(index).getStackSize()));
-						player.inventory.adjustMainInventoryStackSize(index, player.inventory.getMainInventoryStack(index).getMaxStackSize());
+						player.inventory.adjustMainInventoryStackSize(player, index, player.inventory.getMainInventoryStack(index).getMaxStackSize());
 					}
 				}
 				else //If there is an item there, swap that slot's item and the mouse's item.
@@ -909,7 +909,7 @@ public class UIInventory extends UIBase
 				
 				if(player.inventory.getQuiverStack(index) == null) //There's nothing there, so the mouse doesnt have to pickup something
 				{
-					player.inventory.setQuiverStack(mouseItem, index);
+					player.inventory.setQuiverStack(player, mouseItem, index);
 					mouseItem = null;
 				}
 				else if(player.inventory.getQuiverStack(index).getItemID() == mouseItem.getItemID())
@@ -925,7 +925,7 @@ public class UIInventory extends UIBase
 					{
 						mouseItem.removeFromStack((player.inventory.getQuiverStack(index).getMaxStackSize() - 
 								player.inventory.getQuiverStack(index).getStackSize()));
-						player.inventory.adjustQuiverStackSize(index, player.inventory.getQuiverStack(index).getMaxStackSize());
+						player.inventory.adjustQuiverStackSize(player, index, player.inventory.getQuiverStack(index).getMaxStackSize());
 					}
 				}
 				
@@ -933,7 +933,7 @@ public class UIInventory extends UIBase
 				else //If there is an item there, swap that slot's item and the mouse's item.
 				{
 					ItemStack stack = player.inventory.getQuiverStack(index);
-					player.inventory.setQuiverStack(mouseItem, index);
+					player.inventory.setQuiverStack(player, mouseItem, index);
 					mouseItem = stack;
 				}
 			}

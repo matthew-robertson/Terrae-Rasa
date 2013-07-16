@@ -39,8 +39,6 @@ public class MouseInput
 			if (!Mouse.isButtonDown(0) && !Mouse.isButtonDown(1) && player.getIsMining()){
 				String command = "/mine stop " + player.entityID;
 				clientCommands.add(command);
-				///mine continue playerid x y activeslot 
-				
 			}
 			if(Mouse.isButtonDown(0) && player.inventory.getMainInventoryStack(active) != null) //Left Mouse Down && Actionbar slot isnt empty
 			{			
@@ -51,7 +49,6 @@ public class MouseInput
 					{
 						Item item = Item.itemsList[selectedItemID];
 						//Try to mine a block
-						//player.breakBlock(world, mouseBX, mouseBY, Item.itemsList[player.inventory.getMainInventoryStack(active).getItemID()]);
 						String command = "/mine frontcontinue " + player.entityID + " " + mouseBX + " " + mouseBY + " " + active;
 						clientCommands.add(command);
 						
@@ -68,50 +65,24 @@ public class MouseInput
 						//Attempt to launch a projectile				
 						if(selectedItemID >= ActionbarItem.itemIndex)
 						{
-							if (item instanceof ItemMagic)
-							{
-								ItemMagic spell = (ItemMagic) item;
-								player.launchProjectileMagic(world, 
-										(double)(Render.getCameraX() + MathHelper.getCorrectMouseXPosition()), 
-										(double)(Render.getCameraY() + MathHelper.getCorrectMouseYPosition()), 
-										spell);
-							}
-							else if (item instanceof ItemRanged)
-							{
-								ItemRanged weapon = (ItemRanged) item;
-								player.launchProjectileWeapon(world, 
-										(double)(Render.getCameraX() + MathHelper.getCorrectMouseXPosition()), 
-										(double)(Render.getCameraY() + MathHelper.getCorrectMouseYPosition()), 
-										weapon);
-							}	
-							else if(item instanceof ItemThrown)
-							{
-								ItemThrown weapon = (ItemThrown) item;
-								player.launchProjectileThrown(world, 
-										(double)(Render.getCameraX() + MathHelper.getCorrectMouseXPosition()), 
-										(double)(Render.getCameraY() + MathHelper.getCorrectMouseYPosition()), 
-										weapon,
-										player.selectedSlot);
-								
-							}
+							double xPos = Render.getCameraX() + MathHelper.getCorrectMouseXPosition(); 
+							double yPos = Render.getCameraY() + MathHelper.getCorrectMouseYPosition();
+							command = "/projectile launch " + player.entityID + " " + active + " " + xPos + " " + yPos;
+							clientCommands.add(command);							
 						}
 					}
 				}
 			}
 			else if (Mouse.isButtonDown(1)) //Right Mouse down
 			{			
-				if(world.getBlockGenerate(mouseBX, mouseBY) instanceof BlockChest && player.isInventoryOpen) //If the block is a chest
-				{
+				//If the block is a chest
+				if(world.getBlockGenerate(mouseBX, mouseBY) instanceof BlockChest && player.isInventoryOpen) {
 					player.setViewedChest(mouseBX, mouseBY);
 				}
-				else
-				{
-					if((player.viewedChestX != mouseBX || player.viewedChestY != mouseBY) && 
-						world.getBlockGenerate(mouseBX, mouseBY) instanceof BlockChest && player.isInventoryOpen)
-					{
-					}
-					else
-					{
+				else {
+					if(!((player.viewedChestX != mouseBX || player.viewedChestY != mouseBY) && 
+						world.getBlockGenerate(mouseBX, mouseBY) instanceof BlockChest && 
+						player.isInventoryOpen)) {
 						player.isViewingChest = false;
 					}
 				}
@@ -126,26 +97,25 @@ public class MouseInput
 						mouseBX = (int) ((double)(Render.getCameraX() + MathHelper.getCorrectMouseXPosition()) / 6);
 						mouseBY = (int) ((double)(Render.getCameraY() + MathHelper.getCorrectMouseYPosition()) / 6);				
 						
+						//Find the distance from the appropriate hand
 						double d = Math.sqrt(( 
 							(Math.pow(((MathHelper.getCorrectMouseXPosition() + Render.getCameraX()) - (player.x + ((player.isFacingRight) ? 9 : 3))), 2)) +
 							(Math.pow(((MathHelper.getCorrectMouseYPosition() + Render.getCameraY()) - (player.y + 9)), 2))  
-						)); //Find the distance from the appropriate hand
-						
-						if(d <= player.getMaximumBlockPlaceDistance()) //if the click was close enough to place a block, try to place one
-						{
-							if (Block.blocksList[selectedItemID] instanceof BlockBackWall){
+						)); 
+						//if the click was close enough to place a block, try to place one
+						if(d <= player.getMaximumBlockPlaceDistance()) {
+							if (Block.blocksList[selectedItemID] instanceof BlockBackWall) {
 								String command = "/placebackblock " + mouseBX + " " + mouseBY + " " + player.entityID + " " + player.inventory.getMainInventoryStack(active).getItemID() + " " + active;
-								//world.placeBackWall(player, mouseBX, mouseBY, Block.blocksList[player.inventory.getMainInventoryStack(active).getItemID()]);
 								clientCommands.add(command);
 							}
 							else {
 								String command = "/placefrontblock " + mouseBX + " " + mouseBY + " " + player.entityID + " " + player.inventory.getMainInventoryStack(active).getItemID() + " " + active;
-								//world.placeBlock(player, mouseBX, mouseBY, Block.blocksList[player.inventory.getMainInventoryStack(active).getItemID()]);
 								clientCommands.add(command);
 							}
 						}
 					}
-					else if(player.inventory.getMainInventoryStack(active) != null && !player.isInventoryOpen && 
+					else if(player.inventory.getMainInventoryStack(active) != null && 
+							!player.isInventoryOpen && 
 							player.inventory.getMainInventoryStack(active).getItemID() >= ActionbarItem.itemIndex && 
 							player.inventory.getMainInventoryStack(active).getItemID() < ActionbarItem.spellIndex) //otherwise, if it's an item
 					{
@@ -157,17 +127,15 @@ public class MouseInput
 					}
 					else if(player.inventory.getMainInventoryStack(active) != null && !player.isInventoryOpen) //Spell
 					{
-						if(!mouseLock)
-						{
+						if(!mouseLock) {
 							Spell.spellList[player.inventory.getMainInventoryStack(active).getItemID()].onRightClick(world, player);
 							mouseLock = true;
 						}
 					}
-					if (player.inventory.getMainInventoryStack(active) != null && selectedItemID < ActionbarItem.spellIndex){
+					if (player.inventory.getMainInventoryStack(active) != null && selectedItemID < ActionbarItem.spellIndex) {
 						Item item = Item.itemsList[selectedItemID];
 						
 						//Mine the backwall
-						//player.breakBackBlock(world, mouseBX, mouseBY, Item.itemsList[player.inventory.getMainInventoryStack(active).getItemID()]);
 						String command = "/mine backcontinue " + player.entityID + " " + mouseBX + " " + mouseBY + " " + active;
 						clientCommands.add(command);
 						
@@ -180,7 +148,6 @@ public class MouseInput
 							}				
 						}					
 					}
-					
 				}
 			}		
 			else

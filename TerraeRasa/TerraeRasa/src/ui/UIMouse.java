@@ -1,24 +1,26 @@
 package ui;
 
+import hardware.Keys;
 import items.Item;
 import items.ItemAmmo;
 import items.ItemArmor;
 import items.ItemGem;
-import hardware.Keys;
+
+import java.util.Vector;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 
-import blocks.Block;
-import blocks.BlockChest;
-
+import transmission.ClientUpdate;
+import transmission.UpdateWithObject;
 import utils.ActionbarItem;
 import utils.ItemStack;
 import utils.MathHelper;
 import utils.MetaDataHelper;
 import world.World;
-import entities.EntityItemStack;
+import blocks.Block;
+import blocks.BlockChest;
 import entities.EntityPlayer;
 
 /**
@@ -34,9 +36,9 @@ public class UIMouse extends UIBase
 	 * Updates all mouse events on call. Including: chests, the mainInventory, the garbage, 
 	 * and the recipe scroller 
 	 */
-	protected static void mouse(World world, EntityPlayer player)
+	protected static void mouse(ClientUpdate update, World world, EntityPlayer player)
 	{
-		mouseEventLeftClick(world, player);	
+		mouseEventLeftClick(update, world, player);	
 		mouseEventRightClick(world, player);
 	}
 
@@ -242,7 +244,7 @@ public class UIMouse extends UIBase
 	/**
 	 * Handles Mouse Events for everything in the inventory.
 	 */
-	protected static void mouseEventLeftClick(World world, EntityPlayer player)
+	protected static void mouseEventLeftClick(ClientUpdate update, World world, EntityPlayer player)
 	{
 		//If the mouse isnt down, there's really no reason to run the rest of this function
 		if(!Mouse.isButtonDown(0)) 
@@ -270,7 +272,7 @@ public class UIMouse extends UIBase
 		}
 		else
 		{
-			mouseClickNoModifier(world, player, x, y);
+			mouseClickNoModifier(update, world, player, x, y);
 		}		
 	}
 	
@@ -280,7 +282,7 @@ public class UIMouse extends UIBase
 	 * @param world the world in use
 	 * @param player the player in use
 	 */
-	protected static void mouseClickNoModifier(World world, EntityPlayer player, int x, int y)
+	protected static void mouseClickNoModifier(ClientUpdate update, World world, EntityPlayer player, int x, int y)
 	{
 		shouldDropItem = true;
 		
@@ -474,7 +476,7 @@ public class UIMouse extends UIBase
 		//if the player didnt click something, drop their mouseitem
 		if(shouldDropItem)
 		{
-			dropMouseItem(world, player);
+			dropMouseItem(update, world, player);
 		}
 	}
 	
@@ -512,7 +514,7 @@ public class UIMouse extends UIBase
 		else if(whichInventory == 4) //Quiver
 		{
 			mouseItem = player.inventory.getQuiverStack(index);
-			player.inventory.setQuiverStack(null, index);
+			player.inventory.setQuiverStack(player, null, index);
 		}			
 	}
 	
@@ -537,7 +539,7 @@ public class UIMouse extends UIBase
 		{
 			mouseItem = new ItemStack(player.inventory.getMainInventoryStack(index));
 			mouseItem.setStackSize((int)(MathHelper.floorOne(mouseItem.getStackSize() / 2)));
-			player.inventory.removeItemsFromInventoryStack(mouseItem.getStackSize(), index); 
+			player.inventory.removeItemsFromInventoryStack(player, mouseItem.getStackSize(), index); 
 		}
 		else if(whichInventory == 2) //Armor Inventory
 		{
@@ -554,7 +556,7 @@ public class UIMouse extends UIBase
 		{
 			mouseItem = new ItemStack(player.inventory.getQuiverStack(index));
 			mouseItem.setStackSize((int)(MathHelper.floorOne(mouseItem.getStackSize() / 2)));
-			player.inventory.removeItemsFromQuiverStack(mouseItem.getStackSize(), index);
+			player.inventory.removeItemsFromQuiverStack(player, mouseItem.getStackSize(), index);
 		}			
 	}
 	
@@ -606,7 +608,7 @@ public class UIMouse extends UIBase
 			if(x > x1 && x < x1 + size && y > y1 && y < y1 + size && player.inventory.getQuiverStack(i) != null) 
 			{
 				//Try to place that stack in the inventory - leaving what's left in the quiver (if any)
-				player.inventory.setQuiverStack(player.inventory.pickUpItemStack(world, 
+				player.inventory.setQuiverStack(player, player.inventory.pickUpItemStack(world, 
 						player, 
 						player.inventory.getQuiverStack(i)), 
 						i);
@@ -797,11 +799,17 @@ public class UIMouse extends UIBase
 	/**
 	 * Drops the mouseItem into the world
 	 */
-	protected static void dropMouseItem(World world, EntityPlayer player)
+	protected static void dropMouseItem(ClientUpdate update, World world, EntityPlayer player)
 	{
 		if(mouseItem != null)
 		{
-			world.addItemStackToItemList(new EntityItemStack(player.x, player.y, mouseItem));
+			//TODO: throw stacks.
+			UpdateWithObject objUpdate = new UpdateWithObject();
+			String command = "/player " + player.entityID + " throw " + " " + player.x + " " + player.y;
+			objUpdate.command = command;
+			objUpdate.object = new ItemStack(mouseItem);
+			update.addObjectUpdate(objUpdate);
+			//world.addItemStackToItemList(new EntityItemStack(player.x, player.y, mouseItem));
 			mouseItem = null;
 		}
 	}

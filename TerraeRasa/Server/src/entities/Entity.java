@@ -314,7 +314,7 @@ public class Entity
 			}
 			return false;
 		}
-		catch(Exception e) //if there's an out of bounds error, assume the player is standing on something solid
+		catch(NullPointerException e) //if there's an out of bounds error, assume the player is standing on something solid
 		{
 			e.printStackTrace();
 			return true;

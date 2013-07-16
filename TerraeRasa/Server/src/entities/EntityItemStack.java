@@ -3,6 +3,7 @@ package entities;
 import items.Item;
 import items.ItemArmor;
 import items.ItemTool;
+import server.GameEngine;
 import utils.ActionbarItem;
 import utils.ItemStack;
 
@@ -19,7 +20,8 @@ import utils.ItemStack;
 public class EntityItemStack extends EntityParticle
 {
 	private static final long serialVersionUID = 1L;
-
+	private static final int LIFE_TIME_IN_TICKS = 300 * GameEngine.TICKS_PER_SECOND; //IE 5 minutes
+	private int remainingTimeTicks;
 	private int ticksBeforePickup;
 	private ItemStack stack;
 	
@@ -51,6 +53,7 @@ public class EntityItemStack extends EntityParticle
 			height = 10;
 		}	
 		
+		remainingTimeTicks = LIFE_TIME_IN_TICKS;
 		this.x = x;
 		this.y = y;
 		blockWidth = (double)(width) / 6;
@@ -74,6 +77,15 @@ public class EntityItemStack extends EntityParticle
 	public void update()
 	{
 		ticksBeforePickup--;
+		remainingTimeTicks--;
+	}
+
+	/**
+	 * An entity itemstack is considered dead should it run out of remaining time to exist.
+	 */
+	public boolean isDead()
+	{
+		return remainingTimeTicks <= 0;
 	}
 	
 	public ItemStack getStack() 

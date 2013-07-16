@@ -19,7 +19,7 @@ public class ItemPotionMana extends Item
 
 		if(success)
 		{
-			player.inventory.removeItemsFromInventoryStack(1, player.selectedSlot);
+			player.inventory.removeItemsFromInventoryStack(player, 1, player.selectedSlot);
 		}
 	}
 	

@@ -11,6 +11,7 @@ import java.util.Vector;
 import transmission.CompressedClientUpdate;
 import transmission.EntityUpdate;
 import transmission.ServerUpdate;
+import transmission.UpdateWithObject;
 import utils.ErrorUtils;
 import utils.FileManager;
 import world.World;
@@ -152,13 +153,17 @@ public class GameEngine
 	{
 		for(CompressedClientUpdate update : updates)
 		{
-			if(update.newInventory != null)
-			{
-				((EntityPlayer)(world.getEntityByID(update.playerID))).inventory.set(update.newInventory);
-			}
 			for(String command : update.commands)
 			{
-				String result = Commands.processClientCommand(serverUpdate, world, this, players, command);
+				String result = Commands.processClientCommand(serverUpdate, null, world, this, players, command);
+				if(!result.equals(""))
+				{
+					commandUpdates.add(result);
+				}
+			}
+			for(UpdateWithObject objUpdate : update.objectUpdates)
+			{
+				String result = Commands.processClientCommand(serverUpdate, objUpdate.object, world, this, players, objUpdate.command);
 				if(!result.equals(""))
 				{
 					commandUpdates.add(result);

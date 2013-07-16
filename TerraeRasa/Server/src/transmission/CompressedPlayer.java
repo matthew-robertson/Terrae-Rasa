@@ -19,7 +19,6 @@ public class CompressedPlayer extends Entity
 {
 	public static final long serialVersionUID = 1L;
 		
-	public boolean isFireImmune;
 	public double attackSpeedModifier;
 	public double knockbackModifier;
 	public double meleeDamageModifier;
@@ -29,9 +28,7 @@ public class CompressedPlayer extends Entity
 	public List<StatusEffect> statusEffects;	
 	public double criticalStrikeChance; 
 	public double dodgeChance;
-	public boolean isImmuneToCrits;
 	public boolean isImmuneToFallDamage;
-	public boolean isImmuneToFireDamage;
 	public int invincibilityTicks;	
 	public int maxHealth;
 	public int maxMana;

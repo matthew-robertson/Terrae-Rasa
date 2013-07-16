@@ -47,7 +47,6 @@ public class EntityLiving extends Entity
 	public final static double DEFENSE_REDUCTION_FLAT = 0.375F;
 	/** The percent of damage reduction provided by 1 point of defense (from 0-1F, where 1F is 100%)*/
 	public final static double DEFENSE_REDUCTION_PERCENT = 0.25F / 100F;
-	public boolean isFireImmune;
 	public double attackSpeedModifier;
 	public double knockbackModifier;
 	public double meleeDamageModifier;
@@ -59,17 +58,14 @@ public class EntityLiving extends Entity
 	public double criticalStrikeChance; 
 	/** (Chance to dodge / 100) */
 	public double dodgeChance;
-	public boolean isImmuneToCrits;
 	public boolean isImmuneToFallDamage;
-	public boolean isImmuneToFireDamage;
 	public int invincibilityTicks;	
 	public int maxHealth;
 	public int maxMana;
 	public double mana;
 	public double defense;
 	protected double health;
-	public List<StatusEffectAbsorb> absorbs;
-	
+	public List<StatusEffectAbsorb> absorbs;	
 	public String jumpSound;
 	public String deathSound;
 	public String hitSound;
@@ -96,7 +92,6 @@ public class EntityLiving extends Entity
 		isJumping = false;
 		canJumpAgain = true;
 		isImmuneToFallDamage = false;
-		isImmuneToFireDamage = false;
 		dodgeChance = 0.05f;
 		attackSpeedModifier = 1.0f;
 		knockbackModifier = 1;
@@ -104,7 +99,6 @@ public class EntityLiving extends Entity
 		rangeDamageModifier = 1;
 		magicDamageModifier = 1;
 		allDamageModifier = 1;		
-		isImmuneToCrits = false;
 		criticalStrikeChance = 0.05f;
 		statusEffects = new ArrayList<StatusEffect>();
 		absorbs = new ArrayList<StatusEffectAbsorb>();		
@@ -124,7 +118,6 @@ public class EntityLiving extends Entity
 	{
 		super(entity);
 
-		this.isFireImmune = entity.isFireImmune;
 		this.attackSpeedModifier = entity.attackSpeedModifier;
 		this.knockbackModifier = entity.knockbackModifier;
 		this.meleeDamageModifier = entity.meleeDamageModifier;
@@ -139,9 +132,7 @@ public class EntityLiving extends Entity
 		this.absorbs = new ArrayList<StatusEffectAbsorb>();		
 		this.criticalStrikeChance = entity.criticalStrikeChance; 
 		this.dodgeChance = entity.dodgeChance;
-		this.isImmuneToCrits = entity.isImmuneToCrits;
 		this.isImmuneToFallDamage = entity.isImmuneToFallDamage;
-		this.isImmuneToFireDamage = entity.isImmuneToFireDamage;
 		this.invincibilityTicks = entity.invincibilityTicks;		
 		this.maxHealth = entity.maxHealth;
 		this.maxMana = entity.maxMana;
@@ -198,7 +189,7 @@ public class EntityLiving extends Entity
 			{
 				double damageDone = damage.amount();
 				//Double the damage done if it was a critical hit
-				if(damage.isCrit() && !isImmuneToCrits)
+				if(damage.isCrit())
 				{
 					damageDone *= 2;
 				}

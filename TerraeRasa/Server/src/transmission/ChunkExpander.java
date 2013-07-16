@@ -14,13 +14,10 @@ public class ChunkExpander
 	public static Chunk expandChunk(SuperCompressedChunk compressedChunk)
 	{
 		Chunk chunk = new Chunk(compressedChunk.biome, compressedChunk.x, compressedChunk.height);
-		chunk.light = compressedChunk.light;
-		chunk.diffuseLight = compressedChunk.diffuseLight;
-		chunk.ambientLight = compressedChunk.ambientLight;
 		chunk.backWalls = expand(compressedChunk.backWalls);
 		chunk.blocks = expand(compressedChunk.blocks);
 		chunk.setChanged(compressedChunk.wasChanged);
-		chunk.setLightUpdated(compressedChunk.lightUpdated);
+		chunk.setLightUpdated(false);
 		chunk.setFlaggedForLightingUpdate(true);
 		return chunk;
 	}

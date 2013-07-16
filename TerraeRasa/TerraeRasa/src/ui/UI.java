@@ -1,5 +1,7 @@
 package ui;
 
+import java.util.Vector;
+
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
@@ -9,6 +11,7 @@ import render.TrueTypeFont;
 
 import blocks.BlockChest;
 
+import transmission.ClientUpdate;
 import utils.ItemStack;
 import utils.MathHelper;
 import utils.MetaDataHelper;
@@ -22,7 +25,7 @@ import entities.EntityPlayer;
  */
 public class UI extends UIBase
 {
-	public static void render(World world, EntityPlayer player, Settings settings)
+	public static void render(ClientUpdate update, World world, EntityPlayer player, Settings settings)
 	{		
 		GL11.glEnable(GL11.GL_BLEND);
 		UIStatusEffects.updateStatusEffects(player);
@@ -41,7 +44,7 @@ public class UI extends UIBase
 			}			
 			if(!settings.menuOpen)
 			{
-				UIMouse.mouse(world, player);
+				UIMouse.mouse(update, world, player);
 				if(isSocketWindowOpen)
 				{
 					UISocketMenu.renderSocketsMenu(world, player);

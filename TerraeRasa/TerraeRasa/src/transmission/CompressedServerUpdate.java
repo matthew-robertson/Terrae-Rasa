@@ -14,5 +14,6 @@ public class CompressedServerUpdate
 	public EntityUpdate[] entityUpdates;
 	public PositionUpdate[] positionUpdates;
 	public BlockUpdate[] blockUpdates;
+	public StatUpdate[] statUpdates;
 	
 }

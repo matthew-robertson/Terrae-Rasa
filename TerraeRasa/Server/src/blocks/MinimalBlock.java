@@ -16,8 +16,8 @@ public class MinimalBlock
 {
 	public ItemStack[] mainInventory;
 	public short id;
-	public short metaData;
-	public short bitMap;
+	public byte metaData;
+	public byte bitMap;
 	public boolean hasMetaData;
 	public boolean isSolid;
 	
@@ -28,7 +28,7 @@ public class MinimalBlock
 	public MinimalBlock(Block block)
 	{
 		this.id = (short) block.getID();
-		this.metaData = (short) block.metaData;
+		this.metaData = (byte) block.metaData;
 		this.mainInventory = (block instanceof BlockChest) ? ((BlockChest)(block)).getMainInventory() : new ItemStack[0];
 		this.setBitMap(block.getBitMap());
 		this.hasMetaData = block.hasMetaData;
@@ -43,7 +43,7 @@ public class MinimalBlock
 	{
 		Block block = Block.blocksList[savedBlock.id].clone();
 		this.id = (short) block.getID();
-		this.metaData = (short) savedBlock.metaData;
+		this.metaData = (byte) savedBlock.metaData;
 		this.mainInventory = savedBlock.mainInventory; //??????
 		this.hasMetaData = block.hasMetaData;
 		this.isSolid = block.isSolid;
@@ -54,7 +54,7 @@ public class MinimalBlock
 	{
 		Block block = Block.blocksList[compressedBlock.id].clone();
 		this.id = (short) block.getID();
-		this.metaData = (short) compressedBlock.metaData;
+		this.metaData = (byte) compressedBlock.metaData;
 		this.mainInventory = compressedBlock.mainInventory; //??????
 		this.hasMetaData = block.hasMetaData;
 		this.isSolid = block.isSolid;
@@ -73,7 +73,7 @@ public class MinimalBlock
 	 */
 	public MinimalBlock setBitMap(int i) 
 	{
-		bitMap = (short)i;		
+		bitMap = (byte)i;		
 		return this;
 	}
 }

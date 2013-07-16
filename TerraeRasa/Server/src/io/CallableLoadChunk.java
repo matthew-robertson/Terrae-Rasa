@@ -25,9 +25,6 @@ public class CallableLoadChunk implements Callable<Chunk>
 	{
 		SavableChunk savable = (SavableChunk)new SaveManager().loadCompressedFile("/World/" + basepath + "/" + x + ".trc");
 		Chunk chunk = new Chunk(Biome.getBiomeFromBiomeList(savable.biomeID), savable.x, savable.height);
-		chunk.light = savable.light;
-		chunk.diffuseLight = savable.diffuseLight;
-		chunk.ambientLight = savable.ambientLight;
 		chunk.backWalls = convertFromSavable(savable.backWalls);
 		chunk.blocks = convertFromSavable(savable.blocks);
 		chunk.setChanged(savable.wasChanged);

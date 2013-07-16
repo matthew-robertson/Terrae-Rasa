@@ -20,7 +20,7 @@ public class ItemPotionHealth extends Item
 			boolean success = player.heal(world, healthRestored, true);
 			if(success)
 			{
-				player.inventory.removeItemsFromInventoryStack(1, player.selectedSlot);
+				player.inventory.removeItemsFromInventoryStack(player, 1, player.selectedSlot);
 				player.putOnCooldown(id, 60);
 				world.soundEngine.playSoundEffect(onUseSound);
 			}

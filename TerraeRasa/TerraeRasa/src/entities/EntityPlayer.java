@@ -1,14 +1,7 @@
 package entities;
 import items.Item;
-import items.ItemAmmo;
 import items.ItemArmor;
-import items.ItemMagic;
-import items.ItemRanged;
-import items.ItemThrown;
 import items.ItemTool;
-import items.ItemToolAxe;
-import items.ItemToolHammer;
-import items.ItemToolPickaxe;
 
 import java.util.Dictionary;
 import java.util.Enumeration;
@@ -16,14 +9,13 @@ import java.util.Hashtable;
 import java.util.Random;
 import java.util.Vector;
 
-import org.lwjgl.input.Mouse;
-
 import passivebonuses.PassiveBonus;
 import passivebonuses.PassiveBonusContainer;
 import passivebonuses.PassiveBonusFactory;
-import render.Render;
-import transmission.CompressedInventory;
+import transmission.ClientUpdate;
 import transmission.CompressedPlayer;
+import transmission.StatUpdate;
+import transmission.UpdateWithObject;
 import utils.Cooldown;
 import utils.CraftingManager;
 import utils.Damage;
@@ -42,7 +34,6 @@ import enums.EnumColor;
 import enums.EnumDamageSource;
 import enums.EnumDamageType;
 import enums.EnumPlayerDifficulty;
-import enums.EnumToolMaterial;
 
 /**
  * <br><br>
@@ -152,7 +143,7 @@ public class EntityPlayer extends EntityLiving
 	public double dexterityModifier;
 	public double strengthModifier;
 	
-	public boolean inventoryNeedsResent;
+	public Vector<String> changedInventorySlots = new Vector<String>();
 	
 	/** A flag indicating if the player has been forever defeated. If they have, they will not be saved to disk.*/
 	public boolean defeated;
@@ -204,7 +195,6 @@ public class EntityPlayer extends EntityLiving
 		viewedChestX = 0;
 		viewedChestY = 0;
 		defeated = false;
-		isImmuneToCrits = false;
 		craftingManager = new CraftingManager();
 		inventoryChanged = true;	
 		selectedRecipe = 0;
@@ -277,36 +267,36 @@ public class EntityPlayer extends EntityLiving
 		auraTracker = new AuraTracker();
 	}
 	
-	/**
-	 * Updates the player, should only be called each world tick.
-	 */
-	public void onWorldTick(World world)
-	{		
-		invincibilityTicks = (invincibilityTicks > 0) ? --invincibilityTicks : 0;
-		ticksSinceLastCast++;
-		if(armorChanged)
-		{
-			refreshPassiveBonuses();
-			recalculateStats();
-		}		
-		checkForCombatStatus();
-		checkAndUpdateStatusEffects(world);
-		applyGravity(world); //Apply Gravity to the player (and jumping)
-		applyHealthRegen(world);
-		applyManaRegen(world);
-		applySpecialRegen(world);
-		checkForNearbyBlocks(world);	
-		verifyChestRange();
-		updateCooldowns();
-		auraTracker.update(world, this);
-		auraTracker.onTick(world, this);
-		if(isDead())
-		{
-			onDeath(world);
-		}
-	}
+//	/**
+//	 * Updates the player, should only be called each world tick.
+//	 */
+//	public void onWorldTick(World world)
+//	{		
+//		invincibilityTicks = (invincibilityTicks > 0) ? --invincibilityTicks : 0;
+//		ticksSinceLastCast++;
+//		if(armorChanged)
+//		{
+//			refreshPassiveBonuses();
+//			recalculateStats();
+//		}		
+//		checkForCombatStatus();
+//		checkAndUpdateStatusEffects(world);
+//		applyGravity(world); //Apply Gravity to the player (and jumping)
+//		applyHealthRegen(world);
+//		applyManaRegen(world);
+//		applySpecialRegen(world);
+//		checkForNearbyBlocks(world);	
+//		verifyChestRange();
+//		updateCooldowns();
+//		auraTracker.update(world, this);
+//		auraTracker.onTick(world, this);
+//		if(isDead())
+//		{
+//			onDeath(world);
+//		}
+//	}
 	
-	public void onClientTick(World world)
+	public void onClientTick(ClientUpdate update, World world)
 	{
 //		invincibilityTicks = (invincibilityTicks > 0) ? --invincibilityTicks : 0;
 //		ticksSinceLastCast++;
@@ -330,8 +320,38 @@ public class EntityPlayer extends EntityLiving
 //		{
 //			onDeath(world);
 //		}
-
+		String[] changes = new String[changedInventorySlots.size()];
+		changedInventorySlots.copyInto(changes);
+		changedInventorySlots.clear();
+		
+		for(String change : changes)
+		{
+			UpdateWithObject objUpdate = new UpdateWithObject();
+			
+			String[] split = change.split(" ");
+			if(split[0].equals("a"))
+			{
+				objUpdate.command = "/player " + entityID + " armorreplace " + split[1];
+				objUpdate.object = inventory.getArmorInventoryStack(Integer.parseInt(split[1]));
+			}
+			else if(split[0].equals("q"))
+			{
+				objUpdate.command = "/player " + entityID + " quiverreplace " + split[1];
+				objUpdate.object = inventory.getQuiverStack(Integer.parseInt(split[1]));
+			}
+			else if(split[0].equals("i") || split[0].equals("m"))
+			{
+				objUpdate.command = "/player " + entityID + " inventoryreplace " + split[1];
+				objUpdate.object = inventory.getMainInventoryStack(Integer.parseInt(split[1]));
+			}	
+			update.addObjectUpdate(objUpdate);
+			
+		}
+	}
 	
+	public synchronized void clearChangedSlots()
+	{
+		changedInventorySlots.clear();
 	}
 	
 	/**
@@ -470,7 +490,7 @@ public class EntityPlayer extends EntityLiving
 				
 				double damageDone = damage.amount();
 				//Double the damage done if it was a critical hit
-				if(damage.isCrit() && !isImmuneToCrits)
+				if(damage.isCrit())
 				{
 					damageDone *= 2;
 				}
@@ -598,6 +618,10 @@ public class EntityPlayer extends EntityLiving
 	{
 		armorChanged = true;
 	}
+
+	public void onQuiverChange()
+	{
+	}
 	
 	/**
 	 * Overrides EntityLiving onDeath() to provide special things like hardcore (mode) and itemdrops
@@ -669,7 +693,7 @@ public class EntityPlayer extends EntityLiving
 				world.addItemStackToItemList((EntityItemStack)new EntityItemStack(x, 
 						y - 15, 
 						inventory.getQuiverStack(i)).setVelocity(new Vector2F((random.nextFloat() * 8) - 4, random.nextFloat() * 8)));
-				inventory.setQuiverStack(null, i);			
+				inventory.setQuiverStack(this, null, i);			
 			}
 		}
 	}
@@ -680,16 +704,6 @@ public class EntityPlayer extends EntityLiving
 	public void onInventoryChange()
 	{
 		inventoryChanged = true; 
-		inventoryNeedsResent = true;
-	}
-
-	public CompressedInventory getCompressedInventory()
-	{
-		CompressedInventory inv = new CompressedInventory();
-		inv.mainInventory = inventory.getMainInventory();
-		inv.armorInventory = inventory.getArmorInventory();
-		inv.quiver = inventory.getQuiver();
-		return inv;
 	}
 	
 	/**
@@ -935,135 +949,7 @@ public class EntityPlayer extends EntityLiving
 		currentBonuses = PassiveBonusFactory.getPassiveBonuses(inventory);
 		currentBonuses.applyAll(this);
 	}
-
-	/**
-	 * Function called when the player is mining a block
-	 * @param mx x position in worldmap array, of the block being mined
-	 * @param my y position in the worldmap array, of the block being mined
-	 * @param item the tool mining the block
-	 */
-	public void breakBlock (World world, int mx, int my, Item item)
-	{
-		Block block = world.getBlockGenerate(mx,  my);
-		if (world.getBlock(mx, my).getID() != Block.air.getID()){
-			if (((item instanceof ItemToolPickaxe && block.getBlockType() == 1) 
-			  || (item instanceof ItemToolAxe && block.getBlockType() == 2) 
-			  || (item instanceof ItemToolHammer && block.getBlockType() == 3) 
-		      || block.getBlockType() == 0) && Mouse.isButtonDown(0))
-			{ //If the left-mouse button is pressed && they have the correct tool to mine
-				EnumToolMaterial material;
-				if (item instanceof ItemTool)
-				{
-					material = item.getToolMaterial();
-				}
-				else
-				{
-					material = EnumToolMaterial.FIST;
-				}
-				double distance = MathHelper.distanceBetweenTwoPoints((MathHelper.getCorrectMouseXPosition() + Render.getCameraX()), (MathHelper.getCorrectMouseYPosition() + Render.getCameraY()), (this.x + ((isFacingRight) ? 9 : 3)), (this.y + 9));
-					      
-				if(distance <= material.getDistance()){
-					if (material.getToolTier() >= block.getBlockTier()) //If the block is within range
-						{ 	
-						if(ticksreq == 0 || world.getBlock(mx, my) != world.getBlock(sx, sy)) //the mouse has moved or they arent mining anything
-						{				
-							isMining = false;
-							sx = mx; //save the co-ords
-							sy = my;
-							ticksreq = (int) (block.getBlockHardness() / material.getStrength()) + 1; //Determine how long to break
-							
-						}	
-						else if(ticksreq == 1 && Mouse.isButtonDown(0) && block.getIsMineable()) //If the block should break
-						{
-							isMining = false;
-							if(block.id == Block.cactus.getID()) 
-							{
-								world.breakCactus(this, mx, my);
-							}
-							else if(block.id == Block.tree.getID())
-							{
-								world.breakTree(this, mx, my);					
-							}
-							world.breakBlock(this, mx, my);
-							
-							//Overwrite snow/flowers/etc...
-							if (world.getBlockGenerate(mx, my-1).getIsOveridable() == true && world.getBlock(mx, my-1).id != Block.air.getID())
-							{
-								world.breakBlock(this, mx, my-1);
-							}
-						}		
-						else if (Mouse.isButtonDown(0)) //mining is in progress, decrease remaining time.
-						{
-							isMining = true;
-							ticksreq--;			
-						}	
-					}
-				}
-			}
-		}
-	}	
-	
-	/**
-	 * Function called when the player is mining a back wall block
-	 * @param mx x position in worldmap array, of the block being mined
-	 * @param my y position in the worldmap array, of the block being mined
-	 * @param item the tool mining the block
-	 */
-	public void breakBackBlock (World world, int mx, int my, Item item)
-	{
-		if (world.getBackBlock(mx, my).getID() != Block.backAir.getID()){
-			if (((item instanceof ItemToolPickaxe && world.getBackBlock(mx, my).getBlockType() == 1) 
-			  || (item instanceof ItemToolAxe && world.getBackBlock(mx, my).getBlockType() == 2) 
-			  || (item instanceof ItemToolHammer && world.getBackBlock(mx, my).getBlockType() == 3) 
-		      || world.getBackBlock(mx, my).getBlockType() == 0) && Mouse.isButtonDown(1))
-			{ //If the right-mouse button is pressed && they have the correct tool to mine
-				EnumToolMaterial material;
-				if (item instanceof ItemTool)
-				{
-					material = item.getToolMaterial();
-				}
-				else
-				{
-					material = EnumToolMaterial.FIST;
-				}
-				double distance = MathHelper.distanceBetweenTwoPoints((MathHelper.getCorrectMouseXPosition() + Render.getCameraX()), (MathHelper.getCorrectMouseYPosition() + Render.getCameraY()), (this.x + ((isFacingRight) ? 9 : 3)), (this.y + 9));
-					      
-				if(distance <= material.getDistance() && (!world.getBackBlock(mx, my-1).isSolid ||
-						!world.getBackBlock(mx, my+1).isSolid || !world.getBackBlock(mx - 1, my).isSolid ||
-						!world.getBackBlock(mx + 1, my).isSolid)){
-					if (material.getToolTier() >= world.getBackBlock(mx, my).getBlockTier()) //If the block is within range and at an edge
-						{ 	
-						if(ticksreq == 0 || world.getBackBlock(mx, my) != world.getBackBlock(sx, sy)) //the mouse has moved or they arent mining anything
-						{				
-							isMining = false;
-							sx = mx; //save the co-ords
-							sy = my;
-							ticksreq = (int) (world.getBackBlock(mx, my).getBlockHardness() / material.getStrength()) + 1; //Determine how long to break
-							
-						}	
-						else if(ticksreq == 1 && Mouse.isButtonDown(1) && world.getBackBlock(mx,  my).getIsMineable()) //If the block should break
-						{
-							isMining = false;
-							
-							world.breakBackBlock(this, mx, my);
-							
-							//Overwrite snow/flowers/etc...
-							if (world.getBackBlock(mx, my-1).getIsOveridable() == true && world.getBackBlock(mx, my-1) != Block.air)
-							{
-								world.breakBlock(this, mx, my-1);
-							}
-						}		
-						else if (Mouse.isButtonDown(1)) //mining is in progress, decrease remaining time.
-						{
-							isMining = true;
-							ticksreq--;			
-						}	
-					}
-				}
-			}
-		}
-	}	
-	
+		
 	/**
 	 * Increases the maximum health of the player
 	 * @param increase the amount to increase maxHealth
@@ -1153,94 +1039,7 @@ public class EntityPlayer extends EntityLiving
 		sy = 0;
 		sx = 0;
 	}
-	
-	/**
-	 * Launch a player spell projectile
-	 * @param world = current world
-	 * @param mouseX = x position to create the projectile at
-	 * @param mouseY = y position to create the projectile at
-	 * @param item = Item to be used to launch projectile (what projectile is needed)
-	 */
-	public void launchProjectileMagic(World world, double mouseX, double mouseY, ItemMagic item){		
-		if (mana >= item.getManaReq()){
-			int angle = MathHelper.angleMousePlayer(mouseX, mouseY, x, y);
-			if (angle < 0){
-				angle += 360;
-			}
-			world.addEntityToProjectileList(new EntityProjectile(item.getProjectile()).setXLocAndYLoc(x, y)
-					.setDirection(angle).setDamage(item.getProjectile().getDamage() * rangeDamageModifier * allDamageModifier));
-			mana -= item.getManaReq();			
-		}
 		
-	}
-
-	/**
-	 * Launch a player weapon projectile
-	 * @param world = current world
-	 * @param mouseX = x position to create the projectile at
-	 * @param mouseY = y position to create the projectile at
-	 * @param item = Item to be used to launch projectile (to determine what projectile is needed)
-	 */
-	public void launchProjectileWeapon(World world, double mouseX, double mouseY, ItemRanged item){
-		if (ticksSinceLastCast > item.getCooldownTicks())
-		{
-			for (int i = 0; i < inventory.getQuiverLength(); i++)
-			{			
-				if(inventory.getQuiverStack(i) != null)
-				{	
-					ItemAmmo ammunition = (ItemAmmo) Item.itemsList[inventory.getQuiverStack(i).getItemID()];
-					
-					int angle = MathHelper.angleMousePlayer(mouseX, mouseY, x, y) - 90;
-					if (angle < 0)
-					{
-						angle += 360;
-					}
-					if (isFacingRight)
-					{
-						world.addEntityToProjectileList(new EntityProjectile(ammunition.getProjectile()).setDrop(new ItemStack(ammunition)).setXLocAndYLoc(x, y)
-								.setDirection(angle).setDamage((ammunition.getProjectile().getDamage() + item.getDamage()) * rangeDamageModifier * allDamageModifier));
-					}
-					else{
-						world.addEntityToProjectileList(new EntityProjectile(ammunition.getProjectile()).setDrop(new ItemStack(ammunition)).setXLocAndYLoc(x, y)
-								.setDirection(angle).setDamage((ammunition.getProjectile().getDamage() + item.getDamage()) * rangeDamageModifier * allDamageModifier));
-					}
-					inventory.removeItemsFromQuiverStack(1, i);
-					ticksSinceLastCast = 0;
-					break;
-				}
-			}
-		}
-	}
-	
-	/**
-	 * Launch a player weapon projectile
-	 * @param world = current world
-	 * @param mouseX = x position to create the projectile at
-	 * @param mouseY = y position to create the projectile at
-	 * @param item = Item to be used to launch projectile (to determine what projectile is needed)
-	 */
-	public void launchProjectileThrown(World world, double mouseX, double mouseY, ItemThrown item, int index){
-		if (ticksSinceLastCast > item.getCooldownTicks())
-		{
-			int angle = MathHelper.angleMousePlayer(mouseX, mouseY, x, y) - 90;
-			if (angle < 0)
-			{
-				angle += 360;
-			}
-			if (isFacingRight)
-			{
-				world.addEntityToProjectileList(new EntityProjectile(item.getProjectile()).setDrop(new ItemStack(item)).setXLocAndYLoc(x, y)
-						.setDirection(angle).setDamage(item.getProjectile().getDamage() * rangeDamageModifier * allDamageModifier));
-			}
-			else{
-				world.addEntityToProjectileList(new EntityProjectile(item.getProjectile()).setDrop(new ItemStack(item)).setXLocAndYLoc(x, y)
-						.setDirection(angle).setDamage(item.getProjectile().getDamage() * rangeDamageModifier * allDamageModifier));
-			}
-			inventory.removeItemsFromInventoryStack(1, index);
-			ticksSinceLastCast = 0;
-		}
-	}
-	
 	/**
 	 * Gets the Block the player is holding, if it's a Block and it's an instanceof BlockLight. Used for handheld lighting.
 	 * @return an instanceof BlockLight if the player is holding one, otherwise null
@@ -1488,7 +1287,6 @@ public class EntityPlayer extends EntityLiving
 		compressPlayer.baseSpeed = player.baseSpeed;
 		compressPlayer.movementSpeedModifier = player.movementSpeedModifier;
 
-		compressPlayer.isFireImmune = player.isFireImmune;
 		compressPlayer.attackSpeedModifier = player.attackSpeedModifier;
 		compressPlayer.knockbackModifier = player.knockbackModifier;
 		compressPlayer.meleeDamageModifier = player.meleeDamageModifier;
@@ -1498,9 +1296,7 @@ public class EntityPlayer extends EntityLiving
 		compressPlayer.statusEffects = player.statusEffects;	
 		compressPlayer.criticalStrikeChance = player.criticalStrikeChance; 
 		compressPlayer.dodgeChance = player.dodgeChance;
-		compressPlayer.isImmuneToCrits = player.isImmuneToCrits;
 		compressPlayer.isImmuneToFallDamage = player.isImmuneToFallDamage;
-		compressPlayer.isImmuneToFireDamage = player.isImmuneToFireDamage;
 		compressPlayer.invincibilityTicks = player.invincibilityTicks;	
 		compressPlayer.maxHealth = player.maxHealth;
 		compressPlayer.maxMana = player.maxMana;
@@ -1600,7 +1396,6 @@ public class EntityPlayer extends EntityLiving
 		player.baseSpeed = compressedPlayer.baseSpeed;
 		player.movementSpeedModifier = compressedPlayer.movementSpeedModifier;
 
-		player.isFireImmune = compressedPlayer.isFireImmune;
 		player.attackSpeedModifier = compressedPlayer.attackSpeedModifier;
 		player.knockbackModifier = compressedPlayer.knockbackModifier;
 		player.meleeDamageModifier = compressedPlayer.meleeDamageModifier;
@@ -1610,9 +1405,7 @@ public class EntityPlayer extends EntityLiving
 		player.statusEffects = compressedPlayer.statusEffects;	
 		player.criticalStrikeChance = compressedPlayer.criticalStrikeChance; 
 		player.dodgeChance = compressedPlayer.dodgeChance;
-		player.isImmuneToCrits = compressedPlayer.isImmuneToCrits;
 		player.isImmuneToFallDamage = compressedPlayer.isImmuneToFallDamage;
-		player.isImmuneToFireDamage = compressedPlayer.isImmuneToFireDamage;
 		player.invincibilityTicks = compressedPlayer.invincibilityTicks;	
 		player.maxHealth = compressedPlayer.maxHealth;
 		player.maxMana = compressedPlayer.maxMana;
@@ -1709,7 +1502,6 @@ public class EntityPlayer extends EntityLiving
 		this.baseSpeed = player.baseSpeed;
 		this.movementSpeedModifier = player.movementSpeedModifier;
 
-		this.isFireImmune = player.isFireImmune;
 		this.attackSpeedModifier = player.attackSpeedModifier;
 		this.knockbackModifier = player.knockbackModifier;
 		this.meleeDamageModifier = player.meleeDamageModifier;
@@ -1719,9 +1511,7 @@ public class EntityPlayer extends EntityLiving
 		this.statusEffects = player.statusEffects;	
 		this.criticalStrikeChance = player.criticalStrikeChance; 
 		this.dodgeChance = player.dodgeChance;
-		this.isImmuneToCrits = player.isImmuneToCrits;
 		this.isImmuneToFallDamage = player.isImmuneToFallDamage;
-		this.isImmuneToFireDamage = player.isImmuneToFireDamage;
 		this.invincibilityTicks = player.invincibilityTicks;	
 		this.maxHealth = player.maxHealth;
 		this.maxMana = player.maxMana;
@@ -1785,5 +1575,47 @@ public class EntityPlayer extends EntityLiving
 		
 		
 		
+	}
+	
+	public StatUpdate getStats()
+	{
+		StatUpdate update = new StatUpdate();
+		update.entityID = this.entityID;
+		update.isStunned = this.isStunned;
+		update.defense = this.defense;
+		update.mana = this.mana;
+		update.maxMana = this.maxMana;
+		update.health = this.health;
+		update.maxHealth = this.maxHealth;
+		update.specialEnergy = this.specialEnergy;
+		update.maxSpecialEnergy = this.maxSpecialEnergy;
+		update.isSwingingRight = this.isSwingingRight;
+		update.hasSwungTool = this.hasSwungTool;
+		update.rotateAngle = this.rotateAngle;
+		update.statusEffects = this.statusEffects;
+		update.absorbs = this.absorbs;
+		update.cooldowns = this.cooldowns;
+		update.defeated = this.defeated;
+		return update;
+		
+	}
+	
+	public void setStats(StatUpdate newStats)
+	{
+		this.isStunned = newStats.isStunned;
+		this.defense = newStats.defense;
+		this.mana = newStats.mana;
+		this.maxMana = (int) newStats.maxMana;
+		this.health = newStats.health;
+		this.maxHealth = (int) newStats.maxHealth;
+		this.specialEnergy = newStats.specialEnergy;
+		this.maxSpecialEnergy = newStats.maxSpecialEnergy;
+		this.isSwingingRight = newStats.isSwingingRight;
+		this.hasSwungTool = newStats.hasSwungTool;
+		this.rotateAngle = newStats.rotateAngle;
+		this.statusEffects = newStats.statusEffects;
+		this.absorbs = newStats.absorbs;
+		this.cooldowns = newStats.cooldowns;
+		this.defeated = newStats.defeated;
 	}
 }

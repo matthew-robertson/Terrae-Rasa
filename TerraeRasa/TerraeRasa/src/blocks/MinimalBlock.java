@@ -16,8 +16,8 @@ public class MinimalBlock
 {
 	public ItemStack[] mainInventory;
 	public short id;
-	public short metaData;
-	public short bitMap;
+	public byte metaData;
+	public byte bitMap;
 	public short iconX;
 	public short iconY;
 	public boolean hasMetaData;
@@ -30,7 +30,7 @@ public class MinimalBlock
 	public MinimalBlock(Block block)
 	{
 		this.id = (short) block.getID();
-		this.metaData = (short) block.metaData;
+		this.metaData = (byte) block.metaData;
 		this.mainInventory = (block instanceof BlockChest) ? ((BlockChest)(block)).getMainInventory() : new ItemStack[0];
 		this.iconX = (short) block.iconX;
 		this.iconY = (short) block.iconY;
@@ -47,7 +47,7 @@ public class MinimalBlock
 	{
 		Block block = Block.blocksList[savedBlock.id].clone();
 		this.id = (short) block.getID();
-		this.metaData = (short) savedBlock.metaData;
+		this.metaData = (byte) savedBlock.metaData;
 		this.mainInventory = savedBlock.mainInventory; //??????
 		this.hasMetaData = block.hasMetaData;
 		this.isSolid = block.isSolid;
@@ -60,7 +60,7 @@ public class MinimalBlock
 	{
 		Block block = Block.blocksList[compressedBlock.id].clone();
 		this.id = (short) block.getID();
-		this.metaData = (short) compressedBlock.metaData;
+		this.metaData = (byte) compressedBlock.metaData;
 		this.mainInventory = compressedBlock.mainInventory; //??????
 		this.hasMetaData = block.hasMetaData;
 		this.isSolid = block.isSolid;
@@ -82,7 +82,7 @@ public class MinimalBlock
 	public MinimalBlock setBitMap(int i) 
 	{
 		char tilemap = Block.blocksList[id].getTileMap(); 
-		bitMap = (short)i;
+		bitMap = (byte)i;
 		// If the block is a general case
 		if (tilemap == 'g') {
 			if (i <= 15) {

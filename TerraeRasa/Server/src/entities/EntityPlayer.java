@@ -13,6 +13,7 @@ import items.ItemToolPickaxe;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Random;
 import java.util.Vector;
 
@@ -20,8 +21,12 @@ import passivebonuses.PassiveBonus;
 import passivebonuses.PassiveBonusContainer;
 import passivebonuses.PassiveBonusFactory;
 import server.TerraeRasa;
+import statuseffects.StatusEffect;
+import statuseffects.StatusEffectAbsorb;
 import transmission.CompressedPlayer;
+import transmission.EntityUpdate;
 import transmission.ServerUpdate;
+import transmission.StatUpdate;
 import utils.Cooldown;
 import utils.Damage;
 import utils.GemSocket;
@@ -145,6 +150,7 @@ public class EntityPlayer extends EntityLiving
 	public double dexterityModifier;
 	public double strengthModifier;
 	
+	private boolean statsNeedResent;
 	
 	/** A flag indicating if the player has been forever defeated. If they have, they will not be saved to disk.*/
 	public boolean defeated;
@@ -196,7 +202,6 @@ public class EntityPlayer extends EntityLiving
 		viewedChestX = 0;
 		viewedChestY = 0;
 		defeated = false;
-		isImmuneToCrits = false;
 		inventoryChanged = true;	
 		selectedRecipe = 0;
 		knockbackModifier = 1;
@@ -255,7 +260,7 @@ public class EntityPlayer extends EntityLiving
 	/**
 	 * Updates the player, should only be called each world tick.
 	 */
-	public void onWorldTick(World world)
+	public void onWorldTick(ServerUpdate update, World world)
 	{		
 		invincibilityTicks = (invincibilityTicks > 0) ? --invincibilityTicks : 0;
 		ticksSinceLastCast++;
@@ -263,6 +268,7 @@ public class EntityPlayer extends EntityLiving
 		{
 			refreshPassiveBonuses();
 			recalculateStats();
+			armorChanged = false;
 		}		
 		checkForCombatStatus();
 		checkAndUpdateStatusEffects(world);
@@ -278,6 +284,11 @@ public class EntityPlayer extends EntityLiving
 		if(isDead())
 		{
 			onDeath(world);
+		}
+		if(statsNeedResent)
+		{
+			statsNeedResent = false;
+			update.addStatUpdate(getStats());
 		}
 	}
 	
@@ -407,7 +418,7 @@ public class EntityPlayer extends EntityLiving
 				
 				double damageDone = damage.amount();
 				//Double the damage done if it was a critical hit
-				if(damage.isCrit() && !isImmuneToCrits)
+				if(damage.isCrit())
 				{
 					damageDone *= 2;
 				}
@@ -533,6 +544,12 @@ public class EntityPlayer extends EntityLiving
 	public void onArmorChange()
 	{
 		armorChanged = true;
+		statsNeedResent = true;
+	}
+	
+	public void onQuiverChange()
+	{
+		
 	}
 	
 	/**
@@ -603,7 +620,7 @@ public class EntityPlayer extends EntityLiving
 				world.addItemStackToItemList((EntityItemStack)new EntityItemStack(x, 
 						y - 15, 
 						inventory.getQuiverStack(i)).setVelocity(new Vector2F((random.nextFloat() * 8) - 4, random.nextFloat() * 8)));
-				inventory.setQuiverStack(null, i);			
+				inventory.setQuiverStack(this, null, i);			
 			}
 		}
 	}
@@ -636,6 +653,7 @@ public class EntityPlayer extends EntityLiving
 		maxHealth = (int) (temporaryMaxHealth + baseMaxHealth + (staminaModifier * stamina * HEALTH_FROM_STAMINA));
 		maxMana = (int) (temporaryMaxMana + baseMaxMana + (intellectModifier * intellect * MANA_FROM_INTELLECT));	
 		maxSpecialEnergy = temporarySpecialEnergy + baseSpecialEnergy;
+		statsNeedResent = true;
 	}
 	
 	/**
@@ -759,10 +777,11 @@ public class EntityPlayer extends EntityLiving
 	 */
 	public void breakBlock (ServerUpdate update, World world, int mx, int my, Item item)
 	{
-		//TODO: FIX
-	//	world.breakBlock(this, mx, my);
-		
 		Block block = world.getBlockGenerate(mx,  my);
+		if(item == null)
+		{
+			return;
+		}
 		//Check If the left-mouse button is pressed && they have the correct tool to mine
 		if (world.getBlock(mx, my).getID() != Block.air.getID()){
 			if (((item instanceof ItemToolPickaxe && block.getBlockType() == 1) //TODO: Magic number fix @ block types
@@ -830,9 +849,10 @@ public class EntityPlayer extends EntityLiving
 	 */
 	public void breakBackBlock (ServerUpdate update, World world, int mx, int my, Item item)
 	{
-		//TODO: FIX
-		//world.breakBackBlock(update, this, mx, my);
-		
+		if(item == null)
+		{
+			return;
+		}
 		if (world.getBackBlock(mx, my).getID() != Block.backAir.getID()){
 			if (((item instanceof ItemToolPickaxe && world.getBackBlock(mx, my).getBlockType() == 1) 
 			  || (item instanceof ItemToolAxe && world.getBackBlock(mx, my).getBlockType() == 2) 
@@ -986,17 +1006,23 @@ public class EntityPlayer extends EntityLiving
 	 * @param mouseY = y position to create the projectile at
 	 * @param item = Item to be used to launch projectile (what projectile is needed)
 	 */
-	public void launchProjectileMagic(World world, double mouseX, double mouseY, ItemMagic item){		
+	public void launchProjectileMagic(ServerUpdate update, World world, double mouseX, double mouseY, ItemMagic item){		
 		if (mana >= item.getManaReq()){
 			int angle = MathHelper.angleMousePlayer(mouseX, mouseY, x, y);
 			if (angle < 0){
 				angle += 360;
 			}
-			world.addEntityToProjectileList(new EntityProjectile(item.getProjectile()).setXLocAndYLoc(x, y)
-					.setDirection(angle).setDamage(item.getProjectile().getDamage() * rangeDamageModifier * allDamageModifier));
+			EntityProjectile projectile = new EntityProjectile(item.getProjectile()).setXLocAndYLoc(x, y)
+					.setDirection(angle).setDamage(item.getProjectile().getDamage() * rangeDamageModifier * allDamageModifier);
+			EntityUpdate entityUpdate = new EntityUpdate();
+			entityUpdate.action = 'a';
+			entityUpdate.type = 4;
+			entityUpdate.entityID = projectile.entityID;
+			entityUpdate.updatedEntity = projectile;
+			update.addEntityUpdate(entityUpdate);
+			world.addEntityToProjectileList(projectile);
 			mana -= item.getManaReq();			
-		}
-		
+		}		
 	}
 
 	/**
@@ -1006,7 +1032,7 @@ public class EntityPlayer extends EntityLiving
 	 * @param mouseY = y position to create the projectile at
 	 * @param item = Item to be used to launch projectile (to determine what projectile is needed)
 	 */
-	public void launchProjectileWeapon(World world, double mouseX, double mouseY, ItemRanged item){
+	public void launchProjectileWeapon(ServerUpdate update, World world, double mouseX, double mouseY, ItemRanged item){
 		if (ticksSinceLastCast > item.getCooldownTicks())
 		{
 			for (int i = 0; i < inventory.getQuiverLength(); i++)
@@ -1020,16 +1046,20 @@ public class EntityPlayer extends EntityLiving
 					{
 						angle += 360;
 					}
-					if (isFacingRight)
-					{
-						world.addEntityToProjectileList(new EntityProjectile(ammunition.getProjectile()).setDrop(new ItemStack(ammunition)).setXLocAndYLoc(x, y)
-								.setDirection(angle).setDamage((ammunition.getProjectile().getDamage() + item.getDamage()) * rangeDamageModifier * allDamageModifier));
-					}
-					else{
-						world.addEntityToProjectileList(new EntityProjectile(ammunition.getProjectile()).setDrop(new ItemStack(ammunition)).setXLocAndYLoc(x, y)
-								.setDirection(angle).setDamage((ammunition.getProjectile().getDamage() + item.getDamage()) * rangeDamageModifier * allDamageModifier));
-					}
-					inventory.removeItemsFromQuiverStack(1, i);
+					
+					EntityProjectile projectile = new EntityProjectile(ammunition.getProjectile()).setDrop(new ItemStack(ammunition)).setXLocAndYLoc(x, y)
+							.setDirection(angle).setDamage((ammunition.getProjectile().getDamage() + item.getDamage()) * rangeDamageModifier * allDamageModifier);
+					EntityUpdate entityUpdate = new EntityUpdate();
+					entityUpdate.action = 'a';
+					entityUpdate.type = 4;
+					entityUpdate.entityID = projectile.entityID;
+					entityUpdate.updatedEntity = projectile;
+					update.addEntityUpdate(entityUpdate);
+					world.addEntityToProjectileList(projectile);
+								
+					String command = "/player " + entityID + " quiverremove " + i + " " + 1;
+					update.addValue(command);					
+					inventory.removeItemsFromQuiverStack(this, 1, i);
 					ticksSinceLastCast = 0;
 					break;
 				}
@@ -1044,7 +1074,7 @@ public class EntityPlayer extends EntityLiving
 	 * @param mouseY = y position to create the projectile at
 	 * @param item = Item to be used to launch projectile (to determine what projectile is needed)
 	 */
-	public void launchProjectileThrown(World world, double mouseX, double mouseY, ItemThrown item, int index){
+	public void launchProjectileThrown(ServerUpdate update, World world, double mouseX, double mouseY, ItemThrown item, int index){
 		if (ticksSinceLastCast > item.getCooldownTicks())
 		{
 			int angle = MathHelper.angleMousePlayer(mouseX, mouseY, x, y) - 90;
@@ -1052,16 +1082,21 @@ public class EntityPlayer extends EntityLiving
 			{
 				angle += 360;
 			}
-			if (isFacingRight)
-			{
-				world.addEntityToProjectileList(new EntityProjectile(item.getProjectile()).setDrop(new ItemStack(item)).setXLocAndYLoc(x, y)
-						.setDirection(angle).setDamage(item.getProjectile().getDamage() * rangeDamageModifier * allDamageModifier));
-			}
-			else{
-				world.addEntityToProjectileList(new EntityProjectile(item.getProjectile()).setDrop(new ItemStack(item)).setXLocAndYLoc(x, y)
-						.setDirection(angle).setDamage(item.getProjectile().getDamage() * rangeDamageModifier * allDamageModifier));
-			}
-			inventory.removeItemsFromInventoryStack(1, index);
+						
+			EntityProjectile projectile = new EntityProjectile(item.getProjectile()).setDrop(new ItemStack(item)).setXLocAndYLoc(x, y)
+					.setDirection(angle).setDamage(item.getProjectile().getDamage() * rangeDamageModifier * allDamageModifier);
+			EntityUpdate entityUpdate = new EntityUpdate();
+			entityUpdate.action = 'a';
+			entityUpdate.type = 4;
+			entityUpdate.entityID = projectile.entityID;
+			entityUpdate.updatedEntity = projectile;
+			update.addEntityUpdate(entityUpdate);
+			world.addEntityToProjectileList(projectile);				
+			
+			
+			String command = "/player " + entityID + " inventoryremove " + index + " " + 1;
+			update.addValue(command);			
+			inventory.removeItemsFromInventoryStack(this, 1, index);
 			ticksSinceLastCast = 0;
 		}
 	}
@@ -1313,7 +1348,6 @@ public class EntityPlayer extends EntityLiving
 		compressPlayer.baseSpeed = player.baseSpeed;
 		compressPlayer.movementSpeedModifier = player.movementSpeedModifier;
 
-		compressPlayer.isFireImmune = player.isFireImmune;
 		compressPlayer.attackSpeedModifier = player.attackSpeedModifier;
 		compressPlayer.knockbackModifier = player.knockbackModifier;
 		compressPlayer.meleeDamageModifier = player.meleeDamageModifier;
@@ -1323,9 +1357,7 @@ public class EntityPlayer extends EntityLiving
 		compressPlayer.statusEffects = player.statusEffects;	
 		compressPlayer.criticalStrikeChance = player.criticalStrikeChance; 
 		compressPlayer.dodgeChance = player.dodgeChance;
-		compressPlayer.isImmuneToCrits = player.isImmuneToCrits;
 		compressPlayer.isImmuneToFallDamage = player.isImmuneToFallDamage;
-		compressPlayer.isImmuneToFireDamage = player.isImmuneToFireDamage;
 		compressPlayer.invincibilityTicks = player.invincibilityTicks;	
 		compressPlayer.maxHealth = player.maxHealth;
 		compressPlayer.maxMana = player.maxMana;
@@ -1425,7 +1457,6 @@ public class EntityPlayer extends EntityLiving
 		player.baseSpeed = compressedPlayer.baseSpeed;
 		player.movementSpeedModifier = compressedPlayer.movementSpeedModifier;
 
-		player.isFireImmune = compressedPlayer.isFireImmune;
 		player.attackSpeedModifier = compressedPlayer.attackSpeedModifier;
 		player.knockbackModifier = compressedPlayer.knockbackModifier;
 		player.meleeDamageModifier = compressedPlayer.meleeDamageModifier;
@@ -1435,9 +1466,7 @@ public class EntityPlayer extends EntityLiving
 		player.statusEffects = compressedPlayer.statusEffects;	
 		player.criticalStrikeChance = compressedPlayer.criticalStrikeChance; 
 		player.dodgeChance = compressedPlayer.dodgeChance;
-		player.isImmuneToCrits = compressedPlayer.isImmuneToCrits;
 		player.isImmuneToFallDamage = compressedPlayer.isImmuneToFallDamage;
-		player.isImmuneToFireDamage = compressedPlayer.isImmuneToFireDamage;
 		player.invincibilityTicks = compressedPlayer.invincibilityTicks;	
 		player.maxHealth = compressedPlayer.maxHealth;
 		player.maxMana = compressedPlayer.maxMana;
@@ -1507,6 +1536,48 @@ public class EntityPlayer extends EntityLiving
 		player.defeated = compressedPlayer.defeated;
 		
 		return player;
+	}
+	
+	public StatUpdate getStats()
+	{
+		StatUpdate update = new StatUpdate();
+		update.entityID = this.entityID;
+		update.isStunned = this.isStunned;
+		update.defense = this.defense;
+		update.mana = this.mana;
+		update.maxMana = this.maxMana;
+		update.health = this.health;
+		update.maxHealth = this.maxHealth;
+		update.specialEnergy = this.specialEnergy;
+		update.maxSpecialEnergy = this.maxSpecialEnergy;
+		update.isSwingingRight = this.isSwingingRight;
+		update.hasSwungTool = this.hasSwungTool;
+		update.rotateAngle = this.rotateAngle;
+		update.statusEffects = this.statusEffects;
+		update.absorbs = this.absorbs;
+		update.cooldowns = this.cooldowns;
+		update.defeated = this.defeated;
+		return update;
+		
+	}
+	
+	public void setStats(StatUpdate newStats)
+	{
+		this.isStunned = newStats.isStunned;
+		this.defense = newStats.defense;
+		this.mana = newStats.mana;
+		this.maxMana = (int) newStats.maxMana;
+		this.health = newStats.health;
+		this.maxHealth = (int) newStats.maxHealth;
+		this.specialEnergy = newStats.specialEnergy;
+		this.maxSpecialEnergy = newStats.maxSpecialEnergy;
+		this.isSwingingRight = newStats.isSwingingRight;
+		this.hasSwungTool = newStats.hasSwungTool;
+		this.rotateAngle = newStats.rotateAngle;
+		this.statusEffects = newStats.statusEffects;
+		this.absorbs = newStats.absorbs;
+		this.cooldowns = newStats.cooldowns;
+		this.defeated = newStats.defeated;
 	}
 	
 }

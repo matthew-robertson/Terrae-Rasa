@@ -26,9 +26,6 @@ public class CallableSaveChunk implements Callable<Boolean>
 	{
 		SavableChunk savable = new SavableChunk();
 		savable.biomeID = chunk.getBiome().getBiomeID();
-		savable.light = chunk.getLight();
-		savable.diffuseLight = chunk.diffuseLight;
-		savable.ambientLight = chunk.ambientLight;
 		savable.backWalls = convertToSavable(chunk.backWalls);
 		savable.blocks = convertToSavable(chunk.blocks);
 		savable.x = chunk.getX();

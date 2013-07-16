@@ -1,5 +1,6 @@
 package auras;
 
+import java.io.Serializable;
 import java.util.Vector;
 
 /**
@@ -13,8 +14,9 @@ import java.util.Vector;
  * @since       1.0
  */
 public class AuraContainer 
-		 
+		 implements Serializable
 {
+	private static final long serialVersionUID = 1L;
 	private Aura[] auras;
 	
 	/**

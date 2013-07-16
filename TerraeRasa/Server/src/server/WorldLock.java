@@ -88,6 +88,7 @@ public class WorldLock
 			compressedUpdate.blockUpdates = update.getBlockUpdates();
 			compressedUpdate.entityUpdates = update.getUpdates();
 			compressedUpdate.positionUpdates = update.getPositionUpdates();
+			compressedUpdate.statUpdates = update.getStatUpdates();
 		//	compressedUpdate.update = new PositionUpdate(getRelevantPlayer().entityID, getRelevantPlayer().x, getRelevantPlayer().y);
 			serverUpdates.add(compressedUpdate);
 		}

@@ -1,14 +1,20 @@
 package server;
 
 import items.Item;
+import items.ItemMagic;
+import items.ItemRanged;
+import items.ItemThrown;
 
 import java.util.Vector;
 
 import transmission.BlockUpdate;
+import transmission.EntityUpdate;
 import transmission.ServerUpdate;
 import transmission.SuperCompressedBlock;
+import utils.ItemStack;
 import world.World;
 import blocks.Block;
+import entities.EntityItemStack;
 import entities.EntityPlayer;
 
 public class Commands 
@@ -125,7 +131,7 @@ public class Commands
 	}
 	
 	
-	public static String processClientCommand(ServerUpdate update, World world, GameEngine engine, Vector<EntityPlayer> players, String command)
+	public static String processClientCommand(ServerUpdate update, Object associatedObject, World world, GameEngine engine, Vector<EntityPlayer> players, String command)
 	{
 		if(command.startsWith("/placefrontblock"))
 		{
@@ -171,36 +177,102 @@ public class Commands
 			EntityPlayer player = ((EntityPlayer)(world.getEntityByID(Integer.parseInt(split[2]))));
 			if(split[1].equals("frontcontinue"))
 			{
-				//player.breakBlock(world, mouseBX, mouseBY, Item.itemsList[player.inventory.getMainInventoryStack(active).getItemID()]);
-				//String command = "/mine frontcontinue " + player.entityID + " " + mouseBX + " " + mouseBY + " " + active;
-				//commandUpdates.add(command);
-				player.breakBlock(update,
-						world, 
-						Integer.parseInt(split[3]), 
-						Integer.parseInt(split[4]),
-						Item.itemsList[player.inventory.getMainInventoryStack(Integer.parseInt(split[5])).getItemID()]);
-				
+				if(player.inventory.getMainInventoryStack(Integer.parseInt(split[5])) != null)
+				{
+					player.breakBlock(update,
+							world, 
+							Integer.parseInt(split[3]), 
+							Integer.parseInt(split[4]),
+							Item.itemsList[player.inventory.getMainInventoryStack(Integer.parseInt(split[5])).getItemID()]);
+				}
 			}
 			else if(split[1].equals("backcontinue"))
 			{
-				//player.breakBackBlock(world, mouseBX, mouseBY, Item.itemsList[player.inventory.getMainInventoryStack(active).getItemID()]);
-//				String command = "/mine backcontinue " + player.entityID + " " + mouseBX + " " + mouseBY + " " + active;
-//				commandUpdates.add(command);
-				player.breakBackBlock(update,
-						world, 
-						Integer.parseInt(split[3]), 
-						Integer.parseInt(split[4]),
-						Item.itemsList[player.inventory.getMainInventoryStack(Integer.parseInt(split[5])).getItemID()]);
-				
+				if(player.inventory.getMainInventoryStack(Integer.parseInt(split[5])) != null)
+				{
+					player.breakBackBlock(update,
+							world, 
+							Integer.parseInt(split[3]), 
+							Integer.parseInt(split[4]),
+							Item.itemsList[player.inventory.getMainInventoryStack(Integer.parseInt(split[5])).getItemID()]);
+				}
 			}
 			else if(split[1].equals("stop"))
 			{
-				//String command = "/mine stop " + player.entityID;
-				//clientCommands.add(command);
-				///mine continue playerid x y activeslot 
 				player.setIsMining(false);
 			}
+		}
+		else if(command.startsWith("/projectile"))
+		{
+			String[] split = command.split(" ");
+			EntityPlayer player = (EntityPlayer)(world.getEntityByID(Integer.parseInt(split[2])));
+			if(player.inventory.getMainInventoryStack(Integer.parseInt(split[3])) != null)
+			{
+				Item item = Item.itemsList[player.inventory.getMainInventoryStack(Integer.parseInt(split[3])).getItemID()];
+	
+	//			/projectile launch playerid selected_slot mx my
+				
+				if (item instanceof ItemMagic)
+				{
+					ItemMagic spell = (ItemMagic) item;
+					player.launchProjectileMagic(update,
+							world, 
+							Double.parseDouble(split[4]), 
+							Double.parseDouble(split[5]), 
+							spell);
+				}
+				else if (item instanceof ItemRanged)
+				{
+					ItemRanged weapon = (ItemRanged) item;
+					player.launchProjectileWeapon(update, 
+							world, 
+							Double.parseDouble(split[4]), 
+							Double.parseDouble(split[5]), 
+							weapon);
+				}	
+				else if(item instanceof ItemThrown)
+				{
+					ItemThrown weapon = (ItemThrown) item;
+					player.launchProjectileThrown(update,
+							world, 
+							Double.parseDouble(split[4]), 
+							Double.parseDouble(split[5]), 
+							weapon,
+							Integer.parseInt(split[3]));								
+				}			
+			}
+		}
+		else if(command.startsWith("/player"))
+		{
+			String[] split = command.split(" ");
+			EntityPlayer player = (EntityPlayer)world.getEntityByID(Integer.parseInt(split[1]));
 			
+			if(split[2].equals("inventoryreplace"))
+			{
+				player.inventory.putItemStackInSlot(world, player, (ItemStack)(associatedObject), Integer.parseInt(split[3]));
+			}
+			else if(split[2].equals("quiverreplace"))
+			{
+				player.inventory.setQuiverStack(player, (ItemStack)(associatedObject), Integer.parseInt(split[3]));
+			}
+			else if(split[2].equals("armorreplace")) 
+			{
+				player.inventory.setArmorInventoryStack(player, 
+						(ItemStack)(associatedObject), 
+						player.inventory.getArmorInventoryStack(Integer.parseInt(split[3])), 
+						Integer.parseInt(split[3]));
+			}		
+			else if(split[2].equals("throw"))
+			{
+				EntityItemStack stack = new EntityItemStack(Double.parseDouble(split[4]), Double.parseDouble(split[5]), (ItemStack)associatedObject);
+				EntityUpdate entityUpdate = new EntityUpdate();
+				entityUpdate.action = 'a';
+				entityUpdate.type = 3;
+				entityUpdate.entityID = stack.entityID;
+				entityUpdate.updatedEntity = stack;
+				update.addEntityUpdate(entityUpdate);
+				world.addItemStackToItemList(stack);
+			}
 		}
 		
 		

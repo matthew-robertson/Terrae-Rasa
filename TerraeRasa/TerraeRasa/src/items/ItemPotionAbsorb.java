@@ -16,7 +16,7 @@ public class ItemPotionAbsorb extends ItemPotion
 		if(!player.isOnCooldown(id))
 		{
 			player.registerStatusEffect(world, new StatusEffectAbsorb(durationSeconds, tier, (int)power));
-			player.inventory.removeItemsFromInventoryStack(1, player.selectedSlot);		
+			player.inventory.removeItemsFromInventoryStack(player, 1, player.selectedSlot);		
 			player.putOnCooldown(id, 600);
 			world.soundEngine.playSoundEffect(onUseSound);
 		}		

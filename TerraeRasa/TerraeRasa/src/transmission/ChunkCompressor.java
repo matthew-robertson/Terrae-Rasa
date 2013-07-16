@@ -16,18 +16,11 @@ public class ChunkCompressor
 	{
 		SuperCompressedChunk compressedChunk = new SuperCompressedChunk();
 		compressedChunk.biome = new Biome(chunk.getBiome());
-		compressedChunk.light = chunk.getLight();
-		compressedChunk.diffuseLight = chunk.diffuseLight;
-		compressedChunk.ambientLight = chunk.ambientLight;
 		compressedChunk.backWalls = compress(chunk.backWalls);
 		compressedChunk.blocks = compress(chunk.blocks);
 		compressedChunk.x = chunk.getX();
 		compressedChunk.wasChanged = chunk.getChanged();
 		compressedChunk.height = chunk.getHeight();
-		compressedChunk.lightUpdated = chunk.isLightUpdated();
-		compressedChunk.flaggedForLightingUpdate = true;
-		
-		
 		return compressedChunk;
 	}
 
