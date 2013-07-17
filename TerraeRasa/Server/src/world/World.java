@@ -547,14 +547,12 @@ public class World
 		{
 			player.onWorldTick(update, this); 			
 			//Hittests
-			//TODO: Player-Monster hittest
-			//performPlayerMonsterHittests(player); 
-			//TODO: Player-projectile hittests
-			//performProjectileHittests(player);
-			//TODO: Player-ItemStack hittests
+			performPlayerMonsterHittests(update, player); 
+			performProjectileHittests(update, player);
 			performPlayerItemHittests(update, player);
-			//TODO: PlayerTool-Monster hittests
 			performEnemyToolHittests(update, player);
+			String command = "/player " + player.entityID + " sethms " + player.getHealth() + " " + player.mana + " " + player.specialEnergy;
+			update.addValue(command);
 		}
 		
 		updateChunks(players);
@@ -919,8 +917,9 @@ public class World
 	
 	/**
 	 * Sees if any monsters have hit (are in range of) the player
+	 * @param update 
 	 */
-	private void performPlayerMonsterHittests(EntityPlayer player)
+	private void performPlayerMonsterHittests(ServerUpdate update, EntityPlayer player)
 	{
 		for(int i = 0; i < entityList.size(); i++)
 		{
@@ -938,8 +937,9 @@ public class World
 	
 	/**
 	 * Sees if any projectiles have hit (are in range of) players or npcs
+	 * @param update 
 	 */
-	private void performProjectileHittests(EntityPlayer player)
+	private void performProjectileHittests(ServerUpdate update, EntityPlayer player)
 	{
 		for (int i = 0; i < projectileList.size(); i++){
 			if (projectileList.get(i).isFriendly){

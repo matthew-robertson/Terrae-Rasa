@@ -273,9 +273,11 @@ public class EntityPlayer extends EntityLiving
 		checkForCombatStatus();
 		checkAndUpdateStatusEffects(world);
 		applyGravity(world); //Apply Gravity to the player (and jumping)
-		applyHealthRegen(world);
-		applyManaRegen(world);
-		applySpecialRegen(world);
+		if(world.getWorldTime() % 20 == 0) {
+			applyHealthRegen(world);
+			applyManaRegen(world);
+			applySpecialRegen(world);
+		}
 		checkForNearbyBlocks(world);	
 		verifyChestRange();
 		updateCooldowns();
@@ -507,7 +509,7 @@ public class EntityPlayer extends EntityLiving
 		if(ticksSinceLastCast > 120)
 		{
 			auraTracker.onManaRestored(world, this);
-			mana += manaRegenerationModifier * (((ticksSinceLastCast - 120) / 1000 < 0.60f) ? ((ticksSinceLastCast - 120) / 1000) : 0.60f);
+			mana += manaRegenerationModifier * (((ticksSinceLastCast - 120) / (1000 / 20) < (0.60 * 20)) ? ((ticksSinceLastCast - 120) / (1000 / 20)) : (0.60 * 20));
 		}
 		
 		if(mana > maxMana)
@@ -527,7 +529,7 @@ public class EntityPlayer extends EntityLiving
 			{
 				auraTracker.onHeal(world, this);
 			}
-			double amountHealed = healthRegenerationModifier * ((ticksOfHealthRegen / 1800f < 0.55f) ? (ticksOfHealthRegen / 1800f) : 0.55f);
+			double amountHealed = healthRegenerationModifier * ((ticksOfHealthRegen / (1800 / 20) < (20 * 0.55)) ? (ticksOfHealthRegen / (1800 / 20)) : (20 * 0.55));
 			health += amountHealed;
 			ticksOfHealthRegen++;	
 		}
@@ -1182,7 +1184,7 @@ public class EntityPlayer extends EntityLiving
 	private void applySpecialRegen(World world)
 	{
 		//25% per minute.
-		specialEnergy += (0.020833333) * specialRegenerationModifier;		
+		specialEnergy += (0.020833333 * 20.0) * specialRegenerationModifier;		
 		if(specialEnergy > maxSpecialEnergy)
 		{
 			specialEnergy = maxSpecialEnergy;

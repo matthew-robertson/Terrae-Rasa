@@ -546,7 +546,7 @@ public class Block extends ActionbarItem
 		{
 			((BlockChest)(this)).setInventory(block.mainInventory);
 		}
-		return this;
+ 		return this;
 	}
 	
 	public static final Block[] blocksList = new Block[2048];

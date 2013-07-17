@@ -502,7 +502,18 @@ public class GameEngine
 			else if(split[2].equals("stopswing"))
 			{
 				((EntityPlayer)(world.getEntityByID(Integer.parseInt(split[1])))).clearSwing();
-			}			
+			}
+			else if(split[2].equals("sethms"))
+			{
+				EntityPlayer p = ((EntityPlayer)(world.getEntityByID(Integer.parseInt(split[1]))));
+				if(p != null) 
+				{
+					p.setHealth(Double.parseDouble(split[3]));
+					p.mana = Double.parseDouble(split[4]);
+					p.specialEnergy = Double.parseDouble(split[5]);
+				}
+			}
+
 			//These only affect this client's player
 			if(!(activePlayerID == Integer.parseInt(split[1])))
 			{
