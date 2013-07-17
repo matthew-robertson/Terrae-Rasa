@@ -109,6 +109,7 @@ public class World
 	private LightUtils utils;
 	private boolean lightingUpdateRequired;
 	
+	private List<String> pendingChunkRequests = new ArrayList<String>();
 	public List<EntityPlayer> otherPlayers = new ArrayList<EntityPlayer>();
 	
 	public Dictionary<String, Entity> entitiesByID = new Hashtable<String, Entity>();
@@ -233,15 +234,17 @@ public class World
 	public World(WorldData data, Chunk[] chunks)
 	{
 		setChunks(new ConcurrentHashMap<String, Chunk>(10));
+		chunksLoaded = new Hashtable<String, Boolean>(25);	
 		for(Chunk chunk : chunks)
 		{
 			this.chunks.put(""+chunk.getX(), chunk);
+			this.chunksLoaded.put(""+chunk.getX(), true);
 		}
 		
 		this.width = data.width;
 		this.height = data.height; 
 		this.difficulty = data.difficulty;
-		chunksLoaded = new Hashtable<String, Boolean>(25);	
+		
 		
 		this.entityList = new ArrayList<EntityNPCEnemy>();
 		for(EntityNPCEnemy enemy : data.entityList)
@@ -560,10 +563,12 @@ public class World
 		
 		//Update the time
 		updateWorldTime(player);
-		//checkChunks();
-		//TODO client chunk request
-		//updateChunks(player);
-		//TODO client side light
+		
+		if(worldTime % 20 == 0) {
+			//TODO client chunk request
+			updateChunks(update, player);
+		}
+		//TODO client side light recognizes torches that already exist
 		applyLightingUpdates(player);
 	}
 		
@@ -1000,6 +1005,11 @@ public class World
 		chunks.put(""+x, chunk);
 	}
 	
+	public void removePendingChunkRequest(String command)
+	{
+		pendingChunkRequests.remove(command);
+	}
+	
 	/**
 	 * Gets the block at the specified (x,y). This method is safe, as all Exceptions are handled in this method. Additionally, 
 	 * the (modular) division is performed automatically. The primary intention is that this method is used to generate the 
@@ -1147,37 +1157,45 @@ public class World
 	 * Checks for chunks that need to be loaded or unloaded, based on the player's screen size. The range in which chunks stay loaded increases if the player's 
 	 * screen size is larger. (It's about ((width/2.2), (height/2.2))). 
 	 */
-	private void updateChunks(EntityPlayer player)
+	private void updateChunks(ClientUpdate update, EntityPlayer player)
 	{
 		//How far to check for chunks (in blocks)
-		final int loadDistanceHorizontally = (((int)(Display.getWidth() / 2.2) + 3) > Chunk.getChunkWidth()) ? ((int)(Display.getWidth() / 2.2) + 3) : Chunk.getChunkWidth();
+		int loadDistance = 2 * Chunk.getChunkWidth();//(((int)(Display.getWidth() / 2.2) + 3) > Chunk.getChunkWidth()) ? ((int)(Display.getWidth() / 2.2) + 3) : Chunk.getChunkWidth();
+		int unloadDistance = 3 * Chunk.getChunkWidth();
+		
 		//Position to check from
 		final int x = (int) (player.x / 6);
 		//Where to check, in the chunk map (based off loadDistance variables)
-		int leftOff = (x - loadDistanceHorizontally) / Chunk.getChunkWidth();
-		int rightOff = (x + loadDistanceHorizontally) / Chunk.getChunkWidth();
+		int leftLoad = (x - loadDistance) / Chunk.getChunkWidth();
+		int rightLoad = (x + loadDistance) / Chunk.getChunkWidth();
 		//Bounds checking
-		if(leftOff < 0) leftOff = 0;
-		if(rightOff > (width / Chunk.getChunkWidth())) rightOff = width / Chunk.getChunkWidth();
+		if(leftLoad < 0) leftLoad = 0;
+		if(rightLoad > (width / Chunk.getChunkWidth())) rightLoad = width / Chunk.getChunkWidth();
 		
+		int leftUnload = (x - unloadDistance) / Chunk.getChunkWidth();
+		int rightUnload= (x + unloadDistance) / Chunk.getChunkWidth();
+		//Bounds checking
+		if(leftUnload < 0) leftUnload = 0;
+		if(rightUnload > (width / Chunk.getChunkWidth())) rightUnload = width / Chunk.getChunkWidth();
+				
 		Enumeration<String> keys = chunksLoaded.keys();
         while (keys.hasMoreElements()) 
         {
-            Object key = keys.nextElement();
-            String strKey = (String) key;
+            String strKey = (String) keys.nextElement();
             boolean loaded = chunksLoaded.get(strKey);
-           
+          
             int cx = Integer.parseInt(strKey);
             
-            if(loaded && (cx < leftOff || cx > rightOff) && x != leftOff && x != rightOff)
+            if(loaded && (cx < leftUnload || cx > rightUnload) && x != leftUnload && x != rightUnload)
 			{
-				//If a chunk isnt needed, request a save.
-				chunkManager.saveChunk(worldName, chunks, cx);
-				chunksLoaded.put(""+cx, false);
+//            	System.out.println("Unload: " + cx);
+            	chunksLoaded.put(""+cx, false);
+            	Chunk chunk = chunks.get(""+cx);
+            	chunk = null;
+            	chunks.remove(""+cx);
 			}
-            
 		}
-		for(int i = leftOff; i <= rightOff; i++) //Check for chunks that need loaded
+		for(int i = leftLoad; i <= rightLoad; i++) //Check for chunks that need loaded
 		{
 			if(i >= 0 && chunksLoaded.get(""+i) == null)
 			{
@@ -1185,9 +1203,15 @@ public class World
 			}
 			if(chunksLoaded.get(""+i) != null && !chunksLoaded.get(""+i)) //If a needed chunk isnt loaded, request it.
 			{
-				chunkManager.requestChunk(worldName, this, chunks, i);
+				String command = "/player " + player.entityID + " chunkrequest " + i;
+				if(!pendingChunkRequests.contains(command))
+				{
+//					System.out.println("Request: " + i);
+					pendingChunkRequests.add(command);
+					update.addCommand(command);
+				}
+				//chunkManager.requestChunk(worldName, this, chunks, i);
 			}
-			
 		}
 	}
 	

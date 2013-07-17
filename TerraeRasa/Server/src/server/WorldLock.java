@@ -4,6 +4,7 @@ import io.Chunk;
 
 import java.util.Vector;
 
+import transmission.ChunkCompressor;
 import transmission.CompressedClientUpdate;
 import transmission.CompressedPlayer;
 import transmission.CompressedServerUpdate;
@@ -83,12 +84,19 @@ public class WorldLock
 		{
 			CompressedServerUpdate compressedUpdate = new CompressedServerUpdate();
 			compressedUpdate.values = update.getValues();
-			compressedUpdate.chunks = new SuperCompressedChunk[]{ };
+			Chunk[] chunks = update.getChunks();
+			SuperCompressedChunk[] compressedChunks = new SuperCompressedChunk[chunks.length];
+			for(int i = 0; i < chunks.length; i++)
+			{
+				compressedChunks[i] = ChunkCompressor.compressChunk(chunks[i]);
+			}
+			compressedUpdate.chunks = compressedChunks;
 		//	compressedUpdate.player = null;
 			compressedUpdate.blockUpdates = update.getBlockUpdates();
 			compressedUpdate.entityUpdates = update.getUpdates();
 			compressedUpdate.positionUpdates = update.getPositionUpdates();
 			compressedUpdate.statUpdates = update.getStatUpdates();
+			compressedUpdate.objectUpdates = update.getObjectUpdates();
 		//	compressedUpdate.update = new PositionUpdate(getRelevantPlayer().entityID, getRelevantPlayer().x, getRelevantPlayer().y);
 			serverUpdates.add(compressedUpdate);
 		}

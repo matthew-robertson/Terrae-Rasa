@@ -1254,7 +1254,7 @@ public class EntityPlayer extends EntityLiving
 	/**
 	 * Updates the tool swing. This is based on a weapon's swing speed - a faster speed swings faster.
 	 */
-	public void updateSwing()
+	public void updateSwing(ServerUpdate update)
 	{
 		double swingSpeed = (double)((ItemTool)(Item.itemsList[inventory.getMainInventoryStack(selectedSlot).getItemID()])).swingTime;
 		swingSpeed = (swingSpeed / attackSpeedModifier);
@@ -1264,7 +1264,14 @@ public class EntityPlayer extends EntityLiving
             if(rotateAngle <= leftSwingBound || rotateAngle >= rightSwingBound )
 	        {
 	        	clearSwing();
+	        	String command = "/player " + entityID + " stopswing";
+				update.addValue(command);
 	        }
+            else
+            {
+            	String command = "/player " + entityID + " swingangle " + getSwingAngle();
+				update.addValue(command);
+            }
 		}
 		else
 		{
@@ -1272,7 +1279,14 @@ public class EntityPlayer extends EntityLiving
 		    if(rotateAngle <= leftSwingBound || rotateAngle >= rightSwingBound)
 	        {
 	        	clearSwing();
+		    	String command = "/player " + entityID + " stopswing";
+				update.addValue(command);
 	        }
+		    else
+		    {
+		    	String command = "/player " + entityID + " swingangle " + getSwingAngle();
+				update.addValue(command);
+		    }
 		}
 	}
 	
@@ -1280,11 +1294,11 @@ public class EntityPlayer extends EntityLiving
 	 * Starts swinging the tool based on direction, resetting the angle to an appropriate starting location. 
 	 * @param swingRight whether the swing is right, or not (IE left)
 	 */
-	public void startSwingingTool(boolean swingRight)
+	public void startSwingingTool()
 	{
-		isSwingingRight = swingRight;
+		isSwingingRight = isFacingRight;
 		hasSwungTool = true;
-		if(swingRight)
+		if(isSwingingRight)
 		{
 			rotateAngle = leftSwingBound;			
 		}
@@ -1578,6 +1592,11 @@ public class EntityPlayer extends EntityLiving
 		this.absorbs = newStats.absorbs;
 		this.cooldowns = newStats.cooldowns;
 		this.defeated = newStats.defeated;
+	}
+
+	public double getSwingAngle() 
+	{
+		return rotateAngle;
 	}
 	
 }

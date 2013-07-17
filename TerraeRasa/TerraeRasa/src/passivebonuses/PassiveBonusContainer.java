@@ -1,5 +1,6 @@
 package passivebonuses;
 
+import java.io.Serializable;
 import java.util.Vector;
 
 import entities.EntityPlayer;
@@ -15,7 +16,9 @@ import entities.EntityPlayer;
  * @since       1.0
  */
 public class PassiveBonusContainer 
+		implements Serializable
 {
+	private static final long serialVersionUID = 1L;
 	private PassiveBonus[] bonuses;
 	
 	/**

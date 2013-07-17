@@ -1618,4 +1618,10 @@ public class EntityPlayer extends EntityLiving
 		this.cooldowns = newStats.cooldowns;
 		this.defeated = newStats.defeated;
 	}
+
+	public void setSwingAngle(double angle) 
+	{
+		hasSwungTool = true;
+		this.rotateAngle = angle;
+	}
 }

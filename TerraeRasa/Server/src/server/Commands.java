@@ -5,12 +5,15 @@ import items.ItemMagic;
 import items.ItemRanged;
 import items.ItemThrown;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import transmission.BlockUpdate;
 import transmission.EntityUpdate;
 import transmission.ServerUpdate;
 import transmission.SuperCompressedBlock;
+import transmission.UpdateWithObject;
 import utils.ItemStack;
 import world.World;
 import blocks.Block;
@@ -131,7 +134,8 @@ public class Commands
 	}
 	
 	
-	public static String processClientCommand(ServerUpdate update, Object associatedObject, World world, GameEngine engine, Vector<EntityPlayer> players, String command)
+	public static String processClientCommand(ServerUpdate update, Object associatedObject, World world, 
+			GameEngine engine, Vector<EntityPlayer> players, String command, List<String> pendingChunkRequests)
 	{
 		if(command.startsWith("/placefrontblock"))
 		{
@@ -272,6 +276,35 @@ public class Commands
 				entityUpdate.updatedEntity = stack;
 				update.addEntityUpdate(entityUpdate);
 				world.addItemStackToItemList(stack);
+			}
+			else if(split[2].equals("chunkrequest"))
+			{
+				if(world.chunksLoaded.get(split[3]))
+				{
+					update.addChunkUpdate(world.getChunk(Integer.parseInt(split[3])));
+				}		
+				else
+				{
+					pendingChunkRequests.add(command);
+				}
+			}
+			else if(split[2].equals("startswing"))
+			{
+				if(!player.isSwingingTool()) 
+				{
+					player.selectedSlot = Integer.parseInt(split[3]);
+					UpdateWithObject objUpdate = new UpdateWithObject();
+					objUpdate.command = "/player " + player.entityID + " inv_and_action_update " + player.selectedSlot;
+					objUpdate.object = player.inventory.getMainInventoryStack(player.selectedSlot);
+					update.addObjectUpdate(objUpdate);
+					player.startSwingingTool();
+				}
+			}
+			else if(split[2].equals("cancelswing"))
+			{
+				player.clearSwing();
+				command = "/player " + player.entityID + " stopswing";
+				update.addValue(command);
 			}
 		}
 		

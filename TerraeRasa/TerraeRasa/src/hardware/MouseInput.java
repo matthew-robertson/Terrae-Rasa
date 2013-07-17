@@ -55,9 +55,8 @@ public class MouseInput
 						if(!player.isSwingingTool() && item instanceof ItemTool) //If the player isn't swinging a tool, start swinging
 						{
 							ItemTool tool = (ItemTool) item;
-							command = "";
+							command = "/player " + player.entityID + " startswing " + player.selectedSlot;
 							clientCommands.add(command);
-							
 							if (player.getIsMining()){
 								world.soundEngine.playSoundEffect(tool.hitSound);
 							}				
@@ -164,11 +163,13 @@ public class MouseInput
 		        {
 		        	player.selectedSlot--; //Decrease selected slot (actionbar)
 		        	player.clearSwing();
+		        	clientCommands.add("/player " + player.entityID + " cancelswing");
 		        }
 		        else if(wheelMovement < 0) //If mouse scrolled down
 		        {
 		        	player.selectedSlot++; //Increase selected slot (actionbar)
 		        	player.clearSwing();
+		        	clientCommands.add("/player " + player.entityID + " cancelswing");
 		        }
 		        
 		        //Bounds checking

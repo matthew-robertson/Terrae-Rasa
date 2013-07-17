@@ -144,7 +144,6 @@ public class World
 		chunksLoaded= new Hashtable<String, Boolean>(25);
 		manager = new SpawnManager();
 		lootGenerator = new ChestLootGenerator();
-		checkChunks();
 		lightingUpdateRequired = true;
 		playerInputs = new Vector<PlayerInput>();
 	}
@@ -179,7 +178,6 @@ public class World
 		chunkHeight = height / height;
 		lightingUpdateRequired = true;
 		playerInputs = new Vector<PlayerInput>();
-		checkChunks();
 	}
 		
 	public WorldData getWorldData()
@@ -556,7 +554,7 @@ public class World
 			//TODO: Player-ItemStack hittests
 			performPlayerItemHittests(update, player);
 			//TODO: PlayerTool-Monster hittests
-			//performEnemyToolHittests(player);
+			performEnemyToolHittests(update, player);
 		}
 		
 		updateChunks(players);
@@ -1161,7 +1159,7 @@ public class World
 	 * Performs a hittest between the player's tool and monsters. 
 	 * @param player
 	 */
-	private void performEnemyToolHittests(EntityPlayer player) 
+	private void performEnemyToolHittests(ServerUpdate update, EntityPlayer player) 
 	{
 		//Conditions which indicate the player is not swinging or able to swing
 		if(player.inventory.getMainInventoryStack(player.selectedSlot) == null ||
@@ -1230,7 +1228,7 @@ public class World
 			}
 		}
 		
-		player.updateSwing();
+		player.updateSwing(update);		
 	}
 	
 	/**
@@ -2173,7 +2171,7 @@ public class World
 		List<String> requiredChunks = new ArrayList<String>();
 		List<String> removedChunks = new ArrayList<String>();
 		//How far to check for chunks (in blocks)
-		final int loadDistanceHorizontally = TerraeRasa.terraeRasa.getSettings().loadDistance * Chunk.getChunkWidth();
+		final int loadDistanceHorizontally = (2 * Chunk.getChunkWidth()) + TerraeRasa.terraeRasa.getSettings().loadDistance * Chunk.getChunkWidth();
 		
 		Iterator<EntityPlayer> it = players.iterator();
 		while(it.hasNext())
@@ -2340,18 +2338,6 @@ public class World
 	public void setChunk(Chunk chunk, int x, int y)
 	{
 		getChunks().put(""+x, chunk);
-	}
-	
-	private void checkChunks()
-	{
-		for(int i = 0; i < width / Chunk.getChunkWidth(); i++)
-		{
-			if(getChunks().get(""+i) == null)
-			{
-				registerChunk(new Chunk(Biome.forest, i, height), i);
-			}
-			
-		}
 	}
 	
 	/**

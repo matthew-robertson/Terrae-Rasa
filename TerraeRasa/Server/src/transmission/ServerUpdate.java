@@ -1,5 +1,7 @@
 package transmission;
 
+import io.Chunk;
+
 import java.util.Vector;
 
 public class ServerUpdate
@@ -9,6 +11,8 @@ public class ServerUpdate
 	private Vector<PositionUpdate> positionUpdates;
 	private Vector<BlockUpdate> blockUpdates;
 	private Vector<StatUpdate> statUpdates;
+	private Vector<Chunk> chunkUpdates;
+	public Vector<UpdateWithObject> objectUpdates;
 	
 	public ServerUpdate()
 	{
@@ -17,6 +21,8 @@ public class ServerUpdate
 		this.positionUpdates = new Vector<PositionUpdate>();
 		this.blockUpdates = new Vector<BlockUpdate>();
 		this.statUpdates = new Vector<StatUpdate>();
+		this.chunkUpdates = new Vector<Chunk>();
+		this.objectUpdates = new Vector<UpdateWithObject>();
 	}
 	
 	public synchronized void addValue(String val)
@@ -76,6 +82,30 @@ public class ServerUpdate
 	{
 		StatUpdate[] updates = new StatUpdate[statUpdates.size()];
 		statUpdates.copyInto(updates);
+		return updates;
+	}
+	
+	public synchronized void addChunkUpdate(Chunk chunk)
+	{
+		chunkUpdates.add(chunk);
+	}
+	
+	public synchronized Chunk[] getChunks()
+	{
+		Chunk[] updates = new Chunk[chunkUpdates.size()];
+		chunkUpdates.copyInto(updates);
+		return updates;
+	}
+	
+	public synchronized void addObjectUpdate(UpdateWithObject update)
+	{
+		objectUpdates.add(update);
+	}
+	
+	public synchronized UpdateWithObject[] getObjectUpdates()
+	{
+		UpdateWithObject[] updates = new UpdateWithObject[objectUpdates.size()];
+		objectUpdates.copyInto(updates);
 		return updates;
 	}
 }

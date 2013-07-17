@@ -244,7 +244,7 @@ public class TerraeRasa
 		int width_fix = (int)(width / Render.BLOCK_SIZE) * Render.BLOCK_SIZE + Render.BLOCK_SIZE;
 		int height_fix = (int)(height / Render.BLOCK_SIZE) * Render.BLOCK_SIZE + Render.BLOCK_SIZE;
 		
-		GL11.glClear(16640); //Clear the screen
+		GL11.glClear(16640); //Clear the screendad
         GL11.glMatrixMode(GL11.GL_PROJECTION); 
         GL11.glLoadIdentity(); //Reset to the origin
         GL11.glOrtho(0.0D, width_fix / 2, height_fix / 2, 0.0D, 1000D, 3000D); //initialize the 2D drawing area

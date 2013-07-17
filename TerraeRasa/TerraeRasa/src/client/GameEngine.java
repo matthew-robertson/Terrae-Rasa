@@ -2,11 +2,14 @@ package client;
 
 import hardware.Keys;
 import hardware.MouseInput;
+import io.Chunk;
 import io.ChunkManager;
 import items.Item;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import org.lwjgl.opengl.Display;
@@ -18,6 +21,7 @@ import render.RenderGlobal;
 import render.RenderMenu;
 import spells.Spell;
 import transmission.BlockUpdate;
+import transmission.ChunkExpander;
 import transmission.ClientUpdate;
 import transmission.CompressedClientUpdate;
 import transmission.CompressedPlayer;
@@ -25,6 +29,8 @@ import transmission.CompressedServerUpdate;
 import transmission.EntityUpdate;
 import transmission.PositionUpdate;
 import transmission.StatUpdate;
+import transmission.SuperCompressedChunk;
+import transmission.UpdateWithObject;
 import utils.ErrorUtils;
 import utils.FileManager;
 import utils.ItemStack;
@@ -171,7 +177,7 @@ public class GameEngine
 //		        	}
 		        	
 		        	hardwareInput.clear();
-		        	Keys.universalKeyboard(world, player, settings, settings.keybinds, hardwareInput);
+		        	Keys.universalKeyboard(update, world, player, settings, settings.keybinds, hardwareInput);
 		        	
 		        	//If the music is already playing,set the volume to whatever the settings say it is
 		        	if (soundEngine.getCurrentMusic() != null){
@@ -194,7 +200,7 @@ public class GameEngine
 		        		soundEngine.setCurrentMusic("Pause Music");
 		        		
 		        		
-		        		Keys.keyboard(world, player, settings, settings.keybinds, hardwareInput);	            
+		        		Keys.keyboard(update, world, player, settings, settings.keybinds, hardwareInput);	            
 		        		MouseInput.mouse(world, player, clientCommands, hardwareInput);
 		        		
 		        		//Client player tick
@@ -211,6 +217,7 @@ public class GameEngine
 		        		compUpdate.clientInput = inputsArray;
 		        		hardwareInput.clear();
 		        		//Client Updates (String stuff)
+		        		clientCommands.addAll(update.commands);
 		        		String[] clientUpdates = new String[clientCommands.size()];
 		        		clientCommands.copyInto(clientUpdates);
 		        		compUpdate.commands = clientUpdates;
@@ -317,19 +324,53 @@ public class GameEngine
 					((EntityPlayer)(world.getEntityByID(activePlayerID))).setStats(update);
 				}
 			}
+			for(UpdateWithObject update : serverupdate.objectUpdates)
+			{
+				if(update.command.startsWith("/player"))
+				{
+					String[] split = update.command.split(" ");
+					if(split[2].equals("inv_and_action_update"))
+					{
+						EntityPlayer player = ((EntityPlayer)(world.getEntityByID(Integer.parseInt(split[1]))));
+						player.selectedSlot = Integer.parseInt(split[3]);
+						player.inventory.putItemStackInSlot(world, player, (ItemStack)(update.object), Integer.parseInt(split[3]));
+					}
+				}				
+			}
 			for(String command : serverupdate.values)
 			{
 				processCommand(clientPlayer, command);
+			}
+			for(SuperCompressedChunk compchunk : serverupdate.chunks)
+			{
+				Chunk chunk = ChunkExpander.expandChunk(compchunk);
+				String command = "/player " + activePlayerID + " chunkrequest " + chunk.getX();
+				world.removePendingChunkRequest(command);
+				world.registerChunk(chunk, chunk.getX());
 			}
 			for(BlockUpdate update : serverupdate.blockUpdates)
 			{
 				if(update.type == 0)
 				{
 					Block block = Block.blocksList[update.block.id].clone().mergeOnto(new MinimalBlock(update.block));
-					if(block.lightStrength > 0)
+					if(block.lightStrength > 0) {
 						world.setBlock(block, update.x, update.y, EnumEventType.EVENT_BLOCK_PLACE_LIGHT);
-					else
-						world.setBlock(block, update.x, update.y, EnumEventType.EVENT_BLOCK_PLACE_LIGHT);
+						world.setBitMap(update.x-1, update.y, world.updateBlockBitMap(update.x-1, update.y));
+						world.setBitMap(update.x, update.y-1, world.updateBlockBitMap(update.x, update.y-1));
+						world.setBitMap(update.x, update.y, world.updateBlockBitMap(update.x, update.y));
+						world.setBitMap(update.x+1, update.y, world.updateBlockBitMap(update.x+1, update.y));
+						world.setBitMap(update.x, update.y+1, world.updateBlockBitMap(update.x, update.y+1));
+					}
+					else {
+						world.setBlock(block, update.x, update.y, EnumEventType.EVENT_BLOCK_PLACE);
+						
+						world.setBitMap(update.x-1, update.y, world.updateBlockBitMap(update.x-1, update.y));
+						world.setBitMap(update.x, update.y-1, world.updateBlockBitMap(update.x, update.y-1));
+						world.setBitMap(update.x, update.y, world.updateBlockBitMap(update.x, update.y));
+						world.setBitMap(update.x+1, update.y, world.updateBlockBitMap(update.x+1, update.y));
+						world.setBitMap(update.x, update.y+1, world.updateBlockBitMap(update.x, update.y+1));
+						
+					}
 				}
 				else 
 				{
@@ -454,6 +495,15 @@ public class GameEngine
 		else if(command.startsWith("/player"))
 		{
 			String[] split = command.split(" ");
+			if(split[2].equals("swingangle"))
+			{
+				((EntityPlayer)(world.getEntityByID(Integer.parseInt(split[1])))).setSwingAngle(Double.parseDouble(split[3]));
+			}
+			else if(split[2].equals("stopswing"))
+			{
+				((EntityPlayer)(world.getEntityByID(Integer.parseInt(split[1])))).clearSwing();
+			}			
+			//These only affect this client's player
 			if(!(activePlayerID == Integer.parseInt(split[1])))
 			{
 				return;

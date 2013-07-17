@@ -15,5 +15,5 @@ public class CompressedServerUpdate
 	public PositionUpdate[] positionUpdates;
 	public BlockUpdate[] blockUpdates;
 	public StatUpdate[] statUpdates;
-	
+	public UpdateWithObject[] objectUpdates;
 }

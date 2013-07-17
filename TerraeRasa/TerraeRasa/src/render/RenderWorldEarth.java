@@ -32,7 +32,7 @@ public class RenderWorldEarth extends RenderWorld
 		renderEntities.renderItems(world);
 		renderEntities.renderNPCs(world);
 		renderEntities.renderTemperaryText(world);		
-		renderToolSwing(world, player);
+		//renderToolSwing(world, player);
 		renderParticles.render(world);
 		renderLight.render(world, player);
 

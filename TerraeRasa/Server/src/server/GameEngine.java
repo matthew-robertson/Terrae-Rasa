@@ -6,6 +6,9 @@ import io.ChunkManager;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 
 import transmission.CompressedClientUpdate;
@@ -49,7 +52,8 @@ public class GameEngine
 	private Vector<EntityUpdate> extraEntityUpdates = new Vector<EntityUpdate>();
 	private Vector<CompressedClientUpdate> clientUpdates = new Vector<CompressedClientUpdate>(); 
 	private Vector<String> commandUpdates = new Vector<String>();
-	
+	private List<String> pendingChunkRequests = new ArrayList<String>();
+
 	/**
 	 * Creates a new instance of GameEngine. This includes setting the renderMode to RENDER_MODE_WORLD_EARTH
 	 * and loading the settings object from disk. If a settings object cannot be found a new one is created. 
@@ -118,6 +122,19 @@ public class GameEngine
 		        		update.addValue(val);
 		        	}
 		        	
+		        	Iterator<String> it = pendingChunkRequests.iterator();
+		        	while(it.hasNext())
+		        	{
+		        		String request = it.next();
+		        		String[] split = request.split(" ");
+		        		
+		        		if(world.chunksLoaded.get(split[3]))
+						{
+							update.addChunkUpdate(world.getChunk(Integer.parseInt(split[3])));
+							it.remove();
+						}
+		        	}
+		        	
 		        	TerraeRasa.addWorldUpdate(update);
 		        	
 		        	next_game_tick += SKIP_TICKS;
@@ -155,7 +172,7 @@ public class GameEngine
 		{
 			for(String command : update.commands)
 			{
-				String result = Commands.processClientCommand(serverUpdate, null, world, this, players, command);
+				String result = Commands.processClientCommand(serverUpdate, null, world, this, players, command, pendingChunkRequests);
 				if(!result.equals(""))
 				{
 					commandUpdates.add(result);
@@ -163,7 +180,7 @@ public class GameEngine
 			}
 			for(UpdateWithObject objUpdate : update.objectUpdates)
 			{
-				String result = Commands.processClientCommand(serverUpdate, objUpdate.object, world, this, players, objUpdate.command);
+				String result = Commands.processClientCommand(serverUpdate, objUpdate.object, world, this, players, objUpdate.command, pendingChunkRequests);
 				if(!result.equals(""))
 				{
 					commandUpdates.add(result);

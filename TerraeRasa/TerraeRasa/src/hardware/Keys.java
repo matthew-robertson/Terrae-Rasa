@@ -5,6 +5,7 @@ import java.util.Vector;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 
+import transmission.ClientUpdate;
 import world.World;
 import client.Keybinds;
 import client.Settings;
@@ -43,7 +44,7 @@ public class Keys
 	 * @param settings
 	 * @param keybinds
 	 */
-	public static void universalKeyboard(World world, EntityPlayer player, Settings settings, Keybinds keybinds, Vector<EnumHardwareInput> hardwareInput)
+	public static void universalKeyboard(ClientUpdate update, World world, EntityPlayer player, Settings settings, Keybinds keybinds, Vector<EnumHardwareInput> hardwareInput)
 	{
 		//Check for the (left) shift modifier (this may be useful in other parts of the program)
 		lshiftDown = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT);
@@ -57,7 +58,7 @@ public class Keys
 	 * @param player
 	 * @param settings
 	 */
-	public static void keyboard(World world, EntityPlayer player, Settings settings, Keybinds keybinds, Vector<EnumHardwareInput> hardwareInput)
+	public static void keyboard(ClientUpdate update, World world, EntityPlayer player, Settings settings, Keybinds keybinds, Vector<EnumHardwareInput> hardwareInput)
 	{	
 		if(TerraeRasa.initInDebugMode)
 		{
@@ -131,6 +132,7 @@ public class Keys
         		actionKeys[i] = true;
         		player.selectedSlot = i;
         		player.clearSwing();
+	        	update.addCommand("/player " + player.entityID + " cancelswing");
         	}
         	if(!Keyboard.isKeyDown(Keyboard.KEY_EQUALS))
         	{
