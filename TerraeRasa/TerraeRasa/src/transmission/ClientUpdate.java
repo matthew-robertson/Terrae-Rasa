@@ -11,9 +11,8 @@ public class ClientUpdate {
 	
 	public ClientUpdate()
 	{
-		
 	}
-	
+		
 	public synchronized void addCommand(String com)
 	{
 		this.commands.add(com);

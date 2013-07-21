@@ -43,8 +43,9 @@ public class WorldLock
 	}
 	
 	public synchronized void addPlayerToWorld(EntityPlayer player)
-	{
-		engine.getWorld().addPlayerToWorld(TerraeRasa.terraeRasa.getSettings(), player);
+	{		
+		String message = engine.getWorld().addPlayerToWorld(TerraeRasa.terraeRasa.getSettings(), player);
+		TerraeRasa.terraeRasa.gameEngine.addCommandUpdate(message);
 		engine.registerPlayer(player);
 		relevantPlayer = player;
 	}

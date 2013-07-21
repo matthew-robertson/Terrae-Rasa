@@ -7,6 +7,7 @@ import org.lwjgl.opengl.Display;
 
 import transmission.ClientUpdate;
 import world.World;
+import client.GameEngine;
 import client.Keybinds;
 import client.Settings;
 import client.TerraeRasa;
@@ -27,6 +28,7 @@ public class Keys
 {	
 	private static boolean actionKeys[] = new boolean[12];
 	private static boolean ic;
+	private static boolean enterDown;
 	public static boolean ec;
 	public static boolean lshiftDown;
 	
@@ -47,8 +49,7 @@ public class Keys
 	public static void universalKeyboard(ClientUpdate update, World world, EntityPlayer player, Settings settings, Keybinds keybinds, Vector<EnumHardwareInput> hardwareInput)
 	{
 		//Check for the (left) shift modifier (this may be useful in other parts of the program)
-		lshiftDown = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT);
-				
+		lshiftDown = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT);		
 	}
 	
 	/**
@@ -58,7 +59,7 @@ public class Keys
 	 * @param player
 	 * @param settings
 	 */
-	public static void keyboard(ClientUpdate update, World world, EntityPlayer player, Settings settings, Keybinds keybinds, Vector<EnumHardwareInput> hardwareInput)
+	public static void keyboard(GameEngine engine, ClientUpdate update, World world, EntityPlayer player, Settings settings, Keybinds keybinds, Vector<EnumHardwareInput> hardwareInput)
 	{	
 		if(TerraeRasa.initInDebugMode)
 		{
@@ -78,6 +79,17 @@ public class Keys
 			ec = false;
 		}
 		
+		if(Keyboard.isKeyDown(Keyboard.KEY_RETURN) && !enterDown)
+		{
+			enterDown = true;
+			player.isInventoryOpen = false;
+			player.clearViewedChest();
+			engine.toggleChatOpen();
+		}
+		if(!Keyboard.isKeyDown(Keyboard.KEY_RETURN))
+		{
+			enterDown = false;
+		}
 		
 		if(Keyboard.isKeyDown(keybinds.inventoryToggle) && !ic) //Toggle inventory
 		{

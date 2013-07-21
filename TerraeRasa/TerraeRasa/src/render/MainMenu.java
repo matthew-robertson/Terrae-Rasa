@@ -55,6 +55,7 @@ public class MainMenu extends Render
 	private boolean isMainMenuOpen;
 	private boolean isMultiplayerMenuOpen;
 	private boolean isPlayerMenuOpen;
+	private boolean isMultiplayerPlayerMenuOpen;
 	private boolean isWorldMenuOpen;
 	private boolean isDeleteServerMenuOpen;
 	private boolean isNewServerMenuOpen;
@@ -537,7 +538,7 @@ public class MainMenu extends Render
 	 */
 	private void mouse(Settings settings)
 	{
-		if(isMainMenuOpen || isPlayerMenuOpen || isWorldMenuOpen || isMultiplayerMenuOpen)
+		if(isMainMenuOpen || isPlayerMenuOpen || isWorldMenuOpen || isMultiplayerMenuOpen || isMultiplayerPlayerMenuOpen)
 		{
 			int index = menu.getCellWithoutScroll(MathHelper.getCorrectMouseXPosition(), MathHelper.getCorrectMouseYPosition());
 			menu.setHighlighted(index);
@@ -592,6 +593,10 @@ public class MainMenu extends Render
 		else if(isMultiplayerMenuOpen)
 		{
 			mouseMultiplayerMenu(settings, x, y);
+		}
+		else if(isMultiplayerPlayerMenuOpen)
+		{
+			mouseMultiplayerPlayerSelect(settings, x, y);
 		}
 		else if(isPlayerMenuOpen)
 		{
@@ -649,7 +654,8 @@ public class MainMenu extends Render
 		//Create new player button
 		if(createNewCharacter.inBounds(mouseX, mouseY))
 		{
-			fileManager.generateAndSavePlayer(characterName.getText(), EnumPlayerDifficulty.getDifficulty(characterMode.getValue()));
+			String name = characterName.getText().replaceAll(" ", "");
+			fileManager.generateAndSavePlayer(name, EnumPlayerDifficulty.getDifficulty(characterMode.getValue()));
 			updateMenus(settings);
 			isNewPlayerMenuOpen = false;
 			characterName.setText("");
@@ -748,11 +754,11 @@ public class MainMenu extends Render
 		}
 		if(selectedMenuIndex == 2) //MP
 		{
-			isMultiplayerMenuOpen = true;
+			isMultiplayerPlayerMenuOpen = true;
 			isMainMenuOpen = false;
-			menu.updateLockedInComponents(multiplayerMenuFooter);
-			menu.updateVaryingItems(serversToString(settings.getServersArray()));
-			menu.updateTitle("Multiplayer");
+			menu.updateLockedInComponents(playerMenuFooter);
+			menu.updateTitle("Players");
+			menu.updateVaryingItems(playerNames);
 		}
 		if(selectedMenuIndex == 3) //Settings
 		{
@@ -795,14 +801,14 @@ public class MainMenu extends Render
 		else if(selectedIndex == menu.getNumberOfItems() - 1)
 		{
 			//Back (to main menu)
-			isMainMenuOpen = true;
+			isMultiplayerPlayerMenuOpen = true;
 			isMultiplayerMenuOpen = false;
 			isWaitingToDelete = false;
 			isWaitingToEdit = false;
 			selectedServer = null;
-			menu.updateLockedInComponents(mainMenuFooter);
-			menu.updateTitle("Main Menu");
-			menu.updateVaryingItems(mainMenuVarying);
+			menu.updateLockedInComponents(playerMenuFooter);
+			menu.updateTitle("Players");
+			menu.updateVaryingItems(playerNames);
 		}
 		else if(selectedIndex > 0 && selectedIndex < menu.getVaryingItems().length + 1)
 		{
@@ -835,6 +841,52 @@ public class MainMenu extends Render
 		}
 	}
 	
+	private void mouseMultiplayerPlayerSelect(Settings settings, int mouseX, int mouseY)
+	{
+		menu.onClick(mouseX, mouseY);
+		int selectedIndex = menu.getSelectedCell(mouseX, mouseY);
+		if(selectedIndex == menu.getNumberOfItems() - 3)
+		{
+			//New Player
+			isNewPlayerMenuOpen = true;
+		}
+		else if(selectedIndex == menu.getNumberOfItems() - 2)
+		{
+			//Delete Player
+			isWaitingToDelete = true;
+		}
+		else if(selectedIndex == menu.getNumberOfItems() - 1)
+		{
+			//Back
+			isMultiplayerPlayerMenuOpen = false;
+			isMainMenuOpen = true;
+			isWaitingToDelete = false;
+			menu.updateLockedInComponents(mainMenuFooter);
+			menu.updateTitle("Main Menu");
+			menu.updateVaryingItems(mainMenuVarying);
+		}
+		else if(selectedIndex > 0 && selectedIndex < menu.getVaryingItems().length + 1)
+		{
+			//If the user is waiting to delete something, then prompt them with a delete confirm thing, 
+			//otherwise go to the world select part
+			if(isWaitingToDelete)
+			{
+				isDeletePlayerMenuOpen = true;
+				selectedPlayerName = menu.getVaryingItems()[selectedIndex - 1];
+				deletePlayerMessage.setText("Delete " + selectedPlayerName + "?");
+			}
+			else
+			{
+				selectedPlayerName = menu.getVaryingItems()[selectedIndex - 1];
+				isMultiplayerPlayerMenuOpen = false;
+				isMultiplayerMenuOpen = true;
+				menu.updateLockedInComponents(multiplayerMenuFooter);
+				menu.updateVaryingItems(serversToString(settings.getServersArray()));
+				menu.updateTitle("Multiplayer");
+			}
+		}
+	}
+	
 	private void startMPGame()
 	{
 		//selectedWorldName, fileManager.loadWorld("Earth", selectedWorldName), fileManager.loadPlayer(selectedPlayerName)
@@ -844,6 +896,7 @@ public class MainMenu extends Render
 	private void requestGameConnection()
 	{
 		try {
+			TerraeRasa.terraeRasa.gameEngine.setSentPlayer(new FileManager().loadPlayer(selectedPlayerName));
 			
 			String ip = (selectedServer.getIP()); 
 			int port = Integer.parseInt(selectedServer.getPort());
@@ -871,6 +924,8 @@ public class MainMenu extends Render
 			
 			startMPGame();
 		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 	}
@@ -995,7 +1050,7 @@ public class MainMenu extends Render
 			isWaitingToDelete = false;
 		}
 	}
-	
+		
 	/**
 	 * Handles mouse input for the player select menu - which lists all the different players
 	 * as well as options to create/delete players and go back to the main menu
@@ -1277,7 +1332,7 @@ public class MainMenu extends Render
 		servers = settings.getServersArray();
 		worldNames = menuHelper.getWorldFileNames();
 		playerNames = menuHelper.getPlayerFileNames();
-		if(isPlayerMenuOpen)
+		if(isPlayerMenuOpen || isMultiplayerPlayerMenuOpen)
 		{
 			menu.updateLockedInComponents(playerMenuFooter);
 			menu.updateTitle("Players");

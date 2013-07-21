@@ -354,12 +354,13 @@ public class World
 	 * Adds a player to the world. Currently multiplayer placeholder.
 	 * @param player the player to add
 	 */
-	public void addPlayerToWorld(ServerSettings settings, EntityPlayer player)
+	public String addPlayerToWorld(ServerSettings settings, EntityPlayer player)
 	{
 		requestRequiredChunks(settings, getWorldCenterBlock(), averageSkyHeight);
 		//chunkManager.addAllLoadedChunks_Wait(this, getChunks());
 		spawnPlayer(settings, player);
 		Log.log(player.getName() + " joined the game with entityID " + player.entityID);
+		return player.getName() + " joined the game";
 	}
 	
 	/**
@@ -563,14 +564,12 @@ public class World
 		updateWorldTime();
 
 		//Update Entities
-		//TODO: Monsters
 		if(worldTime % 20 == 0) {
 			checkForMonsterRemoval(update, players);
 		}
 		updateMonsters(update); 
 		//TODO: NPCs
 		updateNPCs(update);
-		//TODO: projectiles
 		updateProjectiles(update);
 		
 		handlePlayerMovement(update);

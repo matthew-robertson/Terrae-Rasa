@@ -565,7 +565,6 @@ public class World
 		updateWorldTime(player);
 		
 		if(worldTime % 20 == 0) {
-			//TODO client chunk request
 			updateChunks(update, player);
 		}
 		//TODO client side light recognizes torches that already exist

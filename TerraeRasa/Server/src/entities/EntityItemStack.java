@@ -1,5 +1,7 @@
 package entities;
 
+import java.util.Random;
+
 import items.Item;
 import items.ItemArmor;
 import items.ItemTool;
@@ -54,8 +56,8 @@ public class EntityItemStack extends EntityParticle
 		}	
 		
 		remainingTimeTicks = LIFE_TIME_IN_TICKS;
-		this.x = x;
-		this.y = y;
+		this.x = x + new Random().nextInt(16) - 8;
+		this.y = y + new Random().nextInt(4) - 2;
 		blockWidth = (double)(width) / 6;
 		blockHeight = (double)(height) / 6;
 		ticksBeforePickup = 20;

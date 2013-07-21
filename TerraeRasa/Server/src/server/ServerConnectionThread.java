@@ -89,6 +89,7 @@ public class ServerConnectionThread extends Thread
 			{
 				player = EntityPlayer.expand((CompressedPlayer)(gzipHelper.expand((byte[])is.readObject())));
 				player.setEntityID(playerID);
+				player.verifyName();
 				worldLock.addPlayerToWorld(player);
 			}
 			

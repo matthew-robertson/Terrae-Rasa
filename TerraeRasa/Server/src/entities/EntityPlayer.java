@@ -103,7 +103,7 @@ public class EntityPlayer extends EntityLiving
 	private int ticksreq;
 	private int sx;
 	private int sy;		
-	private final String playerName;
+	private String playerName;
 	private boolean inventoryChanged;
 	private final EnumPlayerDifficulty difficulty;
 	private final int MAXIMUM_BASE_MANA = 400;
@@ -1596,6 +1596,14 @@ public class EntityPlayer extends EntityLiving
 		this.defeated = newStats.defeated;
 	}
 
+	public void verifyName()
+	{
+		if(playerName.contains(" "))
+		{
+			this.playerName = this.playerName.replaceAll(" ", "");
+		}
+	}
+	
 	public double getSwingAngle() 
 	{
 		return rotateAngle;

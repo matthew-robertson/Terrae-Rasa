@@ -8,13 +8,13 @@ import items.Item;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Vector;
 
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
+import render.GuiChatbox;
 import render.MainMenu;
 import render.Render;
 import render.RenderGlobal;
@@ -31,6 +31,7 @@ import transmission.PositionUpdate;
 import transmission.StatUpdate;
 import transmission.SuperCompressedChunk;
 import transmission.UpdateWithObject;
+import utils.ColoredText;
 import utils.ErrorUtils;
 import utils.FileManager;
 import utils.ItemStack;
@@ -95,6 +96,7 @@ public class GameEngine
 	private EngineLock engineLock;
 	private static boolean canPlayMP;
 	private int activePlayerID = -1;
+	private GuiChatbox chatbox;
 	
 	public EngineLock getEngineLock()
 	{
@@ -108,16 +110,11 @@ public class GameEngine
 	public GameEngine()
 	{
 		renderMode = RENDER_MODE_WORLD_EARTH;
-		try 
-		{
+		try {
 			loadSettings();
-		}
-		catch (IOException e) 
-		{
+		} catch (IOException e) {
 			settings = new Settings();
-		}
-		catch (ClassNotFoundException e) 
-		{
+		} catch (ClassNotFoundException e) {
 			settings = new Settings();
 		}
 		engineLock = new EngineLock(this);
@@ -135,11 +132,6 @@ public class GameEngine
 			int loops;
 			start = System.currentTimeMillis();
 			
-			///////
-			setSentPlayer(new FileManager().loadPlayer("Debug_Player"));
-			sentPlayer.x = 3600;
-			sentPlayer.y = 1200;
-			///////
 			Vector<EnumHardwareInput> hardwareInput = new Vector<EnumHardwareInput>(10);
 			Vector<String> clientCommands = new Vector<String>();
 			ClientUpdate update = new ClientUpdate();
@@ -199,9 +191,19 @@ public class GameEngine
 		        	{		        		
 		        		soundEngine.setCurrentMusic("Pause Music");
 		        		
+		        		//Update the actual chatbox
+		        		chatbox.update();
 		        		
-		        		Keys.keyboard(update, world, player, settings, settings.keybinds, hardwareInput);	            
-		        		MouseInput.mouse(world, player, clientCommands, hardwareInput);
+		        		//Hardware inputs
+		        		if(chatbox.isOpen())
+		        		{
+		        			chatbox.keyboard(player.entityID, update);
+		        		}
+		        		else 
+		        		{
+		        			Keys.keyboard(this, update, world, player, settings, settings.keybinds, hardwareInput);	            
+		        			MouseInput.mouse(world, player, clientCommands, hardwareInput);
+		        		}
 		        		
 		        		//Client player tick
 		        		world.onClientWorldTick(update, player);
@@ -263,8 +265,16 @@ public class GameEngine
 		        {		        
 //		        	if(renderMode == RENDER_MODE_WORLD_EARTH)
 //		    		{
-		        	 	RenderGlobal.render(update, world, player, renderMode, settings); //Renders Everything on the screen for the game
-//		     		}
+		        	RenderGlobal.render(update, world, player, renderMode, settings); //Renders Everything on the screen for the game
+		     		if(chatbox.isOpen())
+		     		{
+		     			chatbox.draw();
+		     		}		 
+		     		else
+		     		{
+		     			chatbox.drawPartially();
+		     		}
+		        
 //		    		else if(renderMode == RENDER_MODE_WORLD_HELL)
 //		    		{
 //		    		 	RenderGlobal.render(worldHell, player, renderMode, settings); //Renders Everything on the screen for the game
@@ -528,6 +538,49 @@ public class GameEngine
 				player.inventory.removeItemsFromInventoryStack(player, Integer.parseInt(split[4]), Integer.parseInt(split[3]));
 			}
 		}
+		else if(command.startsWith("/say"))
+		{
+			// "/say <name> <color> <message>"
+			String[] split = command.split(" ");
+			EnumColor color = EnumColor.get(split[2]);
+			String remaining = split[1] + ": " + command.substring(command.indexOf(" ", 
+					command.indexOf(" ", 
+							command.indexOf(" ", 
+									command.indexOf(" ") + 1)) + 1) + 1);
+			ColoredText text = new ColoredText(color, remaining);
+			chatbox.log(text);
+		}
+	}
+	
+	public void addColoredText(ColoredText text)
+	{
+		chatbox.addText(text);
+	}
+	
+	public void addUncoloredText(String text)
+	{
+		ColoredText whitetext = new ColoredText(EnumColor.WHITE, text);
+		chatbox.addText(whitetext);
+	}
+	
+	public void addUncoloredText(String text, int ticks)
+	{
+		ColoredText whitetext = new ColoredText(EnumColor.WHITE, text, ticks);
+		chatbox.addText(whitetext);
+	}
+	
+	public void setChatOpen(boolean flag)
+	{
+		chatbox.setIsOpen(flag);
+	}
+	
+	public void toggleChatOpen()
+	{
+		for( ; Keyboard.next(); ) { 
+			Keyboard.getEventCharacter();
+			Keyboard.getEventKey();
+		}
+		chatbox.setIsOpen(!chatbox.isOpen());
 	}
 	
 	public static void flagAsMPPlayable()
@@ -576,6 +629,19 @@ public class GameEngine
 	public void init()
 	{
 		Render.initializeTextures(getWorld());
+		chatbox = new GuiChatbox();
+		addUncoloredText(" ", 0);
+		addUncoloredText(" ", 0);
+		addUncoloredText(" ", 0);
+		addUncoloredText(" ", 0);
+		addUncoloredText(" ", 0);
+		addUncoloredText(" ", 0);
+		addUncoloredText(" ", 0);
+		addUncoloredText(" ", 0);
+		addUncoloredText(" ", 0);
+		addUncoloredText(" ", 0);
+		addUncoloredText(" ", 0);
+		
 		chunkManager = new ChunkManager();
 		soundEngine = new SoundEngine(settings);
 		mainMenu = new MainMenu(settings);
@@ -913,7 +979,7 @@ public class GameEngine
 		return sentPlayer;
 	}
 
-	private void setSentPlayer(EntityPlayer player) {
+	public void setSentPlayer(EntityPlayer player) {
 		this.sentPlayer = player;
 	}
 }

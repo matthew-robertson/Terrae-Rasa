@@ -179,6 +179,10 @@ public class EntityPlayer extends EntityLiving
 		jumpSpeed = 5;
 		canJumpAgain = true;
 		inventory = new InventoryPlayer();
+		inventory.pickUpItemStack(null, this, new ItemStack(Item.copperSword));
+		inventory.pickUpItemStack(null, this, new ItemStack(Item.copperPickaxe));
+		inventory.pickUpItemStack(null, this, new ItemStack(Item.copperAxe));
+		inventory.pickUpItemStack(null, this, new ItemStack(Block.craftingTable));
 		playerName = name;
 		rotateAngle = -120.0f;		
 		isInCombat = false;

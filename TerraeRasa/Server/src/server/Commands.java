@@ -25,6 +25,7 @@ public class Commands
 	// -- req world and player?
 	public static void processConsoleCommand(String command)
 	{
+		System.out.println("TODO: Make this command work: " + command);
 		String[] commandComponents = command.split(" ");
 		//Everyone or above
 		if(command.startsWith("/help"))
@@ -303,8 +304,25 @@ public class Commands
 			else if(split[2].equals("cancelswing"))
 			{
 				player.clearSwing();
+				//"/player <player_id> stopswing"
 				command = "/player " + player.entityID + " stopswing";
 				update.addValue(command);
+			}
+			else if(split[2].equals("say"))
+			{
+				if(split[4].startsWith("/"))
+				{
+					//A server command that the player can issue
+					String remaining = command.substring(command.indexOf(" ", command.indexOf("say") + 4) + 1);
+					processConsoleCommand(remaining);
+				}
+				else
+				{
+					//Chat to everyone
+					//"/say <name> <color> <message>"
+					String chatmessage = "/say " + player.getName() + " " + command.substring(command.indexOf("say") + 4);
+					update.addValue(chatmessage);
+				}				
 			}
 		}
 		
