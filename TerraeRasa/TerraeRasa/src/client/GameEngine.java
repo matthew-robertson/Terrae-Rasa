@@ -97,6 +97,7 @@ public class GameEngine
 	private static boolean canPlayMP;
 	private int activePlayerID = -1;
 	private GuiChatbox chatbox;
+	private boolean closeRequested;
 	
 	public EngineLock getEngineLock()
 	{
@@ -220,13 +221,16 @@ public class GameEngine
 		        		hardwareInput.clear();
 		        		//Client Updates (String stuff)
 		        		clientCommands.addAll(update.commands);
+		        		if(closeRequested) {
+		        			clientCommands.add("/quit " + activePlayerID);
+		        		}
 		        		String[] clientUpdates = new String[clientCommands.size()];
 		        		clientCommands.copyInto(clientUpdates);
 		        		compUpdate.commands = clientUpdates;
 		        		clientCommands.clear();
 		        		//Special updates
 		        		compUpdate.objectUpdates = update.getObjectUpdates();		        		
-		        		
+		        		//register the update for the server to recieve
 		        		engineLock.addClientUpdate(compUpdate);
 		        		
 		        		if(engineLock.hasUpdates())
@@ -345,7 +349,27 @@ public class GameEngine
 						player.selectedSlot = Integer.parseInt(split[3]);
 						player.inventory.putItemStackInSlot(world, player, (ItemStack)(update.object), Integer.parseInt(split[3]));
 					}
-				}				
+				}
+				else if(update.command.startsWith("/fullplayersend"))
+				{
+					String[] split = update.command.split(" ");
+					if(Integer.parseInt(split[1]) == activePlayerID)
+					{
+						clientPlayer.mergeOnto((CompressedPlayer)(update.object));
+						try {
+							FileManager manager = new FileManager();
+							manager.savePlayer(clientPlayer);
+						} catch (FileNotFoundException e) {
+							e.printStackTrace();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+						clientPlayer = null;
+						world = null;
+						TerraeRasa.isMainMenuOpen = true;
+						resetMainMenu();
+					}
+				}
 			}
 			for(String command : serverupdate.values)
 			{
@@ -390,7 +414,11 @@ public class GameEngine
 			for(EntityUpdate update : serverupdate.entityUpdates)
 			{
 				if(update.type == 5) { //Player
-					EntityPlayer player = EntityPlayer.expand((CompressedPlayer)update.updatedEntity);
+					EntityPlayer player = null;
+					if(update.updatedEntity != null)
+					{
+						player = EntityPlayer.expand((CompressedPlayer)update.updatedEntity);
+					}
 					if(update.action == 'r') {
 						world.removeEntityByID(update.entityID);
 					}
@@ -590,9 +618,9 @@ public class GameEngine
 	
 	public void startMPGame()
 	{
+		closeRequested = false;
 		TerraeRasa.isMainMenuOpen = false;
 		mainMenu = null;
-		
 	}
 	
 	public void setActivePlayerID(int id)
@@ -940,31 +968,10 @@ public class GameEngine
 	 * @throws FileNotFoundException indicates a failure to find the save location of the player or world
 	 * @throws IOException indicates a general failure to save, not relating to the file
 	 */
-	public void closeGameToMenu() 
+	public void requestClose() 
 			throws FileNotFoundException, IOException
 	{
-		//TODO: Make close work.
-//		if(!getPlayer().defeated)
-//		{
-//			FileManager manager = new FileManager();
-//			manager.savePlayer(getPlayer());
-//		}
-//		
-//		if(renderMode == RENDER_MODE_WORLD_EARTH)
-//		{
-//			world.saveRemainingWorld();
-//		}
-//		else if(renderMode == RENDER_MODE_WORLD_HELL)
-//		{
-//			world.saveRemainingWorld();
-//		}
-//		else if(renderMode == RENDER_MODE_WORLD_SKY)
-//		{
-//			world.saveRemainingWorld();
-//		}
-//		
-//		TerraeRasa.isMainMenuOpen = true;
-//		resetMainMenu();
+		closeRequested = true;	
 	}
 	
 	/**

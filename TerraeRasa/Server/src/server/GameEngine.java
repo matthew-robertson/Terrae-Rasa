@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
+import transmission.CloseRequest;
 import transmission.CompressedClientUpdate;
 import transmission.EntityUpdate;
 import transmission.ServerUpdate;
@@ -48,12 +49,13 @@ public class GameEngine
 	private Vector<EntityPlayer> players = new Vector<EntityPlayer>(10);
 	public ChunkManager chunkManager;
 	private String universeName;
-	//private Vector<PlayerIssuedCommand> playerIssuedCommands;
+	private List<String> pendingChunkRequests = new ArrayList<String>();
 	private Vector<EntityUpdate> extraEntityUpdates = new Vector<EntityUpdate>();
 	private Vector<CompressedClientUpdate> clientUpdates = new Vector<CompressedClientUpdate>(); 
-	private Vector<String> commandUpdates = new Vector<String>();
-	private List<String> pendingChunkRequests = new ArrayList<String>();
-
+	private Vector<String> extraTextUpdates = new Vector<String>();
+	private Vector<String> serverCommands = new Vector<String>();
+	private Vector<CloseRequest> closeRequests = new Vector<CloseRequest>();
+	
 	/**
 	 * Creates a new instance of GameEngine. This includes setting the renderMode to RENDER_MODE_WORLD_EARTH
 	 * and loading the settings object from disk. If a settings object cannot be found a new one is created. 
@@ -62,23 +64,8 @@ public class GameEngine
 	{
 		this.universeName = universeName;
 		this.chunkManager = new ChunkManager();
-//		playerIssuedCommands = new Vector<PlayerIssuedCommand>();
+		this.chunkManager.setUniverseName(universeName);
 	}
-	
-	public synchronized CompressedClientUpdate[] yieldClientUpdates()
-	{
-		CompressedClientUpdate[] updates = new CompressedClientUpdate[clientUpdates.size()];
-		clientUpdates.copyInto(updates);
-		clientUpdates.clear();
-		return updates;
-	}
-	
-	public synchronized void registerClientUpdate(CompressedClientUpdate update)
-	{
-		clientUpdates.add(update);
-	}
-	
-	public World getWorld() { return world; }
 	
 	public void run()
 	{
@@ -106,7 +93,7 @@ public class GameEngine
 		        
 		        	
 		        	ServerUpdate update = new ServerUpdate();
-	
+		        	processCloseRequests();
 		        	CompressedClientUpdate[] updates = yieldClientUpdates();
 		        	handleClientUpdates(update, updates);
 		        	
@@ -120,6 +107,12 @@ public class GameEngine
 		        	for(String val : values)
 		        	{
 		        		update.addValue(val);
+		        	}
+		        	
+		        	String[] serverCommands = yieldServerCommands();
+		        	for(String val : serverCommands)
+		        	{
+		        		Commands.processConsoleCommand(update, world, this, val);
 		        	}
 		        	
 		        	Iterator<String> it = pendingChunkRequests.iterator();
@@ -161,8 +154,9 @@ public class GameEngine
 			ErrorUtils errorUtils = new ErrorUtils();
 			errorUtils.writeErrorToFile(e, true);			
 		} finally {
+			world.saveRemainingWorld();
 			TerraeRasa.done = true;
-			//issue some sort of cease and desist to the main thread and clients
+			TerraeRasa.closeServer();
 		}
 	}	
 	
@@ -175,7 +169,7 @@ public class GameEngine
 				String result = Commands.processClientCommand(serverUpdate, null, world, this, players, command, pendingChunkRequests);
 				if(!result.equals(""))
 				{
-					commandUpdates.add(result);
+					addCommandUpdate(result);
 				}
 			}
 			for(UpdateWithObject objUpdate : update.objectUpdates)
@@ -183,23 +177,67 @@ public class GameEngine
 				String result = Commands.processClientCommand(serverUpdate, objUpdate.object, world, this, players, objUpdate.command, pendingChunkRequests);
 				if(!result.equals(""))
 				{
-					commandUpdates.add(result);
+					addCommandUpdate(result);
 				}
 			}
 		}
 	}
 	
+	public void addCloseRequest(ServerConnectionThread thread, EntityPlayer player)
+	{
+		closeRequests.add(new CloseRequest(thread, player));
+	}
+	
+	private void processCloseRequests()
+	{
+		CloseRequest[] requests = new CloseRequest[closeRequests.size()];
+		closeRequests.copyInto(requests);
+		closeRequests.clear();
+		for(CloseRequest request : requests)
+			TerraeRasa.closeClientThread(request.thread, request.player);
+	}
+	
+	public synchronized void registerServerCommand(String command)
+	{
+		serverCommands.add(command);
+	}
+
+	public synchronized String[] yieldServerCommands()
+	{
+		String[] updates = new String[serverCommands.size()];
+		serverCommands.copyInto(updates);
+		serverCommands.clear();
+		return updates;
+	}
+	
+	public synchronized CompressedClientUpdate[] yieldClientUpdates()
+	{
+		CompressedClientUpdate[] updates = new CompressedClientUpdate[clientUpdates.size()];
+		clientUpdates.copyInto(updates);
+		clientUpdates.clear();
+		return updates;
+	}
+	
+	public synchronized void registerClientUpdate(CompressedClientUpdate update)
+	{
+		clientUpdates.add(update);
+	}
+	
+	public World getWorld() {
+		return world;
+	}
+		
 	public synchronized String[] yieldCommandUpdates()
 	{
-		String[] updates = new String[commandUpdates.size()];
-		commandUpdates.copyInto(updates);
-		commandUpdates.clear();
+		String[] updates = new String[extraTextUpdates.size()];
+		extraTextUpdates.copyInto(updates);
+		extraTextUpdates.clear();
 		return updates;
 	}
 	
 	public synchronized void addCommandUpdate(String command)
 	{
-		commandUpdates.add(command);
+		extraTextUpdates.add(command);
 	}
 	
 	public synchronized EntityPlayer[] getPlayersArray()
@@ -311,7 +349,7 @@ public class GameEngine
 //			manager.savePlayer(player);
 //		}	
 		//TODO: some sort of player saving
-		world.saveRemainingWorld();
+		//world.saveRemainingWorld();
 	}
 	
 	private void loadWorld()
@@ -339,6 +377,5 @@ public class GameEngine
 		Log.log("Loaded Universe: " + universeName);
 		
 	}
-	
 	
 }

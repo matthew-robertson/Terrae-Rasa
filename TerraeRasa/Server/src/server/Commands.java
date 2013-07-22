@@ -23,9 +23,11 @@ import entities.EntityPlayer;
 public class Commands 
 {
 	// -- req world and player?
-	public static void processConsoleCommand(String command)
-	{
+	public synchronized static void processConsoleCommand(ServerUpdate update, World world, GameEngine engine, String command)
+	{	
+		
 		System.out.println("TODO: Make this command work: " + command);
+		
 		String[] commandComponents = command.split(" ");
 		//Everyone or above
 		if(command.startsWith("/help"))
@@ -78,7 +80,7 @@ public class Commands
 		}
 		if(command.startsWith("/stop"))
 		{
-			
+			TerraeRasa.stop();
 		}
 		if(command.startsWith("/save-world"))
 		{
@@ -314,7 +316,8 @@ public class Commands
 				{
 					//A server command that the player can issue
 					String remaining = command.substring(command.indexOf(" ", command.indexOf("say") + 4) + 1);
-					processConsoleCommand(remaining);
+					//TODO: check for permissions
+					engine.registerServerCommand(remaining);
 				}
 				else
 				{
@@ -325,7 +328,11 @@ public class Commands
 				}				
 			}
 		}
-		
+		else if(command.startsWith("/quit"))
+		{
+			String[] split = command.split(" ");
+			TerraeRasa.requestThreadCloseByID(Integer.parseInt(split[1]));
+		}
 		
 		return "";
 	}

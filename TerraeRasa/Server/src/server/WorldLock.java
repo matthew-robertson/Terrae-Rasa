@@ -26,11 +26,6 @@ public class WorldLock
 		this.engine = engine;
 	}
 	
-	public synchronized void issueConsoleCommand(EntityPlayer associatedPlayer, String command)
-	{
-		//TODO: console commands
-	}
-	
 	//This can be null. Indicates chunk load failure.
 	public synchronized Chunk requestChunk(int x)
 	{
@@ -78,7 +73,8 @@ public class WorldLock
 		chunks.copyInto(c);
 		return c;
 	}
-	
+
+	//This is from the server
 	public synchronized void addUpdate(ServerUpdate update)
 	{
 		if(getRelevantPlayer() != null)
@@ -92,13 +88,11 @@ public class WorldLock
 				compressedChunks[i] = ChunkCompressor.compressChunk(chunks[i]);
 			}
 			compressedUpdate.chunks = compressedChunks;
-		//	compressedUpdate.player = null;
 			compressedUpdate.blockUpdates = update.getBlockUpdates();
 			compressedUpdate.entityUpdates = update.getUpdates();
 			compressedUpdate.positionUpdates = update.getPositionUpdates();
 			compressedUpdate.statUpdates = update.getStatUpdates();
 			compressedUpdate.objectUpdates = update.getObjectUpdates();
-		//	compressedUpdate.update = new PositionUpdate(getRelevantPlayer().entityID, getRelevantPlayer().x, getRelevantPlayer().y);
 			serverUpdates.add(compressedUpdate);
 		}
 	}

@@ -108,13 +108,9 @@ public class FileManager
 	 */
 	public void saveAndQuitGame()
 	{
-		try
-		{
-			TerraeRasa.terraeRasa.gameEngine.closeGameToMenu();
-			System.out.println("Save and quit successful");
-		}
-		catch (Exception e)
-		{
+		try {
+			TerraeRasa.terraeRasa.gameEngine.requestClose();
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

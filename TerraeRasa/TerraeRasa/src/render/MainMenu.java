@@ -921,7 +921,7 @@ public class MainMenu extends Render
 			connect.requestGameConnection(message, socket, os, is);
 			ClientConnectionThread thread = new ClientConnectionThread(socket, TerraeRasa.terraeRasa.gameEngine.getEngineLock(), os, is);
 			thread.start();
-			
+			TerraeRasa.registerClientThread(thread);
 			startMPGame();
 		} catch (IOException e) {
 			e.printStackTrace();

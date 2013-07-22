@@ -10,20 +10,22 @@ import java.util.Vector;
 
 import transmission.ServerUpdate;
 import entities.EntityPlayer;
+import enums.EnumColor;
 
 
 public class TerraeRasa 
 {
 	//http://stackoverflow.com/questions/2914375/getting-file-path-in-java
 	private static String basePath = "/home/alec/terraerasaserver";
-	public static boolean done = false;
+	public volatile static boolean done = false;
 	private final static String VERSION = "Alpha 0.1.4";	
 	private ServerSettings settings;
 	private Vector<ServerConnectionThread> connections = new Vector<ServerConnectionThread>();
 	public GameEngine gameEngine;
-	public static TerraeRasa terraeRasa;
+	public volatile static TerraeRasa terraeRasa;
 	private GameEngineThread gameEngineThread;
 	private ServerSocket serverSocket;
+	private ConsoleInputThread consoleInputThread;
 	
 	public static void main(String[] args)
 	{
@@ -41,6 +43,9 @@ public class TerraeRasa
 		gameEngineThread = new GameEngineThread(gameEngine);
 		gameEngineThread.start();
 
+		consoleInputThread = new ConsoleInputThread();
+		consoleInputThread.start();
+
 		try {
 			serverSocket = new ServerSocket(settings.port);
 		} catch (IOException e) {
@@ -56,16 +61,16 @@ public class TerraeRasa
 				e.printStackTrace();
 			}
 			
-			try {
-				handleSocketConnection(socket);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}		
+			if(!done) 
+			{
+				try {
+					handleSocketConnection(socket);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
-
-		//Cleanup
-		//Issue this from the game engine thread.
-		SettingsIO.saveSettings(settings);
+		//Issue cleanup from the game engine thread, this one is locked.
 	}
 	
 	private void handleSocketConnection(Socket socket) throws IOException
@@ -146,6 +151,40 @@ public class TerraeRasa
 		return connections;
 	}
 	
+	public synchronized void close()
+	{
+		try {
+			serverSocket.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		Iterator<ServerConnectionThread> it = terraeRasa.getConnections().iterator();
+		while(it.hasNext())
+		{
+			ServerConnectionThread thread = it.next();
+			thread.forceSendPlayerAndClose();
+		}	
+		
+		while(connections.size() > 0)
+		{
+			it = terraeRasa.getConnections().iterator();
+			while(it.hasNext())
+			{
+				ServerConnectionThread thread = it.next();
+				if(!thread.getOpen())
+				{
+					it.remove();
+				}
+			}	
+			try {
+				Thread.sleep(50);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}		
+	}
+	
 	public synchronized static void addWorldUpdate(ServerUpdate update)
 	{
 		Iterator<ServerConnectionThread> it = terraeRasa.getConnections().iterator();
@@ -156,11 +195,10 @@ public class TerraeRasa
 		}
 	}
 	
-	public static synchronized void close()
+	public static synchronized void closeServer()
 	{
 		SettingsIO.saveSettings(terraeRasa.settings);
-		//Close connections to clients
-		//close the server socket
+		terraeRasa.close();
 		System.exit(0);
 	}
 	
@@ -168,11 +206,40 @@ public class TerraeRasa
 	{
 		return settings;
 	}
+	
+	public static synchronized void addServerIssuedCommand(String command)
+	{
+		terraeRasa.gameEngine.registerServerCommand(command);
+	}
 
-	public static synchronized void closeClientConnection(ServerConnectionThread connection, EntityPlayer player)
+	public static synchronized void requestClientConnectionClosed(ServerConnectionThread connection, EntityPlayer player)
+	{
+		terraeRasa.gameEngine.addCloseRequest(connection, player);
+	}
+	
+	public static synchronized void requestThreadCloseByID(int id)
+	{
+		Iterator<ServerConnectionThread> it = terraeRasa.getConnections().iterator();
+		while(it.hasNext())
+		{
+			ServerConnectionThread thread = it.next();
+			if(thread.getAssociatedPlayerID() == id)
+			{
+				thread.forceSendPlayerAndClose();
+			}
+		}
+	}
+	
+	public static synchronized void closeClientThread(ServerConnectionThread connection, EntityPlayer player)
 	{
 		terraeRasa.connections.remove(connection);
 		terraeRasa.gameEngine.removePlayer(player);
 		Log.log(player.getName() + " has left the game.");
+		terraeRasa.gameEngine.addCommandUpdate("/say " + player.getName() + " " + EnumColor.YELLOW.toString() + " has left the game");
+	}
+	
+	public static synchronized void stop()
+	{
+		done = true;
 	}
 }

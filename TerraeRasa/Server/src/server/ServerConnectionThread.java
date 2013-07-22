@@ -14,9 +14,9 @@ import transmission.CompressedServerUpdate;
 import transmission.GZIPHelper;
 import transmission.ServerUpdate;
 import transmission.SuperCompressedChunk;
+import transmission.UpdateWithObject;
 import transmission.WorldData;
 import entities.EntityPlayer;
-import enums.EnumHardwareInput;
 
 public class ServerConnectionThread extends Thread
 {
@@ -27,6 +27,8 @@ public class ServerConnectionThread extends Thread
 	private ObjectInputStream is;
 	private GZIPHelper gzipHelper;
 	private final int connectionID;
+	private int associatedPlayerID;
+	private volatile boolean sendPlayerAndClose;
 	
 	public ServerConnectionThread(WorldLock lock, Socket socket, ObjectOutputStream os, ObjectInputStream is)
 	{
@@ -34,6 +36,7 @@ public class ServerConnectionThread extends Thread
 		this.worldLock = lock;
 		setDaemon(true);
 		open = true;
+		sendPlayerAndClose = false;
 		this.is = is;
 		this.os = os;
 		gzipHelper = new GZIPHelper();
@@ -42,22 +45,41 @@ public class ServerConnectionThread extends Thread
 	
 	public void registerWorldUpdate(ServerUpdate update)
 	{
-		worldLock.addUpdate(update);
+		if(open)
+		{
+			worldLock.addUpdate(update);
+		}
 	}
 	
 	public void run()
 	{	
-		try 
-		{
+		try {
 			handleInitialData();			
 			while(open)
 			{
 				CompressedClientUpdate[] clientUpdate = (CompressedClientUpdate[])(gzipHelper.expand((byte[])is.readObject()));
 				worldLock.registerPlayerUpdate(clientUpdate);
 				//TODO: Maybe? this may or may not be reckless.
-				CompressedServerUpdate[] updates = worldLock.yieldServerUpdates();
-	        	os.writeObject(gzipHelper.compress(updates));
-	        	os.flush();
+				
+				if(sendPlayerAndClose)
+				{
+					CompressedServerUpdate closingUpdate = new CompressedServerUpdate();
+					UpdateWithObject playerUpdate = new UpdateWithObject();
+					playerUpdate.command = "/fullplayersend " + worldLock.getRelevantPlayer().entityID;
+					playerUpdate.object = EntityPlayer.compress(worldLock.getRelevantPlayer());
+					closingUpdate.objectUpdates = new UpdateWithObject[1];
+					closingUpdate.objectUpdates[0] = playerUpdate;
+					CompressedServerUpdate[] updates = { closingUpdate };
+					os.writeObject(gzipHelper.compress(updates));
+		        	os.flush();
+		        	open = false;
+				}
+				else
+				{
+					CompressedServerUpdate[] updates = worldLock.yieldServerUpdates();
+					os.writeObject(gzipHelper.compress(updates));
+		        	os.flush();
+				}
 			}			
 		} catch (IOException e) {
 			System.err.println("Fatal error to connection thread with ID " + connectionID + " caused by: ");
@@ -69,13 +91,18 @@ public class ServerConnectionThread extends Thread
 			System.err.println("Fatal error to connection thread with ID " + connectionID + " caused by: ");
 			e.printStackTrace();
 		} finally {
+			TerraeRasa.requestClientConnectionClosed(this, worldLock.getRelevantPlayer());
+			try {
+				Thread.sleep(10000);
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+			}
 			try {
 				os.close();
 				is.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			TerraeRasa.closeClientConnection(this, worldLock.getRelevantPlayer());
 		}
 	}
 	
@@ -84,6 +111,7 @@ public class ServerConnectionThread extends Thread
 		try {
 			String message = is.readUTF();
 			int playerID = ServerSettings.getEntityID();
+			this.associatedPlayerID = playerID;
 			EntityPlayer player = null;
 			if(message.equals("/sendplayer"))
 			{
@@ -123,5 +151,20 @@ public class ServerConnectionThread extends Thread
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public boolean getOpen()
+	{
+		return open;
+	}
+	
+	public void forceSendPlayerAndClose()
+	{
+		this.sendPlayerAndClose = true;
+	}
+	
+	public int getAssociatedPlayerID()
+	{
+		return associatedPlayerID;
 	}
 }

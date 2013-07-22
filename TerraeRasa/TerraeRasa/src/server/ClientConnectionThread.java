@@ -58,15 +58,12 @@ public class ClientConnectionThread extends Thread
 					os.writeObject(gzipHelper.compress(input));
 		        	os.flush();
 		        	
-		        	//gzipHelper.expand((byte[])
-		        	
 		        	CompressedServerUpdate[] updates = (CompressedServerUpdate[])(gzipHelper.expand((byte[])is.readObject()));
 		        	for(CompressedServerUpdate update : updates)
 		        	{
 		        		engineLock.addUpdate(update);
-		        	}	
-		        	
-		        	
+		        	}	        	
+		        		        	
 			        next_game_tick += SKIP_TICKS;
 				    loops++;
 		        }
@@ -83,6 +80,14 @@ public class ClientConnectionThread extends Thread
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				os.close();
+				is.close();
+				socket.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}			
 		}
 		
 	}
@@ -119,8 +124,11 @@ public class ClientConnectionThread extends Thread
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
-		}
-		
+		}		
 	}
 
+	public void end()
+	{
+		done = true;
+	}
 }

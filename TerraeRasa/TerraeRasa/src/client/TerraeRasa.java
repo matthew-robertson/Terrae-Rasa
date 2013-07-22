@@ -1,21 +1,15 @@
 package client;
 
-import io.Chunk;
-
 import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-
-import javax.swing.JFrame;
 
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
@@ -23,11 +17,8 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.PixelFormat;
 
 import render.Render;
-import world.Biome;
+import server.ClientConnectionThread;
 import world.World;
-
-import com.thoughtworks.xstream.XStream;
-
 import entities.EntityPlayer;
 
 /**
@@ -59,6 +50,8 @@ public class TerraeRasa
 	public static boolean initInDebugMode;
 	public static TerraeRasa terraeRasa;
 	public final GameEngine gameEngine;
+	private ClientConnectionThread thread;
+
 	
 	/**
 	 * Creates a new instance of the container for all game objects, and a new GameEngine. 
@@ -310,6 +303,16 @@ public class TerraeRasa
 	public static final String getOSName()
 	{
 		return osName;
+	}
+	
+	public synchronized static void registerClientThread(ClientConnectionThread thread)
+	{
+		terraeRasa.thread = thread;
+	}
+	
+	public synchronized static void terminateClientConnection()
+	{
+		terraeRasa.thread.end();
 	}
 }
 

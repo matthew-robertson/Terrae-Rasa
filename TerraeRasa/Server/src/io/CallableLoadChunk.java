@@ -23,7 +23,7 @@ public class CallableLoadChunk implements Callable<Chunk>
 	
 	public Chunk call() throws Exception
 	{
-		SavableChunk savable = (SavableChunk)new SaveManager().loadCompressedFile("/World/" + basepath + "/" + x + ".trc");
+		SavableChunk savable = (SavableChunk)new SaveManager().loadCompressedFile(basepath + "/" + x + ".trc");
 		Chunk chunk = new Chunk(Biome.getBiomeFromBiomeList(savable.biomeID), savable.x, savable.height);
 		chunk.backWalls = convertFromSavable(savable.backWalls);
 		chunk.blocks = convertFromSavable(savable.blocks);

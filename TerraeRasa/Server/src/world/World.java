@@ -360,7 +360,7 @@ public class World
 		//chunkManager.addAllLoadedChunks_Wait(this, getChunks());
 		spawnPlayer(settings, player);
 		Log.log(player.getName() + " joined the game with entityID " + player.entityID);
-		return player.getName() + " joined the game";
+		return "/say " + player.getName() + " " + EnumColor.YELLOW.toString() + " joined the game";
 	}
 	
 	/**
@@ -543,19 +543,6 @@ public class World
 		//causeWeather();		
 		//TODO: weather		
 		
-		//update the player
-		for(EntityPlayer player : players)
-		{
-			player.onWorldTick(update, this); 			
-			//Hittests
-			performPlayerMonsterHittests(update, player); 
-			performProjectileHittests(update, player);
-			performPlayerItemHittests(update, player);
-			performEnemyToolHittests(update, player);
-			String command = "/player " + player.entityID + " sethms " + player.getHealth() + " " + player.mana + " " + player.specialEnergy;
-			update.addValue(command);
-		}
-		
 		updateChunks(players);
 		
 		//Not player based stuff -- do this once per game tick
@@ -573,7 +560,21 @@ public class World
 		updateProjectiles(update);
 		
 		handlePlayerMovement(update);
-				
+		
+		
+		//update the player
+		for(EntityPlayer player : players)
+		{
+			player.onWorldTick(update, this); 			
+			//Hittests
+			performPlayerMonsterHittests(update, player); 
+			performProjectileHittests(update, player);
+			performPlayerItemHittests(update, player);
+			performEnemyToolHittests(update, player);
+			String command = "/player " + player.entityID + " sethms " + player.getHealth() + " " + player.mana + " " + player.specialEnergy;
+			update.addValue(command);
+		}
+		
 		for(WorldText text : temporaryText)
 		{
 			String command = "/worldtext " + text.x + " " + text.y + " " + text.message + " " + text.color.toString();

@@ -19,7 +19,8 @@ public enum EnumColor
 	FIERY2("FIERY2", 11, new double[] { 253.0/255, 124.0/255, 5.0/255, 1}),
 	FIERY3("FIERY3", 12, new double[] { 253.0/255, 181.0/255, 9.0/255, 1}),
 	FIERY4("FIERY4", 13, new double[] { 255.0/255, 117.0/255, 4.0/255, 1}),
-	FIERY5("FIERY5", 14, new double[] { 255.0/255, 69.0/255, 0.0/255, 1});
+	FIERY5("FIERY5", 14, new double[] { 255.0/255, 69.0/255, 0.0/255, 1}),
+	YELLOW("YELLOW", 15, new double[] { 255.0/255, 255.0/255, 51.0/255, 1});
 
 	public final double[] COLOR;
 	private final String name;

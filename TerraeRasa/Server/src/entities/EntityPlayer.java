@@ -7,13 +7,11 @@ import items.ItemRanged;
 import items.ItemThrown;
 import items.ItemTool;
 import items.ItemToolAxe;
-import items.ItemToolHammer;
 import items.ItemToolPickaxe;
 
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.List;
 import java.util.Random;
 import java.util.Vector;
 
@@ -21,8 +19,6 @@ import passivebonuses.PassiveBonus;
 import passivebonuses.PassiveBonusContainer;
 import passivebonuses.PassiveBonusFactory;
 import server.TerraeRasa;
-import statuseffects.StatusEffect;
-import statuseffects.StatusEffectAbsorb;
 import transmission.CompressedPlayer;
 import transmission.EntityUpdate;
 import transmission.ServerUpdate;
@@ -787,8 +783,7 @@ public class EntityPlayer extends EntityLiving
 		//Check If the left-mouse button is pressed && they have the correct tool to mine
 		if (world.getBlock(mx, my).getID() != Block.air.getID()){
 			if (((item instanceof ItemToolPickaxe && block.getBlockType() == 1) //TODO: Magic number fix @ block types
-			  || (item instanceof ItemToolAxe && block.getBlockType() == 2) 
-			  || (item instanceof ItemToolHammer && block.getBlockType() == 3) 
+			  || (item instanceof ItemToolAxe && block.getBlockType() == 2)  
 		      || block.getBlockType() == 0))
 			{	
 				EnumToolMaterial material;
@@ -857,8 +852,7 @@ public class EntityPlayer extends EntityLiving
 		}
 		if (world.getBackBlock(mx, my).getID() != Block.backAir.getID()){
 			if (((item instanceof ItemToolPickaxe && world.getBackBlock(mx, my).getBlockType() == 1) 
-			  || (item instanceof ItemToolAxe && world.getBackBlock(mx, my).getBlockType() == 2) 
-			  || (item instanceof ItemToolHammer && world.getBackBlock(mx, my).getBlockType() == 3) 
+			  || (item instanceof ItemToolAxe && world.getBackBlock(mx, my).getBlockType() == 2)  
 		      || world.getBackBlock(mx, my).getBlockType() == 0))
 			{ 
 				//If the right-mouse button is pressed && they have the correct tool to mine

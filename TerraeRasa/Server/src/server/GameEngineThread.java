@@ -6,6 +6,7 @@ public class GameEngineThread extends Thread
 	
 	public GameEngineThread(GameEngine engine)
 	{
+		setDaemon(true);
 		this.gameEngine = engine;
 	}
 	
