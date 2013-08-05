@@ -14,18 +14,20 @@ import transmission.EntityUpdate;
 import transmission.ServerUpdate;
 import transmission.SuperCompressedBlock;
 import transmission.UpdateWithObject;
+import utils.ColoredText;
 import utils.ItemStack;
 import world.World;
 import blocks.Block;
 import entities.EntityItemStack;
 import entities.EntityPlayer;
+import enums.EnumColor;
 
 public class Commands 
 {
-	// -- req world and player?
-	public synchronized static void processConsoleCommand(ServerUpdate update, World world, GameEngine engine, String command)
+	// -- These are server commands
+	public synchronized static void processConsoleCommand(ServerSettings settings, ServerUpdate update, World world, GameEngine engine, String command)
 	{	
-		
+		System.out.println("Most server commands are NYI");
 		System.out.println("TODO: Make this command work: " + command);
 		
 		String[] commandComponents = command.split(" ");
@@ -129,7 +131,8 @@ public class Commands
 		}
 		if(command.startsWith("/say"))
 		{
-			
+			String clientCommand = command.replace("say", "servermessage");
+			update.addValue(clientCommand);
 		}
 
 		
@@ -316,6 +319,15 @@ public class Commands
 				{
 					//A server command that the player can issue
 					String remaining = command.substring(command.indexOf(" ", command.indexOf("say") + 4) + 1);
+					
+					//Put what the player said onto the console
+					String[] remainingSplit = remaining.split(" ");
+					String message = remainingSplit[1] + ": " + remaining.substring(remaining.indexOf(" ", 
+							remaining.indexOf(" ", 
+									remaining.indexOf(" ", 
+											remaining.indexOf(" ") + 1)) + 1) + 1);
+					Log.log(message);
+					
 					//TODO: check for permissions
 					engine.registerServerCommand(remaining);
 				}
@@ -324,6 +336,15 @@ public class Commands
 					//Chat to everyone
 					//"/say <name> <color> <message>"
 					String chatmessage = "/say " + player.getName() + " " + command.substring(command.indexOf("say") + 4);
+
+					//Put what the player said onto the console
+					String[] remainingSplit = chatmessage.split(" ");
+					String message = remainingSplit[1] + ": " + chatmessage.substring(chatmessage.indexOf(" ", 
+							chatmessage.indexOf(" ", 
+									chatmessage.indexOf(" ", 
+											chatmessage.indexOf(" ") + 1)) + 1) + 1);
+					Log.log(message);
+					
 					update.addValue(chatmessage);
 				}				
 			}

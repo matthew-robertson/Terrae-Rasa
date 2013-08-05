@@ -10,6 +10,7 @@ import transmission.CompressedPlayer;
 import transmission.CompressedServerUpdate;
 import transmission.ServerUpdate;
 import transmission.SuperCompressedChunk;
+import transmission.UpdateWithObject;
 import transmission.WorldData;
 import entities.EntityPlayer;
 import enums.EnumHardwareInput;
@@ -19,8 +20,7 @@ public class WorldLock
 	private GameEngine engine;
 	private Vector<CompressedServerUpdate> serverUpdates = new Vector<CompressedServerUpdate>();
 	private EntityPlayer relevantPlayer;
-	private Vector<CompressedClientUpdate> clientUpdates = new Vector<CompressedClientUpdate>();
-	
+
 	public WorldLock(GameEngine engine)
 	{
 		this.engine = engine;
@@ -39,8 +39,7 @@ public class WorldLock
 	
 	public synchronized void addPlayerToWorld(EntityPlayer player)
 	{		
-		String message = engine.getWorld().addPlayerToWorld(TerraeRasa.terraeRasa.getSettings(), player);
-		TerraeRasa.terraeRasa.gameEngine.addCommandUpdate(message);
+		engine.getWorld().addPlayerToWorld(TerraeRasa.terraeRasa.getSettings(), player);
 		engine.registerPlayer(player);
 		relevantPlayer = player;
 	}
@@ -93,7 +92,22 @@ public class WorldLock
 			compressedUpdate.positionUpdates = update.getPositionUpdates();
 			compressedUpdate.statUpdates = update.getStatUpdates();
 			compressedUpdate.objectUpdates = update.getObjectUpdates();
+			
+			System.out.println("---------Debug Compressed Update start--------");
+			
+			for(String str : compressedUpdate.values)
+			{
+				System.out.println("String: " + str);
+			}
+			for(UpdateWithObject str : compressedUpdate.objectUpdates)
+			{
+				System.out.println("String_withobj_: " + str.command);
+			}
+			
+			System.out.println("---------Debug Compressed Update end----------");
+			
 			serverUpdates.add(compressedUpdate);
+			
 		}
 	}
 	

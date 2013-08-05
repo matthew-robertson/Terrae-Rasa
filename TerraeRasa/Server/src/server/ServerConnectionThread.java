@@ -22,7 +22,7 @@ public class ServerConnectionThread extends Thread
 {
 	private Socket socket;
 	private WorldLock worldLock;
-	private boolean open;
+	private volatile boolean open;
 	private ObjectOutputStream os;
 	private ObjectInputStream is;
 	private GZIPHelper gzipHelper;
@@ -35,7 +35,7 @@ public class ServerConnectionThread extends Thread
 		this.socket = socket;
 		this.worldLock = lock;
 		setDaemon(true);
-		open = true;
+		open = false;
 		sendPlayerAndClose = false;
 		this.is = is;
 		this.os = os;
@@ -54,7 +54,7 @@ public class ServerConnectionThread extends Thread
 	public void run()
 	{	
 		try {
-			handleInitialData();			
+			handleInitialData();
 			while(open)
 			{
 				CompressedClientUpdate[] clientUpdate = (CompressedClientUpdate[])(gzipHelper.expand((byte[])is.readObject()));
@@ -109,6 +109,7 @@ public class ServerConnectionThread extends Thread
 	private void handleInitialData()
 	{
 		try {
+			//Recieve the player and generate an ID for them
 			String message = is.readUTF();
 			int playerID = ServerSettings.getEntityID();
 			this.associatedPlayerID = playerID;
@@ -119,11 +120,14 @@ public class ServerConnectionThread extends Thread
 				player.setEntityID(playerID);
 				player.verifyName();
 				worldLock.addPlayerToWorld(player);
+
 			}
 			
+			//Tell the client what their player's ID is
 			os.writeInt(playerID);
 			os.flush();
 			
+			//Decide what chunks need to be sent
 			message = is.readUTF();
 			if(message.equals("/requestinitChunks"))
 			{
@@ -138,6 +142,7 @@ public class ServerConnectionThread extends Thread
 				os.flush();
 			}
 						
+			//Send world data to the client
 			message = is.readUTF();
 			if(message.equals("/initialgamedata"))
 			{
@@ -146,6 +151,12 @@ public class ServerConnectionThread extends Thread
 				os.writeObject(gzipHelper.compress(data));
 				os.flush();
 			}
+			
+			//Add the player to the world and mark this thread as being active.
+			if(player != null)
+			{
+			}
+			open = true;
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
@@ -153,17 +164,28 @@ public class ServerConnectionThread extends Thread
 		}
 	}
 	
+	/**
+	 * Gets whether or not this connection thread to a client is open. If it is open then server/client update cycle is allowed.
+	 * @return whether this connection thread is open, allowing updates
+	 */
 	public boolean getOpen()
 	{
 		return open;
 	}
 	
-	public void forceSendPlayerAndClose()
+	/**
+	 * Requests that this thread is closed. This will send an updated version of the player back to the client to save and perform any applicable cleanup.
+	 */
+	public void close()
 	{
 		this.sendPlayerAndClose = true;
 	}
 	
-	public int getAssociatedPlayerID()
+	/**
+	 * Gives the ID of the player associated to this connection.
+	 * @return the ID of the player associated with this connection.
+	 */
+	public final int getAssociatedPlayerID()
 	{
 		return associatedPlayerID;
 	}

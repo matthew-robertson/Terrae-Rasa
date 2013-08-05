@@ -578,6 +578,17 @@ public class GameEngine
 			ColoredText text = new ColoredText(color, remaining);
 			chatbox.log(text);
 		}
+		else if(command.startsWith("/servermessage"))
+		{
+			// "/servermessage <color> <message>"
+			String[] split = command.split(" ");
+			EnumColor color = EnumColor.get(split[1]);
+			String remaining = command.substring(command.indexOf(" ", 
+					command.indexOf(" ", 
+							command.indexOf(" ") + 1)) + 1);
+			ColoredText text = new ColoredText(color, remaining);
+			chatbox.log(text);
+		}
 	}
 	
 	public void addColoredText(ColoredText text)

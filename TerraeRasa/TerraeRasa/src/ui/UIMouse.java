@@ -255,14 +255,11 @@ public class UIMouse extends UIBase
 		int x = MathHelper.getCorrectMouseXPosition();
 		int y = MathHelper.getCorrectMouseYPosition();		
 		
-		try 
-		{
+		try {
 			//Band-aid fix for mouse clicks. Get the position before calling this though of it'll break on windows.
 			Mouse.destroy(); 
 			Mouse.create();
-		} 	
-		catch (LWJGLException e)
-		{
+		} catch (LWJGLException e) {
 			e.printStackTrace();
 		}
 		
@@ -292,7 +289,7 @@ public class UIMouse extends UIBase
 			int x1 = (int) ((Display.getWidth() * 0.25f) + (((i % 12) - 6) * (size)));
 			int y1 = (int) ((Display.getHeight() * 0.5f) - ((i / 12) * (size)) - (size + 22f));
 			
-			if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
+			if(x >= x1 && x <= x1 + size && y >= y1 && y <= y1 + size) //Is the click in bounds?
 			{
 				if(player.inventory.getMainInventoryStack(i) != null && mouseItem == null) //The mouse doesn't have something picked up
 				{
@@ -311,7 +308,7 @@ public class UIMouse extends UIBase
 			int x1 = (int) ((Display.getWidth() * 0.25f) + (-7 * size));
 			int y1 = (int) ((Display.getHeight() * 0.5f) - (i * (size)) - (size + 22f));
 			
-			if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
+			if(x >= x1 && x <= x1 + size && y >= y1 && y <= y1 + size) //Is the click in bounds?
 			{
 				if(player.inventory.getQuiverStack(i) != null && mouseItem == null) //The mouse doesn't have something picked up
 				{
@@ -335,7 +332,7 @@ public class UIMouse extends UIBase
 			int x1 = (int) ((Display.getWidth() * 0.5f) - ((size + 2) * (1.5 + (i / 5))));
 			int y1 = armorOffset + ((i % 5) * (size + 2));	
 			
-			if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
+			if(x >= x1 && x <= x1 + size && y >= y1 && y <= y1 + size) //Is the click in bounds?
 			{
 				if(player.inventory.getArmorInventoryStack(i) != null && mouseItem == null) //The mouse doesn't have something picked up
 				{
@@ -352,9 +349,8 @@ public class UIMouse extends UIBase
 		int x1 = (int)(Display.getWidth() * 0.25f) - (6 * 20); 
 		int y1 = (int)(Display.getHeight() * 0.5f) - (6 * 20);
 		
-		if(x > x1 && x < x1 + 20 && y > y1 && y < y1 + 20) //Garbage
+		if(x >= x1 && x <= x1 + 20 && y >= y1 && y <= y1 + 20) //Garbage
 		{
-			//System.out.println("Garbage");
 			if(player.inventory.getTrashStack(0) != null && mouseItem == null)  //The mouse doesn't have something picked up
 			{
 				pickUpMouseItem(world, player, 3, 0, x - x1, y - y1, 16);
@@ -372,7 +368,7 @@ public class UIMouse extends UIBase
 			
 		x1 = xoff;
 		y1 = yoff; 
-		if(x > x1 && x < x1 + size && y > y1 && y < y1 + size && player.selectedRecipe >= 2) //Left
+		if(x >= x1 && x <= x1 + size && y >= y1 && y <= y1 + size && player.selectedRecipe >= 2) //Left
 		{
 			shouldDropItem = false;
 			UI.adjustSliderPosition(world, player, -1);
@@ -380,7 +376,7 @@ public class UIMouse extends UIBase
 		
 		x1 = xoff + 24;
 		y1 = yoff;
-		if(x > x1 && x < x1 + size && y > y1 && y < y1 + size && player.selectedRecipe >= 1) //Mid-Left
+		if(x >= x1 && x <= x1 + size && y >= y1 && y <= y1 + size && player.selectedRecipe >= 1) //Mid-Left
 		{
 		
 			shouldDropItem = false;
@@ -390,7 +386,7 @@ public class UIMouse extends UIBase
 		size = 24; 
 		x1 = xoff + 49;
 		y1 = yoff - 2; 
-		if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Middle
+		if(x >= x1 && x <= x1 + size && y >= y1 && y <= y1 + size) //Middle
 		{
 			
 			shouldDropItem = false;
@@ -400,7 +396,7 @@ public class UIMouse extends UIBase
 		size = 20; 
 		x1 = xoff + 76;
 		y1 = yoff;
-		if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Mid-right
+		if(x >= x1 && x <= x1 + size && y >= y1 && y <= y1 + size) //Mid-right
 		{
 		
 			shouldDropItem = false;
@@ -409,7 +405,7 @@ public class UIMouse extends UIBase
 		
 		x1 = xoff + 100;
 		y1 = yoff;	
-		if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Right
+		if(x >= x1 && x <= x1 + size && y >= y1 && y <= y1 + size) //Right
 		{
 			shouldDropItem = false;
 			UI.adjustSliderPosition(world, player, 1);
@@ -574,7 +570,7 @@ public class UIMouse extends UIBase
 			int x1 = (int) ((Display.getWidth() * 0.25f) + (((i % 12) - 6) * (size)));
 			int y1 = (int) ((Display.getHeight() * 0.5f) - ((i / 12) * (size)) - (size + 22f));
 			
-			if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
+			if(x >= x1 && x <= x1 + size && y >= y1 && y <= y1 + size) //Is the click in bounds?
 			{
 				//Ensure it's actually an Item
 				if (player.inventory.getMainInventoryStack(i) != null && 
@@ -605,7 +601,7 @@ public class UIMouse extends UIBase
 			int x1 = (int) ((Display.getWidth() * 0.25f) + (-7 * size));
 			int y1 = (int) ((Display.getHeight() * 0.5f) - (i * (size)) - (size + 22f));
 			
-			if(x > x1 && x < x1 + size && y > y1 && y < y1 + size && player.inventory.getQuiverStack(i) != null) 
+			if(x >= x1 && x <= x1 + size && y >= y1 && y <= y1 + size && player.inventory.getQuiverStack(i) != null) 
 			{
 				//Try to place that stack in the inventory - leaving what's left in the quiver (if any)
 				player.inventory.setQuiverStack(player, player.inventory.pickUpItemStack(world, 
@@ -626,7 +622,7 @@ public class UIMouse extends UIBase
 			int x1 = (int) ((Display.getWidth() * 0.5f) - ((size + 2) * (1.5 + (i / 5))));
 			int y1 = armorOffset + ((i % 5) * (size + 2));	
 			
-			if(x > x1 && x < x1 + size && y > y1 && y < y1 + size && player.inventory.getArmorInventoryStack(i) != null) 
+			if(x >= x1 && x <= x1 + size && y >= y1 && y <= y1 + size && player.inventory.getArmorInventoryStack(i) != null) 
 			{
 				player.inventory.setArmorInventoryStack(player, player.inventory.pickUpItemStack(world, 
 							player, 
@@ -640,7 +636,7 @@ public class UIMouse extends UIBase
 		int x1 = (int)(Display.getWidth() * 0.25f) - (6 * 20); 
 		int y1 = (int)(Display.getHeight() * 0.5f) - (6 * 20);
 		
-		if(x > x1 && x < x1 + 20 && y > y1 && y < y1 + 20 && player.inventory.getTrashStack(0) != null) //Garbage
+		if(x >= x1 && x <= x1 + 20 && y >= y1 && y <= y1 + 20 && player.inventory.getTrashStack(0) != null) //Garbage
 		{
 			player.inventory.setTrashStack(player.inventory.pickUpItemStack(world, 
 					player, 
@@ -655,14 +651,14 @@ public class UIMouse extends UIBase
 			
 		x1 = xoff;
 		y1 = yoff; 
-		if(x > x1 && x < x1 + size && y > y1 && y < y1 + size && player.selectedRecipe >= 2) //Left
+		if(x >= x1 && x <= x1 + size && y >= y1 && y <= y1 + size && player.selectedRecipe >= 2) //Left
 		{
 			UI.adjustSliderPosition(world, player, -1);
 		}
 		
 		x1 = xoff + 24;
 		y1 = yoff;
-		if(x > x1 && x < x1 + size && y > y1 && y < y1 + size && player.selectedRecipe >= 1) //Mid-Left
+		if(x >= x1 && x <= x1 + size && y >= y1 && y <= y1 + size && player.selectedRecipe >= 1) //Mid-Left
 		{
 		
 			UI.adjustSliderPosition(world, player, -1);
@@ -671,7 +667,7 @@ public class UIMouse extends UIBase
 		size = 24; 
 		x1 = xoff + 49;
 		y1 = yoff - 2; 
-		if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Middle
+		if(x >= x1 && x <= x1 + size && y >= y1 && y <= y1 + size) //Middle
 		{
 			
 			UI.craftRecipe(world, player, player.selectedRecipe, -2, -2, 16);
@@ -680,7 +676,7 @@ public class UIMouse extends UIBase
 		size = 20; 
 		x1 = xoff + 76;
 		y1 = yoff;
-		if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Mid-right
+		if(x >= x1 && x <= x1 + size && y >= y1 && y <= y1 + size) //Mid-right
 		{
 		
 			UI.adjustSliderPosition(world, player, 1);
@@ -688,7 +684,7 @@ public class UIMouse extends UIBase
 		
 		x1 = xoff + 100;
 		y1 = yoff;	
-		if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Right
+		if(x >= x1 && x <= x1 + size && y >= y1 && y <= y1 + size) //Right
 		{
 			UI.adjustSliderPosition(world, player, 1);
 		}
@@ -746,7 +742,7 @@ public class UIMouse extends UIBase
 			int x1 = (int) ((Display.getWidth() * 0.25f) + ((((i % totalRows) - (totalRows / 2)) * (size))));
 			int y1 = (int) ((Display.getHeight() * 0.5f) - ((4 + (i / totalRows)) * (size)) - (size + 22f));
 			
-			if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
+			if(x >= x1 && x <= x1 + size && y >= y1 && y <= y1 + size) //Is the click in bounds?
 			{
 				if(chest.getItemStack(i) != null && mouseItem == null) //The mouse doesn't have something picked up, so this is straightforward
 				{

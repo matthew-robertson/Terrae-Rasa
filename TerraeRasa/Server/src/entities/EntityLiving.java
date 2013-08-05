@@ -467,12 +467,33 @@ public class EntityLiving extends Entity
 		statusEffects.clear();
 	}
 	
-	public double getHealth() {
+	/**
+	 * Returns this entity's current health, which will be less than or equal to its max health.
+	 * @return this entity's current health
+	 */
+	public double getHealth() 
+	{
 		return health;
 	}
 	
+	/**
+	 * Sets the health of this entity. It can exceed the max health if set this way, though will be reduced again when regeneration
+	 * is applied.
+	 * @param health the new health value for this entity
+	 */
 	public void setHealth(double health)
 	{
 		this.health = health;
+	}
+
+	/**
+	 * Gives this entity a given number of immunity ticks. If this entity has a negative amount of immunity it will be set to 0.
+	 * @param ticks the number of immunity ticks to grant an entity
+	 */
+	public void grantImmunityTicks(int ticks)
+	{
+		if(this.invincibilityTicks < 0) 
+			this.invincibilityTicks = 0;
+		this.invincibilityTicks += ticks;
 	}
 }

@@ -112,7 +112,7 @@ public class GameEngine
 		        	String[] serverCommands = yieldServerCommands();
 		        	for(String val : serverCommands)
 		        	{
-		        		Commands.processConsoleCommand(update, world, this, val);
+		        		Commands.processConsoleCommand(TerraeRasa.terraeRasa.getSettings(), update, world, this, val);
 		        	}
 		        	
 		        	Iterator<String> it = pendingChunkRequests.iterator();

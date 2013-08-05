@@ -23,6 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import savable.SavableWorld;
 import savable.SaveManager;
+import server.GameEngine;
 import server.Log;
 import server.PlayerInput;
 import server.ServerSettings;
@@ -283,8 +284,7 @@ public class World
 		requestRequiredChunks(settings, getWorldCenterBlock(), averageSkyHeight);
 		chunkManager.addAllLoadedChunks_Wait(this, getChunks());
 		
-		try
-		{
+		try {
 			for(int i = 0; i < height - 1; i++)
 			{
 				if(getBlock((int)(player.respawnXPos / 6), i).id == 0 && getBlock((int)(player.respawnXPos / 6) + 1, i).id == 0) 
@@ -294,16 +294,16 @@ public class World
 				if(getBlock((int)player.respawnXPos / 6, i).id != 0 || getBlock((int) (player.respawnXPos / 6) + 1, i).id != 0)
 				{	
 					player.x = player.respawnXPos;
-					player.y = (i * 6) - 18;				
+					player.y = (i * 6) - 18;			
+					player.grantImmunityTicks(6 * GameEngine.TICKS_PER_SECOND);
 					return player;
 				}			
 			}
-		}
-		catch (Exception e) //This is probably a nullpointer 
-		{
+		} catch (Exception e) {
+			//This is probably a nullpointer 
 			e.printStackTrace();
-			throw new RuntimeException("This is likely caused by a chunk that's required being denied due to I/O conflicts");
-			//If this exception is thrown, inspect the addition to chunkmanager - chunkLock from A1.0.23
+			throw new RuntimeException("This is likely caused by a chunk that's required being denied due to I/O conflicts" + '\n'
+			+ "If this exception is thrown, inspect the addition to chunkmanager - chunkLock from A1.0.23");
 		}
 		return player;
 	}
@@ -360,7 +360,8 @@ public class World
 		//chunkManager.addAllLoadedChunks_Wait(this, getChunks());
 		spawnPlayer(settings, player);
 		Log.log(player.getName() + " joined the game with entityID " + player.entityID);
-		return "/say " + player.getName() + " " + EnumColor.YELLOW.toString() + " joined the game";
+		TerraeRasa.addServerIssuedCommand("/say " + EnumColor.YELLOW.toString() + " " + player.getName() + " joined the game.");
+		return "";
 	}
 	
 	/**
@@ -565,14 +566,20 @@ public class World
 		//update the player
 		for(EntityPlayer player : players)
 		{
+			double h = player.getHealth();
+			double m = player.mana;
+			double s = player.specialEnergy;
 			player.onWorldTick(update, this); 			
 			//Hittests
 			performPlayerMonsterHittests(update, player); 
 			performProjectileHittests(update, player);
 			performPlayerItemHittests(update, player);
 			performEnemyToolHittests(update, player);
-			String command = "/player " + player.entityID + " sethms " + player.getHealth() + " " + player.mana + " " + player.specialEnergy;
-			update.addValue(command);
+			if(player.getHealth() != h || player.mana != m || player.specialEnergy != s)
+			{
+				String command = "/player " + player.entityID + " sethms " + player.getHealth() + " " + player.mana + " " + player.specialEnergy;
+				update.addValue(command);
+			}
 		}
 		
 		for(WorldText text : temporaryText)
@@ -626,12 +633,17 @@ public class World
 	 * Applies gravity to all itemstacks entities
 	 */
 	private void updateEntityLivingItemStacks(ServerUpdate update)
-	{
+	{		
 		for(int i = 0; i < itemsList.size(); i++)
 		{
+			double x = itemsList.get(i).x;
+			double y = itemsList.get(i).y;
 			itemsList.get(i).move(this);
 			PositionUpdate positionUpdate = new PositionUpdate(itemsList.get(i).entityID, itemsList.get(i).x, itemsList.get(i).y);
-			update.addPositionUpdate(positionUpdate);			
+			if(itemsList.get(i).x != x || itemsList.get(i).y != y)
+			{
+				update.addPositionUpdate(positionUpdate);			
+			}
 		}		
 	}
 	
@@ -782,9 +794,14 @@ public class World
 				continue;
 			}
 			
+			double x = entityList.get(i).x;
+			double y = entityList.get(i).y;
 			entityList.get(i).invincibilityTicks--;
 			entityList.get(i).applyAI(this); //otherwise apply AI
-			update.addPositionUpdate(new PositionUpdate(entityList.get(i).entityID, entityList.get(i).x, entityList.get(i).y));
+			if(entityList.get(i).x != x || entityList.get(i).y != y)
+			{
+				update.addPositionUpdate(new PositionUpdate(entityList.get(i).entityID, entityList.get(i).x, entityList.get(i).y));
+			}
 		}
 	}
 	

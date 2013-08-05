@@ -18,6 +18,7 @@ import java.util.Vector;
 import passivebonuses.PassiveBonus;
 import passivebonuses.PassiveBonusContainer;
 import passivebonuses.PassiveBonusFactory;
+import server.Log;
 import server.TerraeRasa;
 import transmission.CompressedPlayer;
 import transmission.EntityUpdate;
@@ -570,15 +571,22 @@ public class EntityPlayer extends EntityLiving
 	 */
 	private void triggerDifficultyEffect(World world)
 	{
-		if(difficulty == EnumPlayerDifficulty.HARD)
-		{
-			dropAll(world);
-		}
-		else if(difficulty == EnumPlayerDifficulty.HARDCORE)
-		{
-			defeated = true;	
-			return;
-		}
+		//TODO: figure out difficulty modes
+//		if(difficulty == EnumPlayerDifficulty.HARD)
+//		{
+//			dropAll(world);
+//		}
+//		else if(difficulty == EnumPlayerDifficulty.HARDCORE)
+//		{
+//			defeated = true;	
+//			return;
+//		}
+
+		//Death message to everyone, for a normal mode death
+		String chatmessage = "/say " + EnumColor.YELLOW.toString() + " " + getName() + " has died.";
+		Log.log(getName() + " has died.");
+		TerraeRasa.addServerIssuedCommand(chatmessage);
+		
 		health = maxHealth;
 		clearStatusEffects(world);
 		world.spawnPlayer(TerraeRasa.terraeRasa.getSettings(), this);	

@@ -26,6 +26,7 @@ public class TerraeRasa
 	private GameEngineThread gameEngineThread;
 	private ServerSocket serverSocket;
 	private ConsoleInputThread consoleInputThread;
+	private static Object gameEngineLock = new Object();
 	
 	public static void main(String[] args)
 	{
@@ -163,7 +164,7 @@ public class TerraeRasa
 		while(it.hasNext())
 		{
 			ServerConnectionThread thread = it.next();
-			thread.forceSendPlayerAndClose();
+			thread.close();
 		}	
 		
 		while(connections.size() > 0)
@@ -195,10 +196,15 @@ public class TerraeRasa
 		}
 	}
 	
+	/**
+	 * Stops the server, writing stuff to disk and closing the server socket, before calling System.exit() to 
+	 * terminate any rogue daemon threads.
+	 */
 	public static synchronized void closeServer()
 	{
 		SettingsIO.saveSettings(terraeRasa.settings);
 		terraeRasa.close();
+		Log.writeWithTimestamp();
 		System.exit(0);
 	}
 	
@@ -207,9 +213,12 @@ public class TerraeRasa
 		return settings;
 	}
 	
-	public static synchronized void addServerIssuedCommand(String command)
+	public static void addServerIssuedCommand(String command)
 	{
-		terraeRasa.gameEngine.registerServerCommand(command);
+		synchronized(gameEngineLock) 
+		{
+			terraeRasa.gameEngine.registerServerCommand(command);
+		}
 	}
 
 	public static synchronized void requestClientConnectionClosed(ServerConnectionThread connection, EntityPlayer player)
@@ -225,7 +234,7 @@ public class TerraeRasa
 			ServerConnectionThread thread = it.next();
 			if(thread.getAssociatedPlayerID() == id)
 			{
-				thread.forceSendPlayerAndClose();
+				thread.close();
 			}
 		}
 	}
@@ -233,9 +242,12 @@ public class TerraeRasa
 	public static synchronized void closeClientThread(ServerConnectionThread connection, EntityPlayer player)
 	{
 		terraeRasa.connections.remove(connection);
-		terraeRasa.gameEngine.removePlayer(player);
+		synchronized(gameEngineLock) 
+		{
+			terraeRasa.gameEngine.removePlayer(player);
+		}
 		Log.log(player.getName() + " has left the game.");
-		terraeRasa.gameEngine.addCommandUpdate("/say " + player.getName() + " " + EnumColor.YELLOW.toString() + " has left the game");
+		TerraeRasa.addServerIssuedCommand("/say " + EnumColor.YELLOW.toString() + " " + player.getName() + " has left the game.");
 	}
 	
 	public static synchronized void stop()
