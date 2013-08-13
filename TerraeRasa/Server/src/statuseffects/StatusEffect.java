@@ -1,5 +1,7 @@
 package statuseffects;
 
+import java.io.Serializable;
+
 import world.World;
 import entities.EntityLiving;
 
@@ -20,8 +22,9 @@ import entities.EntityLiving;
  * @since       1.0
  */
 public class StatusEffect 
-		 implements IStatusEffect
+		 implements IStatusEffect, Serializable
 {
+	private static final long serialVersionUID = 1L;
 	public boolean reapplicationSkipsRemovalEffect;
 	public int ticksLeft;
 	public int tier;

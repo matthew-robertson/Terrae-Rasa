@@ -18,12 +18,16 @@ import java.util.Vector;
 import passivebonuses.PassiveBonus;
 import passivebonuses.PassiveBonusContainer;
 import passivebonuses.PassiveBonusFactory;
+import server.GameEngine;
 import server.Log;
 import server.TerraeRasa;
+import statuseffects.StatusEffect;
+import statuseffects.StatusEffectAbsorb;
 import transmission.CompressedPlayer;
 import transmission.EntityUpdate;
 import transmission.ServerUpdate;
 import transmission.StatUpdate;
+import transmission.UpdateWithObject;
 import utils.Cooldown;
 import utils.Damage;
 import utils.GemSocket;
@@ -430,7 +434,7 @@ public class EntityPlayer extends EntityLiving
 				if(!damage.penetratesArmor())
 				{
 					damageDone = MathHelper.floorOne(
-						(damageDone * (1F - DEFENSE_REDUCTION_PERCENT * defense)) - (defense * DEFENSE_REDUCTION_FLAT)									
+						(damageDone * (1D - getDamageSoakPercent())) - (defense * DEFENSE_REDUCTION_FLAT)									
 						);
 				}
 				
@@ -505,8 +509,20 @@ public class EntityPlayer extends EntityLiving
 	{
 		if(ticksSinceLastCast > 120)
 		{
-			auraTracker.onManaRestored(world, this);
-			mana += manaRegenerationModifier * (((ticksSinceLastCast - 120) / (1000 / 20) < (0.60 * 20)) ? ((ticksSinceLastCast - 120) / (1000 / 20)) : (0.60 * 20));
+			if(mana < maxMana) 
+			{
+				auraTracker.onManaRestored(world, this);
+			}
+			
+			//Time for the effect to reach its maximum potential
+			int rampupTimeTicks = 18 * GameEngine.TICKS_PER_SECOND;
+			//Max periodic restore
+			double maxRestore = 20.0 + (maxMana * 0.04);
+			//Power of the actual restore based on time
+			double power = ((double)(this.ticksSinceLastCast - 120) / rampupTimeTicks) * maxRestore;
+			
+			double amountRestored = manaRegenerationModifier * ((power > maxRestore) ? maxRestore : (power));
+			mana += amountRestored;
 		}
 		
 		if(mana > maxMana)
@@ -526,9 +542,16 @@ public class EntityPlayer extends EntityLiving
 			{
 				auraTracker.onHeal(world, this);
 			}
-			double amountHealed = healthRegenerationModifier * ((ticksOfHealthRegen / (1800 / 20) < (20 * 0.55)) ? (ticksOfHealthRegen / (1800 / 20)) : (20 * 0.55));
+			//Time for the effect to reach its maximum potential
+			int rampupTimeTicks = 30 * GameEngine.TICKS_PER_SECOND;
+			//Max periodic heal
+			double maxheal = 10.0 + (maxHealth * 0.02);
+			//Power of the actual heal based on time
+			double power = ((double)ticksOfHealthRegen / rampupTimeTicks) * maxheal;
+			
+			double amountHealed = healthRegenerationModifier * ((power > maxheal) ? maxheal : (power));
 			health += amountHealed;
-			ticksOfHealthRegen++;	
+			ticksOfHealthRegen += 20;	
 		}
 	
 		if(health > maxHealth)
@@ -1610,5 +1633,105 @@ public class EntityPlayer extends EntityLiving
 	{
 		return rotateAngle;
 	}
+
+	/**
+	 * Overrides EntityLiving.checkAndUpdateStatusEffects(World) to update the player properly.
+	 * @param world the world that this entity is currently associated with
+	 */
+	public void checkAndUpdateStatusEffects(World world)
+	{
+		for(int i = 0; i < statusEffects.size(); i++)
+		{
+			statusEffects.get(i).applyPeriodicBonus(world, this);
+			
+			if(statusEffects.get(i).ticksLeft % GameEngine.TICKS_PER_SECOND == 0)
+			{
+				String command = "/player " + entityID + " statuseffectupdate " + statusEffects.get(i).id + " " + statusEffects.get(i).ticksLeft;
+				TerraeRasa.terraeRasa.gameEngine.addCommandUpdate(command);
+			}
+
+			if(statusEffects.get(i).isExpired())
+			{
+				statusEffects.get(i).removeInitialEffect(world, this);
+				if(statusEffects.get(i) instanceof StatusEffectAbsorb)
+				{
+					removeAbsorb((StatusEffectAbsorb)statusEffects.get(i));
+				}
+				String command = "/player " + entityID + " statuseffectremove " + statusEffects.get(i).id;
+				TerraeRasa.terraeRasa.gameEngine.addCommandUpdate(command);
+				statusEffects.remove(i);
+			}
+		}
+	}
 	
+	/**
+	 * Registers a status effect to this entity, whether it is positive or negative.
+	 * An effect may fail to register if a more powerful, non-stacking effect is already active.
+	 * @param effect the effect to register
+	 * @return whether or not the effect was successfully registered
+	 */
+	public boolean registerStatusEffect(World world, StatusEffect effect)
+	{
+		if(effect instanceof StatusEffectAbsorb)
+		{
+			registerAbsorb((StatusEffectAbsorb)effect);
+		}
+		
+//		else if(split[2].equals("statuseffectadd"))
+//		{
+//			EntityPlayer player = ((EntityPlayer)(world.getEntityByID(Integer.parseInt(split[1]))));
+//			player.registerStatusEffect((StatusEffect)(update.object));
+//		}
+//		String command = "/player " + entityID + " statuseffectremove " + statusEffects.get(i).id;
+//		TerraeRasa.terraeRasa.gameEngine.addCommandUpdate(command);
+
+		for(int i = 0; i < statusEffects.size(); i++)
+		{
+			if(statusEffects.get(i).toString().equals(effect.toString()) && !effect.stacksIndependantly)
+			{
+				if(statusEffects.get(i).tier <= effect.tier)
+				{
+					if(statusEffects.get(i).tier == effect.tier && statusEffects.get(i).ticksLeft > effect.ticksLeft)
+					{
+						return false;
+					}
+					else
+					{
+						if(!statusEffects.get(i).reapplicationSkipsRemovalEffect)
+						{
+							statusEffects.get(i).removeInitialEffect(world, this);
+						}
+						
+						String command = "/player " + entityID + " statuseffectremove " + statusEffects.get(i).id;
+						TerraeRasa.terraeRasa.gameEngine.addCommandUpdate(command);
+						
+						statusEffects.remove(i);						
+						effect.applyInitialEffect(world, this);
+						
+						UpdateWithObject update = new UpdateWithObject();
+						update.object = effect;
+						update.command = "/player " + entityID + " statuseffectadd";
+						TerraeRasa.terraeRasa.gameEngine.addExtraObjectUpdate(update);
+						
+						statusEffects.add(effect);
+						return true;
+					}
+				}
+				else
+				{
+					return false;
+				}
+			}
+		}
+		
+		effect.applyInitialEffect(world, this);
+		
+		UpdateWithObject update = new UpdateWithObject();
+		update.object = effect;
+		update.command = "/player " + entityID + " statuseffectadd";
+		TerraeRasa.terraeRasa.gameEngine.addExtraObjectUpdate(update);
+		
+		statusEffects.add(effect);
+		return true;
+	}
 }

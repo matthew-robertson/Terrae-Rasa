@@ -33,45 +33,70 @@ import entities.EntityPlayer;
 public enum EnumArmor 
 {
 	NOTHING("None", 0, 0, 0, 0, 0, 0, new PassiveBonus[]{ }),
-	COPPER("Copper", 2, 3, 2, 1, 1, 1, new PassiveBonus[]{
+	COPPER("Copper", 1, 2, 1, 1, 1, 1, new PassiveBonus[]{
 			new PassiveBonusDefense(1).setPiecesRequiredToActivate(3),
 			new PassiveBonusDefense(1).setPiecesRequiredToActivate(6)
 		}),
-	BRONZE("Bronze", 2, 4, 3, 1, 1, 1, new PassiveBonus[]{ 
-			new PassiveBonusDefense(1).setPiecesRequiredToActivate(2), 
-			new PassiveBonusDefense(1).setPiecesRequiredToActivate(4),
-			new PassiveBonusDefense(1).setPiecesRequiredToActivate(6)
-		}),
-	IRON("Iron", 3, 5, 4, 2, 2, 2, new PassiveBonus[]{ 
-			new PassiveBonusDefense(1).setPiecesRequiredToActivate(2),
-			new PassiveBonusDefense(1).setPiecesRequiredToActivate(4),
+	BRONZE("Bronze", 2, 3, 2, 1, 1, 1, new PassiveBonus[]{ 
+			new PassiveBonusDefense(1).setPiecesRequiredToActivate(3), 
 			new PassiveBonusDefense(2).setPiecesRequiredToActivate(6)
 		}),
-	SILVER("Silver", 4, 6, 5, 3, 3, 3, new PassiveBonus[]{ 
-			new PassiveBonusDefense(1).setPiecesRequiredToActivate(2),
-			new PassiveBonusDefense(2).setPiecesRequiredToActivate(4),
-			new PassiveBonusDefense(2).setPiecesRequiredToActivate(6),
+	IRON("Iron", 2, 4, 3, 1, 2, 1, new PassiveBonus[]{ 
+			new PassiveBonusDefense(2).setPiecesRequiredToActivate(3),
+			new PassiveBonusDefense(2).setPiecesRequiredToActivate(6)
 		}),
-	GOLD("Gold", 5, 7, 5, 4, 4, 4, new PassiveBonus[]{ 
+	SILVER("Silver", 3, 4, 3, 2, 2, 2, new PassiveBonus[]{ 
+			new PassiveBonusDefense(2).setPiecesRequiredToActivate(3),
+			new PassiveBonusDefense(3).setPiecesRequiredToActivate(6),
+		}),
+	GOLD("Gold", 4, 5, 4, 2, 3, 2, new PassiveBonus[]{ 
 			new PassiveBonusDefense(2).setPiecesRequiredToActivate(2),
 			new PassiveBonusDefense(3).setPiecesRequiredToActivate(4),
 			new PassiveBonusSpeed(0.1).setPiecesRequiredToActivate(6)
 		}),
-	LUNARIUM("Mage's Grace", 4, 6, 5, 3, 3, 3, new PassiveBonus[]{ 
+	LUNARIUM("Mage's Grace", 4, 5, 4, 3, 3, 3, new PassiveBonus[]{ //'Tier 6 - Mage'
 			new PassiveBonusSpeed(.1).setPiecesRequiredToActivate(2),
 			new PassiveBonusManaBoost(200).setPiecesRequiredToActivate(4),
-			new PassiveBonusIntellect(10).setPiecesRequiredToActivate(6)
+			new PassiveBonusIntellect(5).setPiecesRequiredToActivate(6)
 		}),
-	RANGE_SET("Archer's Finesse", 4, 6, 5, 3, 3, 3, new PassiveBonus[]{ 
+	RANGE_SET_1("Archer's Finesse", 4, 5, 4, 3, 3, 3, new PassiveBonus[]{ //'Tier 6 - Archer'
 			new PassiveBonusSpeed(.1).setPiecesRequiredToActivate(2),
 			new PassiveBonusCriticalStrike(0.05).setPiecesRequiredToActivate(4),
-			new PassiveBonusDexterity(10).setPiecesRequiredToActivate(6)
+			new PassiveBonusDexterity(5).setPiecesRequiredToActivate(6)
 		}),
-	STRENGTH_SET("Warriors's Tact", 6, 9, 6, 4, 4, 4, new PassiveBonus[]{ 
+	STRENGTH_SET_1("Warriors's Tact", 4, 5, 4, 3, 3, 3, new PassiveBonus[]{ //'Tier 6 - Melee'
 			new PassiveBonusSpeed(.1).setPiecesRequiredToActivate(2),
 			new PassiveBonusAttackSpeed(0.05).setPiecesRequiredToActivate(4),
-			new PassiveBonusStrength(10).setPiecesRequiredToActivate(6)
+			new PassiveBonusStrength(5).setPiecesRequiredToActivate(6)
 		}),		
+	ARTEMIS_SET("Spirit of the Hunt", 5, 7, 5, 3, 4, 3, new PassiveBonus[]{ //'Tier 7 - Archer'
+			//(2): Arrows deal 3 extra fire damage
+			//(4): 6% chance to nullify any hit of damage
+			//(6): 10% chance for an arrow to deal double damage
+		}),
+	CELESTIAL_SET("Grace of the Celestials", 6, 8, 5, 4, 4, 3, new PassiveBonus[]{ //'Tier 7 - Mage'
+			//(2): +10% Elemental Damage
+			//(4): +300 Mana. -7% Spell Cost
+			//(6): 15% chance a spell deals 65% more damage
+		}),		
+	BERSERKER_SET("Berserk's Rage", 5, 7, 5, 3, 4, 3, new PassiveBonus[]{ //'Tier 7 - Melee'
+			new PassiveBonusSpeed(.2).setPiecesRequiredToActivate(2),
+			//(4): -8% Damage taken
+			//(6): 40% crit for 5-7 seconds. 2 PPM
+		}),
+	GUARDIAN_SET("Guardian's Aegis", 7, 9, 7, 5, 6, 5, new PassiveBonus[] { //'Tier 7 - Tank'
+			//(2): +20 stamina
+			//(4): -8% Damage taken
+			//(6): 8% chance to restore damage taken over 6 seconds
+	}),
+	SPIRITUALIST_SET("Purity of the Spirit", 6, 8, 6, 0, 0, 0, new PassiveBonus[] {
+		//(3):+2% HP / sec
+		//(3):+10% Special Energy / minute (40% more)
+	}),	
+	
+	
+	
+	
 	OP_TEST_SET("OP-Ness", 7, 9, 7, 5, 5, 5, new PassiveBonus[]{ 
 			new PassiveBonusSpeed(.4).setPiecesRequiredToActivate(2),
 			new PassiveBonusDefense(200).setPiecesRequiredToActivate(4),

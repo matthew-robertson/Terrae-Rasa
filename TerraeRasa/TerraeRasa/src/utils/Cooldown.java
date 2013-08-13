@@ -1,5 +1,7 @@
 package utils;
 
+import java.io.Serializable;
+
 /**
  * Cooldown is a data structure to store an ability or potion cooldown of some sort. An ID and remaining time are stored.
  * An id should be a value with some connection to the item, such as the item id. Calling {@link #update()} will decrease the
@@ -11,7 +13,9 @@ package utils;
  * @since       1.0
  */
 public class Cooldown 
+		implements Serializable
 {
+	private static final long serialVersionUID = 1L;
 	public int id;
 	public int ticksLeft;
 	

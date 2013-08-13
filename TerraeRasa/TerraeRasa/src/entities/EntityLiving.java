@@ -318,6 +318,17 @@ public class EntityLiving extends Entity
 		absorbs.add(absorb);
 	}
 	
+	public boolean registerStatusEffect(StatusEffect effect)
+	{
+		if(effect instanceof StatusEffectAbsorb)
+		{
+			registerAbsorb((StatusEffectAbsorb)effect);
+		}
+		
+		statusEffects.add(effect);
+		return true;
+	}
+	
 	/**
 	 * Registers a status effect to this entity, whether it is positive or negative.
 	 * An effect may fail to register if a more powerful, non-stacking effect is already active.

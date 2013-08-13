@@ -2188,23 +2188,51 @@ public class World
 		List<String> requiredChunks = new ArrayList<String>();
 		List<String> removedChunks = new ArrayList<String>();
 		//How far to check for chunks (in blocks)
-		final int loadDistanceHorizontally = (2 * Chunk.getChunkWidth()) + TerraeRasa.terraeRasa.getSettings().loadDistance * Chunk.getChunkWidth();
+		final int loadDistanceHorizontally = ((2 * Chunk.getChunkWidth()) + TerraeRasa.terraeRasa.getSettings().loadDistance * Chunk.getChunkWidth()) - 1;
 		
+		// Force Chunks next to the original spawn to be loaded for speed
+		//Position to check from
+		int x = getWorldCenterBlock();
+		//Where to check, in the chunk map (based off loadDistance variables)
+		int leftOff = (x - loadDistanceHorizontally) / Chunk.getChunkWidth();
+		int rightOff = (x + loadDistanceHorizontally) / Chunk.getChunkWidth();
+		//Bounds checking
+		if(leftOff < 0) leftOff = 0;
+		if(rightOff > (width / Chunk.getChunkWidth())) rightOff = width / Chunk.getChunkWidth();
+		
+		Enumeration<String> keys = chunksLoaded.keys();
+        while (keys.hasMoreElements()) 
+        {
+            String key = (String) keys.nextElement();
+            int cx = Integer.parseInt(key);
+            if(chunksLoaded.get(key) && (cx < leftOff || cx > rightOff) && x != leftOff && x != rightOff)
+			{
+            	removedChunks.add(key);
+			}
+		}
+		for(int i = leftOff; i <= rightOff; i++) //Check for chunks that need loaded
+		{
+			requiredChunks.add(""+i);	
+		}
+		
+		//Chunks for every player
 		Iterator<EntityPlayer> it = players.iterator();
 		while(it.hasNext())
 		{
 			EntityPlayer player = it.next();
 			
 			//Position to check from
-			int x = (int) (player.x / 6);
+			x = (int) (player.x / 6);
 			//Where to check, in the chunk map (based off loadDistance variables)
-			int leftOff = (x - loadDistanceHorizontally) / Chunk.getChunkWidth();
-			int rightOff = (x + loadDistanceHorizontally) / Chunk.getChunkWidth();
+			leftOff = (x - loadDistanceHorizontally) / Chunk.getChunkWidth();
+			rightOff = (x + loadDistanceHorizontally) / Chunk.getChunkWidth();
 			//Bounds checking
 			if(leftOff < 0) leftOff = 0;
 			if(rightOff > (width / Chunk.getChunkWidth())) rightOff = width / Chunk.getChunkWidth();
 			
-			Enumeration<String> keys = chunksLoaded.keys();
+			//SSystem.out.println(leftOff + " " + rightOff + " " + x);
+			
+			keys = chunksLoaded.keys();
 	        while (keys.hasMoreElements()) 
 	        {
 	            String key = (String) keys.nextElement();
@@ -2216,14 +2244,7 @@ public class World
 			}
 			for(int i = leftOff; i <= rightOff; i++) //Check for chunks that need loaded
 			{
-				if(i >= 0 && chunksLoaded.get(""+i) == null)
-				{
-					chunksLoaded.put(""+i, false);
-				}
-				if(!chunksLoaded.get(""+i)) //If a needed chunk isnt loaded, request it.
-				{
-					requiredChunks.add(""+i);	
-				}
+				requiredChunks.add(""+i);
 			}	
 		}
 		
@@ -2233,7 +2254,7 @@ public class World
 		
         for(String str : sortedRemoveRequirement) 
         {
-        	if(!list.contains(sortedRemoveRequirement))
+        	if(!list.contains(str))
         	{
         		//If a chunk isnt needed, request a save.
     			chunkManager.saveChunk(worldName, chunks, Integer.parseInt(str));
@@ -2243,6 +2264,10 @@ public class World
 	
 		for(String str : sortedChunkRequirement) //Check for chunks that need loaded
 		{
+			if(Integer.parseInt(str) >= 0 && chunksLoaded.get(str) == null)
+			{
+				chunksLoaded.put(str, false);
+			}
 			if(!chunksLoaded.get(str)) //If a needed chunk isnt loaded, request it.
 			{
 				chunkManager.requestChunk(worldName, this, chunks, Integer.parseInt(str));

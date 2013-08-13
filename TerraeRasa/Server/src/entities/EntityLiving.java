@@ -44,9 +44,7 @@ public class EntityLiving extends Entity
 	private static final long serialVersionUID = 1L;
 
 	/** The flat damage reduction provided by 1 point of defense */
-	public final static double DEFENSE_REDUCTION_FLAT = 0.375F;
-	/** The percent of damage reduction provided by 1 point of defense (from 0-1F, where 1F is 100%)*/
-	public final static double DEFENSE_REDUCTION_PERCENT = 0.25F / 100F;
+	public final static double DEFENSE_REDUCTION_FLAT = 0.5F;
 	public double attackSpeedModifier;
 	public double knockbackModifier;
 	public double meleeDamageModifier;
@@ -203,7 +201,7 @@ public class EntityLiving extends Entity
 				if(!damage.penetratesArmor())
 				{
 					damageDone = MathHelper.floorOne(
-						(damageDone * (1F - DEFENSE_REDUCTION_PERCENT * defense)) - (defense * DEFENSE_REDUCTION_FLAT)									
+						(damageDone * (1D - getDamageSoakPercent())) - (defense * DEFENSE_REDUCTION_FLAT)									
 						);
 				}
 				
@@ -227,6 +225,20 @@ public class EntityLiving extends Entity
 		{
 			onDeath(world);
 		}		
+	}
+	
+	/**
+	 * Gives a damage soak percentage from 0-0.25 (0-25%), based on the amount of defense an entity has. This maxes out at 25%
+	 * when an entity has 60 Defense
+	 * @return the damage soak percent, as a double from 0-0.25
+	 */
+	protected double getDamageSoakPercent()
+	{
+		//0.004166667D is (0.25 / 60), essentially indicating that each point of defense provides 0.416% soak
+		double soakPercent = defense * 0.004166667D;
+		if(soakPercent > 0.25)
+			soakPercent = 0.25;
+		return soakPercent;
 	}
 	
 	/**
@@ -297,7 +309,7 @@ public class EntityLiving extends Entity
 	 * Removes an absorb effect from this EntityLiving.
 	 * @param absorb the absorb effect to remove
 	 */
-	private void removeAbsorb(StatusEffectAbsorb absorb)
+	protected void removeAbsorb(StatusEffectAbsorb absorb)
 	{
 		for(int i = 0; i < absorbs.size(); i++)
 		{

@@ -60,10 +60,9 @@ public class AuraReflectiveAbsorb extends Aura
 				absorbValue = absorbAmount;
 			}
 		}
-		player.registerStatusEffect(world, 
-				new StatusEffectAbsorb(durationSeconds, 
-						1, 
-						(int)absorbValue));
+		
+		StatusEffectAbsorb effect = new StatusEffectAbsorb(durationSeconds, 1, (int)absorbValue);
+		player.registerStatusEffect(world, effect);
 	}
 	
 	public String toString()

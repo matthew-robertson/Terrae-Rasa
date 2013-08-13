@@ -120,7 +120,8 @@ public class MouseInput
 					{
 						if(!mouseLock)
 						{
-							Item.itemsList[player.inventory.getMainInventoryStack(active).getItemID()].onRightClick(world, player);
+							clientCommands.add("/player " + player.entityID + " use " + active);
+							//Item.itemsList[player.inventory.getMainInventoryStack(active).getItemID()].onRightClick(world, player);
 							mouseLock = true;
 						}
 					}

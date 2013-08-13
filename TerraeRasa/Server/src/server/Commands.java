@@ -348,6 +348,11 @@ public class Commands
 					update.addValue(chatmessage);
 				}				
 			}
+			else if(split[2].equals("use"))
+			{
+				player.selectedSlot = Integer.parseInt(split[3]);
+				Item.itemsList[player.inventory.getMainInventoryStack(Integer.parseInt(split[3])).getItemID()].onRightClick(world, player);
+			}
 		}
 		else if(command.startsWith("/quit"))
 		{

@@ -13,6 +13,7 @@ import items.ItemArmorPants;
 import java.io.Serializable;
 import java.util.Hashtable;
 
+import server.TerraeRasa;
 import spells.Spell;
 import world.World;
 import blocks.Block;
@@ -509,6 +510,7 @@ public class InventoryPlayer
 		{
 			player.onInventoryChange();
 			mainInventory[index].removeFromStack(howMany);
+			TerraeRasa.terraeRasa.gameEngine.addCommandUpdate("/player " + player.entityID + " inventoryremove " + index + " " + howMany);
 			inventoryTotals.put(mainInventory[index].getItemName(), inventoryTotals.get(mainInventory[index].getItemName()) - howMany); //adjust totals
 			return true;
 		}
@@ -516,6 +518,7 @@ public class InventoryPlayer
 		{
 			player.onInventoryChange();
 			mainInventory[index].removeFromStack(howMany);
+			TerraeRasa.terraeRasa.gameEngine.addCommandUpdate("/player " + player.entityID + " inventoryremove " + index + " " + howMany);
 			inventoryTotals.put(mainInventory[index].getItemName(), inventoryTotals.get(mainInventory[index].getItemName()) - howMany); //adjust totals
 			mainInventory[index] = null;
 			return true;

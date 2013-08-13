@@ -12,6 +12,7 @@ import java.util.Vector;
 import passivebonuses.PassiveBonus;
 import passivebonuses.PassiveBonusContainer;
 import passivebonuses.PassiveBonusFactory;
+import statuseffects.StatusEffect;
 import transmission.ClientUpdate;
 import transmission.CompressedPlayer;
 import transmission.StatUpdate;
@@ -574,45 +575,6 @@ public class EntityPlayer extends EntityLiving
 	public void resetCastTimer()
 	{
 		ticksSinceLastCast = 0;
-	}
-	
-	/**
-	 * Applies mana regen to the player, increasing as time between casts increases.
-	 */
-	private void applyManaRegen(World world)
-	{
-		if(ticksSinceLastCast > 120)
-		{
-			auraTracker.onManaRestored(world, this);
-			mana += manaRegenerationModifier * (((ticksSinceLastCast - 120) / 1000 < 0.60f) ? ((ticksSinceLastCast - 120) / 1000) : 0.60f);
-		}
-		
-		if(mana > maxMana)
-		{
-			mana = maxMana;
-		}
-	}
-	
-	/**
-	 * Applies health regen that scales over time, until reaching the maximum of (11 HP/sec)
-	 */
-	private void applyHealthRegen(World world)
-	{
-		if(!isInCombat)
-		{
-			if(health < maxHealth)
-			{
-				auraTracker.onHeal(world, this);
-			}
-			double amountHealed = healthRegenerationModifier * ((ticksOfHealthRegen / 1800f < 0.55f) ? (ticksOfHealthRegen / 1800f) : 0.55f);
-			health += amountHealed;
-			ticksOfHealthRegen++;	
-		}
-	
-		if(health > maxHealth)
-		{
-			health = maxHealth;
-		}
 	}
 	
 	/**
@@ -1627,5 +1589,28 @@ public class EntityPlayer extends EntityLiving
 	{
 		hasSwungTool = true;
 		this.rotateAngle = angle;
+	}
+	
+	public StatusEffect getStatusEffectByID(long id)
+	{
+		for(int i = 0; i < statusEffects.size(); i++)
+		{
+			if(id == statusEffects.get(i).getID())
+			{
+				return statusEffects.get(i);
+			}
+		}
+		return null;
+	}
+	
+	public void removeStatusEffectByID(long id)
+	{
+		for(int i = 0; i < statusEffects.size(); i++)
+		{
+			if(id == statusEffects.get(i).getID())
+			{
+				statusEffects.remove(i);
+			}
+		}
 	}
 }

@@ -10,6 +10,7 @@ public class ServerSettings
 {
 	private static int entityID = 0;
 	private static int connectionID = 0;
+	private static int statusEffectID = 0;
 	
 	public boolean forcePlayerDifficultiesNormal;
 	public int maxPlayers;
@@ -120,4 +121,9 @@ public class ServerSettings
 	{
 		return connectionID++;
 	}
+	
+//	public static int getStatusEffectID()
+//	{
+//		return statusEffectID++;
+//	}
 }

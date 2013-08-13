@@ -20,6 +20,7 @@ import render.Render;
 import render.RenderGlobal;
 import render.RenderMenu;
 import spells.Spell;
+import statuseffects.StatusEffect;
 import transmission.BlockUpdate;
 import transmission.ChunkExpander;
 import transmission.ClientUpdate;
@@ -349,6 +350,11 @@ public class GameEngine
 						player.selectedSlot = Integer.parseInt(split[3]);
 						player.inventory.putItemStackInSlot(world, player, (ItemStack)(update.object), Integer.parseInt(split[3]));
 					}
+					else if(split[2].equals("statuseffectadd"))
+					{
+						EntityPlayer player = ((EntityPlayer)(world.getEntityByID(Integer.parseInt(split[1]))));
+						player.registerStatusEffect((StatusEffect)(update.object));
+					}
 				}
 				else if(update.command.startsWith("/fullplayersend"))
 				{
@@ -551,7 +557,20 @@ public class GameEngine
 					p.specialEnergy = Double.parseDouble(split[5]);
 				}
 			}
-
+			else if(split[2].equals("statuseffectupdate"))
+			{
+				StatusEffect effect = ((EntityPlayer)(world.getEntityByID(Integer.parseInt(split[1])))).getStatusEffectByID(Long.parseLong(split[3]));
+				if(effect != null) 
+				{
+					effect.ticksLeft = (Integer.parseInt(split[4]));
+				}
+			}
+			else if(split[2].equals("statuseffectremove"))
+			{
+				((EntityPlayer)(world.getEntityByID(Integer.parseInt(split[1])))).removeStatusEffectByID(Long.parseLong(split[3]));
+			}
+				
+			
 			//These only affect this client's player
 			if(!(activePlayerID == Integer.parseInt(split[1])))
 			{
