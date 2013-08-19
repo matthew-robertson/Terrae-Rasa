@@ -1,8 +1,9 @@
 package items;
 
-import entities.EntityPlayer;
 import statuseffects.StatusEffectDamageBuff;
 import world.World;
+import audio.SoundEngine;
+import entities.EntityPlayer;
 
 public class ItemPotionDamageBuff extends ItemPotion
 {
@@ -15,6 +16,6 @@ public class ItemPotionDamageBuff extends ItemPotion
 	{
 		player.registerStatusEffect(world, new StatusEffectDamageBuff(durationSeconds, tier, power, ticksBetweenEffect));
 		player.inventory.removeItemsFromInventoryStack(player, 1, player.selectedSlot);
-		world.soundEngine.playSoundEffect(onUseSound);
+		SoundEngine.playSoundEffect(onUseSound);
 	}
 }

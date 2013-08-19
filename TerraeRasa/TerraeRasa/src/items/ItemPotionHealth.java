@@ -1,7 +1,8 @@
 package items;
 
-import entities.EntityPlayer;
 import world.World;
+import audio.SoundEngine;
+import entities.EntityPlayer;
 
 public class ItemPotionHealth extends Item
 {
@@ -22,7 +23,7 @@ public class ItemPotionHealth extends Item
 			{
 				player.inventory.removeItemsFromInventoryStack(player, 1, player.selectedSlot);
 				player.putOnCooldown(id, 60);
-				world.soundEngine.playSoundEffect(onUseSound);
+				SoundEngine.playSoundEffect(onUseSound);
 			}
 		}
 	}

@@ -11,7 +11,6 @@ import java.util.Vector;
 
 import passivebonuses.PassiveBonus;
 import passivebonuses.PassiveBonusContainer;
-import passivebonuses.PassiveBonusFactory;
 import statuseffects.StatusEffect;
 import transmission.ClientUpdate;
 import transmission.CompressedPlayer;
@@ -27,6 +26,7 @@ import utils.MathHelper;
 import utils.Recipe;
 import utils.Vector2F;
 import world.World;
+import audio.SoundEngine;
 import auras.Aura;
 import auras.AuraContainer;
 import auras.AuraTracker;
@@ -90,7 +90,6 @@ public class EntityPlayer extends EntityLiving
 	private int ticksOfHealthRegen;
 	private boolean isInCombat;
 	private boolean isMining;
-	private boolean isReloaded;
 	private int ticksreq;
 	private int sx;
 	private int sy;		
@@ -216,7 +215,6 @@ public class EntityPlayer extends EntityLiving
 		intellectModifier = 1;
 		dexterityModifier = 1;
 		strengthModifier = 1;
-		isReloaded = false;
 		cooldowns = new Hashtable<String, Cooldown>();
 		nearBlock = new Hashtable<String, Boolean>();
 		for(Block block : CraftingManager.getCraftingBlocks())
@@ -246,7 +244,6 @@ public class EntityPlayer extends EntityLiving
 	 */
 	public void reconstructPlayerFromFile()
 	{	
-		isReloaded = true;
 		rotateAngle = -120.0f;			
 		invincibilityTicks = 10;
 		selectedSlot = 0;
@@ -254,7 +251,7 @@ public class EntityPlayer extends EntityLiving
 		viewedChestY = 0;
 		isViewingChest = false;
 		isMining = false;
-		inventory.initializeInventoryTotals(isReloaded);
+		inventory.initializeInventoryTotals(true);
 		craftingManager = new CraftingManager();
 		inventoryChanged = true;	
 		selectedRecipe = 0;
@@ -272,59 +269,11 @@ public class EntityPlayer extends EntityLiving
 		auraTracker = new AuraTracker();
 	}
 	
-//	/**
-//	 * Updates the player, should only be called each world tick.
-//	 */
-//	public void onWorldTick(World world)
-//	{		
-//		invincibilityTicks = (invincibilityTicks > 0) ? --invincibilityTicks : 0;
-//		ticksSinceLastCast++;
-//		if(armorChanged)
-//		{
-//			refreshPassiveBonuses();
-//			recalculateStats();
-//		}		
-//		checkForCombatStatus();
-//		checkAndUpdateStatusEffects(world);
-//		applyGravity(world); //Apply Gravity to the player (and jumping)
-//		applyHealthRegen(world);
-//		applyManaRegen(world);
-//		applySpecialRegen(world);
-//		checkForNearbyBlocks(world);	
-//		verifyChestRange();
-//		updateCooldowns();
-//		auraTracker.update(world, this);
-//		auraTracker.onTick(world, this);
-//		if(isDead())
-//		{
-//			onDeath(world);
-//		}
-//	}
-	
 	public void onClientTick(ClientUpdate update, World world)
 	{
-//		invincibilityTicks = (invincibilityTicks > 0) ? --invincibilityTicks : 0;
-//		ticksSinceLastCast++;
-//		if(armorChanged)
-//		{
-//			refreshPassiveBonuses();
-//			recalculateStats();
-//		}		
-//		checkForCombatStatus();
-//		checkAndUpdateStatusEffects(world);
-//		applyGravity(world); //Apply Gravity to the player (and jumping)
-//		applyHealthRegen(world);
-//		applyManaRegen(world);
-//		applySpecialRegen(world);
 		checkForNearbyBlocks(world);	
 		verifyChestRange();
-//		updateCooldowns();
-//		auraTracker.update(world, this);
-//		auraTracker.onTick(world, this);
-//		if(isDead())
-//		{
-//			onDeath(world);
-//		}
+
 		String[] changes = new String[changedInventorySlots.size()];
 		changedInventorySlots.copyInto(changes);
 		changedInventorySlots.clear();
@@ -358,21 +307,7 @@ public class EntityPlayer extends EntityLiving
 	{
 		changedInventorySlots.clear();
 	}
-	
-	/**
-	 * Updates time in combat, and if the time has exceeded 120 ticks (6 seconds) since the last combat action, combat status is removed.
-	 */
-	private void checkForCombatStatus()
-	{
-		ticksInCombat++;
 		
-		if(ticksInCombat > 120)
-		{
-			ticksInCombat = 0;
-			isInCombat = false;
-		}
-	}
-	
 	/**
 	 * Checks if the player is still near their selected chest (should there be one selected). If the player is not near that
 	 * chest, it is cleared and no longer rendered.
@@ -519,7 +454,7 @@ public class EntityPlayer extends EntityLiving
 				}
 				
 				health -= damageDone; 
-				world.soundEngine.playSoundEffect(hitSound);
+				SoundEngine.playSoundEffect(hitSound);
 				//Show world text if applicable
 				if(showWorldText)
 				{
@@ -619,7 +554,7 @@ public class EntityPlayer extends EntityLiving
 			return;
 		}
 		health = maxHealth;
-		world.soundEngine.playSoundEffect(deathSound);
+		SoundEngine.playSoundEffect(deathSound);
 		clearStatusEffects(world);
 		world.clearEntityList();
 		world.spawnPlayer(this);	
@@ -900,21 +835,6 @@ public class EntityPlayer extends EntityLiving
 		stamina -= armor.getStamina();
 		armorChanged = true;
 	}
-	
-	/**
-	 * Updates set bonus data. Unused bonuses are removed and new ones are applied. The new bonuses are 
-	 * stored in the player's instance to be removed later.
-	 */
-	private void refreshPassiveBonuses()
-	{
-		if(currentBonuses != null)
-		{
-			currentBonuses.removeAll(this);
-			currentBonuses = null;
-		}
-		currentBonuses = PassiveBonusFactory.getPassiveBonuses(inventory);
-		currentBonuses.applyAll(this);
-	}
 		
 	/**
 	 * Increases the maximum health of the player
@@ -1079,19 +999,6 @@ public class EntityPlayer extends EntityLiving
 	public int getTicksLeftOnCooldown(int id)
 	{
 		return cooldowns.get("" + id).ticksLeft;
-	}
-
-	/**
-	 * Regens a little bit of the special energy bar, totalling 25% per minute * applicable modifiers
-	 */
-	private void applySpecialRegen(World world)
-	{
-		//25% per minute.
-		specialEnergy += (0.020833333) * specialRegenerationModifier;		
-		if(specialEnergy > maxSpecialEnergy)
-		{
-			specialEnergy = maxSpecialEnergy;
-		}
 	}
 	
 	/**
@@ -1280,7 +1187,6 @@ public class EntityPlayer extends EntityLiving
 		compressPlayer.ticksOfHealthRegen = player.ticksOfHealthRegen;
 		compressPlayer.isInCombat = player.isInCombat;
 		compressPlayer.isMining = player.isMining;
-		compressPlayer.isReloaded = player.isReloaded;
 		compressPlayer.ticksreq = player.ticksreq;
 		compressPlayer.sx = player.sx;
 		compressPlayer.sy = player.sy;		
@@ -1389,7 +1295,6 @@ public class EntityPlayer extends EntityLiving
 		player.ticksOfHealthRegen = compressedPlayer.ticksOfHealthRegen;
 		player.isInCombat = compressedPlayer.isInCombat;
 		player.isMining = compressedPlayer.isMining;
-		player.isReloaded = compressedPlayer.isReloaded;
 		player.ticksreq = compressedPlayer.ticksreq;
 		player.sx = compressedPlayer.sx;
 		player.sy = compressedPlayer.sy;		
@@ -1495,7 +1400,6 @@ public class EntityPlayer extends EntityLiving
 		this.ticksOfHealthRegen = player.ticksOfHealthRegen;
 		this.isInCombat = player.isInCombat;
 		this.isMining = player.isMining;
-		this.isReloaded = player.isReloaded;
 		this.ticksreq = player.ticksreq;
 		this.sx = player.sx;
 		this.sy = player.sy;		

@@ -90,7 +90,6 @@ public class GameEngine
 	private WorldSky worldSky;
 	private EntityPlayer sentPlayer;
 	private Settings settings;
-	private SoundEngine soundEngine;
 	private RenderMenu renderMenu;
 	public ChunkManager chunkManager;
 	private String universeName;
@@ -174,8 +173,8 @@ public class GameEngine
 		        	Keys.universalKeyboard(update, world, player, settings, settings.keybinds, hardwareInput);
 		        	
 		        	//If the music is already playing,set the volume to whatever the settings say it is
-		        	if (soundEngine.getCurrentMusic() != null){
-		        		soundEngine.setVolume((float) settings.musicVolume);
+		        	if (SoundEngine.getCurrentMusic() != null){
+		        		SoundEngine.setVolume((float) settings.musicVolume);
 		        		//System.out.println("Settings: " + settings.volume + " Music: " + soundEngine.getVolume());
 		        	}
 		        	
@@ -185,13 +184,13 @@ public class GameEngine
 				    }
 		        	else if(settings.menuOpen) //Ingame pause menu - distribute keyboard/mouse input appropriately
 		        	{ 
-		        		soundEngine.setCurrentMusic("Main Music");
+		        		SoundEngine.setCurrentMusic("Main Music");
 		        		renderMenu.mouse(settings);
 		        		renderMenu.keyboard(settings);
 		        	}
 		        	else if(!TerraeRasa.isMainMenuOpen) //Handle game inputs if the main menu isnt open (aka the game is being played)
 		        	{		        		
-		        		soundEngine.setCurrentMusic("Pause Music");
+		        		SoundEngine.setCurrentMusic("Pause Music");
 		        		
 		        		//Update the actual chatbox
 		        		chatbox.update();
@@ -263,7 +262,7 @@ public class GameEngine
 		        
 		        if(TerraeRasa.isMainMenuOpen) //if the main menu is open, render that, otherwise render the game
 		        {
-		        	soundEngine.setCurrentMusic("Placeholder Music");
+		        	SoundEngine.setCurrentMusic("Placeholder Music");
 		        	mainMenu.render(settings);
 			    }
 		        else
@@ -318,7 +317,7 @@ public class GameEngine
 		} finally {
 			//Save the settings; Cleanup
 		    try {
-				soundEngine.destroy();
+		    	SoundEngine.destroy();
 		    	saveSettings();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
@@ -673,7 +672,6 @@ public class GameEngine
 		this.world = world;
 		this.world.chunkManager = chunkManager;
 		this.world.chunkManager.setUniverseName(universeName);
-		this.world.initSoundEngine(soundEngine);
 		this.setSentPlayer(player);
 		world.addPlayerToWorld(player);
 		TerraeRasa.isMainMenuOpen = false;
@@ -701,9 +699,9 @@ public class GameEngine
 		addUncoloredText(" ", 0);
 		
 		chunkManager = new ChunkManager();
-		soundEngine = new SoundEngine(settings);
 		mainMenu = new MainMenu(settings);
 		renderMenu = new RenderMenu(settings);
+		SoundEngine.initialize(settings);
 		Display.setVSyncEnabled(settings.vsyncEnabled);
 		debugCheats();
 	}

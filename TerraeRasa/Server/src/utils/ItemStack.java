@@ -409,8 +409,21 @@ public class ItemStack
 		return allBonuses;
 	}
 	
+	/**
+	 * Yields a string in the form of <b> "ItemStack of " + QUANTITY + " X " + ITEM_NAME </b>
+	 */
 	public String toString()
 	{
-		return "ItemStack of " + itemID + " " + itemName;
+		return "ItemStack of " + stackSize + " X " + itemName;
+	}
+	
+	/**
+	 * Yields a fairly unique ID in the form of: <b> ITEM_ID + " " + AFFIX_CRAFTING_ID </b>. The AFFIX_CRAFTING_ID is something
+	 * fairly unique to each affix.
+	 * @return a String representing this Itemstack's crafting ID
+	 */
+	public String getCraftingID()
+	{
+		return this.itemID + " " + affix.getCraftingID();
 	}
 }

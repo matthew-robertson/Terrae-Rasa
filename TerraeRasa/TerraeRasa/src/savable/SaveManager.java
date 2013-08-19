@@ -21,8 +21,10 @@ import com.thoughtworks.xstream.XStream;
 
 /**
  * 
- * @author alec
- *
+ * @author      Alec Sobeck
+ * @author      Matthew Robertson
+ * @version     1.0 
+ * @since       1.0
  */
 public class SaveManager 
 {
@@ -44,6 +46,12 @@ public class SaveManager
 		return xstream.fromXML(stream);
 	}
 	
+	/**
+	 * Saves an object to file using GZIP compression. It must be Serializable or this will fail.
+	 * @param path
+	 * @param object
+	 * @throws IOException
+	 */
 	public void saveCompressedFile(String path, Object object) 
 			throws IOException
 	{		
@@ -53,21 +61,25 @@ public class SaveManager
 		s.writeObject(object); 
 		byte data[] = bos.toByteArray();
 		fileWriter.write(data, 0, data.length);
-//		System.out.println("Saved to: " + path + " With Initial Size: " + data.length);
 		s.close();
 		bos.close();
 		fileWriter.close();  
 	}
-
+	
+	/**
+	 * Loads an object that was previously saved using GZIP compression.
+	 * @param path
+	 * @return
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
 	public Object loadCompressedFile(String path) 
 			throws FileNotFoundException, IOException, ClassNotFoundException
 	{
 		ObjectInputStream ois = new ObjectInputStream(new DataInputStream(new GZIPInputStream(new FileInputStream(TerraeRasa.getBasePath() + path)))); //Open an input stream
 		Object obj = ois.readObject(); 
-//	    System.out.println("loaded from: " + path);
 		ois.close();
 		return obj;
 	}
-
-
 }

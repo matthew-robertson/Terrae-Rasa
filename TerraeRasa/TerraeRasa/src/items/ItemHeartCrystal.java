@@ -1,7 +1,8 @@
 package items;
 
-import entities.EntityPlayer;
 import world.World;
+import audio.SoundEngine;
+import entities.EntityPlayer;
 
 public class ItemHeartCrystal extends Item
 {
@@ -21,7 +22,7 @@ public class ItemHeartCrystal extends Item
 		if(success)
 		{
 			player.inventory.removeEntireStackFromInventory(world, player, player.selectedSlot);
-			world.soundEngine.playSoundEffect(onUseSound);
+			SoundEngine.playSoundEffect(onUseSound);
 		}
 	}
 }

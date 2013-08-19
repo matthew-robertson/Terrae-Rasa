@@ -29,6 +29,8 @@ public class Affix
 	 * Destruction->3
 	 */
 	protected int id;
+	/**Indicates the strength of this affix. Default value is 1. */
+	private int tier;
 	
 	/**
 	 * The default constructor for Affixes. This is not to be used alone, as it won't actually do anything.
@@ -37,6 +39,7 @@ public class Affix
 	 */
 	public Affix(String name){
 		this.name = name;
+		tier = 1;
 		this.id = 0;
 		rng = new Random();
 		passives = new Vector<PassiveBonus>();
@@ -102,5 +105,25 @@ public class Affix
 	public int getID()
 	{
 		return id;
+	}
+	
+	public Affix setTier(int tier)
+	{
+		this.tier = tier;
+		return this;
+	}
+	
+	public int getTier()
+	{
+		return tier;
+	}
+	
+	/**
+	 * Yields a string in the form of "AFFIX_ID" + " " + "Tier". <b>This does not include the actual roll of the stat just the affix and tier.</b>
+	 * @return a string containing an affix's ID then TIER which is useful for crafting
+	 */
+	public String getCraftingID()
+	{
+		return "" + id + " " + tier;
 	}
 }

@@ -1,8 +1,9 @@
 package items;
 
-import entities.EntityPlayer;
 import statuseffects.StatusEffectSteelSkin;
 import world.World;
+import audio.SoundEngine;
+import entities.EntityPlayer;
 
 public class ItemPotionSteelSkin extends ItemPotion
 {
@@ -15,6 +16,6 @@ public class ItemPotionSteelSkin extends ItemPotion
 	{
 		player.registerStatusEffect(world, new StatusEffectSteelSkin(durationSeconds, tier, power, ticksBetweenEffect));
 		player.inventory.removeItemsFromInventoryStack(player, 1, player.selectedSlot);
-		world.soundEngine.playSoundEffect(onUseSound);
+		SoundEngine.playSoundEffect(onUseSound);
 	}
 }

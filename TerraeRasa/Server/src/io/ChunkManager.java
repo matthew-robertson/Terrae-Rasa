@@ -246,6 +246,11 @@ public class ChunkManager
 				{
 					e.printStackTrace();
 				}
+				if(chunk == null)
+				{
+					System.err.println(">>> NULL CHUNK ");
+					continue;
+				}
 				chunk.setFlaggedForLightingUpdate(true);
 				
 				String key = ""+chunk.getX();

@@ -1,8 +1,9 @@
 package items;
 
-import entities.EntityPlayer;
 import statuseffects.StatusEffectAttackSpeedBuff;
 import world.World;
+import audio.SoundEngine;
+import entities.EntityPlayer;
 
 public class ItemPotionAttackSpeed extends ItemPotion
 {
@@ -15,6 +16,6 @@ public class ItemPotionAttackSpeed extends ItemPotion
 	{
 		player.registerStatusEffect(world, new StatusEffectAttackSpeedBuff(durationSeconds, tier, power, ticksBetweenEffect));
 		player.inventory.removeItemsFromInventoryStack(player, 1, player.selectedSlot);
-		world.soundEngine.playSoundEffect(onUseSound);
+		SoundEngine.playSoundEffect(onUseSound);
 	}
 }

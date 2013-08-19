@@ -1,7 +1,8 @@
 package items;
 
-import entities.EntityPlayer;
 import world.World;
+import audio.SoundEngine;
+import entities.EntityPlayer;
 
 public class ItemPotionMana extends Item
 {
@@ -20,7 +21,7 @@ public class ItemPotionMana extends Item
 		if(success)
 		{
 			player.inventory.removeItemsFromInventoryStack(player, 1, player.selectedSlot);
-			world.soundEngine.playSoundEffect(onUseSound);
+			SoundEngine.playSoundEffect(onUseSound);
 		}
 	}
 	

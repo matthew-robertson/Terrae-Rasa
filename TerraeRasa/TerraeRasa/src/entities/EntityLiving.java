@@ -3,17 +3,16 @@ package entities;
 import java.util.ArrayList;
 import java.util.List;
 
-import enums.EnumColor;
-import enums.EnumDamageSource;
-import enums.EnumDamageType;
-
-import blocks.Block;
-
 import statuseffects.StatusEffect;
 import statuseffects.StatusEffectAbsorb;
 import utils.Damage;
 import utils.MathHelper;
 import world.World;
+import audio.SoundEngine;
+import blocks.Block;
+import enums.EnumColor;
+import enums.EnumDamageSource;
+import enums.EnumDamageType;
 
 /**
  * It provides most of the features required for an Entity
@@ -213,7 +212,7 @@ public class EntityLiving extends Entity
 				}
 				
 				health -= damageDone; 
-				world.soundEngine.playSoundEffect(hitSound);
+				SoundEngine.playSoundEffect(hitSound);
 				//Show world text if applicable
 				if(showWorldText)
 				{
@@ -269,7 +268,7 @@ public class EntityLiving extends Entity
 	 */
 	public void onDeath(World world)
 	{		
-		world.soundEngine.playSoundEffect(deathSound);
+		SoundEngine.playSoundEffect(deathSound);
 	}	
 			
 	/**
@@ -469,7 +468,7 @@ public class EntityLiving extends Entity
 				//world.soundEngine.playSoundEffect(jumpSound, percentageVolume);
 			}
 			else {
-				world.soundEngine.playSoundEffect(jumpSound);
+				SoundEngine.playSoundEffect(jumpSound);
 			}
 		}	
 	}

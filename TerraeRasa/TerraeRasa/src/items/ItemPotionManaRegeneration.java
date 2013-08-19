@@ -1,8 +1,9 @@
 package items;
 
-import entities.EntityPlayer;
 import statuseffects.StatusEffectManaRegeneration;
 import world.World;
+import audio.SoundEngine;
+import entities.EntityPlayer;
 
 public class ItemPotionManaRegeneration extends ItemPotion
 {
@@ -15,6 +16,6 @@ public class ItemPotionManaRegeneration extends ItemPotion
 	{
 		player.registerStatusEffect(world, new StatusEffectManaRegeneration(durationSeconds, tier, power, ticksBetweenEffect));
 		player.inventory.removeItemsFromInventoryStack(player, 1, player.selectedSlot);
-		world.soundEngine.playSoundEffect(onUseSound);
+		SoundEngine.playSoundEffect(onUseSound);
 	}
 }

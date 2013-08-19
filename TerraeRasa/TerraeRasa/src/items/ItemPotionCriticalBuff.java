@@ -1,8 +1,9 @@
 package items;
 
-import entities.EntityPlayer;
 import statuseffects.StatusEffectCriticalBuff;
 import world.World;
+import audio.SoundEngine;
+import entities.EntityPlayer;
 
 public class ItemPotionCriticalBuff extends ItemPotion
 {
@@ -15,6 +16,6 @@ public class ItemPotionCriticalBuff extends ItemPotion
 	{
 		player.registerStatusEffect(world, new StatusEffectCriticalBuff(durationSeconds, tier, power, ticksBetweenEffect));
 		player.inventory.removeItemsFromInventoryStack(player, 1, player.selectedSlot);
-		world.soundEngine.playSoundEffect(onUseSound);
+		SoundEngine.playSoundEffect(onUseSound);
 	}
 }

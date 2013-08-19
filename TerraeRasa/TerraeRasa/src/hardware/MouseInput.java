@@ -1,9 +1,6 @@
 package hardware;
 
 import items.Item;
-import items.ItemMagic;
-import items.ItemRanged;
-import items.ItemThrown;
 import items.ItemTool;
 
 import java.util.Vector;
@@ -15,6 +12,7 @@ import spells.Spell;
 import utils.ActionbarItem;
 import utils.MathHelper;
 import world.World;
+import audio.SoundEngine;
 import blocks.Block;
 import blocks.BlockBackWall;
 import blocks.BlockChest;
@@ -58,7 +56,7 @@ public class MouseInput
 							command = "/player " + player.entityID + " startswing " + player.selectedSlot;
 							clientCommands.add(command);
 							if (player.getIsMining()){
-								world.soundEngine.playSoundEffect(tool.hitSound);
+								SoundEngine.playSoundEffect(tool.hitSound);
 							}				
 						}
 						//Attempt to launch a projectile				
@@ -142,9 +140,13 @@ public class MouseInput
 						if(!player.isSwingingTool() && item instanceof ItemTool) //If the player isn't swinging a tool, start swinging
 						{
 							ItemTool tool = (ItemTool) item;
-							player.startSwingingTool(player.isFacingRight);
+							
+							command = "/player " + player.entityID + " startswing " + player.selectedSlot;
+							clientCommands.add(command);
+							
+						//	player.startSwingingTool(player.isFacingRight);
 							if (player.getIsMining()){
-								world.soundEngine.playSoundEffect(tool.hitSound);
+								SoundEngine.playSoundEffect(tool.hitSound);
 							}				
 						}					
 					}

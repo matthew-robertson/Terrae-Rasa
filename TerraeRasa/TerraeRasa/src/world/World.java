@@ -91,7 +91,6 @@ public class World
 	public List<EntityNPC> npcList;
 	public List<EntityProjectile> projectileList;
 	public SpawnManager manager;
-	public SoundEngine soundEngine;
 	
 	private int[] generatedHeightMap;
 	private int averageSkyHeight;
@@ -1481,12 +1480,6 @@ public class World
             	chunk.setLightUpdated(true);
             }
         }
-	}
-	
-	public void initSoundEngine(SoundEngine engine){
-		if (soundEngine == null){
-			this.soundEngine = engine;
-		}
 	}
 
 	/** 

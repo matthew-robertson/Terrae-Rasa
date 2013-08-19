@@ -1,8 +1,9 @@
 package items;
 
-import entities.EntityPlayer;
 import statuseffects.StatusEffectAbsorb;
 import world.World;
+import audio.SoundEngine;
+import entities.EntityPlayer;
 
 public class ItemPotionAbsorb extends ItemPotion
 {
@@ -18,7 +19,7 @@ public class ItemPotionAbsorb extends ItemPotion
 			player.registerStatusEffect(world, new StatusEffectAbsorb(durationSeconds, tier, (int)power));
 			player.inventory.removeItemsFromInventoryStack(player, 1, player.selectedSlot);		
 			player.putOnCooldown(id, 600);
-			world.soundEngine.playSoundEffect(onUseSound);
+			SoundEngine.playSoundEffect(onUseSound);
 		}		
 	}
 }
