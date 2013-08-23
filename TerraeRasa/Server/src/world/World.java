@@ -49,6 +49,7 @@ import blocks.BlockChest;
 import blocks.BlockGrass;
 import blocks.BlockPillar;
 import blocks.MinimalBlock;
+import entities.DisplayableEntity;
 import entities.Entity;
 import entities.EntityItemStack;
 import entities.EntityNPC;
@@ -184,10 +185,7 @@ public class World
 	public WorldData getWorldData()
 	{
 		WorldData data = new WorldData();
-		data.itemsList = this.itemsList;
-		data.entityList = this.entityList;
-		data.npcList = this.npcList;
-		data.projectileList = this.projectileList;
+		data.setLists(this.itemsList, this.entityList, this.npcList, this.projectileList);
 		data.generatedHeightMap = this.generatedHeightMap;
 		data.averageSkyHeight = this.averageSkyHeight;
 		data.chunkWidth = this.chunkWidth;
@@ -780,7 +778,7 @@ public class World
 						entityUpdate.action = 'a';
 						entityUpdate.entityID = entityStack.entityID;
 						entityUpdate.type = 3; 
-						entityUpdate.updatedEntity = entityStack;
+						entityUpdate.updatedEntity = new DisplayableEntity(entityStack);
 						update.addEntityUpdate(entityUpdate);
 					}
 				}
@@ -907,7 +905,7 @@ public class World
 					entityUpdate.action = 'a';
 					entityUpdate.entityID = entityStack.entityID;
 					entityUpdate.type = 3; 
-					entityUpdate.updatedEntity = entityStack;
+					entityUpdate.updatedEntity = new DisplayableEntity(entityStack);
 				}
 				EntityUpdate entityUpdate = new EntityUpdate();
 				entityUpdate.action = 'r';
@@ -1099,7 +1097,7 @@ public class World
 									entityUpdate.action = 'a';
 									entityUpdate.entityID = enemy.entityID;
 									entityUpdate.type = 1; 
-									entityUpdate.updatedEntity = enemy;
+									entityUpdate.updatedEntity = new DisplayableEntity(enemy);
 									update.addEntityUpdate(entityUpdate);
 									addEntityToEnemyList(enemy);
 									break forcedSpawnLoop;
@@ -1267,7 +1265,7 @@ public class World
 				entityUpdate.action = 'a';
 				entityUpdate.type = 3;
 				entityUpdate.entityID = entityItemStack.entityID;
-				entityUpdate.updatedEntity = entityItemStack;
+				entityUpdate.updatedEntity = new DisplayableEntity(entityItemStack);
 				update.addEntityUpdate(entityUpdate);
 			}
 			
@@ -1335,7 +1333,7 @@ public class World
 						entityUpdate.action = 'a';
 						entityUpdate.type = 3;
 						entityUpdate.entityID = entityItemStack.entityID;
-						entityUpdate.updatedEntity = entityItemStack;
+						entityUpdate.updatedEntity = new DisplayableEntity(entityItemStack);
 						update.addEntityUpdate(entityUpdate);
 					}
 				}
@@ -1388,7 +1386,7 @@ public class World
 				entityUpdate.action = 'a';
 				entityUpdate.type = 3;
 				entityUpdate.entityID = entityItemStack.entityID;
-				entityUpdate.updatedEntity = entityItemStack;
+				entityUpdate.updatedEntity = new DisplayableEntity(entityItemStack);
 				update.addEntityUpdate(entityUpdate);
 			}
 		}		
@@ -1417,7 +1415,7 @@ public class World
 			entityUpdate.action = 'a';
 			entityUpdate.type = 3;
 			entityUpdate.entityID = entityItemStack.entityID;
-			entityUpdate.updatedEntity = entityItemStack;
+			entityUpdate.updatedEntity = new DisplayableEntity(entityItemStack);
 			update.addEntityUpdate(entityUpdate);
 		}
 		setBackBlock(Block.backAir, mx, my); //replace it with air

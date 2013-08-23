@@ -17,7 +17,7 @@ import blocks.Block;
 import blocks.BlockChest;
 
 import utils.InventoryPlayer;
-import utils.ItemStack;
+import utils.DisplayableItemStack;
 import utils.MetaDataHelper;
 import world.World;
 import entities.EntityPlayer;
@@ -100,7 +100,7 @@ public class UIInventory extends UIBase
 		return -1;
 	}
 	
-	protected static ItemStack getMouseoverRecipeSliderStack(EntityPlayer player, int mouseX, int mouseY)
+	protected static DisplayableItemStack getMouseoverRecipeSliderStack(EntityPlayer player, int mouseX, int mouseY)
 	{
 		int size = 24;
 		int x = (int) (Display.getWidth() * 0.25f) - 13;
@@ -134,7 +134,7 @@ public class UIInventory extends UIBase
 		return null;
 	}
 	
-	protected static ItemStack getMouseoverChestStack(World world, EntityPlayer player, int mouseX, int mouseY)
+	protected static DisplayableItemStack getMouseoverChestStack(World world, EntityPlayer player, int mouseX, int mouseY)
 	{
 		if(player.isViewingChest)
 		{
@@ -171,7 +171,7 @@ public class UIInventory extends UIBase
 			}	
 			
 			int totalRows = chest.getInventorySize() / 4;
-			for(int i = 0; i < chest.getInventorySize(); i++) //for each ItemStack in the chest
+			for(int i = 0; i < chest.getInventorySize(); i++) //for each DisplayableItemStack in the chest
 			{
 				int size = 20;
 				int x = (int) ((Display.getWidth() * 0.25f) + ((((i % totalRows) - (totalRows / 2)) * (size))));
@@ -179,7 +179,7 @@ public class UIInventory extends UIBase
 				
 				if(mouseX > x && mouseX < x + size && mouseY > y && mouseY < y + size) //Is the click in bounds?
 				{
-					return chest.getItemStack(i);
+					return chest.getDisplayableItemStack(i);
 				}		
 			}
 		}
@@ -252,9 +252,9 @@ public class UIInventory extends UIBase
 		
 		for(int i = 0; i < chest.getInventorySize(); i++) //Draw all the items, in the slots (with text)
 		{
-			if(chest.getItemStack(i) != null)
+			if(chest.getDisplayableItemStack(i) != null)
 			{
-				textures[chest.getItemStack(i).getItemID()].bind();
+				textures[chest.getDisplayableItemStack(i).getItemID()].bind();
 				int size = 16;
 				int x = (int) (getCameraX() + (Display.getWidth() * 0.25f) + ((((i % totalRows) - (totalRows / 2)) * (size + 4))) + 2);
 				int y = (int) (getCameraY() + (Display.getHeight() * 0.5f) - ((4 + (i / totalRows)) * (size + 4)) - (size + 22f) - 2);
@@ -266,10 +266,10 @@ public class UIInventory extends UIBase
 				t.addVertexWithUV(x, y, 0, 0, 0);
 				t.draw();
 				
-				if(chest.getItemStack(i).getMaxStackSize() > 1) //If maxStackSize > 1, draw the stackSize
+				if(chest.getDisplayableItemStack(i).getMaxStackSize() > 1) //If maxStackSize > 1, draw the stackSize
 				{
 					GL11.glColor4f(0, 1, 0, 1);
-					trueTypeFont.drawString(x - 2, y + 18, new StringBuilder().append(chest.getItemStack(i).getStackSize()).toString(), 0.25f, -0.25f);
+					trueTypeFont.drawString(x - 2, y + 18, new StringBuilder().append(chest.getDisplayableItemStack(i).getStackSize()).toString(), 0.25f, -0.25f);
 					GL11.glColor4f(1, 1, 1, 1);
 				}	
 			}
@@ -649,7 +649,7 @@ public class UIInventory extends UIBase
 			{
 				if(player.inventory.getMainInventoryStack(index) == null) //There's nothing there, so the mouse doesnt have to pickup something
 				{
-					player.inventory.putItemStackInSlot(world, player, new ItemStack(mouseItem).setStackSize(1), index);
+					player.inventory.putDisplayableItemStackInSlot(world, player, new DisplayableItemStack(mouseItem).setStackSize(1), index);
 					mouseItem.removeFromStack(1);
 					if(mouseItem.getStackSize() <= 0)
 					{
@@ -661,7 +661,7 @@ public class UIInventory extends UIBase
 					if(player.inventory.getMainInventoryStack(index).getStackSize() + 1
 							<= player.inventory.getMainInventoryStack(index).getMaxStackSize())
 					{
-						player.inventory.combineItemStacksInSlot(world, player, new ItemStack(mouseItem).setStackSize(1), index);
+						player.inventory.combineDisplayableItemStacksInSlot(world, player, new DisplayableItemStack(mouseItem).setStackSize(1), index);
 						mouseItem.removeFromStack(1);
 						if(mouseItem.getStackSize() <= 0)
 						{
@@ -731,14 +731,14 @@ public class UIInventory extends UIBase
 				}
 				else //If there is an item there, swap that slot's item and the mouse's item.
 				{
-					ItemStack stack = player.inventory.getArmorInventoryStack(index);
+					DisplayableItemStack stack = player.inventory.getArmorInventoryStack(index);
 					player.inventory.setArmorInventoryStack(player, mouseItem, player.inventory.getArmorInventoryStack(index), index);
 					mouseItem = stack;
 				}
 			}
 			else if(whichInventory == 3) //Trash
 			{
-				player.inventory.setTrashStack(new ItemStack(mouseItem).setStackSize(1), index);
+				player.inventory.setTrashStack(new DisplayableItemStack(mouseItem).setStackSize(1), index);
 				mouseItem.removeFromStack(1);
 				if(mouseItem.getStackSize() <= 0)
 				{
@@ -755,7 +755,7 @@ public class UIInventory extends UIBase
 				
 				if(player.inventory.getQuiverStack(index) == null) //There's nothing there, so the mouse doesnt have to pickup something
 				{
-					player.inventory.setQuiverStack(player, new ItemStack(mouseItem).setStackSize(1), index);
+					player.inventory.setQuiverStack(player, new DisplayableItemStack(mouseItem).setStackSize(1), index);
 					mouseItem.removeFromStack(1);
 					if(mouseItem.getStackSize() <= 0)
 					{
@@ -767,7 +767,7 @@ public class UIInventory extends UIBase
 					if(player.inventory.getQuiverStack(index).getStackSize() + 1 
 							<= player.inventory.getQuiverStack(index).getMaxStackSize())
 					{
-						player.inventory.combineItemStacksInQuiverSlot(world, player, new ItemStack(mouseItem).setStackSize(1), index);
+						player.inventory.combineDisplayableItemStacksInQuiverSlot(world, player, new DisplayableItemStack(mouseItem).setStackSize(1), index);
 						mouseItem.removeFromStack(1);
 						if(mouseItem.getStackSize() <= 0)
 						{
@@ -802,7 +802,7 @@ public class UIInventory extends UIBase
 			{
 				if(player.inventory.getMainInventoryStack(index) == null) //There's nothing there, so the mouse doesnt have to pickup something
 				{
-					player.inventory.putItemStackInSlot(world, player, mouseItem, index);
+					player.inventory.putDisplayableItemStackInSlot(world, player, mouseItem, index);
 					mouseItem = null;
 				}
 				else if(player.inventory.getMainInventoryStack(index).getItemID() == mouseItem.getItemID())
@@ -810,7 +810,7 @@ public class UIInventory extends UIBase
 					if(player.inventory.getMainInventoryStack(index).getStackSize() + mouseItem.getStackSize() 
 							<= player.inventory.getMainInventoryStack(index).getMaxStackSize())
 					{
-						player.inventory.combineItemStacksInSlot(world, player, mouseItem, index);
+						player.inventory.combineDisplayableItemStacksInSlot(world, player, mouseItem, index);
 						mouseItem = null;
 					}
 					else
@@ -822,8 +822,8 @@ public class UIInventory extends UIBase
 				}
 				else //If there is an item there, swap that slot's item and the mouse's item.
 				{
-					ItemStack stack = new ItemStack(player.inventory.getMainInventoryStack(index));
-					player.inventory.putItemStackInSlot(world, player, mouseItem, index);
+					DisplayableItemStack stack = new DisplayableItemStack(player.inventory.getMainInventoryStack(index));
+					player.inventory.putDisplayableItemStackInSlot(world, player, mouseItem, index);
 					mouseItem = stack;
 				}
 			}
@@ -888,7 +888,7 @@ public class UIInventory extends UIBase
 				}
 				else //If there is an item there, swap that slot's item and the mouse's item.
 				{
-					ItemStack stack = player.inventory.getArmorInventoryStack(index);
+					DisplayableItemStack stack = player.inventory.getArmorInventoryStack(index);
 					player.inventory.setArmorInventoryStack(player, mouseItem, player.inventory.getArmorInventoryStack(index), index);
 					mouseItem = stack;
 				}
@@ -918,7 +918,7 @@ public class UIInventory extends UIBase
 					if(player.inventory.getQuiverStack(index).getStackSize() + mouseItem.getStackSize() 
 							<= player.inventory.getQuiverStack(index).getMaxStackSize())
 					{
-						player.inventory.combineItemStacksInQuiverSlot(world, player, mouseItem, index);
+						player.inventory.combineDisplayableItemStacksInQuiverSlot(world, player, mouseItem, index);
 						mouseItem = null;
 					}
 					else
@@ -932,7 +932,7 @@ public class UIInventory extends UIBase
 				
 				else //If there is an item there, swap that slot's item and the mouse's item.
 				{
-					ItemStack stack = player.inventory.getQuiverStack(index);
+					DisplayableItemStack stack = player.inventory.getQuiverStack(index);
 					player.inventory.setQuiverStack(player, mouseItem, index);
 					mouseItem = stack;
 				}

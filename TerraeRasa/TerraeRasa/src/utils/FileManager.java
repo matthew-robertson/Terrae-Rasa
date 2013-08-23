@@ -3,6 +3,7 @@ package utils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 import savable.SaveManager;
 import world.World;
@@ -15,45 +16,29 @@ import enums.EnumPlayerDifficulty;
 public class FileManager
 {		
 	private final String BASE_PATH;
+	private SaveManager manager;
 	
 	public FileManager()
 	{
 		BASE_PATH = TerraeRasa.getBasePath();
+		manager = new SaveManager();
 	}
-		
-	/**
-	 * Loads the specified world from the ~/World Saves/ Directory
-	 * @param name the name of the world to load
-	 * @return the world loaded
-	 * @throws IOException Indicates the saving operation has failed
-	 * @throws ClassNotFoundException Indicates the World class does not exist with the correct version
-	 */	
-	public World loadWorld(String dir, String universeName) 
-			throws IOException, ClassNotFoundException
-	{
-		World world = new World();
-		world.loadAndApplyWorldData(BASE_PATH, universeName, dir);
-		return world;
-	}
-			
+
 	/**
 	 * Creates a new player and saves it to file immediately before returning that new player
 	 * @param name Name of the player being created
 	 * @param difficulty The difficulty settings (EnumDifficulty) of the player being created
 	 * @return The new player created, or in the case of a failure - null;
 	 */
-	public EntityPlayer generateAndSavePlayer(String name, EnumPlayerDifficulty difficulty)
+	public void generateAndSavePlayer(String name, EnumPlayerDifficulty difficulty)
 	{
-		try 
-		{
-			EntityPlayer player = generateNewEntityPlayer(name, difficulty);
-			savePlayer(player);
-			return player;
-		}
-		catch (IOException e)
-		{
+		try {
+			String xml = generateNewEntityPlayer(name, difficulty);
+			savePlayer(name, xml);
+		} catch (IOException e) {
 			e.printStackTrace();
-			return null;
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
 		}
 	}
 	
@@ -62,10 +47,12 @@ public class FileManager
 	 * @param name the name of the player to be generated.
 	 * @param difficulty the difficulty setting (EnumDifficulty) of the player to be generated
 	 * @return a newly generated EntityPlayer with given attributes 
+	 * @throws IOException 
+	 * @throws URISyntaxException 
 	 */
-	private EntityPlayer generateNewEntityPlayer(String name, EnumPlayerDifficulty difficulty)
+	private String generateNewEntityPlayer(String name, EnumPlayerDifficulty difficulty) throws URISyntaxException, IOException
 	{
-		return new EntityPlayer(name, difficulty);
+		return manager.getFileXML("Resources/player.xml", true);
 	}
 	
 	/**
@@ -74,13 +61,11 @@ public class FileManager
 	 * @throws IOException Indicates the saving operation has failed
 	 * @throws FileNotFoundException Indicates the desired directory (file) is not found on the filepath
 	 */
-	public void savePlayer(EntityPlayer player) 
+	public void savePlayer(String name, String xml) 
 			throws FileNotFoundException, IOException
 	{
 		verifyDirectoriesExist();
-
-		SaveManager manager = new SaveManager();
-		manager.saveFile("/Player Saves/" + player.getName() + ".xml", player);
+		manager.saveFileXML("/Player Saves/" + name + ".xml", xml);
 	}
 	
 	/**
@@ -99,9 +84,7 @@ public class FileManager
         new File(BASE_PATH + "/Resources").mkdir();
         new File(BASE_PATH + "/Player Saves").mkdir();
 	}
-	
-	
-	
+		
 	/**
 	 * Saves the player and world to disk after quitting the game. This currently cheats a bit and gets the world using
 	 * "TerraeRasa.terraeRasa.world" as the location. This is not advised, but currently siffices.
@@ -115,26 +98,24 @@ public class FileManager
 		}
 	}
 	
-	
-
 	/**
 	 * Loads the specified player from the ~/Player Saves/ Directory
 	 * @param name the name of the player to load
 	 * @return the EntityPlayer loaded
 	 * @throws IOException Indicates the saving operation has failed
 	 * @throws ClassNotFoundException Indicates the EntityPlayer class does not exist with the correct version
+	 * @throws URISyntaxException 
 	 */
-	public EntityPlayer loadPlayer(String name) 
-			throws IOException, ClassNotFoundException
+	public String loadPlayer(String name) 
+			throws IOException, ClassNotFoundException, URISyntaxException
 	{
 		String fileName = "/Player Saves/" + name + ".xml";
-		EntityPlayer player = (EntityPlayer)new SaveManager().loadFile(fileName);
-		player.reconstructPlayerFromFile();
-		return player;
+		String xml = new SaveManager().getFileXML(fileName, false);
+		return xml;
 	}
 	
 	/**
-	 * Deletes the specified .dat file in the base-folder or deeper
+	 * Deletes the specified .xml file in the base-folder or deeper
 	 * @param fileName the path of the .dat file to be deleted
 	 * @return success of the operation
 	 */
@@ -163,17 +144,11 @@ public class FileManager
 	public boolean deleteWorldSave(String worldName)
 	{
 		File dir = new File(BASE_PATH + worldName);
-		
 		//Try to delete the directory, and indicate whether the contents deleted successfully or not.
 		if(deleteDirectory(dir)) 
-		{
 			System.out.println("World Deletion Succeeded: " + worldName);
-		}
 		else
-		{
 			System.out.println("World Deletion Failed: " + worldName);
-		}
-        
 		return dir.delete();
 	}
 	

@@ -5,20 +5,15 @@ import items.ItemTool;
 
 import org.lwjgl.opengl.GL11;
 
-import client.TerraeRasa;
-
-import entities.EntityNPC;
-import entities.EntityNPCEnemy;
-import entities.EntityPlayer;
-import entities.EntityProjectile;
-
 import utils.ActionbarItem;
 import utils.MathHelper;
 import utils.Point;
-import utils.Texture;
 import utils.Vector2F;
 import utils.WorldText;
 import world.World;
+import client.TerraeRasa;
+import entities.DisplayableEntity;
+import entities.EntityPlayer;
 
 public class RenderEntities extends Render
 {
@@ -149,9 +144,9 @@ public class RenderEntities extends Render
 	 */
 	public void renderWorldEntityList(World world)
 	{
-		for(int i = 0; i < world.entityList.size(); i++)
+		for(int i = 0; i < world.enemyList.size(); i++)
 		{
-			renderEntityNPCEnemy(world.entityList.get(i).getTexture(), (EntityNPCEnemy) world.entityList.get(i));
+			renderEntityNPCEnemy(world.enemyList.get(i));
 		}
 	}
 	
@@ -160,7 +155,7 @@ public class RenderEntities extends Render
 	 */
 	public void renderNPCs(World world){
 		for(int i = 0; i < world.npcList.size(); i++){
-			renderEntityNPC(world.npcList.get(i).getTexture(), (EntityNPC) world.npcList.get(i));
+			renderEntityNPC(world.npcList.get(i));
 		}
 	}
 
@@ -171,7 +166,7 @@ public class RenderEntities extends Render
 	{
 		for(int i = 0; i < world.projectileList.size(); i++)
 		{
-			renderEntityProjectile((EntityProjectile) world.projectileList.get(i));
+			renderEntityProjectile(world.projectileList.get(i));
 		}
 	}
 	
@@ -181,23 +176,25 @@ public class RenderEntities extends Render
 	 * @param tex texture of entity being drawn <<<< likely being replaced
 	 * @param enemy enemy to draw
 	 */
-	public void renderEntityNPCEnemy(Texture tex, EntityNPCEnemy enemy)
+	public void renderEntityNPCEnemy(DisplayableEntity enemy)
 	{
 		GL11.glColor4f(1, 1, 1, 1);
 		double x = (int)enemy.x;
         double y = (int)enemy.y;
         double eh = enemy.getHeight();
         double ew = enemy.getWidth();
-				
-        //System.out.println("[RenderEntities]" + enemy + " " + tex);
+		double tx = (double)enemy.iconX * (32 / 512);
+		double ty = (double)enemy.iconY * (32 / 256); //TODO magic number fix
+		double tw = (double)enemy.textureWidth / 512;
+		double th = (double)enemy.textureHeight / 256;
         
-		tex.bind(); 
+		monsterSheet.bind(); 
         t.startDrawingQuads();
-        t.addVertexWithUV(x, y + eh, 0, 0, 1);
-        t.addVertexWithUV(x + ew, y + eh, 0, 1, 1);
-        t.addVertexWithUV(x + ew, y, 0, 1, 0);
-        t.addVertexWithUV(x, y, 0, 0, 0);
-        t.draw();        
+        t.addVertexWithUV(x, y + eh, 0, tx, ty + th);
+        t.addVertexWithUV(x + ew, y + eh, 0, tx + tw, ty + th);
+        t.addVertexWithUV(x + ew, y, 0, tx + tw, ty);
+        t.addVertexWithUV(x, y, 0, tx, ty);
+        t.draw();          
 	}
 	
 	/**
@@ -205,20 +202,24 @@ public class RenderEntities extends Render
 	 * @param tex texture of entity being drawn <<<< likely being replaced
 	 * @param enemy enemy to draw
 	 */
-	public void renderEntityNPC(Texture tex, EntityNPC npc)
+	public void renderEntityNPC(DisplayableEntity npc)
 	{
 		GL11.glColor4f(1, 1, 1, 1);
 		double x = (int)npc.x;
         double y = (int)npc.y;
         double eh = npc.getHeight();
         double ew = npc.getWidth();
-				
-		tex.bind(); 
+		double tx = (double)npc.iconX / 32;
+		double ty = (double)npc.iconY / 32; //TODO magic number fix
+		double tw = npc.textureWidth;
+		double th = npc.textureHeight;
+        
+		monsterSheet.bind(); 
         t.startDrawingQuads();
-        t.addVertexWithUV(x, y + eh, 0, 0, 1);
-        t.addVertexWithUV(x + ew, y + eh, 0, 1, 1);
-        t.addVertexWithUV(x + ew, y, 0, 1, 0);
-        t.addVertexWithUV(x, y, 0, 0, 0);
+        t.addVertexWithUV(x, y + eh, 0, tx, ty + th);
+        t.addVertexWithUV(x + ew, y + eh, 0, tx + tw, ty + th);
+        t.addVertexWithUV(x + ew, y, 0, tx + tw, ty);
+        t.addVertexWithUV(x, y, 0, tx, ty);
         t.draw();        
 	}
 	
@@ -227,7 +228,7 @@ public class RenderEntities extends Render
 	 * @param tex texture of entity being drawn <<<< likely being replaced
 	 * @param EntityProjectile to draw
 	 */
-	public void renderEntityProjectile(EntityProjectile projectile)
+	public void renderEntityProjectile(DisplayableEntity projectile)
 	{
 		GL11.glColor4f(1, 1, 1, 1);
 		double x = (int)projectile.getX();
@@ -236,8 +237,8 @@ public class RenderEntities extends Render
 		double pw = projectile.width;
 		double tx = (double)(projectile.iconX * 16) / 256;
 	    double ty = (double)(projectile.iconY * 16) / 256;
-		double tw = tx + ((double)projectile.blockWidth  / 16);
-		double th = ty + ((double)projectile.blockHeight / 16);
+		double tw = tx + ((double)projectile.width  / (16 * 6));
+		double th = ty + ((double)projectile.height / (16 * 6));
 		PROJECTILES.bind();
         t.startDrawingQuads();
         t.addVertexWithUV(x, y + ph, 0, tx, th);
@@ -259,7 +260,7 @@ public class RenderEntities extends Render
 	        double y = world.itemsList.get(i).y;
 			double w = world.itemsList.get(i).width;
 			double h = world.itemsList.get(i).height;
-			textures[world.itemsList.get(i).getStack().getItemID()].bind(); 
+			textures[world.itemsList.get(i).iconX].bind(); //TODO fix this really, really terrible thing that's going on right here
 	        t.startDrawingQuads();
 	        t.addVertexWithUV(x, y + h, 0, 0, 1);
 	        t.addVertexWithUV(x + w, y + h, 0, 1, 1);

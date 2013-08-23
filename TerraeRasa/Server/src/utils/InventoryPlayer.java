@@ -9,14 +9,8 @@ import items.ItemArmorBoots;
 import items.ItemArmorGloves;
 import items.ItemArmorHelmet;
 import items.ItemArmorPants;
-
-import java.io.Serializable;
-import java.util.Hashtable;
-
 import server.TerraeRasa;
-import spells.Spell;
 import world.World;
-import blocks.Block;
 import entities.EntityPlayer;
 
 /**
@@ -39,10 +33,7 @@ import entities.EntityPlayer;
  * @since       1.0
  */
 public class InventoryPlayer 
-		 implements Serializable
 {
-	private static final long serialVersionUID = 1L;
-	private Hashtable<String, Integer> inventoryTotals;
 	private ItemStack[] trash;
 	private ItemStack[] mainInventory;
 	/**
@@ -85,85 +76,20 @@ public class InventoryPlayer
 		armorInventory = new ItemStack[10];
 		trash = new ItemStack[1];
 		quiver = new ItemStack[4];
-		initializeInventoryTotals(false);	
 	}
 	
 	/**
-	 * Populates the inventoryTotals Hashtable with every possible item/block that exists (each with a value of 0)
+	 * Constructs an InventoryPlayer with the given ItemStack[] for main, armor, and quiver inventories
+	 * @param mainInventory an ItemStack[] of length 48 representing the mainInventory
+	 * @param armorInventory an ItemStack[] of length 10 representing the armorInventory
+	 * @param quiver an ItemStack[] of length 4 representing the quiver
 	 */
-	public void initializeInventoryTotals(boolean isReloaded)
+	public InventoryPlayer(ItemStack[] mainInventory, ItemStack[] armorInventory, ItemStack[] quiver)
 	{
-		if(isReloaded)
-		{
-			for(int i = 0; i < Item.itemsList.length; i++) //Items
-			{
-				if(Item.itemsList[i] != null && inventoryTotals.get(Item.itemsList[i].getName()) == null) //A new Item needs added 
-				{
-					inventoryTotals.put(Item.itemsList[i].name, 0);
-				}
-			}
-			for(int i = 0; i < Block.blocksList.length; i++) //Blocks
-			{	
-				if(Block.blocksList[i] != null  && inventoryTotals.get(Block.blocksList[i].getName()) == null) //A new Block needs added
-				{
-					inventoryTotals.put(Block.blocksList[i].name, 0);					
-				}
-			}
-			for(int i = 0; i < Spell.spellList.length; i++) //Spell
-			{	
-				if(Spell.spellList[i] != null  && inventoryTotals.get(Spell.spellList[i].getName()) == null) //A new Spell needs added
-				{
-					inventoryTotals.put(Spell.spellList[i].name, 0);					
-				}
-			}
-		}
-		else
-		{
-			inventoryTotals = new Hashtable<String, Integer>();
-			
-			for(int i = 0; i < Item.itemsList.length; i++) //Items
-			{
-				if(Item.itemsList[i] != null && inventoryTotals.get(Item.itemsList[i].getName()) != null) //If the Item exists and is already in inventoryTotals
-				{
-					if(Item.itemsList[i].getName().toLowerCase() != "unnamed") //And it isnt unnamed
-					{
-						throw new RuntimeException("Item name already exists : " + Item.itemsList[i].getName()); //There is a name conflict, throw an exception
-					}
-				}
-				else if(Item.itemsList[i] != null) //Otherwise if the item exists, add it with a starting value of 0
-				{
-					inventoryTotals.put(Item.itemsList[i].name, 0);
-				}
-			}
-			for(int i = 0; i < Block.blocksList.length; i++) //Blocks
-			{	
-				if(Block.blocksList[i] != null && inventoryTotals.get(Block.blocksList[i].getName()) != null) //If the block exists
-				{
-					if(Block.blocksList[i].getName().toLowerCase() != "unnamed") //And it isnt unnamed
-					{
-						throw new RuntimeException("Block name already exists : " + Block.blocksList[i].getName()); //There is a name conflict, throw an exception
-					}
-				}
-				else if(Block.blocksList[i] != null) //Otherwise if the block exists, add it with a starting value of 0
-				{
-					inventoryTotals.put(Block.blocksList[i].name, 0);				
-				}
-			}
-			for(int i = 0; i < Spell.spellList.length; i++) //Spell
-			{
-				if(Spell.spellList[i] != null && inventoryTotals.get(Spell.spellList[i].getName()) != null) //If the Item exists and is already in inventoryTotals
-				{
-					if(Spell.spellList[i].getName().toLowerCase() != "unnamed") //And it isnt unnamed
-					{
-						throw new RuntimeException("Spell name already exists : " + Spell.spellList[i].getName()); //There is a name conflict, throw an exception
-					}
-				}
-				else if(Spell.spellList[i] != null) //Otherwise if the item exists, add it with a starting value of 0
-				{
-					inventoryTotals.put(Spell.spellList[i].name, 0);
-				}
-			}
-		}
+		this.mainInventory = mainInventory;
+		this.armorInventory = armorInventory;
+		trash = new ItemStack[1];
+		this.quiver = quiver;
 	}
 	
 	/**
@@ -230,13 +156,11 @@ public class InventoryPlayer
 			{
 				int t = stack.getMaxStackSize() - mainInventory[slot].getStackSize();
 				size -= t;
-				inventoryTotals.put(mainInventory[slot].getItemName(), inventoryTotals.get(mainInventory[slot].getItemName()) + t);
 				mainInventory[slot].addToStack(t);				
 			}
 			else //If there isn't, add the stacks and return
 			{
 				mainInventory[slot].addToStack(size);
-				inventoryTotals.put(mainInventory[slot].getItemName(), inventoryTotals.get(mainInventory[slot].getItemName()) + size);
 				return null;
 			}
 		}
@@ -259,7 +183,6 @@ public class InventoryPlayer
 					{
 						mainInventory[slot] = new ItemStack(stack.getItemID(), stack.getStackSize());
 						mainInventory[slot].setStackSize(stack.getMaxStackSize());
-						inventoryTotals.put(mainInventory[slot].getItemName(), inventoryTotals.get(mainInventory[slot].getItemName()) + mainInventory[slot].getStackSize());						
 						size -= stack.getMaxStackSize();
 						continue;
 					}
@@ -267,7 +190,6 @@ public class InventoryPlayer
 					{
 						mainInventory[slot] = new ItemStack(stack);
 						mainInventory[slot].setStackSize(size);
-						inventoryTotals.put(mainInventory[slot].getItemName(), inventoryTotals.get(mainInventory[slot].getItemName()) + size);
 						size = 0;
 						return null;
 					}
@@ -491,7 +413,6 @@ public class InventoryPlayer
 				if(nullSlots[i]) //if the slot needs removed, remove it
 					mainInventory[i] = null;
 			}
-			inventoryTotals.put(stack.getItemName(), inventoryTotals.get(stack.getItemName()) - stack.getStackSize()); //adjust totals
 			return true;
 		}					
 		
@@ -511,7 +432,6 @@ public class InventoryPlayer
 			player.onInventoryChange();
 			mainInventory[index].removeFromStack(howMany);
 			TerraeRasa.terraeRasa.gameEngine.addCommandUpdate("/player " + player.entityID + " inventoryremove " + index + " " + howMany);
-			inventoryTotals.put(mainInventory[index].getItemName(), inventoryTotals.get(mainInventory[index].getItemName()) - howMany); //adjust totals
 			return true;
 		}
 		else if(howMany == mainInventory[index].getStackSize())
@@ -519,7 +439,6 @@ public class InventoryPlayer
 			player.onInventoryChange();
 			mainInventory[index].removeFromStack(howMany);
 			TerraeRasa.terraeRasa.gameEngine.addCommandUpdate("/player " + player.entityID + " inventoryremove " + index + " " + howMany);
-			inventoryTotals.put(mainInventory[index].getItemName(), inventoryTotals.get(mainInventory[index].getItemName()) - howMany); //adjust totals
 			mainInventory[index] = null;
 			return true;
 		}
@@ -533,7 +452,6 @@ public class InventoryPlayer
 	public void removeEntireStackFromInventory(World world, EntityPlayer player, int index)
 	{
 		player.onInventoryChange();
-		inventoryTotals.put(mainInventory[index].getItemName(), inventoryTotals.get(mainInventory[index].getItemName()) - mainInventory[index].getStackSize()); 
 		mainInventory[index] = null;
 	}
 	
@@ -550,12 +468,10 @@ public class InventoryPlayer
 		//the stack to be placed is null, so clear the slot in mainInventory[] (this has to get a bit hacky for control reasons)
 		if(stack == null && mainInventory[index] != null) 
 		{
-			inventoryTotals.put(mainInventory[index].getItemName(), inventoryTotals.get(mainInventory[index].getItemName()) - mainInventory[index].getStackSize());		
 			mainInventory[index] = null;
 		}
 		else if(stack != null)//otherwise put the stack in the inventory
 		{
-			inventoryTotals.put(stack.getItemName(), inventoryTotals.get(stack.getItemName()) + stack.getStackSize());		
 			mainInventory[index] = new ItemStack(stack);	
 		}
 
@@ -578,7 +494,6 @@ public class InventoryPlayer
 		
 		int size = stack.getStackSize();
 		mainInventory[index].addToStack(size);
-		inventoryTotals.put(stack.getItemName(), inventoryTotals.get(stack.getItemName()) + stack.getStackSize());		
 		return true;
 	}
 	
@@ -709,17 +624,7 @@ public class InventoryPlayer
 	{
 		return  (trash[index] != null) ? new ItemStack(trash[index]) : null;
 	}
-	
-	/**
-	 * Gets the quantity of an Item/Block in the mainInventory[] 
-	 * @param name the Item/Block name to check. It should be given by using Item.getItemName() or Block.getBlockName()
-	 * @return the quantity of that item in the mainInventory[]
-	 */
-	public final int getTotalInInventory(String name)
-	{
-		return inventoryTotals.get(name);
-	}
-		
+
 	/**
 	 * Gets the size of the armorInventory
 	 * @return the length of the armorInventory[] array
@@ -802,9 +707,6 @@ public class InventoryPlayer
 			//The change in stack size. A positive number is an increase, negative number a 
 			//decrease overall.
 			player.onInventoryChange();
-			int differenceInStackSize = newStackSize - mainInventory[index].getStackSize();			
-			inventoryTotals.put(mainInventory[index].getItemName(), 
-					inventoryTotals.get(mainInventory[index].getItemName()) + differenceInStackSize);				
 			mainInventory[index].setStackSize(newStackSize);
 		}
 	}

@@ -12,7 +12,7 @@ import render.TrueTypeFont;
 import blocks.BlockChest;
 
 import transmission.ClientUpdate;
-import utils.ItemStack;
+import utils.DisplayableItemStack;
 import utils.MathHelper;
 import utils.MetaDataHelper;
 import utils.Recipe;
@@ -192,7 +192,7 @@ public class UI extends UIBase
 			mouseXOffset = xoff;
 			mouseYOffset = yoff;
 			mouseItemSize = size;
-			mouseItem = new ItemStack(whatToCraft.getResult()); //THIS IS VERY IMPORTANT
+			mouseItem = new DisplayableItemStack(whatToCraft.getResult()); //THIS IS VERY IMPORTANT
 		}
 	}
 		

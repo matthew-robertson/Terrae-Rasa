@@ -96,6 +96,7 @@ public class EntityNPCEnemy extends EntityNPC
 		this.damageType = entity.damageType;
 		this.monsterType = entity.monsterType;
 		this.isBoss = entity.isBoss;
+		
 	}
 
 	protected EntityNPCEnemy setDamageType(EnumDamageSource type)
@@ -209,18 +210,34 @@ public class EntityNPCEnemy extends EntityNPC
 		return time;
 	}
 	
+	protected EntityNPCEnemy setIconIndex(int x, int y)
+	{
+		iconX = x;
+		iconY = y;
+		return this;
+	}
+	
+	protected EntityNPCEnemy setIconIndex(int x, int y, int texwidth, int texheight)
+	{
+		this.iconX = x;
+		this.iconY = y;
+		this.textureWidth = texwidth;
+		this.textureHeight = texheight;
+		return this;
+	}
+	
 	public final static EntityNPCEnemy[] enemyList = new EntityNPCEnemy[10];		
 	/** EntityNPCEnemy Declarations **/
-	public final static EntityNPCEnemy goblin = new EntityNPCEnemy(0, "Goblin").setIsAlert(true).setSpawnVector("forest", " ").setSpawnVector("desert", "night").setDamageDone(7).setMaxHealth(50).setDrops(new MonsterDrop[] { 
+	public final static EntityNPCEnemy goblin = new EntityNPCEnemy(0, "Goblin").setIconIndex(2, 0, 32, 64).setIsAlert(true).setSpawnVector("forest", " ").setSpawnVector("desert", "night").setDamageDone(7).setMaxHealth(50).setDrops(new MonsterDrop[] { 
 			new MonsterDrop(new ItemStack(Item.coal), 1, 2, 5), new MonsterDrop(new ItemStack(Item.healthPotion1), 1, 2, 20)
 	});
-	public final static EntityNPCEnemy zombie = new EntityNPCEnemy(1, "zombie").setIsAlert(true).setSpawnVector(" ", "night").setDamageDone(16).setMaxHealth(60).setDrops(new MonsterDrop[]{
+	public final static EntityNPCEnemy zombie = new EntityNPCEnemy(1, "zombie").setIconIndex(0, 0, 32, 64).setIsAlert(true).setSpawnVector(" ", "night").setDamageDone(16).setMaxHealth(60).setDrops(new MonsterDrop[]{
 			new MonsterDrop(new ItemStack(Item.healthPotion2), 1, 1, 50), new MonsterDrop(new ItemStack(Item.ironSword), 1, 1, 100), new MonsterDrop(new ItemStack(Item.bronzeSword), 1, 1, 66)
 	});
-	public final static EntityNPCEnemy slime = new EntityNPCEnemy(2, "Slime").setIsAlert(true).setSpawnVector(" ", " ").setBlockAndWorldDimensions(1,1).setMaxHealth(30).setDamageDone(4).setBaseSpeed(1.4f).setDrops(new MonsterDrop[]{
+	public final static EntityNPCEnemy slime = new EntityNPCEnemy(2, "Slime").setIconIndex(1, 0, 32, 32).setIsAlert(true).setSpawnVector(" ", " ").setBlockAndWorldDimensions(1,1).setMaxHealth(30).setDamageDone(4).setBaseSpeed(1.4f).setDrops(new MonsterDrop[]{
 			new MonsterDrop(new ItemStack(Item.silverIngot), 1, 1, 200), new MonsterDrop(new ItemStack(Item.healingHerb1), 1, 1, 15), new MonsterDrop(new ItemStack(Item.vialOfWater), 1, 1, 15)  
 	});
-	public final static EntityNPCEnemy dino = new EntityNPCEnemy(3, "Dinosaur").setIsAlert(true).setSpawnVector("forest", "night").setBlockAndWorldDimensions(5,4).setMaxHealth(150).setDamageDone(20).setBaseSpeed(3.4f).setDrops(new MonsterDrop[]{
+	public final static EntityNPCEnemy dino = new EntityNPCEnemy(3, "Dinosaur").setIconIndex(3, 0, 96, 64).setIsAlert(true).setSpawnVector("forest", "night").setBlockAndWorldDimensions(5,4).setMaxHealth(150).setDamageDone(20).setBaseSpeed(3.4f).setDrops(new MonsterDrop[]{
 			new MonsterDrop(new ItemStack(Item.ringOfVigor), 1, 1, 100), new MonsterDrop(new ItemStack(Item.coal), 1, 3, 4), new MonsterDrop(new ItemStack(Item.healingHerb2), 1, 1, 20) 
 	});
 	//public final static EntityNPCEnemy doubleingEye = new EntityNPCEnemy(4, "Eyeball").setDamageDone(12).setMaxHealth(60);

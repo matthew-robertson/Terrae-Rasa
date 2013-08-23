@@ -278,7 +278,7 @@ public class GameEngine
 		players.add(player);
 		EntityUpdate update = new EntityUpdate();
 		update.entityID = player.entityID;
-		update.updatedEntity = EntityPlayer.compress(player);
+		update.updatedEntity = player.getTransmittable();
 		update.action = 'a';
 		update.type = 5;
 		extraEntityUpdates.add(update);

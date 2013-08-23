@@ -11,33 +11,26 @@ import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.lwjgl.opengl.Display;
 
-import savable.SavableWorld;
 import savable.SaveManager;
 import transmission.ClientUpdate;
-import transmission.CompressedPlayer;
+import transmission.TransmittablePlayer;
 import transmission.WorldData;
-import utils.ItemStack;
+import utils.DisplayableItemStack;
 import utils.LightUtils;
 import utils.MathHelper;
-import utils.SpawnManager;
 import utils.WorldText;
-import audio.SoundEngine;
 import blocks.Block;
 import blocks.BlockGrass;
 import blocks.BlockPillar;
 import blocks.MinimalBlock;
+import entities.DisplayableEntity;
 import entities.Entity;
-import entities.EntityItemStack;
-import entities.EntityNPC;
-import entities.EntityNPCEnemy;
-import entities.EntityNPCFriendly;
 import entities.EntityPlayer;
-import entities.EntityProjectile;
+import entities.IEntityTransmitBase;
 import enums.EnumColor;
 import enums.EnumEventType;
 import enums.EnumWorldDifficulty;
@@ -85,12 +78,11 @@ public class World
 	public Hashtable<String, Boolean> chunksLoaded;
 	
 	public Weather weather;
-	public List<EntityItemStack> itemsList;
+	public List<DisplayableEntity> itemsList;
 	public List<WorldText> temporaryText; 
-	public List<EntityNPCEnemy> entityList;
-	public List<EntityNPC> npcList;
-	public List<EntityProjectile> projectileList;
-	public SpawnManager manager;
+	public List<DisplayableEntity> enemyList;
+	public List<DisplayableEntity> npcList;
+	public List<DisplayableEntity> projectileList;
 	
 	private int[] generatedHeightMap;
 	private int averageSkyHeight;
@@ -98,7 +90,6 @@ public class World
 	private int chunkWidth;
 	public ChunkManager chunkManager;
 	private EnumWorldDifficulty difficulty;
-	private final Random random = new Random();
 	protected String worldName;
 	private long worldTime;
 	private ConcurrentHashMap<String, Chunk> chunks;
@@ -111,7 +102,7 @@ public class World
 	private List<String> pendingChunkRequests = new ArrayList<String>();
 	public List<EntityPlayer> otherPlayers = new ArrayList<EntityPlayer>();
 	
-	public Dictionary<String, Entity> entitiesByID = new Hashtable<String, Entity>();
+	public Dictionary<String, Object> entitiesByID = new Hashtable<String, Object>();
 	
 	/**
 	 * Reconstructs a world from a save file. This is the first step.
@@ -119,19 +110,18 @@ public class World
 	public World()
 	{
 		setChunks(new ConcurrentHashMap<String, Chunk>(10));
-		entityList = new ArrayList<EntityNPCEnemy>(255);
-		projectileList = new ArrayList<EntityProjectile>(255);
-		npcList = new ArrayList<EntityNPC>(255);
+		enemyList = new ArrayList<DisplayableEntity>(255);
+		projectileList = new ArrayList<DisplayableEntity>(255);
+		npcList = new ArrayList<DisplayableEntity>(255);
 		temporaryText = new ArrayList<WorldText>(100);
-		itemsList = new ArrayList<EntityItemStack>(250);
+		itemsList = new ArrayList<DisplayableEntity>(250);
 		chunksLoaded= new Hashtable<String, Boolean>(25);
-		manager = new SpawnManager();
 		utils = new LightUtils();
 //		checkChunks();
 		lightingUpdateRequired = true;
 	}
 	
-	public Entity getEntityByID(int id)
+	public Object getEntityByID(int id)
 	{
 		try {
 			return entitiesByID.get(""+id);
@@ -141,30 +131,30 @@ public class World
 		return null;
 	}
 		
-	public void overwriteEntityByID(int id, Entity newEntity)
+	public void overwriteEntityByID(int id, Object newEntity)
 	{
-		Entity entity = entitiesByID.get(""+id);
-		if(entity instanceof EntityItemStack)
+		IEntityTransmitBase entity = (IEntityTransmitBase) entitiesByID.get(""+id);
+		if(entity.getEntityType() == DisplayableEntity.TYPE_ITEMSTACK)
 		{
 			itemsList.remove(entity);
-			itemsList.add((EntityItemStack) newEntity);
+			itemsList.add((DisplayableEntity) newEntity);
 		}
-		else if(entity instanceof EntityProjectile)
+		else if(entity.getEntityType() == DisplayableEntity.TYPE_PROJECTILE)
 		{
 			projectileList.remove(entity);
-			projectileList.add((EntityProjectile) newEntity);
+			projectileList.add((DisplayableEntity) newEntity);
 		}
-		else if(entity instanceof EntityNPCEnemy)
+		else if(entity.getEntityType() == DisplayableEntity.TYPE_ENEMY)
 		{
-			entityList.remove(entity);
-			entityList.add((EntityNPCEnemy) newEntity);
+			enemyList.remove(entity);
+			enemyList.add((DisplayableEntity) newEntity);
 		}
-		else if(entity instanceof EntityNPC) //Friendly?
+		else if(entity.getEntityType() == DisplayableEntity.TYPE_FRIENDLY) //Friendly?
 		{
 			npcList.remove(entity);
-			npcList.add((EntityNPC) newEntity);
+			npcList.add((DisplayableEntity) newEntity);
 		}
-		else if(entity instanceof EntityPlayer)
+		else if(entity.getEntityType() == DisplayableEntity.TYPE_PLAYER)
 		{
 			otherPlayers.remove(entity);
 			otherPlayers.add((EntityPlayer) newEntity);
@@ -174,24 +164,24 @@ public class World
 	
 	public void removeEntityByID(int id)
 	{
-		Entity entity = entitiesByID.get(""+id);
-		if(entity instanceof EntityItemStack)
+		IEntityTransmitBase entity = (IEntityTransmitBase) entitiesByID.get(""+id);
+		if(entity.getEntityType() == DisplayableEntity.TYPE_ITEMSTACK)
 		{
 			itemsList.remove(entity);
 		}
-		else if(entity instanceof EntityProjectile)
+		else if(entity.getEntityType() == DisplayableEntity.TYPE_PROJECTILE)
 		{
 			projectileList.remove(entity);
 		}
-		else if(entity instanceof EntityNPCEnemy)
+		else if(entity.getEntityType() == DisplayableEntity.TYPE_ENEMY)
 		{
-			entityList.remove(entity);
+			enemyList.remove(entity);
 		}
-		else if(entity instanceof EntityNPC) //Friendly?
+		else if(entity.getEntityType() == DisplayableEntity.TYPE_FRIENDLY) //Friendly?
 		{
 			npcList.remove(entity);
 		}
-		else if(entity instanceof EntityPlayer)
+		else if(entity.getEntityType() == DisplayableEntity.TYPE_PLAYER)
 		{
 			otherPlayers.remove(entity);
 		}
@@ -212,18 +202,17 @@ public class World
 		setChunks(new ConcurrentHashMap<String, Chunk>(10));
 		this.width = width;
 		this.height = height; 
-		entityList = new ArrayList<EntityNPCEnemy>(255);
-		projectileList = new ArrayList<EntityProjectile>(255);
-		npcList = new ArrayList<EntityNPC>(255);
+		enemyList = new ArrayList<DisplayableEntity>(255);
+		projectileList = new ArrayList<DisplayableEntity>(255);
+		npcList = new ArrayList<DisplayableEntity>(255);
 		temporaryText = new ArrayList<WorldText>(100);
-		itemsList = new ArrayList<EntityItemStack>(250);
+		itemsList = new ArrayList<DisplayableEntity>(250);
 		chunksLoaded= new Hashtable<String, Boolean>(25);
 		worldTime = (long) (6.5 * GAMETICKSPERHOUR);
 		worldName = "Earth";
 		totalBiomes = 0;
 		previousLightLevel = getLightLevel();
 		this.difficulty = difficulty;
-		manager = new SpawnManager();
 		chunkWidth = width / Chunk.getChunkWidth();
 		utils = new LightUtils();
 		lightingUpdateRequired = true;
@@ -245,16 +234,16 @@ public class World
 		this.difficulty = data.difficulty;
 		
 		
-		this.entityList = new ArrayList<EntityNPCEnemy>();
-		for(EntityNPCEnemy enemy : data.entityList)
+		this.enemyList = new ArrayList<DisplayableEntity>();
+		for(DisplayableEntity enemy : data.enemyList)
 		{
-			enemy.setTexture(EntityNPCEnemy.enemyList[enemy.getNPCID()].getTexture());
+//			enemy.setTexture(EntityNPCEnemy.enemyList[enemy.getNPCID()].getTexture());
 			addEntityToEnemyList(enemy);
 		}
-		this.npcList = new ArrayList<EntityNPC>();
-		for(EntityNPC friendly : data.npcList)
+		this.npcList = new ArrayList<DisplayableEntity>();
+		for(DisplayableEntity friendly : data.npcList)
 		{
-			friendly .setTexture(EntityNPCFriendly.npcList[friendly.getNPCID()].getTexture());
+//			friendly.setTexture(EntityNPCFriendly.npcList[friendly.getNPCID()].getTexture());
 			addEntityToNPCList(friendly);
 		}		
 		this.itemsList = data.itemsList;
@@ -269,11 +258,10 @@ public class World
 		this.generatedHeightMap = data.generatedHeightMap;
 		this.averageSkyHeight = data.averageSkyHeight;
 		
-		for(CompressedPlayer player : data.otherplayers)
+		for(TransmittablePlayer player : data.otherplayers)
 		{
-			addPlayer(EntityPlayer.expand(player));
+			addPlayer(player);
 		}		
-		manager = new SpawnManager();
 		utils = new LightUtils();		
 	}
 			
@@ -286,10 +274,10 @@ public class World
 	{
 		if(player.inventory.isEmpty())
 		{
-			player.inventory.pickUpItemStack(this, player, new ItemStack(Item.copperSword));
-			player.inventory.pickUpItemStack(this, player, new ItemStack(Item.copperPickaxe));
-			player.inventory.pickUpItemStack(this, player, new ItemStack(Item.copperAxe));
-			player.inventory.pickUpItemStack(this, player, new ItemStack(Block.craftingTable));
+			player.inventory.pickUpItemStack(this, player, new DisplayableItemStack(Item.copperSword));
+			player.inventory.pickUpItemStack(this, player, new DisplayableItemStack(Item.copperPickaxe));
+			player.inventory.pickUpItemStack(this, player, new DisplayableItemStack(Item.copperAxe));
+			player.inventory.pickUpItemStack(this, player, new DisplayableItemStack(Block.craftingTable));
 		}
 		
 		player.respawnXPos = getWorldCenterOrtho();
@@ -324,31 +312,6 @@ public class World
 		}
 		return player;
 	}
-		
-	/**
-	 * Opens the worlddata.dat file and applies all the data to the reconstructed world. Then final reconstruction is performed.
-	 * @param BASE_PATH the base path for the TerraeRasa folder, stored on disk
-	 * @param universeName the name of the world to be loaded
-	 * @throws FileNotFoundException indicates the worlddata.dat file cannot be found
-	 * @throws IOException indicates the load operation has failed to perform the required I/O. This error is critical
-	 * @throws ClassNotFoundException indicates casting of an object has failed, due to incorrect class version or the class not existing
-	 */
-	public void loadAndApplyWorldData(final String BASE_PATH, String universeName, String dir)
-			throws FileNotFoundException, IOException, ClassNotFoundException
-	{
-		//Open an input stream for the file	
-		SaveManager manager = new SaveManager();	
-		SavableWorld savable = (SavableWorld)(manager.loadFile("/World Saves/" + universeName + "/" + dir + "/worlddata.xml"));
-		this.width = savable.width;
-		this.height = savable.height;
-		this.chunkWidth = savable.chunkWidth;
-		this.averageSkyHeight = savable.averageSkyHeight;
-		this.generatedHeightMap = savable.generatedHeightMap;
-		this.worldTime = savable.worldTime;
-		this.worldName = savable.worldName;
-		this.totalBiomes = savable.totalBiomes;
-		this.difficulty = savable.difficulty;
-	}
 	
 	/**
 	 * Adds a player to the world. Currently multiplayer placeholder.
@@ -380,32 +343,7 @@ public class World
 			chunkManager.requestChunk(worldName, this, getChunks(), i);
 		}
 	}
-	
-	/**
-	 * Clears all monsters from entityList, generally invoked after a single player death to provide some mercy to the player.
-	 */
-	public void clearEntityList()
-	{
-//		entityList.clear();
-		entityList = new ArrayList<EntityNPCEnemy>(255);
-	}
-	
-	/**
-	 * Clears all projectiles from projectileList
-	 */
-	public void clearProjectileList()
-	{
-		projectileList.clear();
-	}
-	
-	/**
-	 * Clears all NPCs from npcList
-	 */
-	public void clearNPCList()
-	{
-		npcList.clear();
-	}
-	
+		
 	/**
 	 * Keeps track of the worldtime and updates the light if needed
 	 */
@@ -455,50 +393,50 @@ public class World
 		return width * 3;
 	}
 	
-	public void addUnspecifiedEntity(Entity entity)
+	public void addUnspecifiedEntity(IEntityTransmitBase entity)
 	{
-		if(getEntityByID(entity.entityID) != null)
+		if(getEntityByID(entity.getEntityID()) != null)
 		{
 			return;
 		}
-		if(entity instanceof EntityNPCEnemy)
+		if(entity.getEntityType() == DisplayableEntity.TYPE_ENEMY)
 		{
-			entityList.add((EntityNPCEnemy) entity);
-			entitiesByID.put(""+entity.entityID, entity);
+			enemyList.add((DisplayableEntity) entity);
+			entitiesByID.put(""+entity.getEntityID(), entity);
 		}
-		else if(entity instanceof EntityNPC)
+		else if(entity.getEntityType() == DisplayableEntity.TYPE_FRIENDLY)
 		{
-			npcList.add((EntityNPC) entity);
-			entitiesByID.put(""+entity.entityID, entity);
+			npcList.add((DisplayableEntity) entity);
+			entitiesByID.put(""+entity.getEntityID(), entity);
 		}
-		else if(entity instanceof EntityItemStack)
+		else if(entity.getEntityType() == DisplayableEntity.TYPE_ITEMSTACK)
 		{
-			itemsList.add((EntityItemStack) entity);
-			entitiesByID.put(""+entity.entityID, entity);
+			itemsList.add((DisplayableEntity) entity);
+			entitiesByID.put(""+entity.getEntityID(), entity);
 		}
-		else if(entity instanceof EntityProjectile)
+		else if(entity.getEntityType() == DisplayableEntity.TYPE_PROJECTILE)
 		{
-			projectileList.add((EntityProjectile) entity);
-			entitiesByID.put(""+entity.entityID, entity);
+			projectileList.add((DisplayableEntity) entity);
+			entitiesByID.put(""+entity.getEntityID(), entity);
 		}
 		
 	}
 	
 	/**
-	 * Adds an EntityNPCEnemy to the entityList in this instance of World
-	 * @param enemy the enemy to add to entityList
+	 * Adds an EntityNPCEnemy to the enemyList in this instance of World
+	 * @param enemy the enemy to add to enemyList
 	 */
-	public void addEntityToEnemyList(EntityNPCEnemy enemy)
+	public void addEntityToEnemyList(DisplayableEntity enemy)
 	{
-		entityList.add(enemy);
+		enemyList.add(enemy);
 		entitiesByID.put(""+enemy.entityID, enemy);
 	}
 	
 	/**
 	 * Adds an EntityNPC to the npcList in this instance of World
-	 * @param npc the npc to add to entityList
+	 * @param npc the npc to add to enemyList
 	 */
-	public void addEntityToNPCList(EntityNPC npc)
+	public void addEntityToNPCList(DisplayableEntity npc)
 	{
 		npcList.add(npc);
 		entitiesByID.put(""+npc.entityID, npc);
@@ -508,7 +446,7 @@ public class World
 	 * Adds an entityProjectile to the projectileList in this instance of World
 	 * @param projectile the projectile to add to projectileList
 	 */
-	public void addEntityToProjectileList(EntityProjectile projectile)
+	public void addEntityToProjectileList(DisplayableEntity projectile)
 	{
 		projectileList.add(projectile);
 		entitiesByID.put(""+projectile.entityID, projectile);
@@ -518,21 +456,22 @@ public class World
 	 * Adds an EntityLivingItemStack to the itemsList in this instance of World
 	 * @param stack the EntityLivingItemStack to add to itemsList
 	 */
-	public void addItemStackToItemList(EntityItemStack stack)
+	public void addItemStackToItemList(DisplayableEntity stack)
 	{
 		itemsList.add(stack);
 		entitiesByID.put(""+stack.entityID, stack);
 	}
 	
-	public void addPlayer(EntityPlayer player)
+	public void addPlayer(TransmittablePlayer transmittablePlayer)
 	{
 		for(EntityPlayer p : otherPlayers)
 		{
-			if(player.entityID == p.entityID)
+			if(transmittablePlayer.entityID == p.entityID)
 			{
 				return;
 			}
 		}
+		EntityPlayer player = new EntityPlayer(transmittablePlayer);
 		otherPlayers.add(player);
 		entitiesByID.put(""+player.entityID, player);
 	}
@@ -1480,17 +1419,6 @@ public class World
             	chunk.setLightUpdated(true);
             }
         }
-	}
-
-	/** 
-	 * Launches a projectile
-	 * @param world - current world
-	 * @param angle - the angle at which to launch the projectile
-	 * @param projectile - the projectile to launch
-	 */
-	public void launchProjectile(World world, int angle, EntityProjectile projectile, double x, double y)
-	{
-		addEntityToProjectileList(new EntityProjectile(projectile).setXLocAndYLoc(x, y).setDirection(angle));
 	}
 	
 	public void setBitMap(int x, int y, int bitMap)

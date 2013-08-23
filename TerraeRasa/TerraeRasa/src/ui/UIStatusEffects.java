@@ -6,7 +6,7 @@ import java.util.List;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
-import statuseffects.StatusEffect;
+import statuseffects.DisplayableStatusEffect;
 import entities.EntityPlayer;
 
 /**
@@ -19,8 +19,8 @@ import entities.EntityPlayer;
 public class UIStatusEffects extends UIBase
 {
 	private static final int MAX_STATUS_PER_ROW = 8;
-	protected static List<StatusEffect> goodEffects = new ArrayList<StatusEffect>();
-	protected static List<StatusEffect> badEffects = new ArrayList<StatusEffect>();
+	protected static List<DisplayableStatusEffect> goodEffects = new ArrayList<DisplayableStatusEffect>();
+	protected static List<DisplayableStatusEffect> badEffects = new ArrayList<DisplayableStatusEffect>();
 
 	/**
 	 * Updates the status effect lists as is appropriate
@@ -29,7 +29,7 @@ public class UIStatusEffects extends UIBase
 	protected static void updateStatusEffects(EntityPlayer player)
 	{
 		//Get the status effects
-		List<StatusEffect> statusEffects = player.statusEffects;
+		List<DisplayableStatusEffect> statusEffects = player.statusEffects;
 		goodEffects.clear();
 		badEffects.clear();
 		
@@ -53,7 +53,7 @@ public class UIStatusEffects extends UIBase
 	 * @param mouseY the mouse's Y position in ortho units
 	 * @return the currently hovered over status effect, or null if there is none
 	 */
-	protected static StatusEffect getMouseoverStatusEffect(int mouseX, int mouseY)
+	protected static DisplayableStatusEffect getMouseoverStatusEffect(int mouseX, int mouseY)
 	{
 		int size = 16;
 		int goodEffectHeight = 2;

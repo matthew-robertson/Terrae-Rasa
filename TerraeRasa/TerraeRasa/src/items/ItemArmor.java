@@ -3,16 +3,15 @@ package items;
 import java.util.ArrayList;
 import java.util.List;
 
-import passivebonuses.PassiveBonus;
-import auras.Aura;
-import auras.AuraHeavensReprieve;
+import passivebonuses.DisplayablePassiveBonus;
+import auras.DisplayableAura;
 import enums.EnumArmor;
 
 public class ItemArmor extends Item
 {
 	protected boolean isSavingRelic;
-	protected PassiveBonus[] bonuses;
-	protected Aura[] auras;
+	protected DisplayablePassiveBonus[] bonuses;
+	protected DisplayableAura[] auras;
 	protected EnumArmor armorType;
 	protected int defense;
 	protected int dexterity;
@@ -29,8 +28,8 @@ public class ItemArmor extends Item
 		dexterity = 0;
 		strength = 0;
 		armorType = EnumArmor.NOTHING;
-		bonuses = new PassiveBonus[0];
-		auras = new Aura[0];
+		bonuses = new DisplayablePassiveBonus[0];
+		auras = new DisplayableAura[0];
 		totalSockets = 0;
 	}
 	
@@ -102,26 +101,27 @@ public class ItemArmor extends Item
 		return armorType;
 	}
 	
-	protected ItemArmor passiveBonuses(PassiveBonus[] bonuses)
+	protected ItemArmor passiveBonuses(DisplayablePassiveBonus[] bonuses)
 	{
 		this.bonuses = bonuses;
 		return this;
 	}
 	
-	protected ItemArmor setAuras(Aura[] auras)
+	protected ItemArmor setAuras(DisplayableAura[] auras)
 	{
 		this.auras = auras;
-		for(Aura aura : auras)
-		{
-			if(aura instanceof AuraHeavensReprieve)
-			{
-				isSavingRelic = true;
-			}
-		}
+//TODO fix heaven's reprieve (stay of execution)
+//		for(Aura aura : auras)
+//		{
+//			if(aura instanceof AuraHeavensReprieve)
+//			{
+//				isSavingRelic = true;
+//			}
+//		}
 		return this;
 	}
 	
-	public Aura[] getAuras()
+	public DisplayableAura[] getAuras()
 	{
 		return auras;
 	}
@@ -137,7 +137,7 @@ public class ItemArmor extends Item
 		return this;
 	}
 	
-	public PassiveBonus[] getBonuses()
+	public DisplayablePassiveBonus[] getBonuses()
 	{
 		return bonuses;
 	}
@@ -221,7 +221,7 @@ public class ItemArmor extends Item
 		return strings;
 	}
 	
-	public PassiveBonus[] getTierBonuses()
+	public DisplayablePassiveBonus[] getTierBonuses()
 	{
 		return armorType.getBonuses();
 	}

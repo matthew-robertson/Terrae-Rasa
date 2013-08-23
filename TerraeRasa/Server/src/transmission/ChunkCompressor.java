@@ -4,6 +4,8 @@ import io.Chunk;
 
 import java.io.Serializable;
 
+import utils.DisplayableItemStack;
+import utils.ItemStack;
 import world.Biome;
 import blocks.MinimalBlock;
 
@@ -35,11 +37,24 @@ public class ChunkCompressor
 				cblock.bitMap = blocks[i][k].bitMap;
 				cblock.id = blocks[i][k].id;
 				cblock.metaData = blocks[i][k].metaData;
-				cblock.mainInventory = blocks[i][k].mainInventory;
+				cblock.mainInventory = convert(blocks[i][k].mainInventory);
 				compressed[i][k] = cblock;			
 			}
 		}
 		return compressed;		
+	}
+	
+	public static DisplayableItemStack[] convert(ItemStack[] stacks)
+	{
+		DisplayableItemStack[] displayables = new DisplayableItemStack[stacks.length];
+		for(int i = 0; i < stacks.length; i++)
+		{
+			if(stacks[i] != null)
+			{
+				displayables[i] = new DisplayableItemStack(stacks[i]);
+			}
+		}
+		return displayables;
 	}
 	
 }

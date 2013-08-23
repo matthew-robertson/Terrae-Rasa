@@ -7,9 +7,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+import savable.SavablePlayer;
+import savable.SaveManager;
 import transmission.ChunkCompressor;
 import transmission.CompressedClientUpdate;
-import transmission.CompressedPlayer;
 import transmission.CompressedServerUpdate;
 import transmission.GZIPHelper;
 import transmission.ServerUpdate;
@@ -65,8 +66,8 @@ public class ServerConnectionThread extends Thread
 				{
 					CompressedServerUpdate closingUpdate = new CompressedServerUpdate();
 					UpdateWithObject playerUpdate = new UpdateWithObject();
-					playerUpdate.command = "/fullplayersend " + worldLock.getRelevantPlayer().entityID;
-					playerUpdate.object = EntityPlayer.compress(worldLock.getRelevantPlayer());
+					playerUpdate.command = "/recievesavable " + worldLock.getRelevantPlayer().entityID;
+					playerUpdate.object = worldLock.getRelevantPlayer().getSavableXML();
 					closingUpdate.objectUpdates = new UpdateWithObject[1];
 					closingUpdate.objectUpdates[0] = playerUpdate;
 					CompressedServerUpdate[] updates = { closingUpdate };
@@ -116,7 +117,9 @@ public class ServerConnectionThread extends Thread
 			EntityPlayer player = null;
 			if(message.equals("/sendplayer"))
 			{
-				player = EntityPlayer.expand((CompressedPlayer)(gzipHelper.expand((byte[])is.readObject())));
+				String savableXML = is.readUTF();
+				//TODO this is dangerous (the world access)
+				player = new EntityPlayer(TerraeRasa.terraeRasa.gameEngine.getWorld(), (SavablePlayer)new SaveManager().xmlToObject(savableXML));
 				player.setEntityID(playerID);
 				player.verifyName();
 				worldLock.addPlayerToWorld(player);
@@ -158,8 +161,6 @@ public class ServerConnectionThread extends Thread
 			}
 			open = true;
 		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 	}

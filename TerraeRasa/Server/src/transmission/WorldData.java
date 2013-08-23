@@ -1,8 +1,10 @@
 package transmission;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
+import entities.DisplayableEntity;
 import entities.EntityItemStack;
 import entities.EntityNPC;
 import entities.EntityNPCEnemy;
@@ -17,10 +19,10 @@ public class WorldData
 	//private boolean weatherFinished;
 	
 	private static final long serialVersionUID = 1L;
-	public List<EntityItemStack> itemsList;
-	public List<EntityNPCEnemy> entityList;
-	public List<EntityNPC> npcList;
-	public List<EntityProjectile> projectileList;
+	public List<DisplayableEntity> itemsList;
+	public List<DisplayableEntity> enemyList;
+	public List<DisplayableEntity> npcList;
+	public List<DisplayableEntity> projectileList;
 	public int[] generatedHeightMap;
 	public int averageSkyHeight;
 	public int totalBiomes;
@@ -32,7 +34,30 @@ public class WorldData
 	public int width; 
 	public int height; 
 	public double previousLightLevel;
-	public EntityNPCEnemy[] spawnList;
 	public boolean lightingUpdateRequired;
-	public CompressedPlayer[] otherplayers;
+	public TransmittablePlayer[] otherplayers;
+	
+	public void setLists(List<EntityItemStack> itemstacks, List<EntityNPCEnemy> enemies, List<EntityNPC> npcs, List<EntityProjectile> projectiles)
+	{
+		itemsList = new ArrayList<DisplayableEntity>();
+		enemyList = new ArrayList<DisplayableEntity>();
+		npcList = new ArrayList<DisplayableEntity>();
+		projectileList = new ArrayList<DisplayableEntity>();
+		for(EntityItemStack stack : itemstacks)
+		{
+			itemsList.add(new DisplayableEntity(stack));
+		}
+		for(EntityNPCEnemy enemy : enemies)
+		{
+			enemyList.add(new DisplayableEntity(enemy));
+		}
+		for(EntityNPC npc : npcs)
+		{
+			npcList.add(new DisplayableEntity(npc));
+		}
+		for(EntityProjectile projectile : projectiles)
+		{
+			projectileList.add(new DisplayableEntity(projectile));
+		}
+	}
 }

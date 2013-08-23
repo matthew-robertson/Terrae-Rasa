@@ -6,14 +6,12 @@ import java.util.Vector;
 
 import transmission.ChunkCompressor;
 import transmission.CompressedClientUpdate;
-import transmission.CompressedPlayer;
 import transmission.CompressedServerUpdate;
 import transmission.ServerUpdate;
 import transmission.SuperCompressedChunk;
-import transmission.UpdateWithObject;
+import transmission.TransmittablePlayer;
 import transmission.WorldData;
 import entities.EntityPlayer;
-import enums.EnumHardwareInput;
 
 public class WorldLock 
 {
@@ -135,13 +133,13 @@ public class WorldLock
 		}
 	}
 
-	public synchronized CompressedPlayer[] requestOtherPlayers()
+	public synchronized TransmittablePlayer[] requestOtherPlayers()
 	{
 		EntityPlayer[] players = engine.getPlayersArray();
-		CompressedPlayer[] compPlayers = new CompressedPlayer[players.length];
+		TransmittablePlayer[] compPlayers = new TransmittablePlayer[players.length];
 		for(int i = 0; i < compPlayers.length; i++)
 		{
-			compPlayers[i] = EntityPlayer.compress(players[i]);
+			compPlayers[i] = players[i].getTransmittable();
 		}		
 		return compPlayers;
 	}

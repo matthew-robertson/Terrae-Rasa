@@ -9,7 +9,6 @@ import org.lwjgl.opengl.GL11;
 
 import utils.MathHelper;
 import utils.Texture;
-import utils.TextureCoords;
 import world.World;
 import entities.EntityPlayer;
 
@@ -23,10 +22,9 @@ import entities.EntityPlayer;
  * @since       1.0
  */
 public class Render 
-{	
+{
 	public final static int TEXTURE_SHEET_ITEMS = 1,
 			   TEXTURE_SHEET_TERRAIN_EARTH = 2;
-
 	//Variables describing the size of the terrain_ground.png texture
 	public final static int TEXTURE_SHEET_WIDTH = 256;
 	public final static int TEXTURE_SHEET_HEIGHT = 512;
@@ -47,13 +45,25 @@ public class Render
 	public final static int ITEMS_PER_ROW =  ICONS_SHEET_WIDTH / 32;
 	public final static int ITEMS_PER_COLUMN = ICONS_SHEET_HEIGHT / 32;
 	
+	//monsters.png variables
+	public final static int MONSTERS_SHEET_WIDTH = 512;
+	public final static int MONSTERS_SHEET_HEIGHT = 256;
+	public final static int MONSTERS_PER_ROW =  ICONS_SHEET_WIDTH / 32;
+	public final static int MONSTERS_PER_COLUMN = ICONS_SHEET_HEIGHT / 32;
+	
+	
 	public static Texture[] icons;
 	
 	public static Texture zombie;
 	public static Texture goblin;
 	public static Texture slime;
-	
-	//</menu textures>
+
+	//Menu textures begin
+	public static Texture buttonTexture;
+	public static Texture[] moons;
+	public static Texture sun; 
+	public static Texture background_1; //Background (sky)
+	//Menu textures end
 
 	public static Texture dino;
 	public static Texture ICONS;
@@ -61,9 +71,6 @@ public class Render
 	public static Texture TERRAIN;
 	public static Texture TERRAIN_GROUND;
 	public static Texture PROJECTILES;
-	public static RenderEntities renderEntities;
-	public static RenderBlocks renderBlocks;
-	public static RenderParticles renderParticles;
 	public static TrueTypeFont trueTypeFont;
 	public static TrueTypeFont trueTypeFont_AR;
 	public static Tessellator t = Tessellator.instance;
@@ -75,18 +82,14 @@ public class Render
 	public static Texture logo;
 	public static Texture[] textures;
 	public static Texture[] backgroundImages;
-	//menu textures
-	public static Texture buttonTexture;
-	public static Texture[] moons;
-	public static Texture sun; 
-	public static Texture background_1; //Background (sky)
 	
 	public static Texture background_menu;
 	public static Texture starParticleBackground;
 	public static Texture starParticleForeground;
 	public static Texture menuButtonBackground;
-	public static Texture starAnimationSheet;
+	public static Texture starAnimationSheet;	
 	
+	public static Texture monsterSheet;
 	/** 
 	 * cameraX is a relatively unique variable. It's where the camera is moved to on the X axis, based on player location. 
 	 * Therefore this value becomes very important to rendering user interface components. Using this value in addition 
@@ -103,28 +106,15 @@ public class Render
 	 **/
 	private static int cameraY;
 	public static Texture mainLogo;
-	
-	/**
-	 * Renders a sky background image. This is a filler for now.
-	 */
-	protected void renderSkyBackgroundScene()
-	{		
-		background_1.bind();        
-		t.startDrawingQuads();
-        t.setColorRGBA_F(1, 1, 1, 1);
-        t.addVertexWithUV(0, Display.getHeight() / 2, 0, 0, 1);
-        t.addVertexWithUV(Display.getWidth() / 2, Display.getHeight() / 2, 0, 1, 1);
-        t.addVertexWithUV(Display.getWidth() / 2, 0, 0, 1, 0);
-        t.addVertexWithUV(0, 0, 0, 0, 0);
-        t.draw();
-	}
+//	static Animation zombie_test_animation;
+	private static boolean initialized = false;
 	
 	/**
 	 * Adjusts the camera, based on where the player is. This should only be called once (the first time) per render. 
 	 * This is due to the large amount of math required. Subsequent camera adjustments (per rendered frame) can be made 
 	 * much cheaper using {@link #adjustToLastCameraPosition()}.
 	 */
-	protected void adjustCamera(World world, EntityPlayer player) 
+	protected static void adjustCamera(World world, EntityPlayer player) 
 	{
 		GL11.glLoadIdentity();// + seems to be on ----> this side of the Y axis, it behaves quite wierdly when comparing along the X axis however
 		final int width = (int) (Display.getWidth() / 2) + 2;
@@ -150,7 +140,7 @@ public class Render
 	 * GL11.glTranslatef has to be called to rotate properly; this is due to there be significant math required ONLY the
 	 * first camera adjustment per frame. 
 	 */
-	protected void adjustCameraToLastPosition()
+	protected static void adjustCameraToLastPosition()
 	{
 		GL11.glLoadIdentity();
 		GL11.glTranslatef(cameraX, cameraY, -2000F);
@@ -161,6 +151,10 @@ public class Render
 	 */
 	public static void initializeTextures(World world)
 	{
+		if(initialized)
+			return;
+		initialized = true;
+		
 		trueTypeFont = new TrueTypeFont(new Font("Comic Sans MS", Font.BOLD, 32), false);
 		loader = new TextureLoader();
 		backgroundImages = new Texture[12];
@@ -178,6 +172,8 @@ public class Render
 		slime = loader.getTexture("Resources/slime.png");
 		dino = loader.getTexture("Resources/dino.png");
 		
+		monsterSheet = loader.getTexture("Resources/monsters.png");
+		
 		snow_tex = loader.getTexture("Resources/snow_particle.png");
 		ICONS = loader.getTexture("Resources/icons.png");
 		TERRAIN = loader.getTexture("Resources/terrain.png");
@@ -191,14 +187,14 @@ public class Render
 		
 		icons = loader.getIcons();
 		
-		//
-		zombie_test_animation = new Animation(loader.getTexture("Resources/test_animation.png"), 
-				new TextureCoords(0, 0, 128F / 256F, 48.0F / 256F), 
-				32, 
-				48,
-				160, 
-				4, 
-				Animation.ANIMATE_HORIZONTAL);
+		
+//		zombie_test_animation = new Animation(loader.getTexture("Resources/test_animation.png"), 
+//				new TextureCoords(0, 0, 128F / 256F, 48.0F / 256F), 
+//				32, 
+//				48,
+//				160, 
+//				4, 
+//				Animation.ANIMATE_HORIZONTAL);
 		background_menu = loader.getTexture("Resources/stars.png");
 		logo = loader.getTexture("Resources/logo.png");
 		starParticleBackground = loader.getTexture("Resources/shooting_star_background.png");
@@ -206,12 +202,8 @@ public class Render
 		menuButtonBackground = loader.getTexture("Resources/menubuttonbackground.png");
 		//fivePointStar = loader.getTexture("Resources/five_point_star.png");
 		starAnimationSheet = loader.getTexture("Resources/star_animation.png");
-		renderParticles = new RenderParticles();
-		renderEntities = new RenderEntities();
-		renderBlocks = new RenderBlocks();
+
 	}	
-		
-	static Animation zombie_test_animation;
 	
 	/**
 	 * Gets the absolute value of cameraX, as it's generally negative. This value is useful for rendering the user interface and many

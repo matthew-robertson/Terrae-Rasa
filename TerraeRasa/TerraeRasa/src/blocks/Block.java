@@ -6,14 +6,14 @@ import java.util.Random;
 
 import render.Render;
 import utils.ActionbarItem;
-import utils.ItemStack;
+import utils.DisplayableItemStack;
 import enums.EnumBlockMaterial;
 
 
 /**
  * <code>Block extends ActionbarItem and implements , Cloneable</code>
  * <br>
- * <code>Block</code> defines the class for placable ItemStacks in the player's
+ * <code>Block</code> defines the class for placable DisplayableItemStacks in the player's
  * inventory, and the Objects used to render the world and determine where
  * <code>Entities</code> are able to move. All possible <code>Blocks</code> must
  * extend <code>Block</code>, to ensure general consistancy and storage of all
@@ -67,7 +67,7 @@ public class Block extends ActionbarItem
 	/** (constant) Block height in pixels, currently this is 6. Corresponds to the value of Render.BLOCK_SIZE. */
 	public final static int BLOCK_HEIGHT = 6;
 	protected static final Random random = new Random();
-	protected ItemStack droppedItem;
+	protected DisplayableItemStack droppedItem;
 	protected int maximumDropAmount;
 	protected int minimumDropAmount;
 	public int metaData;
@@ -154,7 +154,7 @@ public class Block extends ActionbarItem
 		maxStackSize = 250;
 		gradeOfToolRequired = 0;
 		blockTier = 0;
-		droppedItem = new ItemStack(this);
+		droppedItem = new DisplayableItemStack(this);
 		maximumDropAmount = 1;
 		minimumDropAmount = 1;
 		isOveridable = false;
@@ -198,7 +198,7 @@ public class Block extends ActionbarItem
 	public Block(Block block) 
 	{
 		super(block);
-		this.droppedItem = new ItemStack(block.droppedItem);
+		this.droppedItem = new DisplayableItemStack(block.droppedItem);
 		this.maximumDropAmount = block.maximumDropAmount;
 		this.minimumDropAmount = block.minimumDropAmount;
 		this.metaData = block.metaData;
@@ -366,7 +366,7 @@ public class Block extends ActionbarItem
 		return this;
 	}
 
-	protected Block setDroppedItem(ItemStack stack, int min, int max) 
+	protected Block setDroppedItem(DisplayableItemStack stack, int min, int max) 
 	{
 		droppedItem = stack;
 		minimumDropAmount = min;
@@ -515,9 +515,9 @@ public class Block extends ActionbarItem
 		return tileMap;
 	}
 
-	public ItemStack getDroppedItem() 
+	public DisplayableItemStack getDroppedItem() 
 	{
-		return (droppedItem != null) ? new ItemStack(droppedItem.getItemID(), (minimumDropAmount + (((maximumDropAmount - minimumDropAmount) > 0) ? random.nextInt(maximumDropAmount - minimumDropAmount) : 0))) : null;
+		return (droppedItem != null) ? new DisplayableItemStack(droppedItem.getItemID(), (minimumDropAmount + (((maximumDropAmount - minimumDropAmount) > 0) ? random.nextInt(maximumDropAmount - minimumDropAmount) : 0))) : null;
 	}
 
 	public boolean getIsSolid() 
@@ -609,51 +609,51 @@ public class Block extends ActionbarItem
 	public static Block gold = new BlockOre(26).setName("Gold Ore Block")
 			.setBlockHardness(10.0f).setHRange(0).setLRange(3)
 			.setIconIndex(15, 11).setBlockType(1)
-			.setDroppedItem(new ItemStack(Item.goldOre), 1, 1);
+			.setDroppedItem(new DisplayableItemStack(Item.goldOre), 1, 1);
 	public static Block iron = new BlockOre(27).setName("Iron Ore Block")
 			.setBlockHardness(10.0f).setHRange(5).setLRange(10)
 			.setIconIndex(15, 8).setBlockType(1)
-			.setDroppedItem(new ItemStack(Item.ironOre), 1, 1);
+			.setDroppedItem(new DisplayableItemStack(Item.ironOre), 1, 1);
 	public static Block coal = new BlockOre(28).setName("Coal Ore Block")
 			.setTileMap('g').setHRange(40).setLRange(10)
 			.setBlockHardness(10.0f).setIconIndex(15, 6).setBlockType(1)
-			.setDroppedItem(new ItemStack(Item.coal), 1, 1);
+			.setDroppedItem(new DisplayableItemStack(Item.coal), 1, 1);
 	public static Block diamond = new BlockOre(29).setName("Diamond Ore Block")
 			.setBlockHardness(10.0f).setLRange(10)
 			.setIconIndex(15, 14).setBlockType(1)
-			.setDroppedItem(new ItemStack(Item.diamond), 1, 1);
+			.setDroppedItem(new DisplayableItemStack(Item.diamond), 1, 1);
 	public static Block ruby = new BlockOre(30).setName("Ruby Ore Block")
 			.setBlockHardness(10.0f).setLRange(5)
 			.setIconIndex(15, 13).setBlockType(1)
-			.setDroppedItem(new ItemStack(Item.ruby), 1, 1);
+			.setDroppedItem(new DisplayableItemStack(Item.ruby), 1, 1);
 	public static Block sapphire = new BlockOre(31).setName("Sapphire Ore Block")
 			.setBlockHardness(10.0f).setLRange(5)
 			.setIconIndex(15, 12).setBlockType(1)
-			.setDroppedItem(new ItemStack(Item.sapphire), 1, 1);
+			.setDroppedItem(new DisplayableItemStack(Item.sapphire), 1, 1);
 	public static Block emerald = new BlockOre(32).setName("Emerald Ore Block")
 			.setBlockHardness(10.0f).setLRange(5)
 			.setIconIndex(15, 15).setBlockType(1)
-			.setDroppedItem(new ItemStack(Item.emerald), 1, 1);
+			.setDroppedItem(new DisplayableItemStack(Item.emerald), 1, 1);
 	public static Block opal = new BlockOre(33).setName("Opal Ore Block")
 			.setBlockHardness(10.0f).setLRange(5)
 			.setIconIndex(15, 16).setBlockType(1)
-			.setDroppedItem(new ItemStack(Item.opal), 1, 1);
+			.setDroppedItem(new DisplayableItemStack(Item.opal), 1, 1);
 	public static Block jasper = new BlockOre(34).setName("Jasper Ore Block")
 			.setBlockHardness(10.0f).setLRange(5)
 			.setIconIndex(15, 17).setBlockType(1)
-			.setDroppedItem(new ItemStack(Item.jasper), 1, 1);
+			.setDroppedItem(new DisplayableItemStack(Item.jasper), 1, 1);
 	public static Block copper = new BlockOre(35).setName("Copper Ore Block")
 			.setBlockHardness(55.0f).setHRange(25).setLRange(0)
 			.setIconIndex(15, 9).setBlockType(1)
-			.setDroppedItem(new ItemStack(Item.copperOre), 1, 1);
+			.setDroppedItem(new DisplayableItemStack(Item.copperOre), 1, 1);
 	public static Block silver = new BlockOre(36).setName("Silver Ore Block")
 			.setBlockHardness(80.0f).setHRange(0).setLRange(10)
 			.setIconIndex(15, 10).setBlockType(1)
-			.setDroppedItem(new ItemStack(Item.silverOre), 1, 1);
+			.setDroppedItem(new DisplayableItemStack(Item.silverOre), 1, 1);
 	public static Block tin = new BlockOre(37).setName("Tin Ore Block")
 			.setBlockHardness(55.0f).setHRange(20).setLRange(0)
 			.setIconIndex(15, 8).setBlockType(1)
-			.setDroppedItem(new ItemStack(Item.tinOre), 1, 1);
+			.setDroppedItem(new DisplayableItemStack(Item.tinOre), 1, 1);
 	public static Block redflower = new Block(38).setName("Red Flower")
 			.setBlockHardness(10.0f).setIconIndex(0, 1).setPassable(true)
 			.setIsOveridable(true).setIsSolid(false);
@@ -666,7 +666,7 @@ public class Block extends ActionbarItem
 	public static Block snowCover = new Block(44).setName("Snow Cover")
 			.setBlockHardness(10.0f).setIconIndex(9, 10).setPassable(true)
 			.setIsOveridable(true)
-			.setDroppedItem(new ItemStack(Item.snowball), 1, 1)
+			.setDroppedItem(new DisplayableItemStack(Item.snowball), 1, 1)
 			.setIsSolid(false);
 	public static Block torch = new Block(48)
 			.setLightStrengthAndRadius(1.0F, 10).setName("Torch")
@@ -693,7 +693,7 @@ public class Block extends ActionbarItem
 			.setName("Heart Crystal Block").setBlockHardness(50.0f)
 			.setIconIndex(1, 1).setBlockType(3)
 			.setBothBlockWidthAndHeight(2, 2)
-			.setDroppedItem(new ItemStack(Item.heartCrystal), 1, 1);
+			.setDroppedItem(new DisplayableItemStack(Item.heartCrystal), 1, 1);
 	public static Block chest = new BlockChest(56, 20).setName("Chest")
 			.setBothBlockWidthAndHeight(2, 2).setBlockHardness(40.0f)
 			.setIconIndex(11, 1).setBlockType(2).setIsOveridable(false)

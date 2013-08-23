@@ -1,0 +1,567 @@
+<savable.SavablePlayer>
+  <playerName>Debug_Player</playerName>
+  <difficulty>HARD</difficulty>
+  <mana>0.0</mana>
+  <health>100.0</health>
+  <specialEnergy>100.0</specialEnergy>
+  <baseSpecialEnergy>100</baseSpecialEnergy>
+  <baseMaxHealth>100</baseMaxHealth>
+  <baseMaxMana>0</baseMaxMana>
+  <cooldowns/>
+  <mainInventory>
+    <utils.ItemStack>
+      <itemName>Copper Sword</itemName>
+      <stackSize>1</stackSize>
+      <maxStackSize>1</maxStackSize>
+      <itemID>2050</itemID>
+      <gemSockets/>
+      <renderedName>Copper Sword</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Copper Pickaxe</itemName>
+      <stackSize>1</stackSize>
+      <maxStackSize>1</maxStackSize>
+      <itemID>2049</itemID>
+      <gemSockets/>
+      <renderedName>Copper Pickaxe</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Copper Axe</itemName>
+      <stackSize>1</stackSize>
+      <maxStackSize>1</maxStackSize>
+      <itemID>2048</itemID>
+      <gemSockets/>
+      <renderedName>Copper Axe</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Crafting table</itemName>
+      <stackSize>1</stackSize>
+      <maxStackSize>250</maxStackSize>
+      <itemID>53</itemID>
+      <gemSockets/>
+      <renderedName>Crafting table</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Gold Sword</itemName>
+      <stackSize>1</stackSize>
+      <maxStackSize>1</maxStackSize>
+      <itemID>2062</itemID>
+      <gemSockets/>
+      <renderedName>Gold Sword</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Copper Pickaxe</itemName>
+      <stackSize>1</stackSize>
+      <maxStackSize>1</maxStackSize>
+      <itemID>2049</itemID>
+      <gemSockets/>
+      <renderedName>Copper Pickaxe</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>God-Minium Pickaxe</itemName>
+      <stackSize>1</stackSize>
+      <maxStackSize>1</maxStackSize>
+      <itemID>2204</itemID>
+      <gemSockets/>
+      <renderedName>God-Minium Pickaxe</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Gold Axe</itemName>
+      <stackSize>1</stackSize>
+      <maxStackSize>1</maxStackSize>
+      <itemID>2060</itemID>
+      <gemSockets/>
+      <renderedName>Gold Axe</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Stone</itemName>
+      <stackSize>100</stackSize>
+      <maxStackSize>250</maxStackSize>
+      <itemID>2</itemID>
+      <gemSockets/>
+      <renderedName>Stone</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Torch</itemName>
+      <stackSize>100</stackSize>
+      <maxStackSize>250</maxStackSize>
+      <itemID>48</itemID>
+      <gemSockets/>
+      <renderedName>Torch</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Chest</itemName>
+      <stackSize>100</stackSize>
+      <maxStackSize>250</maxStackSize>
+      <itemID>56</itemID>
+      <gemSockets/>
+      <renderedName>Chest</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Iron Chest</itemName>
+      <stackSize>100</stackSize>
+      <maxStackSize>250</maxStackSize>
+      <itemID>80</itemID>
+      <gemSockets/>
+      <renderedName>Iron Chest</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Steadfast Shield</itemName>
+      <stackSize>1</stackSize>
+      <maxStackSize>1</maxStackSize>
+      <itemID>2462</itemID>
+      <gemSockets/>
+      <renderedName>Steadfast Shield</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Wooden Bow</itemName>
+      <stackSize>1</stackSize>
+      <maxStackSize>1</maxStackSize>
+      <itemID>2063</itemID>
+      <gemSockets/>
+      <renderedName>Wooden Bow</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Absorb Potion</itemName>
+      <stackSize>50</stackSize>
+      <maxStackSize>250</maxStackSize>
+      <itemID>2581</itemID>
+      <gemSockets/>
+      <renderedName>Absorb Potion</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Gold Ingot</itemName>
+      <stackSize>100</stackSize>
+      <maxStackSize>250</maxStackSize>
+      <itemID>2653</itemID>
+      <gemSockets/>
+      <renderedName>Gold Ingot</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Silver Ingot</itemName>
+      <stackSize>100</stackSize>
+      <maxStackSize>250</maxStackSize>
+      <itemID>2652</itemID>
+      <gemSockets/>
+      <renderedName>Silver Ingot</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Jasper</itemName>
+      <stackSize>50</stackSize>
+      <maxStackSize>250</maxStackSize>
+      <itemID>2666</itemID>
+      <gemSockets/>
+      <renderedName>Jasper</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Sapphire</itemName>
+      <stackSize>50</stackSize>
+      <maxStackSize>250</maxStackSize>
+      <itemID>2664</itemID>
+      <gemSockets/>
+      <renderedName>Sapphire</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Emerald</itemName>
+      <stackSize>50</stackSize>
+      <maxStackSize>250</maxStackSize>
+      <itemID>2663</itemID>
+      <gemSockets/>
+      <renderedName>Emerald</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Ruby</itemName>
+      <stackSize>50</stackSize>
+      <maxStackSize>250</maxStackSize>
+      <itemID>2662</itemID>
+      <gemSockets/>
+      <renderedName>Ruby</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Diamond</itemName>
+      <stackSize>50</stackSize>
+      <maxStackSize>250</maxStackSize>
+      <itemID>2661</itemID>
+      <gemSockets/>
+      <renderedName>Diamond</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Opal</itemName>
+      <stackSize>50</stackSize>
+      <maxStackSize>250</maxStackSize>
+      <itemID>2665</itemID>
+      <gemSockets/>
+      <renderedName>Opal</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Gold Ring</itemName>
+      <stackSize>1</stackSize>
+      <maxStackSize>1</maxStackSize>
+      <itemID>2469</itemID>
+      <gemSockets/>
+      <renderedName>Gold Ring</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Gold Ring</itemName>
+      <stackSize>1</stackSize>
+      <maxStackSize>1</maxStackSize>
+      <itemID>2469</itemID>
+      <gemSockets/>
+      <renderedName>Gold Ring</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Gold Ring</itemName>
+      <stackSize>1</stackSize>
+      <maxStackSize>1</maxStackSize>
+      <itemID>2469</itemID>
+      <gemSockets/>
+      <renderedName>Gold Ring</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Gold Ring</itemName>
+      <stackSize>1</stackSize>
+      <maxStackSize>1</maxStackSize>
+      <itemID>2469</itemID>
+      <gemSockets/>
+      <renderedName>Gold Ring</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Gold Ring</itemName>
+      <stackSize>1</stackSize>
+      <maxStackSize>1</maxStackSize>
+      <itemID>2469</itemID>
+      <gemSockets/>
+      <renderedName>Gold Ring</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Gold Ring</itemName>
+      <stackSize>1</stackSize>
+      <maxStackSize>1</maxStackSize>
+      <itemID>2469</itemID>
+      <gemSockets/>
+      <renderedName>Gold Ring</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Berserker&apos;s Essence</itemName>
+      <stackSize>1</stackSize>
+      <maxStackSize>1</maxStackSize>
+      <itemID>2454</itemID>
+      <gemSockets/>
+      <renderedName>Berserker&apos;s Essence</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Snow Ball</itemName>
+      <stackSize>100</stackSize>
+      <maxStackSize>250</maxStackSize>
+      <itemID>2068</itemID>
+      <gemSockets/>
+      <renderedName>Snow Ball</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>TIER6 Helmet</itemName>
+      <stackSize>1</stackSize>
+      <maxStackSize>1</maxStackSize>
+      <itemID>2502</itemID>
+      <gemSockets>
+        <utils.GemSocket/>
+      </gemSockets>
+      <renderedName>TIER6 Helmet</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>TIER6 Body</itemName>
+      <stackSize>1</stackSize>
+      <maxStackSize>1</maxStackSize>
+      <itemID>2503</itemID>
+      <gemSockets>
+        <utils.GemSocket/>
+        <utils.GemSocket/>
+      </gemSockets>
+      <renderedName>TIER6 Body</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>TIER6 Legguards</itemName>
+      <stackSize>1</stackSize>
+      <maxStackSize>1</maxStackSize>
+      <itemID>2504</itemID>
+      <gemSockets>
+        <utils.GemSocket/>
+        <utils.GemSocket/>
+        <utils.GemSocket/>
+      </gemSockets>
+      <renderedName>TIER6 Legguards</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>TIER6 Gloves</itemName>
+      <stackSize>1</stackSize>
+      <maxStackSize>1</maxStackSize>
+      <itemID>2506</itemID>
+      <gemSockets>
+        <utils.GemSocket/>
+        <utils.GemSocket/>
+        <utils.GemSocket/>
+        <utils.GemSocket/>
+      </gemSockets>
+      <renderedName>TIER6 Gloves</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>TIER6 Boots</itemName>
+      <stackSize>1</stackSize>
+      <maxStackSize>1</maxStackSize>
+      <itemID>2505</itemID>
+      <gemSockets>
+        <utils.GemSocket/>
+        <utils.GemSocket/>
+        <utils.GemSocket/>
+        <utils.GemSocket/>
+      </gemSockets>
+      <renderedName>TIER6 Boots</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>TIER6 Belt</itemName>
+      <stackSize>1</stackSize>
+      <maxStackSize>1</maxStackSize>
+      <itemID>2507</itemID>
+      <gemSockets>
+        <utils.GemSocket/>
+        <utils.GemSocket/>
+        <utils.GemSocket/>
+        <utils.GemSocket/>
+      </gemSockets>
+      <renderedName>TIER6 Belt</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Lunarium Crown</itemName>
+      <stackSize>1</stackSize>
+      <maxStackSize>1</maxStackSize>
+      <itemID>2278</itemID>
+      <gemSockets>
+        <utils.GemSocket/>
+      </gemSockets>
+      <renderedName>Sturdy Lunarium Crown</renderedName>
+      <bonuses>
+        <passivebonuses.PassiveBonusDefense>
+          <power>4.0</power>
+          <piecesRequiredToActivate>1</piecesRequiredToActivate>
+        </passivebonuses.PassiveBonusDefense>
+      </bonuses>
+      <auras/>
+      <affix class="affix.AffixSturdy">
+        <rng serialization="custom">
+          <java.util.Random>
+            <default>
+              <seed>164308843356355</seed>
+              <nextNextGaussian>0.0</nextNextGaussian>
+              <haveNextNextGaussian>false</haveNextNextGaussian>
+            </default>
+          </java.util.Random>
+        </rng>
+        <name>Sturdy</name>
+        <passives>
+          <passivebonuses.PassiveBonusDefense reference="../../../bonuses/passivebonuses.PassiveBonusDefense"/>
+        </passives>
+        <auras/>
+        <prefix>true</prefix>
+        <id>1</id>
+        <tier>1</tier>
+        <max>10</max>
+        <min>2</min>
+      </affix>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Lunarum Robe</itemName>
+      <stackSize>1</stackSize>
+      <maxStackSize>1</maxStackSize>
+      <itemID>2279</itemID>
+      <gemSockets>
+        <utils.GemSocket/>
+      </gemSockets>
+      <renderedName>Lunarum Robe</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Lunarium Pants</itemName>
+      <stackSize>1</stackSize>
+      <maxStackSize>1</maxStackSize>
+      <itemID>2280</itemID>
+      <gemSockets>
+        <utils.GemSocket/>
+      </gemSockets>
+      <renderedName>Lunarium Pants</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Lunarium Gloves</itemName>
+      <stackSize>1</stackSize>
+      <maxStackSize>1</maxStackSize>
+      <itemID>2282</itemID>
+      <gemSockets/>
+      <renderedName>Lunarium Gloves</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Lunarium Boots</itemName>
+      <stackSize>1</stackSize>
+      <maxStackSize>1</maxStackSize>
+      <itemID>2281</itemID>
+      <gemSockets/>
+      <renderedName>Lunarium Boots</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Lunarium Belt</itemName>
+      <stackSize>1</stackSize>
+      <maxStackSize>1</maxStackSize>
+      <itemID>2283</itemID>
+      <gemSockets/>
+      <renderedName>Lunarium Belt</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Gemcrafting table</itemName>
+      <stackSize>1</stackSize>
+      <maxStackSize>250</maxStackSize>
+      <itemID>81</itemID>
+      <gemSockets/>
+      <renderedName>Gemcrafting table</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Alchemy station</itemName>
+      <stackSize>1</stackSize>
+      <maxStackSize>250</maxStackSize>
+      <itemID>82</itemID>
+      <gemSockets/>
+      <renderedName>Alchemy station</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Eagle&apos;s Feather</itemName>
+      <stackSize>1</stackSize>
+      <maxStackSize>1</maxStackSize>
+      <itemID>2458</itemID>
+      <gemSockets/>
+      <renderedName>Eagle&apos;s Feather</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Wooden Arrow</itemName>
+      <stackSize>50</stackSize>
+      <maxStackSize>250</maxStackSize>
+      <itemID>2064</itemID>
+      <gemSockets/>
+      <renderedName>Wooden Arrow</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+    <utils.ItemStack>
+      <itemName>Rejuvenate</itemName>
+      <stackSize>1</stackSize>
+      <maxStackSize>1</maxStackSize>
+      <itemID>6145</itemID>
+      <gemSockets/>
+      <renderedName>Rejuvenate</renderedName>
+      <bonuses/>
+      <auras/>
+    </utils.ItemStack>
+  </mainInventory>
+  <armorInventory>
+    <null/>
+    <null/>
+    <null/>
+    <null/>
+    <null/>
+    <null/>
+    <null/>
+    <null/>
+    <null/>
+    <null/>
+  </armorInventory>
+  <quiver>
+    <null/>
+    <null/>
+    <null/>
+    <null/>
+  </quiver>
+</savable.SavablePlayer>

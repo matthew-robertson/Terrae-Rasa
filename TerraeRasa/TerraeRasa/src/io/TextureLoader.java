@@ -9,7 +9,6 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL11.glGenTextures;
 import static org.lwjgl.opengl.GL11.glTexImage2D;
 import static org.lwjgl.opengl.GL11.glTexParameteri;
-
 import items.Item;
 
 import java.awt.Color;
@@ -33,15 +32,12 @@ import java.util.Vector;
 
 import javax.swing.ImageIcon;
 
-
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 
 import render.Render;
 import spells.Spell;
-
 import utils.Texture;
-
 import blocks.Block;
 
 public class TextureLoader 

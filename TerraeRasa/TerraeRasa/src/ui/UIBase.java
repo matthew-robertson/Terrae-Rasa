@@ -4,7 +4,7 @@ import java.awt.Font;
 
 import render.Render;
 import render.TrueTypeFont;
-import utils.ItemStack;
+import utils.DisplayableItemStack;
 
 /**
  * UIBase holds common variables that the entire UI shares.
@@ -24,14 +24,14 @@ public class UIBase extends Render
 	//Variables for the item picked up by the mouse:
 	protected static boolean shouldDropItem;
 	protected static int mouseItemSize; //How big it is
-	protected static ItemStack mouseItem; //What it is
+	protected static DisplayableItemStack mouseItem; //What it is
 	protected static int mouseXOffset; //How far it should be adjusted to avoid looking bad
 	protected static int mouseYOffset;	
 	//Socket Window Variables
 	protected static boolean isSocketWindowOpen;
 	protected static boolean socketItemEquipped;
 	protected static int socketItemIndex;
-	protected static ItemStack socketedItem;
+	protected static DisplayableItemStack socketedItem;
 	
 	public static void init()
 	{

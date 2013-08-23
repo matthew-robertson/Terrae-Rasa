@@ -14,13 +14,13 @@ public class GemSocket
 		implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	private ItemStack gem;
+	private DisplayableItemStack gem;
 	
 	/**
 	 * Sockets the given ItemGem, replacing whatever gem is currently held.
 	 * @param gem the ItemGem to socket
 	 */
-	public void socket(ItemStack gem)
+	public void socket(DisplayableItemStack gem)
 	{
 		this.gem = gem;
 	}	
@@ -29,7 +29,7 @@ public class GemSocket
 	 * Gets the ItemGem stored in this GemSocket. This will be null if none is stored in it.
 	 * @return the ItemGem stored in this socket; or null if there is none.
 	 */
-	public ItemStack getGem()
+	public DisplayableItemStack getGem()
 	{
 		return gem;
 	}

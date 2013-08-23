@@ -19,7 +19,6 @@ import org.lwjgl.opengl.PixelFormat;
 import render.Render;
 import server.ClientConnectionThread;
 import world.World;
-import entities.EntityPlayer;
 
 /**
  * TerraeRasa.java defines the entry class of the application. After calling the main method of the program,
@@ -51,7 +50,6 @@ public class TerraeRasa
 	public static TerraeRasa terraeRasa;
 	public final GameEngine gameEngine;
 	private ClientConnectionThread thread;
-
 	
 	/**
 	 * Creates a new instance of the container for all game objects, and a new GameEngine. 
@@ -290,9 +288,9 @@ public class TerraeRasa
 	/**
 	 * Calls the startGame(World, EntityPlayer) method of the GameEngine.
 	 */
-	public static void startGame(String universeName, World world, EntityPlayer player)
+	public static void startGame(String universeName, World world, String playerName)
 	{
-		terraeRasa.gameEngine.startGame(universeName, world, player);
+		terraeRasa.gameEngine.startGame(universeName, world, playerName);
 	}
 	
 	public static void startMPGame()

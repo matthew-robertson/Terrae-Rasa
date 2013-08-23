@@ -14,20 +14,20 @@ import blocks.Block;
 public class Recipe 
 {
 	/** What the recipe yields */
-	private ItemStack result; 
+	private DisplayableItemStack result; 
 	/** What the recipe requires. */
-	private ItemStack[] recipe; 
+	private DisplayableItemStack[] recipe; 
 	/** The block that has to be nearby to craft this. Block.none indicates no nearby block is needed. */
 	private Block requiredBlock;
 	
 	/**
 	 * Creates a new Recipe and registers it in the RecipeManager.
 	 * @param manager the RecipeManager to register this Recipe in
-	 * @param result the ItemStack result of this Recipe
+	 * @param result the DisplayableItemStack result of this Recipe
 	 * @param requiredBlock the required nearby Block to craft this Recipe - Block.none means no nearby Block requirement
 	 * @param stacks the materials required to craft this Recipe
 	 */
-	public Recipe(RecipeManager manager, ItemStack result, Block requiredBlock, ItemStack[] stacks)
+	public Recipe(RecipeManager manager, DisplayableItemStack result, Block requiredBlock, DisplayableItemStack[] stacks)
 	{
 		this.recipe = stacks;
 		this.result = result;
@@ -35,12 +35,12 @@ public class Recipe
 		manager.registerRecipe(this);
 	}
 	
-	public final ItemStack getResult()
+	public final DisplayableItemStack getResult()
 	{
-		return new ItemStack(result);
+		return new DisplayableItemStack(result);
 	}
 	
-	public final ItemStack[] getRecipe()
+	public final DisplayableItemStack[] getRecipe()
 	{
 		return recipe;
 	}
@@ -52,7 +52,7 @@ public class Recipe
 	
 	/**
 	 * Overrides Object.toString() for slightly improved naming. toString() now returns the name of the 
-	 * resulting ItemStack.
+	 * resulting DisplayableItemStack.
 	 */
 	public String toString()
 	{

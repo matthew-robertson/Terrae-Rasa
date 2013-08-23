@@ -3,24 +3,21 @@ package ui;
 import items.Item;
 import items.ItemArmor;
 
-import java.awt.Font;
 import java.util.Vector;
 
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
-import passivebonuses.PassiveBonus;
-import passivebonuses.PassiveBonusDefense;
+import passivebonuses.DisplayablePassiveBonus;
 
 import render.TrueTypeFont;
 import spells.Spell;
-import statuseffects.StatusEffect;
+import statuseffects.DisplayableStatusEffect;
 import utils.ActionbarItem;
-import utils.ItemStack;
+import utils.DisplayableItemStack;
 import utils.MathHelper;
 import world.World;
 import blocks.Block;
-import client.TerraeRasa;
 import entities.EntityPlayer;
 import enums.EnumColor;
 import enums.EnumItemQuality;
@@ -30,9 +27,9 @@ public class UITooltips extends UIBase
 	/**
 	 * Checks to see if the mouse is hovering over something that needs to have a tooltip rendered.
 	 * Will return null if nothing appropriate is found.
-	 * @return an appropriate ItemStack to render, or null if none is found
+	 * @return an appropriate DisplayableItemStack to render, or null if none is found
 	 */
-	private static ItemStack getTooltipStack(World world, EntityPlayer player, int mouseX, int mouseY)
+	private static DisplayableItemStack getTooltipStack(World world, EntityPlayer player, int mouseX, int mouseY)
 	{	
 		int index = -1;
 		//Inventory
@@ -56,7 +53,7 @@ public class UITooltips extends UIBase
 			return player.inventory.getTrashStack(index);
 		}
 		
-		ItemStack stack = null;
+		DisplayableItemStack stack = null;
 		//Recipe slider stuff
 		if((stack = UIInventory.getMouseoverRecipeSliderStack(player, mouseX, mouseY)) != null)
 		{
@@ -76,11 +73,11 @@ public class UITooltips extends UIBase
 	}	
 	
 	/**
-	 * Gets the quality of the ItemStack the mouse is hovering over. 
-	 * @param stack the ItemStack being hovered over
-	 * @return the quality of the ItemStack being hovered over
+	 * Gets the quality of the DisplayableItemStack the mouse is hovering over. 
+	 * @param stack the DisplayableItemStack being hovered over
+	 * @return the quality of the DisplayableItemStack being hovered over
 	 */
-	private static EnumItemQuality getQuality(ItemStack stack)
+	private static EnumItemQuality getQuality(DisplayableItemStack stack)
 	{
 		if(stack.getItemID() >= Item.itemIndex && stack.getItemID() < ActionbarItem.spellIndex)
 		{
@@ -90,11 +87,11 @@ public class UITooltips extends UIBase
 	}
 
 	/**
-	 * Gets the fulltooltip of the ItemStack the mouse is hovering over. 
-	 * @param stack the ItemStack being hovered over
-	 * @return the fulltooltip of the ItemStack being hovered over
+	 * Gets the fulltooltip of the DisplayableItemStack the mouse is hovering over. 
+	 * @param stack the DisplayableItemStack being hovered over
+	 * @return the fulltooltip of the DisplayableItemStack being hovered over
 	 */
-	private static String getFullTooltip(ItemStack stack)
+	private static String getFullTooltip(DisplayableItemStack stack)
 	{
 		if(stack.getItemID() >= Item.itemIndex && stack.getItemID() < ActionbarItem.spellIndex)
 		{
@@ -111,11 +108,11 @@ public class UITooltips extends UIBase
 	}
 	
 	/**
-	 * Gets the stats of the ItemStack the mouse is hovering over. 
-	 * @param stack the ItemStack being hovered over
-	 * @return the stats of the ItemStack being hovered over
+	 * Gets the stats of the DisplayableItemStack the mouse is hovering over. 
+	 * @param stack the DisplayableItemStack being hovered over
+	 * @return the stats of the DisplayableItemStack being hovered over
 	 */
-	private static String[] getStats(ItemStack stack)
+	private static String[] getStats(DisplayableItemStack stack)
 	{
 		if(stack.getItemID() >= Item.itemIndex && stack.getItemID() < ActionbarItem.spellIndex)
 		{
@@ -125,11 +122,11 @@ public class UITooltips extends UIBase
 	}
 	
 	/**
-	 * Gets the passive bonuses of the ItemStack the mouse is hovering over. 
-	 * @param stack the ItemStack being hovered over
-	 * @return the passive bonuses of the ItemStack being hovered over
+	 * Gets the passive bonuses of the DisplayableItemStack the mouse is hovering over. 
+	 * @param stack the DisplayableItemStack being hovered over
+	 * @return the passive bonuses of the DisplayableItemStack being hovered over
 	 */
-	private static String[] getBonuses(ItemStack stack)
+	private static String[] getBonuses(DisplayableItemStack stack)
 	{
 		Vector<String> bonusesVector = new Vector<String>();
 		if(stack.getItemID() >= Item.itemIndex && stack.getItemID() < ActionbarItem.spellIndex && Item.itemsList[stack.getItemID()] instanceof ItemArmor)
@@ -159,12 +156,12 @@ public class UITooltips extends UIBase
 	}
 
 	/**
-	 * Gets the active set bonuses of the ItemStack the mouse is currently hovering over. This must be a piece of armour
+	 * Gets the active set bonuses of the DisplayableItemStack the mouse is currently hovering over. This must be a piece of armour
 	 * @param player the player to whom this UI belongs
-	 * @param stack the ItemStack being hovered over
-	 * @return the active set bonuses of the ItemStack being hovered over
+	 * @param stack the DisplayableItemStack being hovered over
+	 * @return the active set bonuses of the DisplayableItemStack being hovered over
 	 */
-	private static boolean[] getActiveBonuses(EntityPlayer player, ItemStack stack)
+	private static boolean[] getActiveBonuses(EntityPlayer player, DisplayableItemStack stack)
 	{
 		if(stack.getItemID() >= Item.itemIndex && stack.getItemID() < ActionbarItem.spellIndex && Item.itemsList[stack.getItemID()] instanceof ItemArmor)
 		{
@@ -174,12 +171,12 @@ public class UITooltips extends UIBase
 	}
 	
 	/**
-	 * Gets the cooldown of the ItemStack the mouse is currently hovering over. This may not be applicable, in which case a blank string is yielded.
+	 * Gets the cooldown of the DisplayableItemStack the mouse is currently hovering over. This may not be applicable, in which case a blank string is yielded.
 	 * @param player the player to whom this UI belongs
-	 * @param stack the ItemStack being hovered over
-	 * @return the cooldown of the ItemStack being hovered over if applicable
+	 * @param stack the DisplayableItemStack being hovered over
+	 * @return the cooldown of the DisplayableItemStack being hovered over if applicable
 	 */
-	private static String getCooldown(EntityPlayer player, ItemStack stack)
+	private static String getCooldown(EntityPlayer player, DisplayableItemStack stack)
 	{
 		return (player.isOnCooldown(stack.getItemID())) ? "Remaining Cooldown: " + (player.getTicksLeftOnCooldown(stack.getItemID()) / 20) : "";
 	}
@@ -243,42 +240,20 @@ public class UITooltips extends UIBase
 		return temp;
 	}
 	
-	private static String getTotalArmor(EntityPlayer player, ItemStack stack, EnumColor color)
+	private static String getTotalArmor(EntityPlayer player, DisplayableItemStack stack, EnumColor color)
 	{
-		Vector<PassiveBonus> bonusesVector = new Vector<PassiveBonus>();
-		if(stack.getItemID() >= Item.itemIndex && stack.getItemID() < ActionbarItem.spellIndex && Item.itemsList[stack.getItemID()] instanceof ItemArmor)
-		{
-			for(PassiveBonus bonus : ((ItemArmor)(Item.itemsList[stack.getItemID()])).getBonuses())
-			{
-				bonusesVector.add(bonus);
-			}
-		}
-		for(PassiveBonus bonus : stack.getBonuses())
-		{
-			bonusesVector.add(bonus);
-		}
-		
 		int totalArmor = ((ItemArmor)(Item.itemsList[stack.getItemID()])).getDefense(); 
-		for(PassiveBonus bonus : bonusesVector)
-		{
-			if(bonus instanceof PassiveBonusDefense)
-			{
-				color = EnumColor.LIME_GREEN;
-				totalArmor += bonus.getPower();
-			}
-		}
-		
 		return (totalArmor > 0) ? "  " + totalArmor : "";
 	}
 	
-	private static String[] getSetBonuses(ItemStack stack)
+	private static String[] getSetBonuses(DisplayableItemStack stack)
 	{
 		Vector<String> bonusesVector = new Vector<String>();
 		if(stack.getItemID() >= Item.itemIndex && stack.getItemID() < ActionbarItem.spellIndex && Item.itemsList[stack.getItemID()] instanceof ItemArmor)
 		{
-			PassiveBonus[] bonuses = ((ItemArmor)(Item.itemsList[stack.getItemID()])).getTierBonuses();
+			DisplayablePassiveBonus[] bonuses = ((ItemArmor)(Item.itemsList[stack.getItemID()])).getTierBonuses();
 			bonusesVector.add(((ItemArmor)(Item.itemsList[stack.getItemID()])).getTierName());
-			for(PassiveBonus bonus : bonuses)
+			for(DisplayablePassiveBonus bonus : bonuses)
 			{
 				String setRequirement = "(" + bonus.getPiecesRequiredToActivate() + ") Set: ";
 				bonusesVector.add(setRequirement);
@@ -302,20 +277,20 @@ public class UITooltips extends UIBase
 		int x = MathHelper.getCorrectMouseXPosition();
 		int y = MathHelper.getCorrectMouseYPosition();	
 		
-		ItemStack stack = getTooltipStack(world, player, x, y);
+		DisplayableItemStack stack = getTooltipStack(world, player, x, y);
 		if(stack != null)
 		{
-			renderItemStackTooltip(player, stack);
+			renderDisplayableItemStackTooltip(player, stack);
 		}
 		
-		StatusEffect effect = UIStatusEffects.getMouseoverStatusEffect(x, y);
+		DisplayableStatusEffect effect = UIStatusEffects.getMouseoverStatusEffect(x, y);
 		if(effect != null)
 		{
 			renderStatusEffectTooltip(player, effect);
 		}
 	}
 	
-	private static void renderItemStackTooltip(EntityPlayer player, ItemStack stack)
+	private static void renderDisplayableItemStackTooltip(EntityPlayer player, DisplayableItemStack stack)
 	{
 		if(player.isInventoryOpen && mouseItem == null)
 		{
@@ -544,7 +519,7 @@ public class UITooltips extends UIBase
 		}
 	}
 	
-	private static void renderStatusEffectTooltip(EntityPlayer player, StatusEffect effect)
+	private static void renderStatusEffectTooltip(EntityPlayer player, DisplayableStatusEffect effect)
 	{
 		//Variables to help determine where and how wide the frame/text will be, as well as text colour.
 		int tooltipWidth = 185;

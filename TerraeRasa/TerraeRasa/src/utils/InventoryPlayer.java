@@ -27,7 +27,7 @@ import entities.EntityPlayer;
  * 
  * <br><br>
  * 
- * V1.1: All changes to the armour inventory should go through {@link #setArmorInventoryStack(EntityPlayer, ItemStack, int)} now. 
+ * V1.1: All changes to the armour inventory should go through {@link #setArmorInventoryStack(EntityPlayer, DisplayableItemStack, int)} now. 
  * This is to ensure that player stats get updated appropriately.
  * 
  * <br><br>
@@ -42,8 +42,8 @@ public class InventoryPlayer
 {
 	private static final long serialVersionUID = 1L;
 	private Hashtable<String, Integer> inventoryTotals;
-	private ItemStack[] trash;
-	private ItemStack[] mainInventory;
+	private DisplayableItemStack[] trash;
+	private DisplayableItemStack[] mainInventory;
 	/**
 	 * Slots are in order (the actual index can be found by subtracting 1 from the number next to that piece of
 	 * armor): <br>
@@ -60,8 +60,8 @@ public class InventoryPlayer
 	 * <li> Accessories </li>
 	 * </ol>
 	 */
-	private ItemStack[] armorInventory;		
-	private ItemStack[] quiver; 
+	private DisplayableItemStack[] armorInventory;		
+	private DisplayableItemStack[] quiver; 
 	public static final int HELMET_INDEX = 0;
 	public static final int BODY_INDEX = 1;
 	public static final int BELT_INDEX = 2;
@@ -80,11 +80,25 @@ public class InventoryPlayer
 	 */
 	public InventoryPlayer()
 	{
-		mainInventory = new ItemStack[48];
-		armorInventory = new ItemStack[10];
-		trash = new ItemStack[1];
-		quiver = new ItemStack[4];
+		mainInventory = new DisplayableItemStack[48];
+		armorInventory = new DisplayableItemStack[10];
+		trash = new DisplayableItemStack[1];
+		quiver = new DisplayableItemStack[4];
 		initializeInventoryTotals(false);	
+	}
+	
+	/**
+	 * Constructs an InventoryPlayer with the given DisplayableItemStack[] for main, armor, and quiver inventories
+	 * @param mainInventory an DisplayableItemStack[] of length 48 representing the mainInventory
+	 * @param armorInventory an DisplayableItemStack[] of length 10 representing the armorInventory
+	 * @param quiver an DisplayableItemStack[] of length 4 representing the quiver
+	 */
+	public InventoryPlayer(DisplayableItemStack[] mainInventory, DisplayableItemStack[] armorInventory, DisplayableItemStack[] quiver)
+	{
+		this.mainInventory = mainInventory;
+		this.armorInventory = armorInventory;
+		trash = new DisplayableItemStack[1];
+		this.quiver = quiver;
 	}
 	
 	/**
@@ -94,6 +108,7 @@ public class InventoryPlayer
 	{
 		if(isReloaded)
 		{
+			inventoryTotals = new Hashtable<String, Integer>();
 			for(int i = 0; i < Item.itemsList.length; i++) //Items
 			{
 				if(Item.itemsList[i] != null && inventoryTotals.get(Item.itemsList[i].getName()) == null) //A new Item needs added 
@@ -182,11 +197,11 @@ public class InventoryPlayer
 	}
 	
 	/**
-	 * Checks for a partial ItemStack in the inventory
+	 * Checks for a partial DisplayableItemStack in the inventory
 	 * @param stack the stack to check for
 	 * @return the mainInventory[] slot containing the item, or -1 if the check failed
 	 */
-	public int doesPartialStackExist(ItemStack stack)
+	public int doesPartialStackExist(DisplayableItemStack stack)
 	{
 		for(int i = 0; i < mainInventory.length; i++)
 		{
@@ -212,17 +227,15 @@ public class InventoryPlayer
 	}
 	
 	/**
-	 * Attempts to pick up an ItemStack
+	 * Attempts to pick up an DisplayableItemStack
 	 * @param stack Stack to pick up
 	 * @return whatever's left, or null for a successful operation
 	 */
-	public ItemStack pickUpItemStack(World world, EntityPlayer player, ItemStack stack)
+	public DisplayableItemStack pickUpItemStack(World world, EntityPlayer player, DisplayableItemStack stack)
 	{
 		int slot;
 		int size = stack.getStackSize();
-		
-		player.onInventoryChange();		
-		
+				
 		if((slot = doesPartialStackExist(stack)) != -1) //Is there already a partial stack of the item?
 		{
 			player.changedInventorySlots.add("i " + slot);
@@ -258,7 +271,7 @@ public class InventoryPlayer
 					player.changedInventorySlots.add("i " + slot);
 					if(size > stack.getMaxStackSize()) //Is there more than a stack of the item? if so loop again
 					{
-						mainInventory[slot] = new ItemStack(stack.getItemID(), stack.getStackSize());
+						mainInventory[slot] = new DisplayableItemStack(stack.getItemID(), stack.getStackSize());
 						mainInventory[slot].setStackSize(stack.getMaxStackSize());
 						inventoryTotals.put(mainInventory[slot].getItemName(), inventoryTotals.get(mainInventory[slot].getItemName()) + mainInventory[slot].getStackSize());						
 						size -= stack.getMaxStackSize();
@@ -266,7 +279,7 @@ public class InventoryPlayer
 					}
 					else //If not, put what's left of the stack in the inventory and return
 					{
-						mainInventory[slot] = new ItemStack(stack);
+						mainInventory[slot] = new DisplayableItemStack(stack);
 						mainInventory[slot].setStackSize(size);
 						inventoryTotals.put(mainInventory[slot].getItemName(), inventoryTotals.get(mainInventory[slot].getItemName()) + size);
 						size = 0;
@@ -281,11 +294,11 @@ public class InventoryPlayer
 	}
 
 	/**
-	 * Checks for a partial ItemStack in the quiver
+	 * Checks for a partial DisplayableItemStack in the quiver
 	 * @param stack the stack to check for
 	 * @return the quiver[] slot containing the item, or -1 if the check failed
 	 */
-	public int doesPartialQuiverStackExist(ItemStack stack)
+	public int doesPartialQuiverStackExist(DisplayableItemStack stack)
 	{
 		for(int i = 0; i < quiver.length; i++)
 		{
@@ -318,15 +331,14 @@ public class InventoryPlayer
 	}
 
 	/**
-	 * Attempts to place an ItemStack it into the appropriate armour slot.
+	 * Attempts to place an DisplayableItemStack it into the appropriate armour slot.
 	 * @param stack Stack to pick up
 	 * @return whatever's left, or null for a successful operation
 	 */
-	public ItemStack pickUpArmorItemStack(World world, EntityPlayer player, ItemStack stack)
+	public DisplayableItemStack pickUpArmorDisplayableItemStack(World world, EntityPlayer player, DisplayableItemStack stack)
 	{
 		Item item = (ItemArmor)(Item.itemsList[stack.getItemID()]);
-		player.onArmorChange();
-		
+				
 		if(item instanceof ItemArmorHelmet && armorInventory[0] == null)
 		{
 			player.changedInventorySlots.add("a 0");
@@ -392,16 +404,14 @@ public class InventoryPlayer
 	}
 
 	/**
-	 * Attempts to place an ItemStack into the quiver.
+	 * Attempts to place an DisplayableItemStack into the quiver.
 	 * @param stack Stack to pick up
 	 * @return whatever's left, or null for a successful operation
 	 */
-	public ItemStack pickUpQuiverItemStack(World world, EntityPlayer player, ItemStack stack)
+	public DisplayableItemStack pickUpQuiverDisplayableItemStack(World world, EntityPlayer player, DisplayableItemStack stack)
 	{
 		int slot;
 		int size = stack.getStackSize();
-		
-		player.onQuiverChange();		
 		
 		if((slot = doesPartialQuiverStackExist(stack)) != -1) //Is there already a partial stack of the item?
 		{
@@ -435,14 +445,14 @@ public class InventoryPlayer
 					player.changedInventorySlots.add("q " + slot);
 					if(size > stack.getMaxStackSize()) //Is there more than a stack of the item? if so loop again
 					{
-						quiver[slot] = new ItemStack(stack.getItemID(), stack.getStackSize());
+						quiver[slot] = new DisplayableItemStack(stack.getItemID(), stack.getStackSize());
 						quiver[slot].setStackSize(stack.getMaxStackSize());
 						size -= stack.getMaxStackSize();
 						continue;
 					}
 					else //If not, put what's left of the stack in the inventory and return
 					{
-						quiver[slot] = new ItemStack(stack.getItemID(), stack.getStackSize());
+						quiver[slot] = new DisplayableItemStack(stack.getItemID(), stack.getStackSize());
 						quiver[slot].setStackSize(size);
 						size = 0;
 						return null;
@@ -460,12 +470,11 @@ public class InventoryPlayer
 	 * @param stack stack to try to remove (including # to remove)
 	 * @return success of the removal
 	 */
-	public boolean removeItemsFromInventory(EntityPlayer player, ItemStack stack)
+	public boolean removeItemsFromInventory(EntityPlayer player, DisplayableItemStack stack)
 	{
 		int quantity = stack.getStackSize();
 		boolean[] nullSlots = new boolean[mainInventory.length];
 		boolean removeItems = false;
-		player.onInventoryChange();
 		
 		for(int i = 0; i < mainInventory.length; i++)
 		{
@@ -524,7 +533,6 @@ public class InventoryPlayer
 	{
 		if(howMany < mainInventory[index].getStackSize())
 		{
-			player.onInventoryChange();
 			player.changedInventorySlots.add("i " + index);
 			mainInventory[index].removeFromStack(howMany);
 			inventoryTotals.put(mainInventory[index].getItemName(), inventoryTotals.get(mainInventory[index].getItemName()) - howMany); //adjust totals
@@ -532,7 +540,6 @@ public class InventoryPlayer
 		}
 		else if(howMany == mainInventory[index].getStackSize())
 		{
-			player.onInventoryChange();
 			player.changedInventorySlots.add("i " + index);
 			mainInventory[index].removeFromStack(howMany);
 			inventoryTotals.put(mainInventory[index].getItemName(), inventoryTotals.get(mainInventory[index].getItemName()) - howMany); //adjust totals
@@ -548,22 +555,19 @@ public class InventoryPlayer
 	 */
 	public void removeEntireStackFromInventory(World world, EntityPlayer player, int index)
 	{
-		player.onInventoryChange();
 		inventoryTotals.put(mainInventory[index].getItemName(), inventoryTotals.get(mainInventory[index].getItemName()) - mainInventory[index].getStackSize()); 
 		mainInventory[index] = null;
 		player.changedInventorySlots.add("i " + index);
 	}
 	
 	/**
-	 * Tries to place an ItemStack in the selected index of the mainInventory[]
+	 * Tries to place an DisplayableItemStack in the selected index of the mainInventory[]
 	 * @param stack stack to place in mainInventory[]
 	 * @param index where to place the stack in mainInventory[]
 	 * @return success of the operation
 	 */
-	public boolean putItemStackInSlot(World world, EntityPlayer player, ItemStack stack, int index)
+	public boolean putDisplayableItemStackInSlot(World world, EntityPlayer player, DisplayableItemStack stack, int index)
 	{
-		player.onInventoryChange();
-
 		//the stack to be placed is null, so clear the slot in mainInventory[] (this has to get a bit hacky for control reasons)
 		if(stack == null && mainInventory[index] != null) 
 		{
@@ -575,21 +579,20 @@ public class InventoryPlayer
 		{
 			player.changedInventorySlots.add("i " + index);
 			inventoryTotals.put(stack.getItemName(), inventoryTotals.get(stack.getItemName()) + stack.getStackSize());		
-			mainInventory[index] = new ItemStack(stack);	
+			mainInventory[index] = new DisplayableItemStack(stack);	
 		}
 
 		return true;
 	}
 	
 	/**
-	 * Attempts to combine two ItemStack in the mainInventory
+	 * Attempts to combine two DisplayableItemStack in the mainInventory
 	 * @param stack stack to combine with the current one
 	 * @param index where to combine stacks in mainInventory[]
 	 * @return success of operation
 	 */
-	public boolean combineItemStacksInSlot(World world, EntityPlayer player, ItemStack stack, int index)
+	public boolean combineDisplayableItemStacksInSlot(World world, EntityPlayer player, DisplayableItemStack stack, int index)
 	{
-		player.onInventoryChange();
 		if(mainInventory[index] == null || mainInventory[index].getItemID() != stack.getItemID())
 		{	
 			return false;
@@ -603,35 +606,23 @@ public class InventoryPlayer
 	}
 	
 	/**
-	 * Tries to place an ItemStack in the selected index of the armorInventory[]. If null is given as an itemstack
+	 * Tries to place an DisplayableItemStack in the selected index of the armorInventory[]. If null is given as an itemstack
 	 * then whatever is in that itemstack will be removed. Use this to remove or add armour from the armorInventory[]
 	 * and update player stats.
 	 * @param stack stack to place in armorInventory[]
 	 * @param index where to place the stack in armorInventory[]
 	 * @return success of the operation
 	 */
-	public boolean setArmorInventoryStack(EntityPlayer player, ItemStack newStack, ItemStack oldStack, int index)
+	public boolean setArmorInventoryStack(EntityPlayer player, DisplayableItemStack newStack, DisplayableItemStack oldStack, int index)
 	{
-		player.onArmorChange();
 		player.changedInventorySlots.add("a " + index);
 		if(newStack == null)
 		{
-			//If a piece of armor is being removed, then ensure its stats are appropriately neutralized
-			if(armorInventory[index] != null)
-			{
-				player.removeSingleArmorItem((ItemArmor)(Item.itemsList[armorInventory[index].getItemID()]), oldStack, index);
-			}
 			armorInventory[index] = null;
 		}
 		else
 		{
-			if(armorInventory[index] != null)
-			{
-				player.removeSingleArmorItem((ItemArmor)(Item.itemsList[armorInventory[index].getItemID()]), oldStack, index);
-			}
-			armorInventory[index] = new ItemStack(newStack);
-			//Apply a newly added armour piece's stats
-			player.applySingleArmorItem((ItemArmor)(Item.itemsList[newStack.getItemID()]), newStack, index);
+			armorInventory[index] = new DisplayableItemStack(newStack);
 		}
 		return true;
 	}
@@ -653,12 +644,12 @@ public class InventoryPlayer
 	}
 	
 	/**
-	 * Tries to place an ItemStack in the selected index of the trashInventory[]
+	 * Tries to place an DisplayableItemStack in the selected index of the trashInventory[]
 	 * @param stack stack to place in trashInventory[]
 	 * @param index where to place the stack in trashInventory[]
 	 * @return success of the operation
 	 */
-	public boolean setTrashStack(ItemStack stack, int index)
+	public boolean setTrashStack(DisplayableItemStack stack, int index)
 	{		
 		if(stack == null)
 		{
@@ -666,7 +657,7 @@ public class InventoryPlayer
 		}
 		else
 		{
-			trash[index] = new ItemStack(stack);
+			trash[index] = new DisplayableItemStack(stack);
 		}
 		return true;
 	}
@@ -676,7 +667,7 @@ public class InventoryPlayer
 	 * is attempted using this method
 	 * @return the mainInventory[] array
 	 */
-	public final ItemStack[] getMainInventory()
+	public final DisplayableItemStack[] getMainInventory()
 	{
 		return mainInventory;
 	}
@@ -686,49 +677,49 @@ public class InventoryPlayer
 	 * is attempted using this method
 	 * @return the armorInventory[] array
 	 */
-	public final ItemStack[] getArmorInventory()
+	public final DisplayableItemStack[] getArmorInventory()
 	{
 		return armorInventory;
 	}
 
 	/**
 	 * Volatile function to return the trash[]. Very vulnerable to pointer issues if modification to trash[]
-	 * is attempted using this method. Currently this should return an ItemStack[] of size 1 all the time.
+	 * is attempted using this method. Currently this should return an DisplayableItemStack[] of size 1 all the time.
 	 * @return the trash[] array
 	 */
-	public final ItemStack[] getTrash()
+	public final DisplayableItemStack[] getTrash()
 	{
 		return trash;
 	}
 	
 	/**
-	 * Gets a reference safe ItemStack from the mainInventory[] 
+	 * Gets a reference safe DisplayableItemStack from the mainInventory[] 
 	 * @param index the slot of mainInventory[] to return.
-	 * @return a pointer(reference) safe ItemStack at the specified index of mainInventory[] or null if nothing is there
+	 * @return a pointer(reference) safe DisplayableItemStack at the specified index of mainInventory[] or null if nothing is there
 	 */
-	public final ItemStack getMainInventoryStack(int index)
+	public final DisplayableItemStack getMainInventoryStack(int index)
 	{
-		return  (mainInventory[index] != null) ? new ItemStack(mainInventory[index]) : null;
+		return  (mainInventory[index] != null) ? new DisplayableItemStack(mainInventory[index]) : null;
 	}
 		
 	/**
-	 * Gets a reference safe ItemStack from the armorInventory[] 
+	 * Gets a reference safe DisplayableItemStack from the armorInventory[] 
 	 * @param index the slot of armorInventory[] to return.
-	 * @return a pointer(reference) safe ItemStack at the specified index of armorInventory[] or null if nothing is there
+	 * @return a pointer(reference) safe DisplayableItemStack at the specified index of armorInventory[] or null if nothing is there
 	 */
-	public final ItemStack getArmorInventoryStack(int index)
+	public final DisplayableItemStack getArmorInventoryStack(int index)
 	{
-		return  (armorInventory[index] != null) ? new ItemStack(armorInventory[index]) : null;
+		return  (armorInventory[index] != null) ? new DisplayableItemStack(armorInventory[index]) : null;
 	}
 		
 	/**
-	 * Gets a reference safe ItemStack from the trash[]
+	 * Gets a reference safe DisplayableItemStack from the trash[]
 	 * @param index the slot of trash[] to return.
-	 * @return a pointer(reference) safe ItemStack at the specified index trash[] or null if nothing is there
+	 * @return a pointer(reference) safe DisplayableItemStack at the specified index trash[] or null if nothing is there
 	 */
-	public final ItemStack getTrashStack(int index)
+	public final DisplayableItemStack getTrashStack(int index)
 	{
-		return  (trash[index] != null) ? new ItemStack(trash[index]) : null;
+		return  (trash[index] != null) ? new DisplayableItemStack(trash[index]) : null;
 	}
 	
 	/**
@@ -763,7 +754,6 @@ public class InventoryPlayer
 			{
 				if(((ItemArmor)(Item.itemsList[armorInventory[i].getItemID()])).getIsSavingRelic())
 				{
-					player.onArmorChange();
 					player.changedInventorySlots.add("a " + i);
 					setArmorInventoryStack(player, null, armorInventory[i], i);
 					return;
@@ -777,7 +767,7 @@ public class InventoryPlayer
 	 * is attempted using this method
 	 * @return the quiver[] array
 	 */
-	public final ItemStack[] getQuiver()
+	public final DisplayableItemStack[] getQuiver()
 	{
 		return quiver;
 	}
@@ -792,15 +782,14 @@ public class InventoryPlayer
 	}
 	
 	/**
-	 * Tries to place an ItemStack in the selected index of the quiver[]. Passing a null ItemStack will clear that slot
+	 * Tries to place an DisplayableItemStack in the selected index of the quiver[]. Passing a null DisplayableItemStack will clear that slot
 	 * of the quiver[].
 	 * @param stack stack to place in quiver[]
 	 * @param index where to place the stack in quiver[]
 	 * @return success of the operation
 	 */
-	public boolean setQuiverStack(EntityPlayer player, ItemStack stack, int index)
+	public boolean setQuiverStack(EntityPlayer player, DisplayableItemStack stack, int index)
 	{
-		player.onQuiverChange();
 		player.changedInventorySlots.add("q " + index);
 		if(stack == null)
 		{
@@ -808,15 +797,15 @@ public class InventoryPlayer
 		}
 		else
 		{
-			quiver[index] = new ItemStack(stack);
+			quiver[index] = new DisplayableItemStack(stack);
 		}
 		return true;
 	}
 	
 	/**
 	 * Adjusts the stacksize of an Itemstack in the mainInventory[]. This will do nothing if that stack is null.
-	 * @param index the index of the ItemStack in the mainInventory[]
-	 * @param newStackSize the new stacksize of the ItemStack
+	 * @param index the index of the DisplayableItemStack in the mainInventory[]
+	 * @param newStackSize the new stacksize of the DisplayableItemStack
 	 */
 	public void adjustMainInventoryStackSize(EntityPlayer player, int index, int newStackSize)
 	{
@@ -824,7 +813,6 @@ public class InventoryPlayer
 		{
 			//The change in stack size. A positive number is an increase, negative number a 
 			//decrease overall.
-			player.onInventoryChange();
 			player.changedInventorySlots.add("i " + index);
 			int differenceInStackSize = newStackSize - mainInventory[index].getStackSize();			
 			inventoryTotals.put(mainInventory[index].getItemName(), 
@@ -834,24 +822,23 @@ public class InventoryPlayer
 	}
 	
 	/**
-	 * Gets a reference safe ItemStack from the quiver[] 
+	 * Gets a reference safe DisplayableItemStack from the quiver[] 
 	 * @param index the slot of quiver[] to return.
-	 * @return a pointer(reference) safe ItemStack at the specified index of quiver[] or null if nothing is there
+	 * @return a pointer(reference) safe DisplayableItemStack at the specified index of quiver[] or null if nothing is there
 	 */
-	public final ItemStack getQuiverStack(int index)
+	public final DisplayableItemStack getQuiverStack(int index)
 	{
-		return  (quiver[index] != null) ? new ItemStack(quiver[index]) : null;
+		return  (quiver[index] != null) ? new DisplayableItemStack(quiver[index]) : null;
 	}
 		
 	/**
-	 * Attempts to combine two ItemStack in the specified quiver slot
+	 * Attempts to combine two DisplayableItemStack in the specified quiver slot
 	 * @param stack stack to combine with the current one
 	 * @param index where to combine stacks in quiver[]
 	 * @return success of operation
 	 */
-	public boolean combineItemStacksInQuiverSlot(World world, EntityPlayer player, ItemStack stack, int index)
+	public boolean combineDisplayableItemStacksInQuiverSlot(World world, EntityPlayer player, DisplayableItemStack stack, int index)
 	{
-		player.onInventoryChange();
 		if(quiver[index] == null || quiver[index].getItemID() != stack.getItemID())
 		{	
 			return false;
@@ -863,14 +850,13 @@ public class InventoryPlayer
 
 	/**
 	 * Adjusts the stacksize of an Itemstack in the quiver[]. This will do nothing if that stack is null.
-	 * @param index the index of the ItemStack in the quiver[]
-	 * @param newStackSize the new stacksize of the ItemStack
+	 * @param index the index of the DisplayableItemStack in the quiver[]
+	 * @param newStackSize the new stacksize of the DisplayableItemStack
 	 */
 	public void adjustQuiverStackSize(EntityPlayer player, int index, int newStackSize)
 	{
 		if(quiver[index] != null && quiver[index].getStackSize() != newStackSize)
 		{
-			player.onQuiverChange();
 			player.changedInventorySlots.add("q " + index);
 			quiver[index].setStackSize(newStackSize);
 		}
@@ -886,14 +872,12 @@ public class InventoryPlayer
 	{
 		if(howMany < quiver[index].getStackSize())
 		{
-			player.onQuiverChange();
 			player.changedInventorySlots.add("q " + index);
 			quiver[index].removeFromStack(howMany);
 			return true;
 		}
 		else if(howMany == quiver[index].getStackSize())
 		{
-			player.onQuiverChange();
 			player.changedInventorySlots.add("q " + index);
 			quiver[index].removeFromStack(howMany);
 			quiver[index] = null;

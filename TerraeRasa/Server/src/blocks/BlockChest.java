@@ -1,5 +1,6 @@
 package blocks;
 
+import utils.DisplayableItemStack;
 import utils.ItemStack;
 
 /**
@@ -126,6 +127,16 @@ public class BlockChest extends Block
 	public ItemStack[] getMainInventory()
 	{
 		return mainInventory;
+	}
+	
+	public DisplayableItemStack[] getDisplayableInventory()
+	{
+		DisplayableItemStack[] displayables = new DisplayableItemStack[mainInventory.length];
+		for(int i = 0; i < mainInventory.length; i++)
+		{
+			displayables[i] = new DisplayableItemStack(mainInventory[i]);
+		}
+		return displayables;
 	}
 	
 	/**

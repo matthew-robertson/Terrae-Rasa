@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.URISyntaxException;
 
+import savable.SaveManager;
 import transmission.ChunkExpander;
 import transmission.CompressedClientUpdate;
 import transmission.CompressedServerUpdate;
@@ -16,8 +18,7 @@ import transmission.WorldData;
 import world.World;
 import client.EngineLock;
 import client.GameEngine;
-import entities.EntityPlayer;
-import enums.EnumHardwareInput;
+import client.TerraeRasa;
 
 public class ClientConnectionThread extends Thread
 {
@@ -41,7 +42,12 @@ public class ClientConnectionThread extends Thread
 	public void run()
 	{
 		try {
-			requestBasicData();
+			try {
+				requestBasicData();
+			} catch (URISyntaxException e) {
+				e.printStackTrace();
+				System.exit(1);
+			}
 			
 			final int SKIP_TICKS = 1000 / GameEngine.TICKS_PER_SECOND;
 			final int MAX_FRAMESKIP = 5;
@@ -93,11 +99,13 @@ public class ClientConnectionThread extends Thread
 	}
 	
 	private void requestBasicData()
+			throws URISyntaxException
 	{
 		try {
 			os.writeUTF("/sendplayer");
-			byte[] bytes = gzipHelper.compress(EntityPlayer.compress(engineLock.getSentPlayer()));
-			os.writeObject(bytes);			
+			String savableXML = new SaveManager().getFileXML(TerraeRasa.getBasePath() + "/Player Saves/" + engineLock.getActivePlayerName() + ".xml", false);
+//			byte[] bytes = gzipHelper.compress(savableXML);
+			os.writeUTF(savableXML);			
 			os.flush();
 			
 			int id = is.readInt();

@@ -5,14 +5,14 @@ import java.io.Serializable;
 import blocks.Block;
 import blocks.BlockChest;
 
-import utils.ItemStack;
+import utils.DisplayableItemStack;
 
 
 public class SuperCompressedBlock 
 		implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	public ItemStack[] mainInventory;
+	public DisplayableItemStack[] mainInventory;
 	public short id;
 	public byte metaData;
 	public byte bitMap;
@@ -27,6 +27,6 @@ public class SuperCompressedBlock
 		this.id = (short) block.id;
 		this.metaData = (byte) block.metaData;
 		this.bitMap = (byte) block.getBitMap();
-		mainInventory = (block instanceof BlockChest) ? ((BlockChest)(block)).getMainInventory() : new ItemStack[0];
+		mainInventory = (block instanceof BlockChest) ? ((BlockChest)(block)).getMainInventory() : new DisplayableItemStack[0];
 	}
 }

@@ -1,23 +1,8 @@
 package items;
 
-import passivebonuses.PassiveBonus;
-import passivebonuses.PassiveBonusAttackSpeed;
-import passivebonuses.PassiveBonusCriticalStrike;
-import passivebonuses.PassiveBonusDamageAll;
-import passivebonuses.PassiveBonusDefense;
-import passivebonuses.PassiveBonusDodge;
-import passivebonuses.PassiveBonusFallHeight;
-import passivebonuses.PassiveBonusIntellect;
-import passivebonuses.PassiveBonusJumpHeight;
-import passivebonuses.PassiveBonusSpeed;
-import passivebonuses.PassiveBonusStamina;
-import passivebonuses.PassiveBonusStrength;
+import passivebonuses.DisplayablePassiveBonus;
 import utils.ActionbarItem;
-import auras.Aura;
-import auras.AuraHeavensReprieve;
-import auras.AuraPeriodicModifier;
-import auras.AuraSmartHeal;
-import entities.EntityProjectile;
+import auras.DisplayableAura;
 import enums.EnumArmor;
 import enums.EnumItemQuality;
 import enums.EnumToolMaterial;
@@ -269,11 +254,11 @@ public class Item extends ActionbarItem
 	public static Item goldPickaxe = new ItemToolPickaxe(13).setDamageDone(7).setName("Gold Pickaxe").setIconPosition(20, 7).setToolMaterial(EnumToolMaterial.GOLD).setItemQuality(EnumItemQuality.LEGENDARY);	
 	public static Item goldSword = new ItemToolSword(14).setDamageDone(14).setName("Gold Sword").setIconPosition(20, 6).setToolMaterial(EnumToolMaterial.GOLD);	
 	public static Item woodenBow = new ItemRanged(15, 8).setCooldownTicks(10).setName("Wooden Bow").setIconPosition(16, 9);
-	public static Item woodenArrow = new ItemAmmo(16).setProjectile(new EntityProjectile(7, 1, 1, 8f).setSpriteIndex(0, 1).setIsFriendly(true)).setIconPosition(4, 9).setName("Wooden Arrow");
-	public static Item bronzeArrow = new ItemAmmo(17).setProjectile(new EntityProjectile(10, 1, 1, 8f).setSpriteIndex(0, 2).setIsFriendly(true)).setIconPosition(4, 10).setName("Bronze Arrow");
-	public static Item ironArrow = new ItemAmmo(18).setProjectile(new EntityProjectile(13, 1, 1, 8f).setSpriteIndex(0, 3).setIsFriendly(true)).setIconPosition(4, 11).setName("Iron Arrow");
-	public static Item silverArrow = new ItemAmmo(19).setProjectile(new EntityProjectile(16, 1, 1, 8f).setSpriteIndex(0, 4).setIsFriendly(true)).setIconPosition(4, 12).setName("Silver Arrow");
-	public static Item snowball = new ItemThrown(20, 5).setProjectile(new EntityProjectile(5, 1, 1, 11f).setSpriteIndex(0, 0).setIsFriendly(true)).setCooldownTicks(10).setName("Snow Ball").setIconPosition(14, 0);
+	public static Item woodenArrow = new ItemAmmo(16).setIconPosition(4, 9).setName("Wooden Arrow");
+	public static Item bronzeArrow = new ItemAmmo(17).setIconPosition(4, 10).setName("Bronze Arrow");
+	public static Item ironArrow = new ItemAmmo(18).setIconPosition(4, 11).setName("Iron Arrow");
+	public static Item silverArrow = new ItemAmmo(19).setIconPosition(4, 12).setName("Silver Arrow");
+	public static Item snowball = new ItemThrown(20, 5).setCooldownTicks(10).setName("Snow Ball").setIconPosition(14, 0);
 	
 	public static Item godminiumPickaxe = new ItemToolPickaxe(156).setDamageDone(7).setName("God-Minium Pickaxe").setIconPosition(20, 7).setToolMaterial(EnumToolMaterial.GOD).setItemQuality(EnumItemQuality.LEGENDARY);	
 	
@@ -308,79 +293,79 @@ public class Item extends ActionbarItem
 	public static Item goldGloves = new ItemArmorGloves(228).setArmorType(EnumArmor.GOLD).setIconPosition(20, 4).setName("Gold Gloves").setItemQuality(EnumItemQuality.RARE);
 	public static Item goldBelt = new ItemArmorBelt(229).setArmorType(EnumArmor.GOLD).setIconPosition(20, 5).setName("Gold Belt").setItemQuality(EnumItemQuality.RARE);
 
-	public static Item lunariumHelmet = new ItemArmorHelmet(230).setArmorType(EnumArmor.LUNARIUM).setIntellect(3).passiveBonuses(new PassiveBonus[]{
-			new PassiveBonusCriticalStrike(0.03)
+	public static Item lunariumHelmet = new ItemArmorHelmet(230).setArmorType(EnumArmor.LUNARIUM).setIntellect(3).passiveBonuses(new DisplayablePassiveBonus[]{
+			new DisplayablePassiveBonus("+3% Critical Strike")
 	}).setIconPosition(22, 0).setName("Lunarium Crown").setTotalSockets(1);
 	public static Item lunariumBody = new ItemArmorBody(231).setArmorType(EnumArmor.LUNARIUM).setIntellect(2).setIconPosition(22, 1).setName("Lunarum Robe").setTotalSockets(1);
 	public static Item lunariumPants = new ItemArmorPants(232).setArmorType(EnumArmor.LUNARIUM).setIntellect(2).setIconPosition(22, 2).setName("Lunarium Pants").setTotalSockets(1);	
-	public static Item lunariumBoots = new ItemArmorBoots(233).setArmorType(EnumArmor.LUNARIUM).setIntellect(1).passiveBonuses(new PassiveBonus[]{
-			new PassiveBonusSpeed(0.03)
+	public static Item lunariumBoots = new ItemArmorBoots(233).setArmorType(EnumArmor.LUNARIUM).setIntellect(1).passiveBonuses(new DisplayablePassiveBonus[]{
+			new DisplayablePassiveBonus("+3% Movement Speed")
 	}).setIconPosition(22, 3).setName("Lunarium Boots");
 	public static Item lunariumGloves = new ItemArmorGloves(234).setArmorType(EnumArmor.LUNARIUM).setIntellect(1).setIconPosition(22, 4).setName("Lunarium Gloves");
 	public static Item lunariumBelt = new ItemArmorBelt(235).setArmorType(EnumArmor.LUNARIUM).setIntellect(1).setIconPosition(22, 5).setName("Lunarium Belt");
 	
-	public static Item archer_1_Helmet = new ItemArmorHelmet(236).setArmorType(EnumArmor.RANGE_SET_1).setDexterity(3).passiveBonuses(new PassiveBonus[]{
-			new PassiveBonusCriticalStrike(0.03)
+	public static Item archer_1_Helmet = new ItemArmorHelmet(236).setArmorType(EnumArmor.RANGE_SET_1).setDexterity(3).passiveBonuses(new DisplayablePassiveBonus[]{
+			new DisplayablePassiveBonus("+3% Critical Strike")
 	}).setIconPosition(22, 0).setName("Archer_Helmet_1").setTotalSockets(1);
 	public static Item archer_1_Body = new ItemArmorBody(237).setArmorType(EnumArmor.RANGE_SET_1).setDexterity(2).setIconPosition(22, 1).setName("Archer_Body_1").setTotalSockets(1);
 	public static Item archer_1_Pants = new ItemArmorPants(238).setArmorType(EnumArmor.RANGE_SET_1).setDexterity(2).setIconPosition(22, 2).setName("Archer_Pants_1").setTotalSockets(1);	
-	public static Item archer_1_Boots = new ItemArmorBoots(239).setArmorType(EnumArmor.RANGE_SET_1).setDexterity(1).passiveBonuses(new PassiveBonus[]{
-			new PassiveBonusSpeed(0.03)
+	public static Item archer_1_Boots = new ItemArmorBoots(239).setArmorType(EnumArmor.RANGE_SET_1).setDexterity(1).passiveBonuses(new DisplayablePassiveBonus[]{
+			new DisplayablePassiveBonus("+3% Movement Speed")
 	}).setIconPosition(22, 3).setName("Archer_Boots_1");
 	public static Item archer_1_Gloves = new ItemArmorGloves(240).setArmorType(EnumArmor.RANGE_SET_1).setDexterity(1).setIconPosition(22, 4).setName("Archer_Gloves_1");
 	public static Item archer_1_Belt = new ItemArmorBelt(241).setArmorType(EnumArmor.RANGE_SET_1).setDexterity(1).setIconPosition(22, 5).setName("Archer_Belt_1");
 	
-	public static Item warrior_1_Helmet = new ItemArmorHelmet(242).setArmorType(EnumArmor.STRENGTH_SET_1).setStrength(3).passiveBonuses(new PassiveBonus[]{
-			new PassiveBonusCriticalStrike(0.03)
+	public static Item warrior_1_Helmet = new ItemArmorHelmet(242).setArmorType(EnumArmor.STRENGTH_SET_1).setStrength(3).passiveBonuses(new DisplayablePassiveBonus[]{
+			new DisplayablePassiveBonus("+3% Critical Strike")
 	}).setIconPosition(22, 0).setName("Warrior_Helm5et_1").setTotalSockets(1);
 	public static Item warrior_1_Body = new ItemArmorBody(243).setArmorType(EnumArmor.STRENGTH_SET_1).setStrength(2).setIconPosition(22, 1).setName("Warrior_Helme4t_1").setTotalSockets(1);
 	public static Item warrior_1_Pants = new ItemArmorPants(244).setArmorType(EnumArmor.STRENGTH_SET_1).setStrength(2).setIconPosition(22, 2).setName("Warrior_He3lmet_1").setTotalSockets(1);	
-	public static Item warrior_1_Boots = new ItemArmorBoots(245).setArmorType(EnumArmor.STRENGTH_SET_1).setStrength(1).passiveBonuses(new PassiveBonus[]{
-			new PassiveBonusSpeed(0.03)
+	public static Item warrior_1_Boots = new ItemArmorBoots(245).setArmorType(EnumArmor.STRENGTH_SET_1).setStrength(1).passiveBonuses(new DisplayablePassiveBonus[]{
+			new DisplayablePassiveBonus("+3% Movement Speed")
 	}).setIconPosition(22, 3).setName("Warrior_Helmet_1");
 	public static Item warrior_1_Gloves = new ItemArmorGloves(246).setArmorType(EnumArmor.STRENGTH_SET_1).setStrength(1).setIconPosition(22, 4).setName("Warrior_H2elmet_1");
 	public static Item warrior_1_Belt = new ItemArmorBelt(247).setArmorType(EnumArmor.STRENGTH_SET_1).setStrength(1).setIconPosition(22, 5).setName("Warrior_Helm1et_1");
 	
-	public static Item celestialHelmet = new ItemArmorHelmet(248).setArmorType(EnumArmor.CELESTIAL_SET).setIntellect(5).passiveBonuses(new PassiveBonus[]{
-			new PassiveBonusCriticalStrike(0.05)
+	public static Item celestialHelmet = new ItemArmorHelmet(248).setArmorType(EnumArmor.CELESTIAL_SET).setIntellect(5).passiveBonuses(new DisplayablePassiveBonus[]{
+			new DisplayablePassiveBonus("+5% Critical Strike")
 	}).setIconPosition(22, 0).setName("Celestial Crown").setTotalSockets(2);
 	public static Item celestialBody = new ItemArmorBody(249).setArmorType(EnumArmor.CELESTIAL_SET).setIntellect(3).setIconPosition(22, 1).setName("Celestial Robetop").setTotalSockets(1);
 	public static Item celestialPants = new ItemArmorPants(250).setArmorType(EnumArmor.CELESTIAL_SET).setIntellect(3).setIconPosition(22, 2).setName("Celestial Robebottom").setTotalSockets(1);	
-	public static Item celestialBoots = new ItemArmorBoots(251).setArmorType(EnumArmor.CELESTIAL_SET).setIntellect(1).passiveBonuses(new PassiveBonus[]{
-			new PassiveBonusSpeed(0.05)
+	public static Item celestialBoots = new ItemArmorBoots(251).setArmorType(EnumArmor.CELESTIAL_SET).setIntellect(1).passiveBonuses(new DisplayablePassiveBonus[]{
+			new DisplayablePassiveBonus("+5% Movement Speed")
 	}).setIconPosition(22, 3).setName("Celestial Boots");
 	public static Item celestialGloves = new ItemArmorGloves(252).setArmorType(EnumArmor.CELESTIAL_SET).setIntellect(2).setIconPosition(22, 4).setName("Celestial Gloves");
 	public static Item celestialBelt = new ItemArmorBelt(253).setArmorType(EnumArmor.CELESTIAL_SET).setIntellect(1).setIconPosition(22, 5).setName("Celestial Belt");
 	
-	public static Item artemisHelmet = new ItemArmorHelmet(254).setArmorType(EnumArmor.ARTEMIS_SET).setDexterity(5).passiveBonuses(new PassiveBonus[]{
-			new PassiveBonusCriticalStrike(0.05)
+	public static Item artemisHelmet = new ItemArmorHelmet(254).setArmorType(EnumArmor.ARTEMIS_SET).setDexterity(5).passiveBonuses(new DisplayablePassiveBonus[]{
+			new DisplayablePassiveBonus("+5% Critical Strike")
 	}).setIconPosition(22, 0).setName("Artemis Helmet").setTotalSockets(2);
 	public static Item artemisBody = new ItemArmorBody(255).setArmorType(EnumArmor.ARTEMIS_SET).setDexterity(3).setIconPosition(22, 1).setName("Artemis Body").setTotalSockets(1);
 	public static Item artemisPants = new ItemArmorPants(256).setArmorType(EnumArmor.ARTEMIS_SET).setDexterity(3).setIconPosition(22, 2).setName("Artemis Pants").setTotalSockets(1);	
-	public static Item artemisBoots = new ItemArmorBoots(257).setArmorType(EnumArmor.ARTEMIS_SET).setDexterity(1).passiveBonuses(new PassiveBonus[]{
-			new PassiveBonusSpeed(0.05)
+	public static Item artemisBoots = new ItemArmorBoots(257).setArmorType(EnumArmor.ARTEMIS_SET).setDexterity(1).passiveBonuses(new DisplayablePassiveBonus[]{
+			new DisplayablePassiveBonus("+5% Movement Speed")
 	}).setIconPosition(22, 3).setName("Artemis Boots");
 	public static Item artemisGloves = new ItemArmorGloves(258).setArmorType(EnumArmor.ARTEMIS_SET).setDexterity(2).setIconPosition(22, 4).setName("Artemis Gloves");
 	public static Item artemisBelt = new ItemArmorBelt(259).setArmorType(EnumArmor.ARTEMIS_SET).setDexterity(1).setIconPosition(22, 5).setName("Artemis Belt");
 	
-	public static Item berserkerHelmet = new ItemArmorHelmet(260).setArmorType(EnumArmor.BERSERKER_SET).setStrength(5).passiveBonuses(new PassiveBonus[]{
-			new PassiveBonusCriticalStrike(0.05)
+	public static Item berserkerHelmet = new ItemArmorHelmet(260).setArmorType(EnumArmor.BERSERKER_SET).setStrength(5).passiveBonuses(new DisplayablePassiveBonus[]{
+			new DisplayablePassiveBonus("+5% Critical Strike")
 	}).setIconPosition(22, 0).setName("Berserker Helmet").setTotalSockets(2);
 	public static Item berserkerBody = new ItemArmorBody(261).setArmorType(EnumArmor.BERSERKER_SET).setStrength(3).setIconPosition(22, 1).setName("Berserker Body").setTotalSockets(1);
 	public static Item berserkerPants = new ItemArmorPants(262).setArmorType(EnumArmor.BERSERKER_SET).setStrength(3).setIconPosition(22, 2).setName("Berserker Platelegs").setTotalSockets(1);	
-	public static Item berserkerBoots = new ItemArmorBoots(263).setArmorType(EnumArmor.BERSERKER_SET).setStrength(1).passiveBonuses(new PassiveBonus[]{
-			new PassiveBonusSpeed(0.05)
+	public static Item berserkerBoots = new ItemArmorBoots(263).setArmorType(EnumArmor.BERSERKER_SET).setStrength(1).passiveBonuses(new DisplayablePassiveBonus[]{
+			new DisplayablePassiveBonus("+5% Movement Speed")
 	}).setIconPosition(22, 3).setName("Berserker Boots");
 	public static Item berserkerGloves = new ItemArmorGloves(264).setArmorType(EnumArmor.BERSERKER_SET).setStrength(2).setIconPosition(22, 4).setName("Berserker Gauntlets");
 	public static Item berserkerBelt = new ItemArmorBelt(265).setArmorType(EnumArmor.BERSERKER_SET).setStrength(1).setIconPosition(22, 5).setName("Berserker Platebelt");
 		
-	public static Item guardiansHelmet = new ItemArmorHelmet(266).setArmorType(EnumArmor.GUARDIAN_SET).passiveBonuses(new PassiveBonus[]{
-			new PassiveBonusCriticalStrike(0.05)
+	public static Item guardiansHelmet = new ItemArmorHelmet(266).setArmorType(EnumArmor.GUARDIAN_SET).passiveBonuses(new DisplayablePassiveBonus[]{
+			new DisplayablePassiveBonus("+5% Critical Strike")
 	}).setIconPosition(22, 0).setName("Guardian Platehelm").setTotalSockets(2);
 	public static Item guardiansBody = new ItemArmorBody(267).setArmorType(EnumArmor.GUARDIAN_SET).setIconPosition(22, 1).setName("Guardian Platemail").setTotalSockets(1);
 	public static Item guardiansPants = new ItemArmorPants(268).setArmorType(EnumArmor.GUARDIAN_SET).setIconPosition(22, 2).setName("Guardian Platelegs").setTotalSockets(1);	
-	public static Item guardiansBoots = new ItemArmorBoots(269).setArmorType(EnumArmor.GUARDIAN_SET).passiveBonuses(new PassiveBonus[]{
-			new PassiveBonusSpeed(0.05)
+	public static Item guardiansBoots = new ItemArmorBoots(269).setArmorType(EnumArmor.GUARDIAN_SET).passiveBonuses(new DisplayablePassiveBonus[]{
+			new DisplayablePassiveBonus("+5% Movement Speed")
 	}).setIconPosition(22, 3).setName("Guardian Plateboots");
 	public static Item guardiansGloves = new ItemArmorGloves(270).setArmorType(EnumArmor.GUARDIAN_SET).setIconPosition(22, 4).setName("Guardian Gauntlets");
 	public static Item guardiansBelt = new ItemArmorBelt(271).setArmorType(EnumArmor.GUARDIAN_SET).setIconPosition(22, 5).setName("Guardian Platebelt");
@@ -399,93 +384,93 @@ public class Item extends ActionbarItem
 	
 	
 	public static Item rocketBoots = new ItemArmorAccessory(400).setIconPosition(0, 0).setName("Rocket Boots");	
-	public static Item ringOfVigor = new ItemArmorAccessory(401).passiveBonuses(new PassiveBonus[]{ 
-			new PassiveBonusDamageAll(0.1F)
+	public static Item ringOfVigor = new ItemArmorAccessory(401).passiveBonuses(new DisplayablePassiveBonus[]{ 
+//			new PassiveBonusDamageAll(0.1F)
 	}).setIconPosition(15, 2).setName("Ring of Vigor").setExtraTooltipInformation("This ring instills a sense of courage in its wearer.");	
-	public static Item talismanOfWinds = new ItemArmorAccessory(402).passiveBonuses(new PassiveBonus[]{ 
-			new PassiveBonusSpeed(0.1F)
+	public static Item talismanOfWinds = new ItemArmorAccessory(402).passiveBonuses(new DisplayablePassiveBonus[]{ 
+//			new PassiveBonusSpeed(0.1F)
 	}).setIconPosition(15, 3).setName("Talisman of Winds").setExtraTooltipInformation("The winds of fortune are at your back.");	
-	public static Item ankh = new ItemArmorAccessory(403).setAuras(new Aura[]{ 
-			new AuraHeavensReprieve()
+	public static Item ankh = new ItemArmorAccessory(403).setAuras(new DisplayableAura[]{ 
+//			new AuraHeavensReprieve()
 	}).setIconPosition(14, 1).setName("Ankh").setExtraTooltipInformation("This relic will destroy itself to save the wearer.");	
-	public static Item goddessesTear = new ItemArmorAccessory(404).passiveBonuses(new PassiveBonus[]{ 
-			new PassiveBonusIntellect(8)
+	public static Item goddessesTear = new ItemArmorAccessory(404).passiveBonuses(new DisplayablePassiveBonus[]{ 
+//			new PassiveBonusIntellect(8)
 	}).setIconPosition(15, 4).setName("Goddess' Tear").setExtraTooltipInformation("This tear contains immense magical power.");	
-	public static Item magicalCloud = new ItemArmorAccessory(405).passiveBonuses(new PassiveBonus[]{ 
-			new PassiveBonusFallHeight(8)
+	public static Item magicalCloud = new ItemArmorAccessory(405).passiveBonuses(new DisplayablePassiveBonus[]{ 
+//			new PassiveBonusFallHeight(8)
 	}).setIconPosition(15, 5).setName("Magical Cloud").setExtraTooltipInformation("As light as air itself.");	
-	public static Item berserkersEssence = new ItemArmorAccessory(406).passiveBonuses(new PassiveBonus[]{ 
-			new PassiveBonusStrength(3), new PassiveBonusAttackSpeed(0.1F)
+	public static Item berserkersEssence = new ItemArmorAccessory(406).passiveBonuses(new DisplayablePassiveBonus[]{ 
+//			new PassiveBonusStrength(3), new PassiveBonusAttackSpeed(0.1F)
 	}).setIconPosition(15, 0).setName("Berserker's Essence").setExtraTooltipInformation("You sense deep inner rage within the essence.");	
 	public static Item guardianAmulet = new ItemArmorAccessory(407).setDefense(6).setIconPosition(15, 6).setName("Amulet of the Guardian").setExtraTooltipInformation("This amulet contains great defensive power.");	
-	public static Item sigilOfAsclepius = new ItemArmorAccessory(408).setAuras(new Aura[]{ 
-			new AuraSmartHeal(25, 50, 0.5, false)
+	public static Item sigilOfAsclepius = new ItemArmorAccessory(408).setAuras(new DisplayableAura[]{ 
+//			new AuraSmartHeal(25, 50, 0.5, false)
 	}).setIconPosition(15, 7).setName("Sigil of Asclepius").setExtraTooltipInformation("This sigil radiates holy energy.");	
-	public static Item heavyMedal = new ItemArmorAccessory(409).setAuras(new Aura[]{ 
-			new AuraPeriodicModifier(0.75)
+	public static Item heavyMedal = new ItemArmorAccessory(409).setAuras(new DisplayableAura[]{ 
+//			new AuraPeriodicModifier(0.75)
 	}).setIconPosition(15, 1).setName("Heavy Medal").setExtraTooltipInformation("The power of this medal protects its wearer.");	
-	public static Item eaglesFeather = new ItemArmorAccessory(410).passiveBonuses(new PassiveBonus[]{
-		new PassiveBonusJumpHeight(4)	
+	public static Item eaglesFeather = new ItemArmorAccessory(410).passiveBonuses(new DisplayablePassiveBonus[]{
+//		new PassiveBonusJumpHeight(4)	
 	}).setIconPosition(14, 2).setName("Eagle's Feather").setExtraTooltipInformation("The eagle's feather almost lets take to the sky.");
-	public static Item nimblefootCloak = new ItemArmorAccessory(411).passiveBonuses(new PassiveBonus[]{
-			new PassiveBonusDodge(0.05)
+	public static Item nimblefootCloak = new ItemArmorAccessory(411).passiveBonuses(new DisplayablePassiveBonus[]{
+//			new PassiveBonusDodge(0.05)
 	}).setIconPosition(15, 9).setName("Nimblefoot Cloak").setExtraTooltipInformation("Grants the wearer great agility.");
-	public static Item mastersBracer = new ItemArmorAccessory(412).passiveBonuses(new PassiveBonus[]{
-			new PassiveBonusCriticalStrike(0.04)
+	public static Item mastersBracer = new ItemArmorAccessory(412).passiveBonuses(new DisplayablePassiveBonus[]{
+//			new PassiveBonusCriticalStrike(0.04)
 	}).setIconPosition(15, 10).setName("Master's Bracer").setExtraTooltipInformation("These bracers contain the spirit of a combat master.");
-	public static Item heartyPendant = new ItemArmorAccessory(413).passiveBonuses(new PassiveBonus[]{
-			new PassiveBonusStamina(5)
+	public static Item heartyPendant = new ItemArmorAccessory(413).passiveBonuses(new DisplayablePassiveBonus[]{
+//			new PassiveBonusStamina(5)
 	}).setIconPosition(14, 3).setName("Hearty Pendant").setExtraTooltipInformation("This pendant radiates life energy.");
 	public static Item steadfastShield = new ItemArmorAccessory(414).setDefense(5).setIconPosition(15, 8).setName("Steadfast Shield").setExtraTooltipInformation("A symbol of unwaivering resolve.");
-	public static Item sapphireRing = new ItemArmorAccessory(415).passiveBonuses(new PassiveBonus[]{
-			new PassiveBonusCriticalStrike(0.01)
+	public static Item sapphireRing = new ItemArmorAccessory(415).passiveBonuses(new DisplayablePassiveBonus[]{
+//			new PassiveBonusCriticalStrike(0.01)
 	}).setIconPosition(14, 4).setName("Sapphire Ring").setExtraTooltipInformation("A basic sapphire ring.");
-	public static Item emeraldRing = new ItemArmorAccessory(416).passiveBonuses(new PassiveBonus[]{
-			new PassiveBonusAttackSpeed(0.01)
+	public static Item emeraldRing = new ItemArmorAccessory(416).passiveBonuses(new DisplayablePassiveBonus[]{
+//			new PassiveBonusAttackSpeed(0.01)
 	}).setIconPosition(14, 5).setName("Emerald Ring").setExtraTooltipInformation("A basic emerald ring.");
-	public static Item rubyRing = new ItemArmorAccessory(417).passiveBonuses(new PassiveBonus[]{
-			new PassiveBonusStrength(1)
+	public static Item rubyRing = new ItemArmorAccessory(417).passiveBonuses(new DisplayablePassiveBonus[]{
+//			new PassiveBonusStrength(1)
 	}).setIconPosition(14, 6).setName("Ruby Ring").setExtraTooltipInformation("A basic ruby ring.");
-	public static Item diamondRing = new ItemArmorAccessory(418).passiveBonuses(new PassiveBonus[]{
-			new PassiveBonusDodge(0.01)
+	public static Item diamondRing = new ItemArmorAccessory(418).passiveBonuses(new DisplayablePassiveBonus[]{
+//			new PassiveBonusDodge(0.01)
 	}).setIconPosition(14, 7).setName("Diamond Ring").setExtraTooltipInformation("A basic diamond ring.");
-	public static Item opalRing = new ItemArmorAccessory(419).passiveBonuses(new PassiveBonus[]{
-			new PassiveBonusDefense(1)
+	public static Item opalRing = new ItemArmorAccessory(419).passiveBonuses(new DisplayablePassiveBonus[]{
+//			new PassiveBonusDefense(1)
 	}).setIconPosition(14, 8).setName("Opal Ring").setExtraTooltipInformation("A basic opal ring.");
-	public static Item jasperRing = new ItemArmorAccessory(420).passiveBonuses(new PassiveBonus[]{
-			new PassiveBonusStamina(1)
+	public static Item jasperRing = new ItemArmorAccessory(420).passiveBonuses(new DisplayablePassiveBonus[]{
+//			new PassiveBonusStamina(1)
 	}).setIconPosition(14, 9).setName("Jasper Ring").setExtraTooltipInformation("A basic jasper ring.");
 	public static Item goldRing = new ItemArmorAccessory(421).setIconPosition(14, 10).setName("Gold Ring");
 	
-	public static Item opHelmet = new ItemArmorHelmet(454).setArmorType(EnumArmor.OP_TEST_SET).passiveBonuses(new PassiveBonus[]{
-			new PassiveBonusCriticalStrike(0.1), new PassiveBonusAttackSpeed(0.1)
-	}).setAuras(new Aura[]{ 
-			new AuraSmartHeal(10, 600, 0.9, false)
+	public static Item opHelmet = new ItemArmorHelmet(454).setArmorType(EnumArmor.OP_TEST_SET).passiveBonuses(new DisplayablePassiveBonus[]{
+//			new PassiveBonusCriticalStrike(0.1), new PassiveBonusAttackSpeed(0.1)
+	}).setAuras(new DisplayableAura[]{ 
+//			new AuraSmartHeal(10, 600, 0.9, false)
 	}).setTotalSockets(1).setIntellect(5).setStamina(10).setStrength(5).setDexterity(5).setIconPosition(21, 0).setName("TIER6 Helmet").setItemQuality(EnumItemQuality.RARE);
-	public static Item opBody = new ItemArmorBody(455).setArmorType(EnumArmor.OP_TEST_SET).passiveBonuses(new PassiveBonus[]{
-			new PassiveBonusCriticalStrike(0.1), new PassiveBonusAttackSpeed(0.1)
-	}).setAuras(new Aura[]{ 
-			new AuraSmartHeal(10, 600, 0.9, false)
+	public static Item opBody = new ItemArmorBody(455).setArmorType(EnumArmor.OP_TEST_SET).passiveBonuses(new DisplayablePassiveBonus[]{
+//			new PassiveBonusCriticalStrike(0.1), new PassiveBonusAttackSpeed(0.1)
+	}).setAuras(new DisplayableAura[]{ 
+//			new AuraSmartHeal(10, 600, 0.9, false)
 	}).setTotalSockets(2).setIntellect(5).setStamina(10).setStrength(5).setDexterity(5).setIconPosition(21, 1).setName("TIER6 Body").setItemQuality(EnumItemQuality.RARE);
-	public static Item opPants = new ItemArmorPants(456).setArmorType(EnumArmor.OP_TEST_SET).passiveBonuses(new PassiveBonus[]{
-			new PassiveBonusCriticalStrike(0.1), new PassiveBonusAttackSpeed(0.1)
-	}).setAuras(new Aura[]{ 
-			new AuraSmartHeal(10, 600, 0.9, false)
+	public static Item opPants = new ItemArmorPants(456).setArmorType(EnumArmor.OP_TEST_SET).passiveBonuses(new DisplayablePassiveBonus[]{
+//			new PassiveBonusCriticalStrike(0.1), new PassiveBonusAttackSpeed(0.1)
+	}).setAuras(new DisplayableAura[]{ 
+//			new AuraSmartHeal(10, 600, 0.9, false)
 	}).setTotalSockets(3).setIntellect(5).setStamina(10).setStrength(5).setDexterity(5).setIconPosition(0, 0).setName("TIER6 Legguards").setItemQuality(EnumItemQuality.RARE);	
-	public static Item opBoots = new ItemArmorBoots(457).setArmorType(EnumArmor.OP_TEST_SET).passiveBonuses(new PassiveBonus[]{
-			new PassiveBonusCriticalStrike(0.1), new PassiveBonusAttackSpeed(0.1)
-	}).setAuras(new Aura[]{ 
-			new AuraSmartHeal(10, 600, 0.9, false)
+	public static Item opBoots = new ItemArmorBoots(457).setArmorType(EnumArmor.OP_TEST_SET).passiveBonuses(new DisplayablePassiveBonus[]{
+//			new PassiveBonusCriticalStrike(0.1), new PassiveBonusAttackSpeed(0.1)
+	}).setAuras(new DisplayableAura[]{ 
+//			new AuraSmartHeal(10, 600, 0.9, false)
 	}).setTotalSockets(4).setIntellect(5).setStamina(10).setStrength(5).setDexterity(5).setIconPosition(21, 3).setName("TIER6 Boots");
-	public static Item opGloves = new ItemArmorGloves(458).setArmorType(EnumArmor.OP_TEST_SET).passiveBonuses(new PassiveBonus[]{
-			new PassiveBonusCriticalStrike(0.1), new PassiveBonusAttackSpeed(0.1)
-	}).setAuras(new Aura[]{ 
-			new AuraSmartHeal(10, 600, 0.9, false)
+	public static Item opGloves = new ItemArmorGloves(458).setArmorType(EnumArmor.OP_TEST_SET).passiveBonuses(new DisplayablePassiveBonus[]{
+//			new PassiveBonusCriticalStrike(0.1), new PassiveBonusAttackSpeed(0.1)
+	}).setAuras(new DisplayableAura[]{ 
+//			new AuraSmartHeal(10, 600, 0.9, false)
 	}).setTotalSockets(4).setIntellect(5).setStamina(10).setStrength(5).setDexterity(5).setIconPosition(21, 4).setName("TIER6 Gloves");
-	public static Item opBelt = new ItemArmorBelt(459).setArmorType(EnumArmor.OP_TEST_SET).passiveBonuses(new PassiveBonus[]{
-			new PassiveBonusCriticalStrike(0.1), new PassiveBonusAttackSpeed(0.1)
-	}).setAuras(new Aura[]{ 
-			new AuraSmartHeal(10, 600, 0.9, false)
+	public static Item opBelt = new ItemArmorBelt(459).setArmorType(EnumArmor.OP_TEST_SET).passiveBonuses(new DisplayablePassiveBonus[]{
+//			new PassiveBonusCriticalStrike(0.1), new PassiveBonusAttackSpeed(0.1)
+	}).setAuras(new DisplayableAura[]{ 
+//			new AuraSmartHeal(10, 600, 0.9, false)
 	}).setTotalSockets(4).setIntellect(5).setStamina(10).setStrength(5).setDexterity(5).setIconPosition(21, 5).setName("TIER6 Belt");
 	
 	public static Item regenerationPotion1 = new ItemPotionRegeneration(500, 90, 1, 4, 40).setIconPosition(9, 1).setName("Minor Regen Potion");

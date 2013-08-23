@@ -1,17 +1,16 @@
 package items;
 
-import entities.EntityProjectile;
 
 public class ItemMagic extends ItemRanged 
 {
-	EntityProjectile projectile;
+//	EntityProjectile projectile;
 	protected int manaReq;
 	
-	protected ItemMagic(int i, int d, int m, EntityProjectile p) {
+	protected ItemMagic(int i, int d, int m) {
 		super(i, d);
 		manaReq = 1;
 		maxStackSize = 1;
-		projectile = p;
+//		projectile = p;
 	}	
 	
 	public ItemMagic setManaReq(int i){
@@ -23,7 +22,7 @@ public class ItemMagic extends ItemRanged
 		return manaReq;
 	}
 	
-	public EntityProjectile getProjectile(){
-		return projectile;
-	}
+//	public EntityProjectile getProjectile(){
+//		return projectile;
+//	}
 }

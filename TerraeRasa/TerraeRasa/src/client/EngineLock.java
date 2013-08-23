@@ -3,11 +3,9 @@ package client;
 import java.util.Vector;
 
 import transmission.CompressedClientUpdate;
-import transmission.CompressedPlayer;
 import transmission.CompressedServerUpdate;
 import world.World;
 import entities.EntityPlayer;
-import enums.EnumHardwareInput;
 
 public class EngineLock 
 {
@@ -64,16 +62,9 @@ public class EngineLock
 		engine.setActivePlayerID(player.entityID);
 	}
 	
-	public synchronized void updatePlayer(CompressedPlayer player)
-	{
-		throw new RuntimeException("NYI");
-		//TODO: EngineLock.updatePlayer() does not work at all
-	//	engine.getPlayer().mergeOnto(player);
-	}
-	
 	public synchronized EntityPlayer getSentPlayer()
 	{
-		return engine.getSentPlayer();
+		return engine.getActivePlayer();
 	}
 	
 	public synchronized void setWorld(World world)
@@ -85,5 +76,9 @@ public class EngineLock
 	public synchronized void setActivePlayerID(int id)
 	{
 		engine.setActivePlayerID(id);
+	}
+
+	public String getActivePlayerName() {
+		return engine.getActivePlayerName();
 	}
 }

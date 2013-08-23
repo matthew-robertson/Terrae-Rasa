@@ -6,16 +6,8 @@ import items.ItemArmor;
 import java.util.EnumSet;
 import java.util.Vector;
 
-import passivebonuses.PassiveBonus;
-import passivebonuses.PassiveBonusAttackSpeed;
-import passivebonuses.PassiveBonusCriticalStrike;
-import passivebonuses.PassiveBonusDefense;
-import passivebonuses.PassiveBonusDexterity;
-import passivebonuses.PassiveBonusIntellect;
-import passivebonuses.PassiveBonusManaBoost;
-import passivebonuses.PassiveBonusSpeed;
-import passivebonuses.PassiveBonusStrength;
-import utils.ItemStack;
+import passivebonuses.DisplayablePassiveBonus;
+import utils.DisplayableItemStack;
 import entities.EntityPlayer;
 
 /**
@@ -32,64 +24,64 @@ import entities.EntityPlayer;
  */
 public enum EnumArmor 
 {
-	NOTHING("None", 0, 0, 0, 0, 0, 0, new PassiveBonus[]{ }),
-	COPPER("Copper", 1, 2, 1, 1, 1, 1, new PassiveBonus[]{
-			new PassiveBonusDefense(1).setPiecesRequiredToActivate(3),
-			new PassiveBonusDefense(1).setPiecesRequiredToActivate(6)
+	NOTHING("None", 0, 0, 0, 0, 0, 0, new DisplayablePassiveBonus[]{ }),
+	COPPER("Copper", 1, 2, 1, 1, 1, 1, new DisplayablePassiveBonus[]{
+			new DisplayablePassiveBonus("+1 Defense").setPiecesRequiredToActivate(3),
+			new DisplayablePassiveBonus("+1 Defense").setPiecesRequiredToActivate(6)
 		}),
-	BRONZE("Bronze", 2, 3, 2, 1, 1, 1, new PassiveBonus[]{ 
-			new PassiveBonusDefense(1).setPiecesRequiredToActivate(3), 
-			new PassiveBonusDefense(2).setPiecesRequiredToActivate(6)
+	BRONZE("Bronze", 2, 3, 2, 1, 1, 1, new DisplayablePassiveBonus[]{ 
+			new DisplayablePassiveBonus("+1 Defense").setPiecesRequiredToActivate(3), 
+			new DisplayablePassiveBonus("+2 Defense").setPiecesRequiredToActivate(6)
 		}),
-	IRON("Iron", 2, 4, 3, 1, 2, 1, new PassiveBonus[]{ 
-			new PassiveBonusDefense(2).setPiecesRequiredToActivate(3),
-			new PassiveBonusDefense(2).setPiecesRequiredToActivate(6)
+	IRON("Iron", 2, 4, 3, 1, 2, 1, new DisplayablePassiveBonus[]{ 
+			new DisplayablePassiveBonus("+2 Defense").setPiecesRequiredToActivate(3),
+			new DisplayablePassiveBonus("+2 Defense").setPiecesRequiredToActivate(6)
 		}),
-	SILVER("Silver", 3, 4, 3, 2, 2, 2, new PassiveBonus[]{ 
-			new PassiveBonusDefense(2).setPiecesRequiredToActivate(3),
-			new PassiveBonusDefense(3).setPiecesRequiredToActivate(6),
+	SILVER("Silver", 3, 4, 3, 2, 2, 2, new DisplayablePassiveBonus[]{ 
+			new DisplayablePassiveBonus("+2 Defense").setPiecesRequiredToActivate(3),
+			new DisplayablePassiveBonus("+3 Defense").setPiecesRequiredToActivate(6),
 		}),
-	GOLD("Gold", 4, 5, 4, 2, 3, 2, new PassiveBonus[]{ 
-			new PassiveBonusDefense(2).setPiecesRequiredToActivate(2),
-			new PassiveBonusDefense(3).setPiecesRequiredToActivate(4),
-			new PassiveBonusSpeed(0.1).setPiecesRequiredToActivate(6)
+	GOLD("Gold", 4, 5, 4, 2, 3, 2, new DisplayablePassiveBonus[]{ 
+			new DisplayablePassiveBonus("+2 Defense").setPiecesRequiredToActivate(2),
+			new DisplayablePassiveBonus("+3 Defense").setPiecesRequiredToActivate(4),
+			new DisplayablePassiveBonus("+10% Movement Speed").setPiecesRequiredToActivate(6)
 		}),
-	LUNARIUM("Mage's Grace", 4, 5, 4, 3, 3, 3, new PassiveBonus[]{ //'Tier 6 - Mage'
-			new PassiveBonusSpeed(.1).setPiecesRequiredToActivate(2),
-			new PassiveBonusManaBoost(200).setPiecesRequiredToActivate(4),
-			new PassiveBonusIntellect(5).setPiecesRequiredToActivate(6)
+	LUNARIUM("Mage's Grace", 4, 5, 4, 3, 3, 3, new DisplayablePassiveBonus[]{ //'Tier 6 - Mage'
+			new DisplayablePassiveBonus("+10% Movement Speed").setPiecesRequiredToActivate(2),
+			new DisplayablePassiveBonus("+200 Maximum Mana").setPiecesRequiredToActivate(4),
+			new DisplayablePassiveBonus("+5 Intellect").setPiecesRequiredToActivate(6)
 		}),
-	RANGE_SET_1("Archer's Finesse", 4, 5, 4, 3, 3, 3, new PassiveBonus[]{ //'Tier 6 - Archer'
-			new PassiveBonusSpeed(.1).setPiecesRequiredToActivate(2),
-			new PassiveBonusCriticalStrike(0.05).setPiecesRequiredToActivate(4),
-			new PassiveBonusDexterity(5).setPiecesRequiredToActivate(6)
+	RANGE_SET_1("Archer's Finesse", 4, 5, 4, 3, 3, 3, new DisplayablePassiveBonus[]{ //'Tier 6 - Archer'
+			new DisplayablePassiveBonus("+10% Movement Speed").setPiecesRequiredToActivate(2),
+			new DisplayablePassiveBonus("+5% Critical Strike").setPiecesRequiredToActivate(4),
+			new DisplayablePassiveBonus("+5 Dexterity").setPiecesRequiredToActivate(6)
 		}),
-	STRENGTH_SET_1("Warriors's Tact", 4, 5, 4, 3, 3, 3, new PassiveBonus[]{ //'Tier 6 - Melee'
-			new PassiveBonusSpeed(.1).setPiecesRequiredToActivate(2),
-			new PassiveBonusAttackSpeed(0.05).setPiecesRequiredToActivate(4),
-			new PassiveBonusStrength(5).setPiecesRequiredToActivate(6)
+	STRENGTH_SET_1("Warriors's Tact", 4, 5, 4, 3, 3, 3, new DisplayablePassiveBonus[]{ //'Tier 6 - Melee'
+			new DisplayablePassiveBonus("+10% Movement Speed").setPiecesRequiredToActivate(2),
+			new DisplayablePassiveBonus("+5% Attack Speed").setPiecesRequiredToActivate(4),
+			new DisplayablePassiveBonus("+5 Strength").setPiecesRequiredToActivate(6)
 		}),		
-	ARTEMIS_SET("Spirit of the Hunt", 5, 7, 5, 3, 4, 3, new PassiveBonus[]{ //'Tier 7 - Archer'
+	ARTEMIS_SET("Spirit of the Hunt", 5, 7, 5, 3, 4, 3, new DisplayablePassiveBonus[]{ //'Tier 7 - Archer'
 			//(2): Arrows deal 3 extra fire damage
 			//(4): 6% chance to nullify any hit of damage
 			//(6): 10% chance for an arrow to deal double damage
 		}),
-	CELESTIAL_SET("Grace of the Celestials", 6, 8, 5, 4, 4, 3, new PassiveBonus[]{ //'Tier 7 - Mage'
+	CELESTIAL_SET("Grace of the Celestials", 6, 8, 5, 4, 4, 3, new DisplayablePassiveBonus[]{ //'Tier 7 - Mage'
 			//(2): +10% Elemental Damage
 			//(4): +300 Mana. -7% Spell Cost
 			//(6): 15% chance a spell deals 65% more damage
 		}),		
-	BERSERKER_SET("Berserk's Rage", 5, 7, 5, 3, 4, 3, new PassiveBonus[]{ //'Tier 7 - Melee'
-			new PassiveBonusSpeed(.2).setPiecesRequiredToActivate(2),
+	BERSERKER_SET("Berserk's Rage", 5, 7, 5, 3, 4, 3, new DisplayablePassiveBonus[]{ //'Tier 7 - Melee'
+			//(2): +20% Movement Speed
 			//(4): -8% Damage taken
 			//(6): 40% crit for 5-7 seconds. 2 PPM
 		}),
-	GUARDIAN_SET("Guardian's Aegis", 7, 9, 7, 5, 6, 5, new PassiveBonus[] { //'Tier 7 - Tank'
+	GUARDIAN_SET("Guardian's Aegis", 7, 9, 7, 5, 6, 5, new DisplayablePassiveBonus[] { //'Tier 7 - Tank'
 			//(2): +20 stamina
 			//(4): -8% Damage taken
 			//(6): 8% chance to restore damage taken over 6 seconds
 	}),
-	SPIRITUALIST_SET("Purity of the Spirit", 6, 8, 6, 0, 0, 0, new PassiveBonus[] {
+	SPIRITUALIST_SET("Purity of the Spirit", 6, 8, 6, 0, 0, 0, new DisplayablePassiveBonus[] {
 		//(3):+2% HP / sec
 		//(3):+10% Special Energy / minute (40% more)
 	}),	
@@ -97,10 +89,10 @@ public enum EnumArmor
 	
 	
 	
-	OP_TEST_SET("OP-Ness", 7, 9, 7, 5, 5, 5, new PassiveBonus[]{ 
-			new PassiveBonusSpeed(.4).setPiecesRequiredToActivate(2),
-			new PassiveBonusDefense(200).setPiecesRequiredToActivate(4),
-			new PassiveBonusIntellect(100).setPiecesRequiredToActivate(6)
+	OP_TEST_SET("OP-Ness", 7, 9, 7, 5, 5, 5, new DisplayablePassiveBonus[]{ 
+			new DisplayablePassiveBonus("+40% Movement Speed").setPiecesRequiredToActivate(2),
+			new DisplayablePassiveBonus("+200 Defense").setPiecesRequiredToActivate(4),
+			new DisplayablePassiveBonus("+100 Intellect").setPiecesRequiredToActivate(6)
 		});
 
 	private final int helmDefense;
@@ -110,7 +102,7 @@ public enum EnumArmor
 	private final int glovesDefense;
 	private final int beltDefense;
 	private final String setname;
-	private PassiveBonus[] bonuses;
+	private DisplayablePassiveBonus[] bonuses;
 	private static Vector<EnumArmor> armorTiers;
 	static
 	{
@@ -123,7 +115,7 @@ public enum EnumArmor
         }
 	}
 	
-	EnumArmor(String setname, int helmDef, int bodyDef, int pantsDef, int bootsDefense, int glovesDefense, int beltDefense, PassiveBonus[] bonuses)
+	EnumArmor(String setname, int helmDef, int bodyDef, int pantsDef, int bootsDefense, int glovesDefense, int beltDefense, DisplayablePassiveBonus[] bonuses)
 	{
 		this.setname = setname;
 		this.helmDefense = helmDef;
@@ -181,7 +173,7 @@ public enum EnumArmor
 		return setname;
 	}
 	
-	public PassiveBonus[] getBonuses()
+	public DisplayablePassiveBonus[] getBonuses()
 	{
 		return bonuses;
 	}
@@ -193,17 +185,17 @@ public enum EnumArmor
 	 * @param piecesEquipped the number of pieces from this set the player has equipped
 	 * @return the PassiveBonuses that are active, based on piecesEquipped
 	 */
-	public PassiveBonus[] getBonuses(int piecesEquipped)
+	public DisplayablePassiveBonus[] getBonuses(int piecesEquipped)
 	{
-		Vector<PassiveBonus> bonusVect = new Vector<PassiveBonus>();
-		for(PassiveBonus set : bonuses)
+		Vector<DisplayablePassiveBonus> bonusVect = new Vector<DisplayablePassiveBonus>();
+		for(DisplayablePassiveBonus set : bonuses)
 		{
 			if(set.getPiecesRequiredToActivate() <= piecesEquipped)
 			{
 				bonusVect.add(set);
 			}
 		}
-		PassiveBonus[] bonus = new PassiveBonus[bonusVect.size()];
+		DisplayablePassiveBonus[] bonus = new DisplayablePassiveBonus[bonusVect.size()];
 		bonusVect.copyInto(bonus);
 		return bonus;
 	}
@@ -237,7 +229,7 @@ public enum EnumArmor
 		
 		//Count the pieces of that tier active
 		int piecesEquipped = 0;
-		for(ItemStack stack: player.inventory.getArmorInventory())
+		for(DisplayableItemStack stack: player.inventory.getArmorInventory())
 		{
 			if(stack != null && ((ItemArmor)(Item.itemsList[stack.getItemID()])).getArmorType() == this)
 			{

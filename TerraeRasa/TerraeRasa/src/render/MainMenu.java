@@ -896,7 +896,7 @@ public class MainMenu extends Render
 	private void requestGameConnection()
 	{
 		try {
-			TerraeRasa.terraeRasa.gameEngine.setSentPlayer(new FileManager().loadPlayer(selectedPlayerName));
+			TerraeRasa.terraeRasa.gameEngine.setActivePlayerName(selectedPlayerName);
 			
 			String ip = (selectedServer.getIP()); 
 			int port = Integer.parseInt(selectedServer.getPort());
@@ -924,8 +924,6 @@ public class MainMenu extends Render
 			TerraeRasa.registerClientThread(thread);
 			startMPGame();
 		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 	}
@@ -1163,7 +1161,6 @@ public class MainMenu extends Render
 	private void playGame() 
 			throws IOException, ClassNotFoundException
 	{
-		TerraeRasa.startGame(selectedWorldName, fileManager.loadWorld("Earth", selectedWorldName), fileManager.loadPlayer(selectedPlayerName));
 	}
 	
 	/**

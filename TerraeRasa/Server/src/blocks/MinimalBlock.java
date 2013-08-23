@@ -50,16 +50,16 @@ public class MinimalBlock
 		this.setBitMap(savedBlock.bitMap);
 	}
 	
-	public MinimalBlock(SuperCompressedBlock compressedBlock)
-	{
-		Block block = Block.blocksList[compressedBlock.id].clone();
-		this.id = (short) block.getID();
-		this.metaData = (byte) compressedBlock.metaData;
-		this.mainInventory = compressedBlock.mainInventory; //??????
-		this.hasMetaData = block.hasMetaData;
-		this.isSolid = block.isSolid;
-		this.setBitMap(compressedBlock.bitMap);
-	}
+//	public MinimalBlock(SuperCompressedBlock compressedBlock)
+//	{
+//		Block block = Block.blocksList[compressedBlock.id].clone();
+//		this.id = (short) block.getID();
+//		this.metaData = (byte) compressedBlock.metaData;
+//		this.mainInventory = compressedBlock.mainInventory; //??????
+//		this.hasMetaData = block.hasMetaData;
+//		this.isSolid = block.isSolid;
+//		this.setBitMap(compressedBlock.bitMap);
+//	}
 	
 	public int getID()
 	{

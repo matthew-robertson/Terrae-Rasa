@@ -4,8 +4,7 @@ import java.io.Serializable;
 import java.util.Hashtable;
 import java.util.List;
 
-import statuseffects.StatusEffect;
-import statuseffects.StatusEffectAbsorb;
+import statuseffects.DisplayableStatusEffect;
 import utils.Cooldown;
 
 /**
@@ -18,10 +17,7 @@ public class StatUpdate
 		implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-
 	public int entityID;
-	
-	public boolean isStunned;
 	public double defense;
 	public double mana;
 	public double maxMana;
@@ -29,19 +25,10 @@ public class StatUpdate
 	public double maxHealth;
 	public double specialEnergy;
 	public double maxSpecialEnergy;
-	
 	public boolean isSwingingRight;
 	public boolean hasSwungTool;
 	public double rotateAngle;
-
-	public List<StatusEffect> statusEffects;
-	public List<StatusEffectAbsorb> absorbs;
+	public List<DisplayableStatusEffect> statusEffects;
 	public Hashtable<String, Cooldown> cooldowns;
-//	public PassiveBonusContainer currentBonuses; 
-//	public AuraTracker auraTracker;
-				
-//	public boolean isFacingRight;
-	
 	public boolean defeated;
-	
 }

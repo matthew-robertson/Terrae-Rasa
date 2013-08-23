@@ -1,11 +1,11 @@
 package blocks;
 
-import utils.ItemStack;
+import utils.DisplayableItemStack;
 
 /**
  * BlockChest is an extension of Block that allows items to be stored in it. Items can be placed in 
- * the chest with {@link #placeItemStack(ItemStack, int)} and removed using {@link #takeItemStack(int)}. 
- * Most methods which request an ItemStack make a deep copy to prevent reference errors, but this is not the 
+ * the chest with {@link #placeDisplayableItemStack(DisplayableItemStack, int)} and removed using {@link #takeDisplayableItemStack(int)}. 
+ * Most methods which request an DisplayableItemStack make a deep copy to prevent reference errors, but this is not the 
  * case with {@link #getMainInventory()}, therefore caution should be used to prevent corrupting the chest's 
  * contents. 
  * <br><br>
@@ -18,7 +18,7 @@ import utils.ItemStack;
 public class BlockChest extends Block
 {
 	/** The contents of the chest. */
-	private ItemStack[] mainInventory;
+	private DisplayableItemStack[] mainInventory;
 	
 	/**
 	 * Creates a chest of the specified size and ID. Block(int) is called, and handed the ID of the 
@@ -30,7 +30,7 @@ public class BlockChest extends Block
 	protected BlockChest(int i, int inventorySize)
 	{
 		super(i);
-		mainInventory = new ItemStack[inventorySize];
+		mainInventory = new DisplayableItemStack[inventorySize];
 	}	
 	
 	/**
@@ -41,7 +41,7 @@ public class BlockChest extends Block
 	public BlockChest(BlockChest block)
 	{
 		super(block);
-		this.mainInventory = new ItemStack[block.getInventorySize()];
+		this.mainInventory = new DisplayableItemStack[block.getInventorySize()];
 	}
 	
 	/**
@@ -50,7 +50,7 @@ public class BlockChest extends Block
 	 * @param index
 	 * @return
 	 */
-	public ItemStack placeItemStack(ItemStack stack, int index)
+	public DisplayableItemStack placeDisplayableItemStack(DisplayableItemStack stack, int index)
 	{
 		if(mainInventory[index] == null)
 		{
@@ -74,14 +74,14 @@ public class BlockChest extends Block
 	}
 	
 	/**
-	 * Gets the ItemStack at the specified index and then removes that ItemStack from the chest. This will return null if 
-	 * there is no item at the given ItemStack. Additionally, the ItemStack returned will be a deep copy.
-	 * @param index the ItemStack to remove from the chest
-	 * @return the ItemStack at given index from the chest
+	 * Gets the DisplayableItemStack at the specified index and then removes that DisplayableItemStack from the chest. This will return null if 
+	 * there is no item at the given DisplayableItemStack. Additionally, the DisplayableItemStack returned will be a deep copy.
+	 * @param index the DisplayableItemStack to remove from the chest
+	 * @return the DisplayableItemStack at given index from the chest
 	 */
-	public ItemStack takeItemStack(int index)
+	public DisplayableItemStack takeDisplayableItemStack(int index)
 	{
-		ItemStack stack = (mainInventory[index] != null) ? new ItemStack(mainInventory[index]) : null;
+		DisplayableItemStack stack = (mainInventory[index] != null) ? new DisplayableItemStack(mainInventory[index]) : null;
 		mainInventory[index] = null;
 		return stack;
 	}
@@ -99,22 +99,22 @@ public class BlockChest extends Block
 	}
 	
 	/**
-	 * Returns a deep copy of the ItemStack at the given index. This will instead be null if there is no 
-	 * ItemStack at the given index. An out of bounds exception is thrown if the given index is not within the 
+	 * Returns a deep copy of the DisplayableItemStack at the given index. This will instead be null if there is no 
+	 * DisplayableItemStack at the given index. An out of bounds exception is thrown if the given index is not within the 
 	 * Chest's mainInventory[] size.
 	 * @param index the slot of the chest to copy
-	 * @return a deep copy of the ItemStack at the given index, or null if it's empty
+	 * @return a deep copy of the DisplayableItemStack at the given index, or null if it's empty
 	 */
-	public ItemStack getItemStack(int index)
+	public DisplayableItemStack getDisplayableItemStack(int index)
 	{
-		return (mainInventory[index] != null) ? new ItemStack(mainInventory[index]) : null;
+		return (mainInventory[index] != null) ? new DisplayableItemStack(mainInventory[index]) : null;
 	}
 	
 	/**
-	 * Removes the ItemStack at the given index from the chest's inventory.
+	 * Removes the DisplayableItemStack at the given index from the chest's inventory.
 	 * @param index the slot of the chest to empty.
 	 */
-	public void removeItemStack(int index)
+	public void removeDisplayableItemStack(int index)
 	{
 		mainInventory[index] = null;
 	}
@@ -123,7 +123,7 @@ public class BlockChest extends Block
 	 * Returns a reference to the chest's mainInventory[].
 	 * @return a reference to the chest's mainInventory[]
 	 */
-	public ItemStack[] getMainInventory()
+	public DisplayableItemStack[] getMainInventory()
 	{
 		return mainInventory;
 	}
@@ -139,16 +139,16 @@ public class BlockChest extends Block
 	}
 	
 	/**
-	 * Sets the mainInventory[] to the given ItemStacks
+	 * Sets the mainInventory[] to the given DisplayableItemStacks
 	 * @param stacks the new contains of the mainInventory[]
 	 */
-	public void setInventory(ItemStack[] stacks)
+	public void setInventory(DisplayableItemStack[] stacks)
 	{
 		for(int i = 0; i < mainInventory.length; i++)
 		{
 			if(i < stacks.length && stacks[i] != null)
 			{
-				mainInventory[i] = new ItemStack(stacks[i]);
+				mainInventory[i] = new DisplayableItemStack(stacks[i]);
 			}
 		}
 	}
@@ -160,7 +160,7 @@ public class BlockChest extends Block
 	 */
 	public void setInventorySize(int newsize)
 	{
-		mainInventory = new ItemStack[newsize];
+		mainInventory = new DisplayableItemStack[newsize];
 	}
 	
 	public boolean removeItemsFromInventoryStack(int howMany, int index)

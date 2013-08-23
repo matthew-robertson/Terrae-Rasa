@@ -1,10 +1,8 @@
 package utils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import savable.SaveManager;
 import server.TerraeRasa;
 import world.World;
 import world.WorldGenEarth;
@@ -12,8 +10,6 @@ import world.WorldGenHell;
 import world.WorldGenSky;
 import world.WorldHell;
 import world.WorldSky;
-import entities.EntityPlayer;
-import enums.EnumPlayerDifficulty;
 import enums.EnumWorldDifficulty;
 import enums.EnumWorldSize;
 
@@ -131,67 +127,6 @@ public class FileManager
 		WorldSky world = (WorldSky) new WorldGenSky().generate(new World(name, w, h, difficulty), 0, w, 0, h);
 	//	LightingEngine.applySunlight(world);
 		return world;
-	}
-	
-	/**
-	 * Creates a new player and saves it to file immediately before returning that new player
-	 * @param name Name of the player being created
-	 * @param difficulty The difficulty settings (EnumDifficulty) of the player being created
-	 * @return The new player created, or in the case of a failure - null;
-	 */
-	public EntityPlayer generateAndSavePlayer(String name, EnumPlayerDifficulty difficulty)
-	{
-		try 
-		{
-			EntityPlayer player = generateNewEntityPlayer(name, difficulty);
-			savePlayer(player);
-			return player;
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-			return null;
-		}
-	}
-	
-	/**
-	 * Generates a new EntityPlayer with filler x, y positions
-	 * @param name the name of the player to be generated.
-	 * @param difficulty the difficulty setting (EnumDifficulty) of the player to be generated
-	 * @return a newly generated EntityPlayer with given attributes 
-	 */
-	private EntityPlayer generateNewEntityPlayer(String name, EnumPlayerDifficulty difficulty)
-	{
-		return new EntityPlayer(name, difficulty);
-	}
-	
-	/**
-	 * Saves the specified player object in compressed GZIP format to the ~/Player Saves/ Directory
-	 * @param player The player to be saved
-	 * @throws IOException Indicates the saving operation has failed
-	 * @throws FileNotFoundException Indicates the desired directory (file) is not found on the filepath
-	 */
-	public void savePlayer(EntityPlayer player) 
-			throws FileNotFoundException, IOException
-	{
-		SaveManager manager = new SaveManager();
-		manager.saveFile("/Player Saves/" + player.getName() + ".xml", player);
-	}
-		
-	/**
-	 * Loads the specified player from the ~/Player Saves/ Directory
-	 * @param name the name of the player to load
-	 * @return the EntityPlayer loaded
-	 * @throws IOException Indicates the saving operation has failed
-	 * @throws ClassNotFoundException Indicates the EntityPlayer class does not exist with the correct version
-	 */
-	public EntityPlayer loadPlayer(String name) 
-			throws IOException, ClassNotFoundException
-	{
-		String fileName = "/Player Saves/" + name + ".xml";
-		EntityPlayer player = (EntityPlayer)new SaveManager().loadFile(fileName);
-		player.reconstructPlayerFromFile();
-		return player;
 	}
 	
 	/**

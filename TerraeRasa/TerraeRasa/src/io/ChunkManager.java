@@ -9,16 +9,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import blocks.Block;
-import blocks.BlockChest;
-import blocks.MinimalBlock;
-
 import savable.SavableBlock;
-import savable.SavableChunk;
-import savable.SavableWorld;
 import savable.SaveManager;
-import utils.ItemStack;
 import world.World;
+import blocks.MinimalBlock;
 import client.TerraeRasa;
 
 
@@ -191,18 +185,18 @@ public class ChunkManager
 		
 	private void submitSaveOperation(Chunk chunk, String dir, int x)
 	{
-		Future<Boolean> event = threadPool.submit(new CallableSaveChunk(this,
-				chunk, x, "/World Saves/" + universeName + "/" + dir,
-				universeName));
-		scheduledSaveOperations.add(event);
+//		Future<Boolean> event = threadPool.submit(new CallableSaveChunk(this,
+//				chunk, x, "/World Saves/" + universeName + "/" + dir,
+//				universeName));
+//		scheduledSaveOperations.add(event);
 	}
 	
 	private void submitLoadOperation(String dir, int x)	
 	{
-		Future<Chunk> event = threadPool.submit(new CallableLoadChunk(this, 
-				x, "/World Saves/" + universeName + "/" + dir, 
-				universeName));
-		scheduledLoadOperations.add(event);
+//		Future<Chunk> event = threadPool.submit(new CallableLoadChunk(this, 
+//				x, "/World Saves/" + universeName + "/" + dir, 
+//				universeName));
+//		scheduledLoadOperations.add(event);
 	}
 	
 	/**
@@ -272,28 +266,28 @@ public class ChunkManager
 	 */
 	public void saveWorldData(World world)
 	{
-		try
-		{
-			SavableWorld savable = new SavableWorld();
-			savable.width = world.getWidth();
-			savable.height = world.getHeight();
-			savable.chunkWidth = world.getChunkWidth();
-			savable.chunkHeight = 1;
-			savable.averageSkyHeight = world.getAverageSkyHeight();
-			savable.generatedHeightMap = world.getGeneratedHeightMap();
-			savable.worldTime = world.getWorldTime();
-			savable.worldName = world.getWorldName();
-			savable.totalBiomes = world.getTotalBiomes();
-			savable.difficulty = world.getDifficulty();
-
-			SaveManager manager = new SaveManager();
-			manager.saveFile("/World Saves/" + universeName + "/" + world.getWorldName() + "/worlddata.xml", savable);
-			
-		}
-		catch (IOException e) 
-		{
-			e.printStackTrace();
-		} 
+//		try
+//		{
+//			SavableWorld savable = new SavableWorld();
+//			savable.width = world.getWidth();
+//			savable.height = world.getHeight();
+//			savable.chunkWidth = world.getChunkWidth();
+//			savable.chunkHeight = 1;
+//			savable.averageSkyHeight = world.getAverageSkyHeight();
+//			savable.generatedHeightMap = world.getGeneratedHeightMap();
+//			savable.worldTime = world.getWorldTime();
+//			savable.worldName = world.getWorldName();
+//			savable.totalBiomes = world.getTotalBiomes();
+//			savable.difficulty = world.getDifficulty();
+//
+//			SaveManager manager = new SaveManager();
+//			manager.saveFile("/World Saves/" + universeName + "/" + world.getWorldName() + "/worlddata.xml", savable);
+//			
+//		}
+//		catch (IOException e) 
+//		{
+//			e.printStackTrace();
+//		} 
 	}
 	
 	/**
@@ -366,29 +360,29 @@ public class ChunkManager
 		
 		lockChunk(x);
 		
-		SavableChunk savable = new SavableChunk();
-		savable.biomeID = chunk.getBiome().getBiomeID();
-		savable.light = chunk.getLight();
-		savable.diffuseLight = chunk.diffuseLight;
-		savable.ambientLight = chunk.ambientLight;
-		savable.backWalls = convertToSavable(chunk.backWalls);
-		savable.blocks = convertToSavable(chunk.blocks);
-		savable.x = chunk.getX();
-		savable.wasChanged = chunk.getChanged();
-		savable.height = chunk.getHeight();
-		savable.lightUpdated = true;
-		savable.flaggedForLightingUpdate = true;
-			
-		String basepath = "/World Saves/" + universeName + "/" + directory;
-		
-		SaveManager smanager = new SaveManager();
-		try {
-			smanager.saveCompressedFile(basepath + "/" + x + ".trc", savable);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		System.out.println("Chunk Saved to: " + basepath + "/" + x + ".trc");
-		unlockChunk(chunk.getX());
+//		SavableChunk savable = new SavableChunk();
+//		savable.biomeID = chunk.getBiome().getBiomeID();
+//		savable.light = chunk.getLight();
+//		savable.diffuseLight = chunk.diffuseLight;
+//		savable.ambientLight = chunk.ambientLight;
+//		savable.backWalls = convertToSavable(chunk.backWalls);
+//		savable.blocks = convertToSavable(chunk.blocks);
+//		savable.x = chunk.getX();
+//		savable.wasChanged = chunk.getChanged();
+//		savable.height = chunk.getHeight();
+//		savable.lightUpdated = true;
+//		savable.flaggedForLightingUpdate = true;
+//			
+//		String basepath = "/World Saves/" + universeName + "/" + directory;
+//		
+//		SaveManager smanager = new SaveManager();
+//		try {
+//			smanager.saveCompressedFile(basepath + "/" + x + ".trc", savable);
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//		System.out.println("Chunk Saved to: " + basepath + "/" + x + ".trc");
+//		unlockChunk(chunk.getX());
 		
 		
 		return true;

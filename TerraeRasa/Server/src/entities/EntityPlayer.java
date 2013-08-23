@@ -9,24 +9,29 @@ import items.ItemTool;
 import items.ItemToolAxe;
 import items.ItemToolPickaxe;
 
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Random;
 import java.util.Vector;
 
 import passivebonuses.PassiveBonus;
 import passivebonuses.PassiveBonusContainer;
 import passivebonuses.PassiveBonusFactory;
+import savable.SavablePlayer;
+import savable.SaveManager;
 import server.GameEngine;
 import server.Log;
 import server.TerraeRasa;
+import statuseffects.DisplayableStatusEffect;
 import statuseffects.StatusEffect;
 import statuseffects.StatusEffectAbsorb;
-import transmission.CompressedPlayer;
 import transmission.EntityUpdate;
 import transmission.ServerUpdate;
 import transmission.StatUpdate;
+import transmission.TransmittablePlayer;
 import transmission.UpdateWithObject;
 import utils.Cooldown;
 import utils.Damage;
@@ -100,15 +105,14 @@ public class EntityPlayer extends EntityLiving
 	private int ticksOfHealthRegen;
 	private boolean isInCombat;
 	private boolean isMining;
-	private boolean isReloaded;
 	private int ticksreq;
 	private int sx;
 	private int sy;		
 	private String playerName;
-	private boolean inventoryChanged;
 	private final EnumPlayerDifficulty difficulty;
 	private final int MAXIMUM_BASE_MANA = 400;
 	private final int MAXIMUM_BASE_HEALTH = 400;
+	private final int MAXIMUM_BASE_SPECIAL = 100;
 	private final int MAX_BLOCK_PLACE_DISTANCE = 42;
 	private Hashtable<String, Cooldown> cooldowns;
 	private int baseSpecialEnergy;
@@ -203,7 +207,6 @@ public class EntityPlayer extends EntityLiving
 		viewedChestX = 0;
 		viewedChestY = 0;
 		defeated = false;
-		inventoryChanged = true;	
 		selectedRecipe = 0;
 		knockbackModifier = 1;
 		meleeDamageModifier = 1;
@@ -218,7 +221,6 @@ public class EntityPlayer extends EntityLiving
 		intellectModifier = 1;
 		dexterityModifier = 1;
 		strengthModifier = 1;
-		isReloaded = false;
 		cooldowns = new Hashtable<String, Cooldown>();
 		nearBlock = new Hashtable<String, Boolean>();
 		
@@ -230,32 +232,125 @@ public class EntityPlayer extends EntityLiving
 		deathSound = "Player Death";
 	}
 	
+	public EntityPlayer(World world, SavablePlayer savable)
+	{
+		super();		
+		stamina = 0;
+		specialEnergy = 100;
+		isJumping = false;
+		isMining = false;
+		setMovementSpeedModifier(1.0f);		
+		setBaseSpeed(5.0f);
+		width = 12;
+		height = 18;
+		baseSpecialEnergy = 100;
+		maxSpecialEnergy = 100;
+		temporarySpecialEnergy = 0;
+		setMaxHeightFallenSafely(78);
+		blockHeight = 3;
+		blockWidth = 2;
+		setRespawnPosition(50, 0);		
+		setUpwardJumpHeight(48);
+		ticksSinceLastCast = 99999;
+		upwardJumpCounter = 0;
+		jumpSpeed = 5;
+		canJumpAgain = true;
+		rotateAngle = -120.0f;		
+		isInCombat = false;
+		ticksInCombat = 0;
+		ticksSinceLastCast = 0;
+		maxHealth = 100;
+		maxMana = 0;
+		invincibilityTicks = 10;
+		selectedSlot = 0;
+		viewedChestX = 0;
+		viewedChestY = 0;
+		defeated = false;
+		selectedRecipe = 0;
+		knockbackModifier = 1;
+		meleeDamageModifier = 1;
+		rangeDamageModifier = 1;
+		magicDamageModifier = 1;
+		healthRegenerationModifier = 1;
+		manaRegenerationModifier = 1;
+		specialRegenerationModifier = 1;
+		allDamageModifier = 1;
+		pickupRangeModifier = 1;
+		staminaModifier = 1;
+		intellectModifier = 1;
+		dexterityModifier = 1;
+		strengthModifier = 1;
+		cooldowns = new Hashtable<String, Cooldown>();
+		nearBlock = new Hashtable<String, Boolean>();
+		nearBlock.put(Block.none.getName(), true);		
+		auraTracker = new AuraTracker();		
+		jumpSound = "Player Jump";
+		deathSound = "Player Death";		
+		//Apply the savable stuff now.		
+		this.difficulty = savable.difficulty;
+		this.playerName = savable.playerName;
+		this.mana = savable.mana;
+		this.health = savable.health;
+		this.specialEnergy = savable.specialEnergy;
+		this.baseSpecialEnergy = savable.baseSpecialEnergy;
+		this.baseMaxHealth = savable.baseMaxHealth;
+		this.baseMaxMana = savable.baseMaxMana;
+		this.cooldowns = savable.cooldowns;
+		this.inventory = new InventoryPlayer(savable.mainInventory, savable.armorInventory, savable.quiver);
+		
+		//Safety Check for base maximums
+		verifyBarItegrity();
+		
+		for(StatusEffect effect : statusEffects)
+		{
+			registerStatusEffect(world, effect);
+		}		
+		for(int i = 0; i < inventory.getArmorInventory().length; i++)
+		{
+			if(inventory.getArmorInventoryStack(i) != null)
+			{
+				ItemStack newStack = inventory.getArmorInventoryStack(i);
+				applySingleArmorItem((ItemArmor)(Item.itemsList[newStack.getItemID()]), newStack, i);
+			}
+		}
+		
+		refreshPassiveBonuses();
+		recalculateStats();
+		armorChanged = false;
+		
+		if(health > maxHealth)
+			health = maxHealth;
+		if(mana > maxMana)
+			mana = maxMana;
+		if(specialEnergy > maxSpecialEnergy)
+			specialEnergy = maxSpecialEnergy;
+		
+		//TODO make sure the stats dont exceed maximum allowed values. I dont see any good reason not to cap stuff.
+		//TODO cap out status effects at a given value. Basically, if the power value exceeds 100% then flag it as invalid?
+	}
+	
 	public EntityPlayer(EntityPlayer entity)
 	{
 		throw new RuntimeException("Support Not Implemented - Was this action actually required?");
 	}
 	
 	/**
-	 * Fixes issues from loading a player from disk. This generally relates to applying newer recipes and content, so that the
-	 * player can actually view and use them.
+	 * Verifies that health, mana, and special energy maximums arent illegal
 	 */
-	public void reconstructPlayerFromFile()
-	{	
-		isReloaded = true;
-		rotateAngle = -120.0f;			
-		invincibilityTicks = 10;
-		selectedSlot = 0;
-		viewedChestX = 0;
-		viewedChestY = 0;
-		isViewingChest = false;
-		isMining = false;
-		inventoryChanged = true;	
-		selectedRecipe = 0;
-		nearBlock = new Hashtable<String, Boolean>();
-
-		nearBlock.put(Block.none.getName(), true);
-
-		auraTracker = new AuraTracker();
+	public void verifyBarItegrity()
+	{
+		if(baseMaxMana > MAXIMUM_BASE_MANA)
+		{
+			baseMaxMana = MAXIMUM_BASE_MANA;
+		}
+		if(baseMaxHealth > MAXIMUM_BASE_HEALTH)
+		{
+			baseMaxHealth = MAXIMUM_BASE_HEALTH;
+		}
+		if(baseSpecialEnergy > MAXIMUM_BASE_SPECIAL)
+		{
+			baseSpecialEnergy = MAXIMUM_BASE_SPECIAL;
+		}
 	}
 	
 	/**
@@ -659,7 +754,6 @@ public class EntityPlayer extends EntityLiving
 	 */
 	public void onInventoryChange()
 	{
-		inventoryChanged = true; 
 	}
 	
 	/**
@@ -1045,7 +1139,7 @@ public class EntityPlayer extends EntityLiving
 			entityUpdate.action = 'a';
 			entityUpdate.type = 4;
 			entityUpdate.entityID = projectile.entityID;
-			entityUpdate.updatedEntity = projectile;
+			entityUpdate.updatedEntity = new DisplayableEntity(projectile);
 			update.addEntityUpdate(entityUpdate);
 			world.addEntityToProjectileList(projectile);
 			mana -= item.getManaReq();			
@@ -1080,7 +1174,7 @@ public class EntityPlayer extends EntityLiving
 					entityUpdate.action = 'a';
 					entityUpdate.type = 4;
 					entityUpdate.entityID = projectile.entityID;
-					entityUpdate.updatedEntity = projectile;
+					entityUpdate.updatedEntity = new DisplayableEntity(projectile);
 					update.addEntityUpdate(entityUpdate);
 					world.addEntityToProjectileList(projectile);
 								
@@ -1116,7 +1210,7 @@ public class EntityPlayer extends EntityLiving
 			entityUpdate.action = 'a';
 			entityUpdate.type = 4;
 			entityUpdate.entityID = projectile.entityID;
-			entityUpdate.updatedEntity = projectile;
+			entityUpdate.updatedEntity = new DisplayableEntity(projectile);
 			update.addEntityUpdate(entityUpdate);
 			world.addEntityToProjectileList(projectile);				
 			
@@ -1363,227 +1457,10 @@ public class EntityPlayer extends EntityLiving
 		return (maxMana == 0) ? 0 : mana / maxMana;
 	}
 	
-	public static CompressedPlayer compress(EntityPlayer player)
-	{
-		CompressedPlayer compressPlayer = new CompressedPlayer();
-		compressPlayer.entityID = player.entityID;
-		compressPlayer.x = player.x;
-		compressPlayer.y = player.y;
-		compressPlayer.isAffectedByWalls = player.isAffectedByWalls;
-		compressPlayer.isAffectedByGravity = player.isAffectedByGravity;
-		compressPlayer.upwardJumpCounter = player.upwardJumpCounter; 	
-		compressPlayer.canJumpAgain = player.canJumpAgain;
-		compressPlayer.isJumping = player.isJumping;	
-		compressPlayer.upwardJumpHeight = player.upwardJumpHeight; 
-		compressPlayer.jumpSpeed = player.jumpSpeed;	
-		compressPlayer.isStunned = player.isStunned;
-		compressPlayer.ticksFallen = player.ticksFallen;
-		compressPlayer.textureWidth = player.textureWidth;
-		compressPlayer.textureHeight = player.textureHeight;
-		compressPlayer.width = player.width;
-		compressPlayer.height = player.height;
-		compressPlayer.blockWidth = player.blockWidth;
-		compressPlayer.blockHeight = player.blockHeight;
-		compressPlayer.distanceFallen = player.distanceFallen;
-		compressPlayer.maxHeightFallenSafely = player.maxHeightFallenSafely;
-		compressPlayer.baseSpeed = player.baseSpeed;
-		compressPlayer.movementSpeedModifier = player.movementSpeedModifier;
-
-		compressPlayer.attackSpeedModifier = player.attackSpeedModifier;
-		compressPlayer.knockbackModifier = player.knockbackModifier;
-		compressPlayer.meleeDamageModifier = player.meleeDamageModifier;
-		compressPlayer.rangeDamageModifier = player.rangeDamageModifier;
-		compressPlayer.magicDamageModifier = player.magicDamageModifier;
-		compressPlayer.allDamageModifier = player.allDamageModifier;	
-		compressPlayer.statusEffects = player.statusEffects;	
-		compressPlayer.criticalStrikeChance = player.criticalStrikeChance; 
-		compressPlayer.dodgeChance = player.dodgeChance;
-		compressPlayer.isImmuneToFallDamage = player.isImmuneToFallDamage;
-		compressPlayer.invincibilityTicks = player.invincibilityTicks;	
-		compressPlayer.maxHealth = player.maxHealth;
-		compressPlayer.maxMana = player.maxMana;
-		compressPlayer.mana = player.mana;
-		compressPlayer.defense = player.defense;
-		compressPlayer.health = player.health;
-		compressPlayer.absorbs = player.absorbs;
-		
-		compressPlayer.isSwingingRight = player.isSwingingRight;
-		compressPlayer.hasSwungTool = player.hasSwungTool;
-		compressPlayer.rotateAngle = player.rotateAngle;
-		compressPlayer.armorChanged = player.armorChanged;
-		compressPlayer.ticksSinceLastCast = player.ticksSinceLastCast;
-		compressPlayer.ticksInCombat = player.ticksInCombat;
-		compressPlayer.ticksOfHealthRegen = player.ticksOfHealthRegen;
-		compressPlayer.isInCombat = player.isInCombat;
-		compressPlayer.isMining = player.isMining;
-		compressPlayer.isReloaded = player.isReloaded;
-		compressPlayer.ticksreq = player.ticksreq;
-		compressPlayer.sx = player.sx;
-		compressPlayer.sy = player.sy;		
-		compressPlayer.playerName = player.playerName;
-		compressPlayer.inventoryChanged = player.inventoryChanged;
-		compressPlayer.difficulty = player.difficulty;
-
-		compressPlayer.cooldowns = player.cooldowns;
-		compressPlayer.baseSpecialEnergy = player.baseSpecialEnergy;
-		compressPlayer.nearBlock = player.nearBlock;
-		compressPlayer.currentBonuses = player.currentBonuses; 
-		compressPlayer.auraTracker = player.auraTracker;
-		
-		compressPlayer.strength = player.strength;
-		compressPlayer.dexterity = player.dexterity;
-		compressPlayer.intellect = player.intellect;
-		compressPlayer.stamina = player.stamina;
-		
-		compressPlayer.temporarySpecialEnergy = player.temporarySpecialEnergy;
-		compressPlayer.specialEnergy = player.specialEnergy;
-		compressPlayer.maxSpecialEnergy = player.maxSpecialEnergy;
-		
-		compressPlayer.viewedChestX = player.viewedChestX;
-		compressPlayer.viewedChestY = player.viewedChestY;
-		compressPlayer.isViewingChest = player.isViewingChest;	
-		compressPlayer.baseMaxHealth = player.baseMaxHealth;
-		compressPlayer.temporaryMaxHealth = player.temporaryMaxHealth;
-		compressPlayer.baseMaxMana = player.baseMaxMana;	
-		compressPlayer.temporaryMaxMana = player.temporaryMaxMana;
-		compressPlayer.respawnXPos = player.respawnXPos;
-		compressPlayer.respawnYPos = player.respawnYPos;	
-		
-		compressPlayer.selectedRecipe = player.selectedRecipe;
-		compressPlayer.selectedSlot = player.selectedSlot;
-		compressPlayer.isFacingRight = player.isFacingRight;
-		compressPlayer.isInventoryOpen = player.isInventoryOpen;	
-		compressPlayer.inventory = player.inventory;
-		
-		compressPlayer.healthRegenerationModifier = player.healthRegenerationModifier;
-		compressPlayer.manaRegenerationModifier = player.manaRegenerationModifier;
-		compressPlayer.specialRegenerationModifier = player.specialRegenerationModifier;
-		
-		compressPlayer.pickupRangeModifier = player.pickupRangeModifier;
-		compressPlayer.staminaModifier = player.staminaModifier;
-		compressPlayer.intellectModifier = player.intellectModifier;
-		compressPlayer.dexterityModifier = player.dexterityModifier;
-		compressPlayer.strengthModifier = player.strengthModifier;
-		
-		compressPlayer.defeated = player.defeated;
-		
-		
-		
-		return compressPlayer;
-	}
-	
-	public static EntityPlayer expand(CompressedPlayer compressedPlayer)
-	{
-		EntityPlayer player = new EntityPlayer(compressedPlayer.playerName, compressedPlayer.difficulty);
-		player.entityID = compressedPlayer.entityID;
-		player.x = compressedPlayer.x;
-		player.y = compressedPlayer.y;
-		player.isAffectedByWalls = compressedPlayer.isAffectedByWalls;
-		player.isAffectedByGravity = compressedPlayer.isAffectedByGravity;
-		player.upwardJumpCounter = compressedPlayer.upwardJumpCounter; 	
-		player.canJumpAgain = compressedPlayer.canJumpAgain;
-		player.isJumping = compressedPlayer.isJumping;	
-		player.upwardJumpHeight = compressedPlayer.upwardJumpHeight; 
-		player.jumpSpeed = compressedPlayer.jumpSpeed;	
-		player.isStunned = compressedPlayer.isStunned;
-		player.ticksFallen = compressedPlayer.ticksFallen;
-		player.textureWidth = compressedPlayer.textureWidth;
-		player.textureHeight = compressedPlayer.textureHeight;
-		player.width = compressedPlayer.width;
-		player.height = compressedPlayer.height;
-		player.blockWidth = compressedPlayer.blockWidth;
-		player.blockHeight = compressedPlayer.blockHeight;
-		player.distanceFallen = compressedPlayer.distanceFallen;
-		player.maxHeightFallenSafely = compressedPlayer.maxHeightFallenSafely;
-		player.baseSpeed = compressedPlayer.baseSpeed;
-		player.movementSpeedModifier = compressedPlayer.movementSpeedModifier;
-
-		player.attackSpeedModifier = compressedPlayer.attackSpeedModifier;
-		player.knockbackModifier = compressedPlayer.knockbackModifier;
-		player.meleeDamageModifier = compressedPlayer.meleeDamageModifier;
-		player.rangeDamageModifier = compressedPlayer.rangeDamageModifier;
-		player.magicDamageModifier = compressedPlayer.magicDamageModifier;
-		player.allDamageModifier = compressedPlayer.allDamageModifier;	
-		player.statusEffects = compressedPlayer.statusEffects;	
-		player.criticalStrikeChance = compressedPlayer.criticalStrikeChance; 
-		player.dodgeChance = compressedPlayer.dodgeChance;
-		player.isImmuneToFallDamage = compressedPlayer.isImmuneToFallDamage;
-		player.invincibilityTicks = compressedPlayer.invincibilityTicks;	
-		player.maxHealth = compressedPlayer.maxHealth;
-		player.maxMana = compressedPlayer.maxMana;
-		player.mana = compressedPlayer.mana;
-		player.defense = compressedPlayer.defense;
-		player.health = compressedPlayer.health;
-		player.absorbs = compressedPlayer.absorbs;
-		
-		player.isSwingingRight = compressedPlayer.isSwingingRight;
-		player.hasSwungTool = compressedPlayer.hasSwungTool;
-		player.rotateAngle = compressedPlayer.rotateAngle;
-		player.armorChanged = compressedPlayer.armorChanged;
-		player.ticksSinceLastCast = compressedPlayer.ticksSinceLastCast;
-		player.ticksInCombat = compressedPlayer.ticksInCombat;
-		player.ticksOfHealthRegen = compressedPlayer.ticksOfHealthRegen;
-		player.isInCombat = compressedPlayer.isInCombat;
-		player.isMining = compressedPlayer.isMining;
-		player.isReloaded = compressedPlayer.isReloaded;
-		player.ticksreq = compressedPlayer.ticksreq;
-		player.sx = compressedPlayer.sx;
-		player.sy = compressedPlayer.sy;		
-		//player.playerName = ;
-		player.inventoryChanged = compressedPlayer.inventoryChanged;
-		//player.difficulty = ;
-
-		player.cooldowns = compressedPlayer.cooldowns;
-		player.baseSpecialEnergy = compressedPlayer.baseSpecialEnergy;
-		player.nearBlock = compressedPlayer.nearBlock;
-		player.currentBonuses = compressedPlayer.currentBonuses; 
-		player.auraTracker = compressedPlayer.auraTracker;
-		
-		player.strength = compressedPlayer.strength;
-		player.dexterity = compressedPlayer.dexterity;
-		player.intellect = compressedPlayer.intellect;
-		player.stamina = compressedPlayer.stamina;
-		
-		player.temporarySpecialEnergy = compressedPlayer.temporarySpecialEnergy;
-		player.specialEnergy = compressedPlayer.specialEnergy;
-		player.maxSpecialEnergy = compressedPlayer.maxSpecialEnergy;
-		
-		player.viewedChestX = compressedPlayer.viewedChestX;
-		player.viewedChestY = compressedPlayer.viewedChestY;
-		player.isViewingChest = compressedPlayer.isViewingChest;	
-		player.baseMaxHealth = compressedPlayer.baseMaxHealth;
-		player.temporaryMaxHealth = compressedPlayer.temporaryMaxHealth;
-		player.baseMaxMana = compressedPlayer.baseMaxMana;	
-		player.temporaryMaxMana = compressedPlayer.temporaryMaxMana;
-		player.respawnXPos = compressedPlayer.respawnXPos;
-		player.respawnYPos = compressedPlayer.respawnYPos;	
-		
-		player.selectedRecipe = compressedPlayer.selectedRecipe;
-		player.selectedSlot = compressedPlayer.selectedSlot;
-		player.isFacingRight = compressedPlayer.isFacingRight;
-		player.isInventoryOpen = compressedPlayer.isInventoryOpen;	
-		player.inventory = compressedPlayer.inventory;
-		
-		player.healthRegenerationModifier = compressedPlayer.healthRegenerationModifier;
-		player.manaRegenerationModifier = compressedPlayer.manaRegenerationModifier;
-		player.specialRegenerationModifier = compressedPlayer.specialRegenerationModifier;
-		
-		player.pickupRangeModifier = compressedPlayer.pickupRangeModifier;
-		player.staminaModifier = compressedPlayer.staminaModifier;
-		player.intellectModifier = compressedPlayer.intellectModifier;
-		player.dexterityModifier = compressedPlayer.dexterityModifier;
-		player.strengthModifier = compressedPlayer.strengthModifier;
-		
-		player.defeated = compressedPlayer.defeated;
-		
-		return player;
-	}
-	
 	public StatUpdate getStats()
 	{
 		StatUpdate update = new StatUpdate();
 		update.entityID = this.entityID;
-		update.isStunned = this.isStunned;
 		update.defense = this.defense;
 		update.mana = this.mana;
 		update.maxMana = this.maxMana;
@@ -1594,31 +1471,21 @@ public class EntityPlayer extends EntityLiving
 		update.isSwingingRight = this.isSwingingRight;
 		update.hasSwungTool = this.hasSwungTool;
 		update.rotateAngle = this.rotateAngle;
-		update.statusEffects = this.statusEffects;
-		update.absorbs = this.absorbs;
+		update.statusEffects = convert(this.statusEffects);
 		update.cooldowns = this.cooldowns;
 		update.defeated = this.defeated;
 		return update;
-		
 	}
 	
-	public void setStats(StatUpdate newStats)
+	public List<DisplayableStatusEffect> convert(List<StatusEffect> effects)
 	{
-		this.isStunned = newStats.isStunned;
-		this.defense = newStats.defense;
-		this.mana = newStats.mana;
-		this.maxMana = (int) newStats.maxMana;
-		this.health = newStats.health;
-		this.maxHealth = (int) newStats.maxHealth;
-		this.specialEnergy = newStats.specialEnergy;
-		this.maxSpecialEnergy = newStats.maxSpecialEnergy;
-		this.isSwingingRight = newStats.isSwingingRight;
-		this.hasSwungTool = newStats.hasSwungTool;
-		this.rotateAngle = newStats.rotateAngle;
-		this.statusEffects = newStats.statusEffects;
-		this.absorbs = newStats.absorbs;
-		this.cooldowns = newStats.cooldowns;
-		this.defeated = newStats.defeated;
+		List<DisplayableStatusEffect> display = new ArrayList<DisplayableStatusEffect>();
+		for(StatusEffect effect : effects)
+		{
+			DisplayableStatusEffect displayable = new DisplayableStatusEffect(effect);
+			display.add(displayable);
+		}
+		return display;
 	}
 
 	public void verifyName()
@@ -1675,16 +1542,8 @@ public class EntityPlayer extends EntityLiving
 		if(effect instanceof StatusEffectAbsorb)
 		{
 			registerAbsorb((StatusEffectAbsorb)effect);
-		}
+		} 
 		
-//		else if(split[2].equals("statuseffectadd"))
-//		{
-//			EntityPlayer player = ((EntityPlayer)(world.getEntityByID(Integer.parseInt(split[1]))));
-//			player.registerStatusEffect((StatusEffect)(update.object));
-//		}
-//		String command = "/player " + entityID + " statuseffectremove " + statusEffects.get(i).id;
-//		TerraeRasa.terraeRasa.gameEngine.addCommandUpdate(command);
-
 		for(int i = 0; i < statusEffects.size(); i++)
 		{
 			if(statusEffects.get(i).toString().equals(effect.toString()) && !effect.stacksIndependantly)
@@ -1709,7 +1568,7 @@ public class EntityPlayer extends EntityLiving
 						effect.applyInitialEffect(world, this);
 						
 						UpdateWithObject update = new UpdateWithObject();
-						update.object = effect;
+						update.object = new DisplayableStatusEffect(effect);
 						update.command = "/player " + entityID + " statuseffectadd";
 						TerraeRasa.terraeRasa.gameEngine.addExtraObjectUpdate(update);
 						
@@ -1727,11 +1586,49 @@ public class EntityPlayer extends EntityLiving
 		effect.applyInitialEffect(world, this);
 		
 		UpdateWithObject update = new UpdateWithObject();
-		update.object = effect;
+		update.object = new DisplayableStatusEffect(effect);
 		update.command = "/player " + entityID + " statuseffectadd";
 		TerraeRasa.terraeRasa.gameEngine.addExtraObjectUpdate(update);
 		
 		statusEffects.add(effect);
 		return true;
+	}
+	
+	public TransmittablePlayer getTransmittable()
+	{
+		TransmittablePlayer player = new TransmittablePlayer();
+		player.x = this.x;
+		player.y = this.y;
+		player.entityID = this.entityID;
+		player.playerName = this.playerName;
+		player.mana = this.mana;
+		player.health = this.health;
+		player.specialEnergy = this.specialEnergy;
+		player.maxSpecialEnergy = (int) this.maxSpecialEnergy;
+		player.maxHealth = this.maxHealth;
+		player.maxMana = this.maxMana;
+		player.addStatusEffects(this.statusEffects);
+		player.cooldowns = this.cooldowns;
+		player.addInventories(this.inventory.getMainInventory(), this.inventory.getArmorInventory(), this.inventory.getQuiver());
+		return player;
+	}
+	
+	public String getSavableXML()
+	{
+		SavablePlayer player = new SavablePlayer();
+		player.playerName = this.playerName;
+		player.difficulty = this.difficulty;
+		player.mana = this.mana;
+		player.health = this.health;
+		player.specialEnergy = this.specialEnergy;
+		player.baseSpecialEnergy = this.baseSpecialEnergy;
+		player.baseMaxHealth = this.baseMaxHealth;
+		player.baseMaxMana = this.baseMaxMana;
+		player.cooldowns = this.cooldowns;
+		player.mainInventory = this.inventory.getMainInventory();
+		player.armorInventory = this.inventory.getArmorInventory();
+		player.quiver = this.inventory.getQuiver();
+		SaveManager manager = new SaveManager();
+		return manager.convertToXML(player);
 	}
 }

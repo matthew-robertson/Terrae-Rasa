@@ -1,39 +1,27 @@
 package entities;
 import items.Item;
-import items.ItemArmor;
-import items.ItemTool;
 
 import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Random;
 import java.util.Vector;
 
-import passivebonuses.PassiveBonus;
-import passivebonuses.PassiveBonusContainer;
-import statuseffects.StatusEffect;
+import statuseffects.DisplayableStatusEffect;
 import transmission.ClientUpdate;
-import transmission.CompressedPlayer;
 import transmission.StatUpdate;
+import transmission.TransmittablePlayer;
 import transmission.UpdateWithObject;
 import utils.Cooldown;
 import utils.CraftingManager;
-import utils.Damage;
-import utils.GemSocket;
 import utils.InventoryPlayer;
-import utils.ItemStack;
+import utils.DisplayableItemStack;
 import utils.MathHelper;
 import utils.Recipe;
 import utils.Vector2F;
 import world.World;
 import audio.SoundEngine;
-import auras.Aura;
-import auras.AuraContainer;
-import auras.AuraTracker;
 import blocks.Block;
-import enums.EnumColor;
-import enums.EnumDamageSource;
-import enums.EnumDamageType;
 import enums.EnumPlayerDifficulty;
 
 /**
@@ -68,36 +56,17 @@ import enums.EnumPlayerDifficulty;
  * @since       1.0
  */
 public class EntityPlayer extends EntityLiving
+		implements IEntityTransmitBase
 {
 	private static final long serialVersionUID = 1L;
-
-	/** This value apparently has to be negative. */
-	private static final double leftSwingBound = MathHelper.degreeToRadian(-135); 
-	private static final double rightSwingBound = MathHelper.degreeToRadian(55);
-	private static final double totalSwingArcRad = Math.abs(leftSwingBound) + Math.abs(rightSwingBound);
- 	private static final double totalSwingArcDeg = MathHelper.radianToDegree(totalSwingArcRad);
-	private static final int HEALTH_FROM_STAMINA = 10;
-	private static final int MANA_FROM_INTELLECT = 10;
-	private static final double DAMAGE_BONUS_INTELLECT = 1.0 / 100;
-	private static final double DAMAGE_BONUS_DEXTERITY = 1.0 / 100;
-	private static final double DAMAGE_BONUS_STRENGTH = 1.0 / 100;
 	private boolean isSwingingRight;
 	private boolean hasSwungTool;
 	private double rotateAngle;
-	private boolean armorChanged;
-	private int ticksSinceLastCast;
-	private int ticksInCombat;
-	private int ticksOfHealthRegen;
-	private boolean isInCombat;
 	private boolean isMining;
-	private int ticksreq;
-	private int sx;
-	private int sy;		
 	private CraftingManager craftingManager;
 	private Recipe[] allPossibleRecipes;
 	private final String playerName;
 	private boolean inventoryChanged;
-	private final EnumPlayerDifficulty difficulty;
 	private final int MAXIMUM_BASE_MANA = 400;
 	private final int MAXIMUM_BASE_HEALTH = 400;
 	private final int MAX_BLOCK_PLACE_DISTANCE = 42;
@@ -105,18 +74,9 @@ public class EntityPlayer extends EntityLiving
 	private int baseSpecialEnergy;
 	private Dictionary<String, Boolean> nearBlock;
 	private Dictionary<String, Recipe[]> possibleRecipesByBlock;
-	private PassiveBonusContainer currentBonuses; 
-	private AuraTracker auraTracker;
-	
-	public int strength;
-	public int dexterity;
-	public int intellect;
-	public int stamina;
-	
 	public int temporarySpecialEnergy;
 	public double specialEnergy;
 	public double maxSpecialEnergy;
-	
 	public int viewedChestX;
 	public int viewedChestY;
 	public boolean isViewingChest;	
@@ -126,25 +86,12 @@ public class EntityPlayer extends EntityLiving
 	public int temporaryMaxMana;
 	public double respawnXPos;
 	public double respawnYPos;	
-	
 	public int selectedRecipe;
 	public int selectedSlot;
 	public boolean isFacingRight;
 	public boolean isInventoryOpen;	
 	public InventoryPlayer inventory;
-	
-	public double healthRegenerationModifier;
-	public double manaRegenerationModifier;
-	public double specialRegenerationModifier;
-	
-	public double pickupRangeModifier;
-	public double staminaModifier;
-	public double intellectModifier;
-	public double dexterityModifier;
-	public double strengthModifier;
-	
 	public Vector<String> changedInventorySlots = new Vector<String>();
-	
 	/** A flag indicating if the player has been forever defeated. If they have, they will not be saved to disk.*/
 	public boolean defeated;
 	
@@ -158,42 +105,28 @@ public class EntityPlayer extends EntityLiving
 	public EntityPlayer(String name, EnumPlayerDifficulty difficulty)
 	{
 		super();		
-		stamina = 0;
 		specialEnergy = 100;
-		isJumping = false;
 		isMining = false;
-		setMovementSpeedModifier(1.0f);		
-		setBaseSpeed(5.0f);
 		width = 12;
 		height = 18;
 		baseSpecialEnergy = 100;
 		maxSpecialEnergy = 100;
 		temporarySpecialEnergy = 0;
-		setMaxHeightFallenSafely(78);
 		blockHeight = 3;
 		blockWidth = 2;
 		setRespawnPosition(50, 0);		
-		setUpwardJumpHeight(48);
-		ticksSinceLastCast = 99999;
-		upwardJumpCounter = 0;
-		jumpSpeed = 5;
-		canJumpAgain = true;
 		inventory = new InventoryPlayer();
-		inventory.pickUpItemStack(null, this, new ItemStack(Item.copperSword));
-		inventory.pickUpItemStack(null, this, new ItemStack(Item.copperPickaxe));
-		inventory.pickUpItemStack(null, this, new ItemStack(Item.copperAxe));
-		inventory.pickUpItemStack(null, this, new ItemStack(Block.craftingTable));
+		inventory.pickUpItemStack(null, this, new DisplayableItemStack(Item.copperSword));
+		inventory.pickUpItemStack(null, this, new DisplayableItemStack(Item.copperPickaxe));
+		inventory.pickUpItemStack(null, this, new DisplayableItemStack(Item.copperAxe));
+		inventory.pickUpItemStack(null, this, new DisplayableItemStack(Block.craftingTable));
 		playerName = name;
 		rotateAngle = -120.0f;		
-		isInCombat = false;
-		ticksInCombat = 0;
-		ticksSinceLastCast = 0;
 		health = 100;
 		maxHealth = 100;
 		baseMaxHealth = 100;
 		baseMaxMana = 0;
 		maxMana = 0;
-		this.difficulty = difficulty;
 		invincibilityTicks = 10;
 		selectedSlot = 0;
 		viewedChestX = 0;
@@ -202,19 +135,6 @@ public class EntityPlayer extends EntityLiving
 		craftingManager = new CraftingManager();
 		inventoryChanged = true;	
 		selectedRecipe = 0;
-		knockbackModifier = 1;
-		meleeDamageModifier = 1;
-		rangeDamageModifier = 1;
-		magicDamageModifier = 1;
-		healthRegenerationModifier = 1;
-		manaRegenerationModifier = 1;
-		specialRegenerationModifier = 1;
-		allDamageModifier = 1;
-		pickupRangeModifier = 1;
-		staminaModifier = 1;
-		intellectModifier = 1;
-		dexterityModifier = 1;
-		strengthModifier = 1;
 		cooldowns = new Hashtable<String, Cooldown>();
 		nearBlock = new Hashtable<String, Boolean>();
 		for(Block block : CraftingManager.getCraftingBlocks())
@@ -227,23 +147,13 @@ public class EntityPlayer extends EntityLiving
 		{
 			possibleRecipesByBlock.put(block.getName(), new Recipe[] { });
 		}
-		auraTracker = new AuraTracker();
 		
 		jumpSound = "Player Jump";
 		deathSound = "Player Death";
 	}
 	
-	public EntityPlayer(EntityPlayer entity)
+	public EntityPlayer(TransmittablePlayer player) 
 	{
-		throw new RuntimeException("Support Not Implemented - Was this action actually required?");
-	}
-	
-	/**
-	 * Fixes issues from loading a player from disk. This generally relates to applying newer recipes and content, so that the
-	 * player can actually view and use them.
-	 */
-	public void reconstructPlayerFromFile()
-	{	
 		rotateAngle = -120.0f;			
 		invincibilityTicks = 10;
 		selectedSlot = 0;
@@ -251,7 +161,6 @@ public class EntityPlayer extends EntityLiving
 		viewedChestY = 0;
 		isViewingChest = false;
 		isMining = false;
-		inventory.initializeInventoryTotals(true);
 		craftingManager = new CraftingManager();
 		inventoryChanged = true;	
 		selectedRecipe = 0;
@@ -266,7 +175,23 @@ public class EntityPlayer extends EntityLiving
 		{
 			possibleRecipesByBlock.put(block.getName(), new Recipe[] { });
 		}
-		auraTracker = new AuraTracker();
+
+		this.entityID = player.entityID;
+		this.x = player.x;
+		this.y = player.y;
+		this.playerName = player.playerName;
+		this.mana = player.mana;
+		this.health = player.health;
+		this.specialEnergy = player.specialEnergy;
+		this.maxSpecialEnergy = player.maxSpecialEnergy;
+		this.maxHealth = player.maxHealth;
+		this.maxMana = player.maxMana;
+		this.statusEffects = player.statusEffects;
+		this.cooldowns = player.cooldowns;
+		this.inventory = new InventoryPlayer(player.mainInventory, player.armorInventory, player.quiver);
+
+		inventory.initializeInventoryTotals(true);
+		
 	}
 	
 	public void onClientTick(ClientUpdate update, World world)
@@ -362,249 +287,15 @@ public class EntityPlayer extends EntityLiving
 	}
 	
 	/**
-	 * Applies gravity or a jump upward, depending on if the entity is jumping
-	 */
-	public void applyGravity(World world) 
-	{
-		if(isOnGround(world)) //Is the entity on the ground? If so they can jump again
-		{
-			//Check for fall damage
-			if((isJumping || !canJumpAgain) && 
-				isAffectedByGravity && 
-				!isImmuneToFallDamage && 
-				distanceFallen > getMaxHeightFallenSafely()) 
-			{
-				//calculate the fall damage
-				double fallDamage = MathHelper.getFallDamage(jumpSpeed, world.g, ticksFallen); 
-				if(fallDamage > 0)
-				{
-					damage(world, 
-							new Damage(fallDamage, 
-									new EnumDamageType[] { EnumDamageType.FALL }, 
-									EnumDamageSource.FALL).setIsDodgeable(false)
-									.setPenetratesArmor(true), 
-							true);
-				}
-			}
-			
-			ticksFallen = 0;
-			canJumpAgain = true;
-			distanceFallen = 0;
-		}
-		
-		if(isJumping) //If the entity is jumping upwards, move them up
-		{
-			moveEntityUp(world, jumpSpeed * getMovementSpeedModifier());			
-		}
-		else if(!isOnGround(world) && isAffectedByGravity) //otherwise, if the entity is in the air, make them fall
-		{
-			moveEntityDown(world, MathHelper.getFallSpeed(jumpSpeed, world.g, ticksFallen));
-			ticksFallen++;
-		}	
-	}
-	
-	/**
-	 * Overrides the entity damage taken to account for different invincibility and death
-	 * @param world the world the player is currently in
-	 * @param damage the damage the player will take 
-	 * @param showWorldText true if the damage should be shown as world text, otherwise false
-	 */
-	public void damage(World world, Damage damage, boolean showWorldText)
-	{
-		if(invincibilityTicks <= 0) //If it's possible to take damage
-		{
-			//Check if the damage can be dodged, then attempt a roll to see if it will be dodged
-			if(damage.isDodgeable() && (Math.random() < dodgeChance || dodgeChance >= 1.0f)) 
-			{
-				//Render world text for the dodge if applicable
-				if(showWorldText)
-				{
-					world.addTemporaryText("Dodge", (int)x - 2, (int)y - 3, 20, EnumColor.GREEN); 
-				}
-			}
-			else 
-			{
-				//Trigger the onDamageTaken() effect of auras before calculating damage after armour and other
-				//effects
-				auraTracker.onDamageTaken(world, this, damage);
-				
-				double damageDone = damage.amount();
-				//Double the damage done if it was a critical hit
-				if(damage.isCrit())
-				{
-					damageDone *= 2;
-				}
-				
-				//The player will be invincible for 750 ms after hit
-				invincibilityTicks = 15; 
-				
-				//Determine the damage after armour, with a floor of 1 damage. If the damage penetrates armour
-				//then this step is skipped
-				if(!damage.penetratesArmor())
-				{
-					damageDone = MathHelper.floorOne(
-						(damageDone * (1F - DEFENSE_REDUCTION_PERCENT * defense)) - (defense * DEFENSE_REDUCTION_FLAT)									
-						);
-				}
-				
-				//Apply absorbs if the damage is affected by them (IE it does not pierce them)
-				if(!damage.piercesAbsorbs())
-				{
-					damageDone = dealDamageToAbsorbs(damageDone);
-				}
-				
-				health -= damageDone; 
-				SoundEngine.playSoundEffect(hitSound);
-				//Show world text if applicable
-				if(showWorldText)
-				{
-					String message = (damageDone == 0) ? "Absorb" : "" + (int)damageDone;
-					world.addTemporaryText(message, (int)x - 2, (int)y - 3, 20, (damageDone == 0) ? EnumColor.WHITE : EnumColor.RED); 
-				}
-			}	
-
-			//Put the player in combat if the damage causes combat status
-			if(damage.causesCombatStatus())
-			{
-				putInCombat();
-			}
-		}		
-	}
-	
-	/**
-	 * Puts the player in combat.
-	 */
-	public void putInCombat()
-	{
-		isInCombat = true;
-		ticksOfHealthRegen = 0;
-	}
-	
-	/**
-	 * Heals the player, and displays green WorldText if applicable.
-	 * @param h the amount healed
-	 * @param rendersText whether or not to render WorldText on the screen
-	 */
-	public boolean heal(World world, double h, boolean rendersText)
-	{
-		if(health < maxHealth)
-		{
-			health += h; 
-			if(rendersText)
-			{
-				world.addTemporaryText(""+(int)h, (int)x - 2, (int)y - 3, 20, EnumColor.GREEN); //add temperary text to be rendered, for the healing done
-			}
-			if(health > maxHealth) //if health exceeds the maximum, set it to the maximum
-			{
-				health = maxHealth;
-			}
-			auraTracker.onHeal(world, this);
-			return true;
-		}
-		return false;
-	}
-		
-	/**
-	 * Resets ticksSinceLastCast to 0, preventing mana regen for 6 seconds and restarting the regeneration cycle.
-	 */
-	public void resetCastTimer()
-	{
-		ticksSinceLastCast = 0;
-	}
-	
-	/**
-	 * Recalculates defense and set bonuses when armour changes
-	 */
-	public void onArmorChange()
-	{
-		armorChanged = true;
-	}
-
-	public void onQuiverChange()
-	{
-	}
-	
-	/**
 	 * Overrides EntityLiving onDeath() to provide special things like hardcore (mode) and itemdrops
 	 */
 	public void onDeath(World world)
 	{	
-		auraTracker.onDeath(world, this);
-		
 		//If the player is still dead, then trigger the respawn code
 		if(health <= 0)
 		{
-			triggerDifficultyEffect(world);
+			SoundEngine.playSoundEffect(deathSound);
 		}
-	}
-	
-	/**
-	 * Triggers an effect appropriate to the player difficulty.
-	 * @param world the world the player is in
-	 */
-	private void triggerDifficultyEffect(World world)
-	{
-		if(difficulty == EnumPlayerDifficulty.HARD)
-		{
-			dropAll(world);
-		}
-		else if(difficulty == EnumPlayerDifficulty.HARDCORE)
-		{
-			defeated = true;	
-			return;
-		}
-		health = maxHealth;
-		SoundEngine.playSoundEffect(deathSound);
-		clearStatusEffects(world);
-		world.clearEntityList();
-		world.spawnPlayer(this);	
-	}
-	
-	/**
-	 * Drops all the player's inventory.
-	 * @param world the world the player is in
-	 */
-	private void dropAll(World world)
-	{
-		Random random = new Random();
-		for(int i = 0; i < inventory.getMainInventoryLength(); i++)
-		{
-			if(inventory.getMainInventoryStack(i) != null)
-			{
-				world.addItemStackToItemList((EntityItemStack)new EntityItemStack(x, 
-						y - 15, 
-						inventory.getMainInventoryStack(i)).setVelocity(new Vector2F((random.nextFloat() * 8) - 4, random.nextFloat() * 8)));
-				inventory.removeEntireStackFromInventory(world, this, i);
-			}
-		}
-		for(int i = 0; i < inventory.getArmorInventoryLength(); i++)
-		{
-			if(inventory.getArmorInventoryStack(i) != null)
-			{
-				world.addItemStackToItemList((EntityItemStack)new EntityItemStack(x, 
-						y - 15, 
-						inventory.getArmorInventoryStack(i)).setVelocity(new Vector2F((random.nextFloat() * 8) - 4, random.nextFloat() * 8)));
-				inventory.setArmorInventoryStack(this, null, inventory.getArmorInventoryStack(i), i);			
-			}
-		}
-		for(int i = 0; i < inventory.getQuiverLength(); i++)
-		{
-			if(inventory.getQuiverStack(i) != null)
-			{
-				world.addItemStackToItemList((EntityItemStack)new EntityItemStack(x, 
-						y - 15, 
-						inventory.getQuiverStack(i)).setVelocity(new Vector2F((random.nextFloat() * 8) - 4, random.nextFloat() * 8)));
-				inventory.setQuiverStack(this, null, i);			
-			}
-		}
-	}
-	
-	/**
-	 * Flag recipes for recalculation
-	 */
-	public void onInventoryChange()
-	{
-		inventoryChanged = true; 
 	}
 	
 	/**
@@ -724,117 +415,6 @@ public class EntityPlayer extends EntityLiving
 	{
 		possibleRecipesByBlock.put(block.getName(), craftingManager.getPossibleRecipesByBlock(inventory, block));		
 	}
-	
-	/**
-	 * Recalculates damage modifiers and health based on stats.
-	 */
-	public void recalculateStats()
-	{
-		rangeDamageModifier = 1.0 + (DAMAGE_BONUS_DEXTERITY * dexterity * dexterityModifier);
-		meleeDamageModifier = 1.0 + (DAMAGE_BONUS_STRENGTH * strength * strengthModifier);
-		magicDamageModifier = 1.0 + (DAMAGE_BONUS_INTELLECT * intellect * intellectModifier);
-		maxHealth = (int) (temporaryMaxHealth + baseMaxHealth + (staminaModifier * stamina * HEALTH_FROM_STAMINA));
-		maxMana = (int) (temporaryMaxMana + baseMaxMana + (intellectModifier * intellect * MANA_FROM_INTELLECT));	
-		maxSpecialEnergy = temporarySpecialEnergy + baseSpecialEnergy;
-	}
-	
-	/**
-	 * Applies defense, stats, and PassiveBonuses from a single piece of armour that is being equipped. These 
-	 * should be constant for a given piece of armour to allow for easy removing.
-	 * @param armor the piece of armour being equipped
-	 */
-	public void applySingleArmorItem(ItemArmor armor, ItemStack stack, int index)
-	{
-		PassiveBonus[] bonuses = armor.getBonuses();		
-		for(PassiveBonus bonus : bonuses)
-		{
-			bonus.apply(this);
-		}		
-		Vector<Aura> auras = new Vector<Aura>();
-		for(GemSocket socket : stack.getGemSockets())
-		{
-			if(socket.getGem() != null)
-			{
-				for(PassiveBonus bonus : socket.getGem().getBonuses())
-				{
-					if(bonus != null)
-					{
-						bonus.apply(this);
-					}
-				}
-				for(Aura aura : socket.getGem().getAuras())
-				{
-					if(aura != null)
-					{
-						auras.add(aura);
-					}
-				}
-			}
-		}
-		for(PassiveBonus bonus : stack.getBonuses())
-		{
-			bonus.apply(this);
-		}
-		
-		for(Aura aura : armor.getAuras())
-		{
-			auras.add(aura);
-		}		
-		for(Aura aura : stack.getAuras())
-		{
-			auras.add(aura);
-		}
-		
-		auraTracker.setAurasByPiece(new AuraContainer(auras), index);			
-		
-		defense += armor.getDefense();
-		dexterity += armor.getDexterity();
-		intellect += armor.getIntellect();
-		strength += armor.getStrength();
-		stamina += armor.getStamina();
-		armorChanged = true;
-	}
-	
-	/**
-	 * Removes defense, stats, and PassiveBonuses for a single piece of armour that is now being removed.
-	 * These should be the same as when it was equipped due to constant values in armour that do not
-	 * change.
-	 * @param armor the piece of armour being removed
-	 */
-	public void removeSingleArmorItem(ItemArmor armor, ItemStack stack, int index)
-	{
-		PassiveBonus[] bonuses = armor.getBonuses();		
-		for(PassiveBonus bonus : bonuses)
-		{
-			bonus.remove(this);
-		}		
-		for(GemSocket socket : stack.getGemSockets())
-		{
-			if(socket.getGem() != null)
-			{
-				for(PassiveBonus bonus : socket.getGem().getBonuses())
-				{
-					if(bonus != null)
-					{
-						bonus.remove(this);
-					}
-				}
-			}
-		}
-		for(PassiveBonus bonus : stack.getBonuses())
-		{
-			bonus.remove(this);
-		}
-		
-		auraTracker.setAurasByPiece(null, index);
-		
-		defense -= armor.getDefense();
-		dexterity -= armor.getDexterity();
-		intellect -= armor.getIntellect();
-		strength -= armor.getStrength();
-		stamina -= armor.getStamina();
-		armorChanged = true;
-	}
 		
 	/**
 	 * Increases the maximum health of the player
@@ -866,15 +446,6 @@ public class EntityPlayer extends EntityLiving
 			return true;
 		}
 		return false;
-	}
-	
-	/**
-	 * Gets the player's difficulty setting. This field is final, and unchanging
-	 * @return the player's difficulty setting
-	 */
-	public final EnumPlayerDifficulty getDifficulty()
-	{
-		return difficulty;
 	}
 	
 	/**
@@ -915,24 +486,14 @@ public class EntityPlayer extends EntityLiving
 		viewedChestX = -1;
 		viewedChestY = -1;
 	}
-	
-	/**
-	 * Resets all variables relating to mining, to a default value so the player can mine again
-	 */
-	public void resetMiningVariables()
-	{
-		ticksreq = 0;
-		sy = 0;
-		sx = 0;
-	}
-		
+			
 	/**
 	 * Gets the Block the player is holding, if it's a Block and it's an instanceof BlockLight. Used for handheld lighting.
 	 * @return an instanceof BlockLight if the player is holding one, otherwise null
 	 */
 	public Block getHandheldLight()
 	{
-		ItemStack stack = inventory.getMainInventoryStack(selectedSlot);
+		DisplayableItemStack stack = inventory.getMainInventoryStack(selectedSlot);
 		if(stack != null)
 		{
 			if(stack.getItemID() < Item.itemIndex && (Block.blocksList[stack.getItemID()]).lightStrength > 0)
@@ -942,25 +503,7 @@ public class EntityPlayer extends EntityLiving
 		}
 		return null;
 	}
-	
-	/**
-	 * Decreases the ticksLeft on each cooldown by 1, and removes that cooldown if it's expired.
-	 */
-	private void updateCooldowns()
-	{
-		Enumeration<String> keys = cooldowns.keys();
-		while (keys.hasMoreElements()) 
-		{
-			String str = (String) keys.nextElement();
-			Cooldown cooldown = cooldowns.get(str);
-			cooldown.ticksLeft--;
-			if(cooldown.ticksLeft <= 0)
-			{
-				cooldowns.remove(str);
-			}
-		}
-	}
-	
+		
 	/**
 	 * Puts an ID on cooldown, which generally relates to an item or something else. If that ID is already on cooldown and
 	 * with a longer time, this will fail and the current cooldown will continue, otherwise the new cooldown will be implemented.
@@ -1062,58 +605,6 @@ public class EntityPlayer extends EntityLiving
 	{
 		hasSwungTool = false;
 	}
-	
-	/**
-	 * Updates the tool swing. This is based on a weapon's swing speed - a faster speed swings faster.
-	 */
-	public void updateSwing()
-	{
-		double swingSpeed = (double)((ItemTool)(Item.itemsList[inventory.getMainInventoryStack(selectedSlot).getItemID()])).swingTime;
-		swingSpeed = (swingSpeed / attackSpeedModifier);
-		if(isSwingingRight)
-		{
-            rotateAngle += MathHelper.degreeToRadian((double)totalSwingArcDeg / (swingSpeed * 20));	        
-            if(rotateAngle <= leftSwingBound || rotateAngle >= rightSwingBound )
-	        {
-	        	clearSwing();
-	        }
-		}
-		else
-		{
-			rotateAngle -= MathHelper.degreeToRadian((double)totalSwingArcDeg / (swingSpeed * 20));
-		    if(rotateAngle <= leftSwingBound || rotateAngle >= rightSwingBound)
-	        {
-	        	clearSwing();
-	        }
-		}
-	}
-	
-	/**
-	 * Starts swinging the tool based on direction, resetting the angle to an appropriate starting location. 
-	 * @param swingRight whether the swing is right, or not (IE left)
-	 */
-	public void startSwingingTool(boolean swingRight)
-	{
-		isSwingingRight = swingRight;
-		hasSwungTool = true;
-		if(swingRight)
-		{
-			rotateAngle = leftSwingBound;			
-		}
-		else
-		{
-			rotateAngle = rightSwingBound;
-		}
-	}
-	
-	/**
-	 * If the player deals damage to a monster or something else this should be called. This will cause
-	 * auras to fire their onDamageDone() events.
-	 */
-	public void inflictedDamageToMonster(World world, Damage damage) 
-	{
-		auraTracker.onDamageDone(world, this, damage);
-	}
 
 	/**
 	 * Gets the player's health percentage, from 0.0-1.0, where 0.0 indicates 0% and 1.0 indicates 100%
@@ -1134,345 +625,24 @@ public class EntityPlayer extends EntityLiving
 		return (maxMana == 0) ? 0 : mana / maxMana;
 	}
 	
-	public static CompressedPlayer compress(EntityPlayer player)
+	/**
+	 * Removes a status effect by its unique ID - a long only that effect has.
+	 * @param id a long that is unique to that status effect
+	 */
+	public void removeStatusEffectByID(long id)
 	{
-		CompressedPlayer compressPlayer = new CompressedPlayer();
-		compressPlayer.entityID = player.entityID;
-		compressPlayer.x = player.x;
-		compressPlayer.y = player.y;
-		compressPlayer.isAffectedByWalls = player.isAffectedByWalls;
-		compressPlayer.isAffectedByGravity = player.isAffectedByGravity;
-		compressPlayer.upwardJumpCounter = player.upwardJumpCounter; 	
-		compressPlayer.canJumpAgain = player.canJumpAgain;
-		compressPlayer.isJumping = player.isJumping;	
-		compressPlayer.upwardJumpHeight = player.upwardJumpHeight; 
-		compressPlayer.jumpSpeed = player.jumpSpeed;	
-		compressPlayer.isStunned = player.isStunned;
-		compressPlayer.ticksFallen = player.ticksFallen;
-		compressPlayer.textureWidth = player.textureWidth;
-		compressPlayer.textureHeight = player.textureHeight;
-		compressPlayer.width = player.width;
-		compressPlayer.height = player.height;
-		compressPlayer.blockWidth = player.blockWidth;
-		compressPlayer.blockHeight = player.blockHeight;
-		compressPlayer.distanceFallen = player.distanceFallen;
-		compressPlayer.maxHeightFallenSafely = player.maxHeightFallenSafely;
-		compressPlayer.baseSpeed = player.baseSpeed;
-		compressPlayer.movementSpeedModifier = player.movementSpeedModifier;
-
-		compressPlayer.attackSpeedModifier = player.attackSpeedModifier;
-		compressPlayer.knockbackModifier = player.knockbackModifier;
-		compressPlayer.meleeDamageModifier = player.meleeDamageModifier;
-		compressPlayer.rangeDamageModifier = player.rangeDamageModifier;
-		compressPlayer.magicDamageModifier = player.magicDamageModifier;
-		compressPlayer.allDamageModifier = player.allDamageModifier;	
-		compressPlayer.statusEffects = player.statusEffects;	
-		compressPlayer.criticalStrikeChance = player.criticalStrikeChance; 
-		compressPlayer.dodgeChance = player.dodgeChance;
-		compressPlayer.isImmuneToFallDamage = player.isImmuneToFallDamage;
-		compressPlayer.invincibilityTicks = player.invincibilityTicks;	
-		compressPlayer.maxHealth = player.maxHealth;
-		compressPlayer.maxMana = player.maxMana;
-		compressPlayer.mana = player.mana;
-		compressPlayer.defense = player.defense;
-		compressPlayer.health = player.health;
-		compressPlayer.absorbs = player.absorbs;
-		
-		compressPlayer.isSwingingRight = player.isSwingingRight;
-		compressPlayer.hasSwungTool = player.hasSwungTool;
-		compressPlayer.rotateAngle = player.rotateAngle;
-		compressPlayer.armorChanged = player.armorChanged;
-		compressPlayer.ticksSinceLastCast = player.ticksSinceLastCast;
-		compressPlayer.ticksInCombat = player.ticksInCombat;
-		compressPlayer.ticksOfHealthRegen = player.ticksOfHealthRegen;
-		compressPlayer.isInCombat = player.isInCombat;
-		compressPlayer.isMining = player.isMining;
-		compressPlayer.ticksreq = player.ticksreq;
-		compressPlayer.sx = player.sx;
-		compressPlayer.sy = player.sy;		
-		compressPlayer.playerName = player.playerName;
-		compressPlayer.inventoryChanged = player.inventoryChanged;
-		compressPlayer.difficulty = player.difficulty;
-
-		compressPlayer.cooldowns = player.cooldowns;
-		compressPlayer.baseSpecialEnergy = player.baseSpecialEnergy;
-		compressPlayer.nearBlock = player.nearBlock;
-		compressPlayer.currentBonuses = player.currentBonuses; 
-		compressPlayer.auraTracker = player.auraTracker;
-		
-		compressPlayer.strength = player.strength;
-		compressPlayer.dexterity = player.dexterity;
-		compressPlayer.intellect = player.intellect;
-		compressPlayer.stamina = player.stamina;
-		
-		compressPlayer.temporarySpecialEnergy = player.temporarySpecialEnergy;
-		compressPlayer.specialEnergy = player.specialEnergy;
-		compressPlayer.maxSpecialEnergy = player.maxSpecialEnergy;
-		
-		compressPlayer.viewedChestX = player.viewedChestX;
-		compressPlayer.viewedChestY = player.viewedChestY;
-		compressPlayer.isViewingChest = player.isViewingChest;	
-		compressPlayer.baseMaxHealth = player.baseMaxHealth;
-		compressPlayer.temporaryMaxHealth = player.temporaryMaxHealth;
-		compressPlayer.baseMaxMana = player.baseMaxMana;	
-		compressPlayer.temporaryMaxMana = player.temporaryMaxMana;
-		compressPlayer.respawnXPos = player.respawnXPos;
-		compressPlayer.respawnYPos = player.respawnYPos;	
-		
-		compressPlayer.selectedRecipe = player.selectedRecipe;
-		compressPlayer.selectedSlot = player.selectedSlot;
-		compressPlayer.isFacingRight = player.isFacingRight;
-		compressPlayer.isInventoryOpen = player.isInventoryOpen;	
-		compressPlayer.inventory = player.inventory;
-		
-		compressPlayer.healthRegenerationModifier = player.healthRegenerationModifier;
-		compressPlayer.manaRegenerationModifier = player.manaRegenerationModifier;
-		compressPlayer.specialRegenerationModifier = player.specialRegenerationModifier;
-		
-		compressPlayer.pickupRangeModifier = player.pickupRangeModifier;
-		compressPlayer.staminaModifier = player.staminaModifier;
-		compressPlayer.intellectModifier = player.intellectModifier;
-		compressPlayer.dexterityModifier = player.dexterityModifier;
-		compressPlayer.strengthModifier = player.strengthModifier;
-		
-		compressPlayer.defeated = player.defeated;
-		
-		
-		
-		return compressPlayer;
+		for(int i = 0; i < statusEffects.size(); i++)
+		{
+			if(id == statusEffects.get(i).getID())
+			{
+				statusEffects.remove(i);
+			}
+		}
 	}
 	
-	public static EntityPlayer expand(CompressedPlayer compressedPlayer)
-	{
-		EntityPlayer player = new EntityPlayer(compressedPlayer.playerName, compressedPlayer.difficulty);
-		player.entityID = compressedPlayer.entityID;
-		player.x = compressedPlayer.x;
-		player.y = compressedPlayer.y;
-		player.isAffectedByWalls = compressedPlayer.isAffectedByWalls;
-		player.isAffectedByGravity = compressedPlayer.isAffectedByGravity;
-		player.upwardJumpCounter = compressedPlayer.upwardJumpCounter; 	
-		player.canJumpAgain = compressedPlayer.canJumpAgain;
-		player.isJumping = compressedPlayer.isJumping;	
-		player.upwardJumpHeight = compressedPlayer.upwardJumpHeight; 
-		player.jumpSpeed = compressedPlayer.jumpSpeed;	
-		player.isStunned = compressedPlayer.isStunned;
-		player.ticksFallen = compressedPlayer.ticksFallen;
-		player.textureWidth = compressedPlayer.textureWidth;
-		player.textureHeight = compressedPlayer.textureHeight;
-		player.width = compressedPlayer.width;
-		player.height = compressedPlayer.height;
-		player.blockWidth = compressedPlayer.blockWidth;
-		player.blockHeight = compressedPlayer.blockHeight;
-		player.distanceFallen = compressedPlayer.distanceFallen;
-		player.maxHeightFallenSafely = compressedPlayer.maxHeightFallenSafely;
-		player.baseSpeed = compressedPlayer.baseSpeed;
-		player.movementSpeedModifier = compressedPlayer.movementSpeedModifier;
-
-		player.attackSpeedModifier = compressedPlayer.attackSpeedModifier;
-		player.knockbackModifier = compressedPlayer.knockbackModifier;
-		player.meleeDamageModifier = compressedPlayer.meleeDamageModifier;
-		player.rangeDamageModifier = compressedPlayer.rangeDamageModifier;
-		player.magicDamageModifier = compressedPlayer.magicDamageModifier;
-		player.allDamageModifier = compressedPlayer.allDamageModifier;	
-		player.statusEffects = compressedPlayer.statusEffects;	
-		player.criticalStrikeChance = compressedPlayer.criticalStrikeChance; 
-		player.dodgeChance = compressedPlayer.dodgeChance;
-		player.isImmuneToFallDamage = compressedPlayer.isImmuneToFallDamage;
-		player.invincibilityTicks = compressedPlayer.invincibilityTicks;	
-		player.maxHealth = compressedPlayer.maxHealth;
-		player.maxMana = compressedPlayer.maxMana;
-		player.mana = compressedPlayer.mana;
-		player.defense = compressedPlayer.defense;
-		player.health = compressedPlayer.health;
-		player.absorbs = compressedPlayer.absorbs;
-		
-		player.isSwingingRight = compressedPlayer.isSwingingRight;
-		player.hasSwungTool = compressedPlayer.hasSwungTool;
-		player.rotateAngle = compressedPlayer.rotateAngle;
-		player.armorChanged = compressedPlayer.armorChanged;
-		player.ticksSinceLastCast = compressedPlayer.ticksSinceLastCast;
-		player.ticksInCombat = compressedPlayer.ticksInCombat;
-		player.ticksOfHealthRegen = compressedPlayer.ticksOfHealthRegen;
-		player.isInCombat = compressedPlayer.isInCombat;
-		player.isMining = compressedPlayer.isMining;
-		player.ticksreq = compressedPlayer.ticksreq;
-		player.sx = compressedPlayer.sx;
-		player.sy = compressedPlayer.sy;		
-		//player.playerName = ;
-		player.inventoryChanged = compressedPlayer.inventoryChanged;
-		//player.difficulty = ;
-
-		player.cooldowns = compressedPlayer.cooldowns;
-		player.baseSpecialEnergy = compressedPlayer.baseSpecialEnergy;
-		player.nearBlock = compressedPlayer.nearBlock;
-		player.currentBonuses = compressedPlayer.currentBonuses; 
-		player.auraTracker = compressedPlayer.auraTracker;
-		
-		player.strength = compressedPlayer.strength;
-		player.dexterity = compressedPlayer.dexterity;
-		player.intellect = compressedPlayer.intellect;
-		player.stamina = compressedPlayer.stamina;
-		
-		player.temporarySpecialEnergy = compressedPlayer.temporarySpecialEnergy;
-		player.specialEnergy = compressedPlayer.specialEnergy;
-		player.maxSpecialEnergy = compressedPlayer.maxSpecialEnergy;
-		
-		player.viewedChestX = compressedPlayer.viewedChestX;
-		player.viewedChestY = compressedPlayer.viewedChestY;
-		player.isViewingChest = compressedPlayer.isViewingChest;	
-		player.baseMaxHealth = compressedPlayer.baseMaxHealth;
-		player.temporaryMaxHealth = compressedPlayer.temporaryMaxHealth;
-		player.baseMaxMana = compressedPlayer.baseMaxMana;	
-		player.temporaryMaxMana = compressedPlayer.temporaryMaxMana;
-		player.respawnXPos = compressedPlayer.respawnXPos;
-		player.respawnYPos = compressedPlayer.respawnYPos;	
-		
-		player.selectedRecipe = compressedPlayer.selectedRecipe;
-		player.selectedSlot = compressedPlayer.selectedSlot;
-		player.isFacingRight = compressedPlayer.isFacingRight;
-		player.isInventoryOpen = compressedPlayer.isInventoryOpen;	
-		player.inventory = compressedPlayer.inventory;
-		
-		player.healthRegenerationModifier = compressedPlayer.healthRegenerationModifier;
-		player.manaRegenerationModifier = compressedPlayer.manaRegenerationModifier;
-		player.specialRegenerationModifier = compressedPlayer.specialRegenerationModifier;
-		
-		player.pickupRangeModifier = compressedPlayer.pickupRangeModifier;
-		player.staminaModifier = compressedPlayer.staminaModifier;
-		player.intellectModifier = compressedPlayer.intellectModifier;
-		player.dexterityModifier = compressedPlayer.dexterityModifier;
-		player.strengthModifier = compressedPlayer.strengthModifier;
-		
-		player.defeated = compressedPlayer.defeated;
-		
-		return player;
-	}
-	
-	public void mergeOnto(CompressedPlayer player)
-	{
-		this.entityID = player.entityID;
-		this.x = player.x;
-		this.y = player.y;
-		this.isAffectedByWalls = player.isAffectedByWalls;
-		this.isAffectedByGravity = player.isAffectedByGravity;
-		this.upwardJumpCounter = player.upwardJumpCounter; 	
-		this.canJumpAgain = player.canJumpAgain;
-		this.isJumping = player.isJumping;	
-		this.upwardJumpHeight = player.upwardJumpHeight; 
-		this.jumpSpeed = player.jumpSpeed;	
-		this.isStunned = player.isStunned;
-		this.ticksFallen = player.ticksFallen;
-		this.textureWidth = player.textureWidth;
-		this.textureHeight = player.textureHeight;
-		this.width = player.width;
-		this.height = player.height;
-		this.blockWidth = player.blockWidth;
-		this.blockHeight = player.blockHeight;
-		this.distanceFallen = player.distanceFallen;
-		this.maxHeightFallenSafely = player.maxHeightFallenSafely;
-		this.baseSpeed = player.baseSpeed;
-		this.movementSpeedModifier = player.movementSpeedModifier;
-
-		this.attackSpeedModifier = player.attackSpeedModifier;
-		this.knockbackModifier = player.knockbackModifier;
-		this.meleeDamageModifier = player.meleeDamageModifier;
-		this.rangeDamageModifier = player.rangeDamageModifier;
-		this.magicDamageModifier = player.magicDamageModifier;
-		this.allDamageModifier = player.allDamageModifier;	
-		this.statusEffects = player.statusEffects;	
-		this.criticalStrikeChance = player.criticalStrikeChance; 
-		this.dodgeChance = player.dodgeChance;
-		this.isImmuneToFallDamage = player.isImmuneToFallDamage;
-		this.invincibilityTicks = player.invincibilityTicks;	
-		this.maxHealth = player.maxHealth;
-		this.maxMana = player.maxMana;
-		this.mana = player.mana;
-		this.defense = player.defense;
-		this.health = player.health;
-		this.absorbs = player.absorbs;
-		
-		this.isSwingingRight = player.isSwingingRight;
-		this.hasSwungTool = player.hasSwungTool;
-		this.rotateAngle = player.rotateAngle;
-		this.armorChanged = player.armorChanged;
-		this.ticksSinceLastCast = player.ticksSinceLastCast;
-		this.ticksInCombat = player.ticksInCombat;
-		this.ticksOfHealthRegen = player.ticksOfHealthRegen;
-		this.isInCombat = player.isInCombat;
-		this.isMining = player.isMining;
-		this.ticksreq = player.ticksreq;
-		this.sx = player.sx;
-		this.sy = player.sy;		
-		this.inventoryChanged = player.inventoryChanged;
-
-		this.cooldowns = player.cooldowns;
-		this.baseSpecialEnergy = player.baseSpecialEnergy;
-		this.currentBonuses = player.currentBonuses; 
-		this.auraTracker = player.auraTracker;
-		
-		this.strength = player.strength;
-		this.dexterity = player.dexterity;
-		this.intellect = player.intellect;
-		this.stamina = player.stamina;
-		
-		this.temporarySpecialEnergy = player.temporarySpecialEnergy;
-		this.specialEnergy = player.specialEnergy;
-		this.maxSpecialEnergy = player.maxSpecialEnergy;
-		
-		//this.viewedChestX = player.viewedChestX;
-		//this.viewedChestY = player.viewedChestY;
-		this.isViewingChest = player.isViewingChest;	
-		this.baseMaxHealth = player.baseMaxHealth;
-		this.temporaryMaxHealth = player.temporaryMaxHealth;
-		this.baseMaxMana = player.baseMaxMana;	
-		this.temporaryMaxMana = player.temporaryMaxMana;
-		this.respawnXPos = player.respawnXPos;
-		this.respawnYPos = player.respawnYPos;	
-		
-		this.inventory = player.inventory;
-		
-		this.healthRegenerationModifier = player.healthRegenerationModifier;
-		this.manaRegenerationModifier = player.manaRegenerationModifier;
-		this.specialRegenerationModifier = player.specialRegenerationModifier;
-		
-		this.pickupRangeModifier = player.pickupRangeModifier;
-		this.staminaModifier = player.staminaModifier;
-		this.intellectModifier = player.intellectModifier;
-		this.dexterityModifier = player.dexterityModifier;
-		this.strengthModifier = player.strengthModifier;
-		
-		this.defeated = player.defeated;
-		
-		
-		
-	}
-	
-	public StatUpdate getStats()
-	{
-		StatUpdate update = new StatUpdate();
-		update.entityID = this.entityID;
-		update.isStunned = this.isStunned;
-		update.defense = this.defense;
-		update.mana = this.mana;
-		update.maxMana = this.maxMana;
-		update.health = this.health;
-		update.maxHealth = this.maxHealth;
-		update.specialEnergy = this.specialEnergy;
-		update.maxSpecialEnergy = this.maxSpecialEnergy;
-		update.isSwingingRight = this.isSwingingRight;
-		update.hasSwungTool = this.hasSwungTool;
-		update.rotateAngle = this.rotateAngle;
-		update.statusEffects = this.statusEffects;
-		update.absorbs = this.absorbs;
-		update.cooldowns = this.cooldowns;
-		update.defeated = this.defeated;
-		return update;
-		
-	}
 	
 	public void setStats(StatUpdate newStats)
 	{
-		this.isStunned = newStats.isStunned;
 		this.defense = newStats.defense;
 		this.mana = newStats.mana;
 		this.maxMana = (int) newStats.maxMana;
@@ -1484,7 +654,6 @@ public class EntityPlayer extends EntityLiving
 		this.hasSwungTool = newStats.hasSwungTool;
 		this.rotateAngle = newStats.rotateAngle;
 		this.statusEffects = newStats.statusEffects;
-		this.absorbs = newStats.absorbs;
 		this.cooldowns = newStats.cooldowns;
 		this.defeated = newStats.defeated;
 	}
@@ -1494,27 +663,20 @@ public class EntityPlayer extends EntityLiving
 		hasSwungTool = true;
 		this.rotateAngle = angle;
 	}
-	
-	public StatusEffect getStatusEffectByID(long id)
-	{
-		for(int i = 0; i < statusEffects.size(); i++)
-		{
-			if(id == statusEffects.get(i).getID())
-			{
-				return statusEffects.get(i);
-			}
-		}
-		return null;
+
+	@Override
+	public int getEntityID() {
+		return entityID;
 	}
 	
-	public void removeStatusEffectByID(long id)
+	public void setPosition(double x, double y)
 	{
-		for(int i = 0; i < statusEffects.size(); i++)
-		{
-			if(id == statusEffects.get(i).getID())
-			{
-				statusEffects.remove(i);
-			}
-		}
+		this.x = x;
+		this.y = y;
+	}
+	
+	@Override
+	public int getEntityType() {
+		return DisplayableEntity.TYPE_PLAYER;
 	}
 }

@@ -5,7 +5,6 @@ import items.ItemMagic;
 import items.ItemRanged;
 import items.ItemThrown;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
@@ -14,13 +13,13 @@ import transmission.EntityUpdate;
 import transmission.ServerUpdate;
 import transmission.SuperCompressedBlock;
 import transmission.UpdateWithObject;
-import utils.ColoredText;
+import utils.DisplayableItemStack;
 import utils.ItemStack;
 import world.World;
 import blocks.Block;
+import entities.DisplayableEntity;
 import entities.EntityItemStack;
 import entities.EntityPlayer;
-import enums.EnumColor;
 
 public class Commands 
 {
@@ -256,14 +255,14 @@ public class Commands
 		{
 			String[] split = command.split(" ");
 			EntityPlayer player = (EntityPlayer)world.getEntityByID(Integer.parseInt(split[1]));
-			
+			//TODO fix replacements
 			if(split[2].equals("inventoryreplace"))
 			{
-				player.inventory.putItemStackInSlot(world, player, (ItemStack)(associatedObject), Integer.parseInt(split[3]));
+//				player.inventory.putItemStackInSlot(world, player, (DisplayableItemStack)(associatedObject), Integer.parseInt(split[3]));
 			}
 			else if(split[2].equals("quiverreplace"))
 			{
-				player.inventory.setQuiverStack(player, (ItemStack)(associatedObject), Integer.parseInt(split[3]));
+//				player.inventory.setQuiverStack(player, (ItemStack)(associatedObject), Integer.parseInt(split[3]));
 			}
 			else if(split[2].equals("armorreplace")) 
 			{
@@ -279,7 +278,7 @@ public class Commands
 				entityUpdate.action = 'a';
 				entityUpdate.type = 3;
 				entityUpdate.entityID = stack.entityID;
-				entityUpdate.updatedEntity = stack;
+				entityUpdate.updatedEntity = new DisplayableEntity(stack);
 				update.addEntityUpdate(entityUpdate);
 				world.addItemStackToItemList(stack);
 			}
@@ -301,7 +300,7 @@ public class Commands
 					player.selectedSlot = Integer.parseInt(split[3]);
 					UpdateWithObject objUpdate = new UpdateWithObject();
 					objUpdate.command = "/player " + player.entityID + " inv_and_action_update " + player.selectedSlot;
-					objUpdate.object = player.inventory.getMainInventoryStack(player.selectedSlot);
+					objUpdate.object = new DisplayableItemStack(player.inventory.getMainInventoryStack(player.selectedSlot));
 					update.addObjectUpdate(objUpdate);
 					player.startSwingingTool();
 				}

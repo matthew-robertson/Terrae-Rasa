@@ -1,6 +1,5 @@
 package items;
 
-import statuseffects.StatusEffectDodgeBuff;
 import world.World;
 import audio.SoundEngine;
 import entities.EntityPlayer;
@@ -14,8 +13,6 @@ public class ItemPotionDodge extends ItemPotion
 	
 	public void onRightClick(World world, EntityPlayer player)
 	{
-		player.registerStatusEffect(world, new StatusEffectDodgeBuff(durationSeconds, tier, power, ticksBetweenEffect));
-		player.inventory.removeItemsFromInventoryStack(player, 1, player.selectedSlot);
 		SoundEngine.playSoundEffect(onUseSound);
 	}
 }

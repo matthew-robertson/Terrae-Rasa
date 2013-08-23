@@ -7,7 +7,7 @@ import org.lwjgl.opengl.GL11;
 
 import render.TrueTypeFont;
 import utils.ActionbarItem;
-import utils.ItemStack;
+import utils.DisplayableItemStack;
 import world.World;
 import entities.EntityPlayer;
 import enums.EnumColor;
@@ -24,10 +24,10 @@ public class UISocketMenu extends UIBase
 	}
 
 	/**
-	 * Returns an applicable ItemStack if a gem that is being socketed is moused over, otherwise this will yield null.
-	 * @return an applicable ItemStack if a gem in the socket UI is moused over, otherwise null
+	 * Returns an applicable DisplayableItemStack if a gem that is being socketed is moused over, otherwise this will yield null.
+	 * @return an applicable DisplayableItemStack if a gem in the socket UI is moused over, otherwise null
 	 */
-	protected static ItemStack getMouseoverSocketedGems(int mouseX, int mouseY)
+	protected static DisplayableItemStack getMouseoverSocketedGems(int mouseX, int mouseY)
 	{
 		if(isSocketWindowOpen)
 		{
@@ -35,7 +35,7 @@ public class UISocketMenu extends UIBase
 			int frameX = (int) (Display.getWidth() * 0.25) - 80;  
 			int frameY = (int) (Display.getHeight() * 0.5) - 106; 
 			
-			ItemStack stack = socketedItem;
+			DisplayableItemStack stack = socketedItem;
 			String itemName = socketedItem.getRenderedName();
 			String[] stats = { };        
 			if(stack.getItemID() >= Item.itemIndex && stack.getItemID() < ActionbarItem.spellIndex)
@@ -63,7 +63,7 @@ public class UISocketMenu extends UIBase
 				{
 					if(stack.getGemSockets()[i].getGem() != null)
 					{
-						return new ItemStack(stack.getGemSockets()[i].getGem());
+						return new DisplayableItemStack(stack.getGemSockets()[i].getGem());
 					}
 				}
 			}
@@ -84,7 +84,7 @@ public class UISocketMenu extends UIBase
 		int frameX = (int) (Display.getWidth() * 0.25) - (4 * size); 
 		int frameY = (int) (Display.getHeight() * 0.5) - (4 * size) - 26; 
 		
-		ItemStack stack = socketedItem;
+		DisplayableItemStack stack = socketedItem;
 		EnumItemQuality quality = EnumItemQuality.COMMON;			
 		String itemName = socketedItem.getRenderedName();
 		String[] stats = { };        

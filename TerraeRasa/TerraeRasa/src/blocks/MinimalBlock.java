@@ -2,7 +2,7 @@ package blocks;
 
 import savable.SavableBlock;
 import transmission.SuperCompressedBlock;
-import utils.ItemStack;
+import utils.DisplayableItemStack;
 
 /**
  * A MinimalBlock is a highly cropped version of Block, which holds minimal amounts of data required for rendering and operations. Other information can
@@ -14,7 +14,7 @@ import utils.ItemStack;
  */
 public class MinimalBlock 
 {
-	public ItemStack[] mainInventory;
+	public DisplayableItemStack[] mainInventory;
 	public short id;
 	public byte metaData;
 	public byte bitMap;
@@ -31,7 +31,7 @@ public class MinimalBlock
 	{
 		this.id = (short) block.getID();
 		this.metaData = (byte) block.metaData;
-		this.mainInventory = (block instanceof BlockChest) ? ((BlockChest)(block)).getMainInventory() : new ItemStack[0];
+		this.mainInventory = (block instanceof BlockChest) ? ((BlockChest)(block)).getMainInventory() : new DisplayableItemStack[0];
 		this.iconX = (short) block.iconX;
 		this.iconY = (short) block.iconY;
 		this.setBitMap(block.getBitMap());

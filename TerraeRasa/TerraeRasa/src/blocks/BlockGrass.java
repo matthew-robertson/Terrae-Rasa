@@ -1,6 +1,6 @@
 package blocks;
 
-import utils.ItemStack;
+import utils.DisplayableItemStack;
 
 
 public class BlockGrass extends Block
@@ -10,8 +10,8 @@ public class BlockGrass extends Block
 		super(i);
 	}
 	
-	public ItemStack getDroppedItem()
+	public DisplayableItemStack getDroppedItem()
 	{
-		return new ItemStack(Block.dirt, 1);
+		return new DisplayableItemStack(Block.dirt, 1);
 	}
 }

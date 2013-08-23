@@ -1,6 +1,6 @@
 package blocks;
 
-import utils.ItemStack;
+import utils.DisplayableItemStack;
 
 
 public class BlockLeaves extends Block 
@@ -11,8 +11,8 @@ public class BlockLeaves extends Block
 		super(i);
 	}
 	
-	public ItemStack getDroppedItem()
+	public DisplayableItemStack getDroppedItem()
 	{
-		return (random.nextInt(20) == 0) ? new ItemStack(Block.sapling, 1) : null;
+		return (random.nextInt(20) == 0) ? new DisplayableItemStack(Block.sapling, 1) : null;
 	}
 }

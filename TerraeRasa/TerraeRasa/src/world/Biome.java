@@ -1,10 +1,6 @@
 package world;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
-import entities.EntityNPCEnemy;
 
 public class Biome 
 		 implements Cloneable, Serializable
@@ -15,12 +11,10 @@ public class Biome
 	protected double y;
 	protected double width;
 	protected double height;
-	protected List<EntityNPCEnemy> spawnableEntites;
 	protected String biomeName;
 	
 	protected Biome(int i, String name)
 	{
-		spawnableEntites = new ArrayList<EntityNPCEnemy>();
 		biomeName = name;
 		x = 0;
 		y = 0;
@@ -45,7 +39,6 @@ public class Biome
 		this.y = biome.y;
 		this.width = biome.width;
 		this.height = biome.height;
-		this.spawnableEntites = biome.spawnableEntites;
 		this.biomeName = biome.biomeName;
 	}
 	

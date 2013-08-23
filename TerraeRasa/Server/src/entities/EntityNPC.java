@@ -36,6 +36,8 @@ public class EntityNPC extends EntityLiving
 		textureHeight = 16;
 		maxHealth = 1;
 		health = 1;
+		iconX = 0;
+		iconY = 0;
 		width = 12;
 		height = 18;
 		maxHeightFallenSafely = 144;

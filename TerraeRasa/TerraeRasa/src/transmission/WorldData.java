@@ -3,10 +3,7 @@ package transmission;
 import java.io.Serializable;
 import java.util.List;
 
-import entities.EntityItemStack;
-import entities.EntityNPC;
-import entities.EntityNPCEnemy;
-import entities.EntityProjectile;
+import entities.DisplayableEntity;
 import enums.EnumWorldDifficulty;
 
 public class WorldData 
@@ -17,10 +14,10 @@ public class WorldData
 	//private boolean weatherFinished;
 	
 	private static final long serialVersionUID = 1L;
-	public List<EntityItemStack> itemsList;
-	public List<EntityNPCEnemy> entityList;
-	public List<EntityNPC> npcList;
-	public List<EntityProjectile> projectileList;
+	public List<DisplayableEntity> itemsList;
+	public List<DisplayableEntity> enemyList;
+	public List<DisplayableEntity> npcList;
+	public List<DisplayableEntity> projectileList;
 	public int[] generatedHeightMap;
 	public int averageSkyHeight;
 	public int totalBiomes;
@@ -32,7 +29,6 @@ public class WorldData
 	public int width; 
 	public int height; 
 	public double previousLightLevel;
-	public EntityNPCEnemy[] spawnList;
 	public boolean lightingUpdateRequired;
-	public CompressedPlayer[] otherplayers;
+	public TransmittablePlayer[] otherplayers;
 }

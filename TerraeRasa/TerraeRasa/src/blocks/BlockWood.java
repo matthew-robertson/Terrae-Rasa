@@ -1,6 +1,6 @@
 package blocks;
 
-import utils.ItemStack;
+import utils.DisplayableItemStack;
 
 public class BlockWood extends Block
 {
@@ -9,8 +9,8 @@ public class BlockWood extends Block
 		super(i);
 	}
 	
-	public ItemStack getDroppedItem()
+	public DisplayableItemStack getDroppedItem()
 	{
-		return new ItemStack(Block.plank, 1);
+		return new DisplayableItemStack(Block.plank, 1);
 	}
 }

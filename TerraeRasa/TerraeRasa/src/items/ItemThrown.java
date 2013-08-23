@@ -1,11 +1,10 @@
 package items;
 
-import entities.EntityProjectile;
 
 public class ItemThrown extends Item
 {
 	protected int cooldownTicks;
-	protected EntityProjectile projectile;
+//	protected EntityProjectile projectile;
 	
 	protected ItemThrown(int i, int d) 
 	{
@@ -28,13 +27,12 @@ public class ItemThrown extends Item
 		return cooldownTicks;
 	}
 	
-	public ItemThrown setProjectile(EntityProjectile projectile){
-		this.projectile = projectile;
-		this.damage = projectile.damage;
-		return this;
-	}
-	
-	public EntityProjectile getProjectile(){
-		return projectile;
-	}	
+//	public ItemThrown setProjectile(EntityProjectile projectile){
+//		this.projectile = projectile;
+//		return this;
+//	}
+//	
+//	public EntityProjectile getProjectile(){
+//		return projectile;
+//	}	
 }
