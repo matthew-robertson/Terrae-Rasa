@@ -1,10 +1,6 @@
 package transmission;
 
-import io.Chunk;
-
 import java.io.Serializable;
-
-import blocks.MinimalBlock;
 
 public class ChunkExpander 
 		implements Serializable

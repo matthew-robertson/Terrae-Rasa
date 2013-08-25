@@ -3,22 +3,18 @@ import items.Item;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
-import java.util.List;
-import java.util.Random;
 import java.util.Vector;
 
-import statuseffects.DisplayableStatusEffect;
 import transmission.ClientUpdate;
 import transmission.StatUpdate;
 import transmission.TransmittablePlayer;
 import transmission.UpdateWithObject;
 import utils.Cooldown;
 import utils.CraftingManager;
-import utils.InventoryPlayer;
 import utils.DisplayableItemStack;
+import utils.InventoryPlayer;
 import utils.MathHelper;
 import utils.Recipe;
-import utils.Vector2F;
 import world.World;
 import audio.SoundEngine;
 import blocks.Block;
@@ -67,23 +63,15 @@ public class EntityPlayer extends EntityLiving
 	private Recipe[] allPossibleRecipes;
 	private final String playerName;
 	private boolean inventoryChanged;
-	private final int MAXIMUM_BASE_MANA = 400;
-	private final int MAXIMUM_BASE_HEALTH = 400;
 	private final int MAX_BLOCK_PLACE_DISTANCE = 42;
 	private Hashtable<String, Cooldown> cooldowns;
-	private int baseSpecialEnergy;
 	private Dictionary<String, Boolean> nearBlock;
 	private Dictionary<String, Recipe[]> possibleRecipesByBlock;
-	public int temporarySpecialEnergy;
 	public double specialEnergy;
 	public double maxSpecialEnergy;
 	public int viewedChestX;
 	public int viewedChestY;
 	public boolean isViewingChest;	
-	public int baseMaxHealth;
-	public int temporaryMaxHealth;
-	public int baseMaxMana;	
-	public int temporaryMaxMana;
 	public double respawnXPos;
 	public double respawnYPos;	
 	public int selectedRecipe;
@@ -109,9 +97,7 @@ public class EntityPlayer extends EntityLiving
 		isMining = false;
 		width = 12;
 		height = 18;
-		baseSpecialEnergy = 100;
 		maxSpecialEnergy = 100;
-		temporarySpecialEnergy = 0;
 		blockHeight = 3;
 		blockWidth = 2;
 		setRespawnPosition(50, 0);		
@@ -124,8 +110,6 @@ public class EntityPlayer extends EntityLiving
 		rotateAngle = -120.0f;		
 		health = 100;
 		maxHealth = 100;
-		baseMaxHealth = 100;
-		baseMaxMana = 0;
 		maxMana = 0;
 		invincibilityTicks = 10;
 		selectedSlot = 0;
@@ -190,7 +174,6 @@ public class EntityPlayer extends EntityLiving
 		this.cooldowns = player.cooldowns;
 		this.inventory = new InventoryPlayer(player.mainInventory, player.armorInventory, player.quiver);
 
-		inventory.initializeInventoryTotals(true);
 		
 	}
 	
@@ -414,38 +397,6 @@ public class EntityPlayer extends EntityLiving
 	private void updateRecipes(Block block)
 	{
 		possibleRecipesByBlock.put(block.getName(), craftingManager.getPossibleRecipesByBlock(inventory, block));		
-	}
-		
-	/**
-	 * Increases the maximum health of the player
-	 * @param increase the amount to increase maxHealth
-	 * @return success of the operation
-	 */
-	public boolean boostMaxHealth(int increase) 
-	{
-		if(baseMaxHealth + increase <= MAXIMUM_BASE_HEALTH)//if the player can have that much of a max health increase
-		{
-			maxHealth += increase; //increase max health
-			baseMaxHealth += increase;
-			return true;
-		}
-		return false;
-	}
-	
-	/**
-	 * Increases the maximum mana of the player
-	 * @param increase the amount to increase maxMana
-	 * @return success of the operation
-	 */
-	public boolean boostMaxMana(int increase) 
-	{
-		if(baseMaxMana + increase <= MAXIMUM_BASE_MANA) //if the player can have that much of a max mana increase
-		{
-			baseMaxMana += increase;
-			maxMana += increase; //increase max mana
-			return true;
-		}
-		return false;
 	}
 	
 	/**

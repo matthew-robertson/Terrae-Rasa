@@ -350,7 +350,7 @@ public class DisplayableItemStack
 		int i = 0;
 		for(i = 0; i < bonuses.length; i++)
 		{
-			if(bonuses[i] == null)
+			if(bonuses[i] != null)
 			{
 				System.out.println("null bonus @" + renderedName);
 				allBonuses[i] = bonuses[i].toString();

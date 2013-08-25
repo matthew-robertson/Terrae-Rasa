@@ -6,10 +6,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 import savable.SaveManager;
-import world.World;
 import client.Settings;
 import client.TerraeRasa;
-import entities.EntityPlayer;
 import enums.EnumPlayerDifficulty;
 
 

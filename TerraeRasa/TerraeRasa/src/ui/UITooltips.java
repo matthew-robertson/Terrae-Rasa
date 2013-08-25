@@ -402,6 +402,12 @@ public class UITooltips extends UIBase
 			yOffset = yOffset + (((tooltipHeight) - (tooltipHeight - tooltipFont.getHeight(itemName))) * xScale * (stats.length));
 			for(int i = 0; i < passiveBonusLines.length; i++)
 			{
+				if(passiveBonusLines[i] == null)
+				{
+					//TODO null passive bonuses crashing the tooltip renderer
+					System.out.println("null passive bonus -- fix req.");
+					continue;
+				}
 				tooltipFont.drawString(frameX + PADDING, 
 						yOffset + (((tooltipHeight) - (tooltipHeight - tooltipFont.getHeight(itemName))) * xScale * (1+i)), 
 						passiveBonusLines[i],

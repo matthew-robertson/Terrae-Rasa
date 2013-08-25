@@ -4,7 +4,6 @@ import passivebonuses.PassiveBonusDefense;
 
 public class AffixSturdy extends Affix{
 	
-	private static final long serialVersionUID = 1L;
 	private int max = 10;
 	private int min = 2;
 	
@@ -13,6 +12,14 @@ public class AffixSturdy extends Affix{
 		this.id = 1;
 		int power = (int) (rng.nextDouble() * (max - min) + min);
 		this.addPassive(new PassiveBonusDefense(power));
+	}
+
+	@Override
+	public void verify() {
+//		if(power > max)
+//			power = max;
+//		if(power < min)
+//			power = min;
 	}
 	
 }

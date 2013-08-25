@@ -1,6 +1,5 @@
 package io;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -10,7 +9,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import savable.SavableBlock;
-import savable.SaveManager;
 import world.World;
 import blocks.MinimalBlock;
 import client.TerraeRasa;

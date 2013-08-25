@@ -34,6 +34,7 @@ import transmission.EntityUpdate;
 import transmission.PositionUpdate;
 import transmission.ServerUpdate;
 import transmission.SuperCompressedBlock;
+import transmission.UpdateWithObject;
 import transmission.WorldData;
 import utils.ActionbarItem;
 import utils.ChestLootGenerator;
@@ -675,7 +676,11 @@ public class World
 					entityUpdate.entityID = stack.entityID;
 					entityUpdate.updatedEntity = null;
 					update.addEntityUpdate(entityUpdate);
+					
+					UpdateWithObject updateWithObject = new UpdateWithObject();
+					s
 					String command = "/pickup " + player.entityID + " " + stack.entityID + " " + originalSize;
+					
 					update.addValue(command);
 					it.remove();
 				}

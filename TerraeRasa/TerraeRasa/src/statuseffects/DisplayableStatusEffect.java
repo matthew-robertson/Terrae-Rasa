@@ -24,10 +24,10 @@ public class DisplayableStatusEffect
 	public int ticksLeft;
 	/** If this effect benefits the entity, then this is true. */
 	public boolean isBeneficialEffect;
-	public int iconX;
-	public int iconY;
-//	public int xSizeOrtho;
-//	public int ySizeOrtho;
+	public short iconX; //->Squares of size 16. IE 2 is at pixel x-positions 32 to 48
+	public short iconY; //->Squares of size 16. IE 1 is at pixel y-positions 16 to 32
+	public short iconWidth; //->Squares of size 16. Size 1 is 16 pixels in the x direction 
+	public short iconHeight; //->Squares of size 16. Size 1 is 16 pixels in the y direction
 	public long id;
 	public String description;
 	
@@ -44,14 +44,10 @@ public class DisplayableStatusEffect
 		this.isBeneficialEffect = true;
 		iconX = 15;
 		iconY = 0;
+		iconWidth = 16;
+		iconHeight = 16;
 		this.id = System.nanoTime();
 		this.description = description;
-	}
-	
-	public void setIconPosition(int x, int y)
-	{
-		this.iconX = x;
-		this.iconY = y;
 	}
 	
 	public long getID()

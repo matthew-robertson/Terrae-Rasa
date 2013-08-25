@@ -34,11 +34,13 @@ import transmission.StatUpdate;
 import transmission.TransmittablePlayer;
 import transmission.UpdateWithObject;
 import utils.Cooldown;
+import utils.CraftingManager;
 import utils.Damage;
 import utils.GemSocket;
 import utils.InventoryPlayer;
 import utils.ItemStack;
 import utils.MathHelper;
+import utils.Recipe;
 import utils.Vector2F;
 import world.World;
 import auras.Aura;
@@ -85,7 +87,6 @@ import enums.EnumToolMaterial;
 public class EntityPlayer extends EntityLiving
 {
 	private static final long serialVersionUID = 1L;
-
 	/** This value apparently has to be negative. */
 	private static final double leftSwingBound = MathHelper.degreeToRadian(-135); 
 	private static final double rightSwingBound = MathHelper.degreeToRadian(55);
@@ -160,6 +161,13 @@ public class EntityPlayer extends EntityLiving
 	/** A flag indicating if the player has been forever defeated. If they have, they will not be saved to disk.*/
 	public boolean defeated;
 	
+	private CraftingManager craftingManager;
+	private Recipe[] allPossibleRecipes;
+	private Dictionary<String, Recipe[]> possibleRecipesByBlock;
+
+	private boolean inventoryChanged;
+	
+	
 	/**
 	 * Constructs a new instance of EntityPlayer with default settings, inventory (includes 3 basic tools),
 	 * and the specified name/difficulty. The default reset position is set to (50, 0), but this
@@ -222,14 +230,24 @@ public class EntityPlayer extends EntityLiving
 		dexterityModifier = 1;
 		strengthModifier = 1;
 		cooldowns = new Hashtable<String, Cooldown>();
-		nearBlock = new Hashtable<String, Boolean>();
-		
-		nearBlock.put(Block.none.getName(), true);
-		
-		auraTracker = new AuraTracker();
-		
+		auraTracker = new AuraTracker();		
 		jumpSound = "Player Jump";
 		deathSound = "Player Death";
+		
+
+		craftingManager = new CraftingManager();
+		nearBlock = new Hashtable<String, Boolean>();
+		for(Block block : CraftingManager.getCraftingBlocks())
+		{
+			nearBlock.put(block.getName(), false);
+		}
+		nearBlock.put(Block.none.getName(), true);
+		possibleRecipesByBlock = new Hashtable<String, Recipe[]>();
+		for(Block block : CraftingManager.getCraftingBlocks())
+		{
+			possibleRecipesByBlock.put(block.getName(), new Recipe[] { });
+		}
+		allPossibleRecipes = new Recipe[0];
 	}
 	
 	public EntityPlayer(World world, SavablePlayer savable)
@@ -313,6 +331,7 @@ public class EntityPlayer extends EntityLiving
 				applySingleArmorItem((ItemArmor)(Item.itemsList[newStack.getItemID()]), newStack, i);
 			}
 		}
+		inventoryChanged = true;
 		
 		refreshPassiveBonuses();
 		recalculateStats();
@@ -324,6 +343,20 @@ public class EntityPlayer extends EntityLiving
 			mana = maxMana;
 		if(specialEnergy > maxSpecialEnergy)
 			specialEnergy = maxSpecialEnergy;
+		
+		craftingManager = new CraftingManager();
+		nearBlock = new Hashtable<String, Boolean>();
+		for(Block block : CraftingManager.getCraftingBlocks())
+		{
+			nearBlock.put(block.getName(), false);
+		}
+		nearBlock.put(Block.none.getName(), true);
+		possibleRecipesByBlock = new Hashtable<String, Recipe[]>();
+		for(Block block : CraftingManager.getCraftingBlocks())
+		{
+			possibleRecipesByBlock.put(block.getName(), new Recipe[] { });
+		}
+		allPossibleRecipes = new Recipe[0];
 		
 		//TODO make sure the stats dont exceed maximum allowed values. I dont see any good reason not to cap stuff.
 		//TODO cap out status effects at a given value. Basically, if the power value exceeds 100% then flag it as invalid?
@@ -754,6 +787,7 @@ public class EntityPlayer extends EntityLiving
 	 */
 	public void onInventoryChange()
 	{
+		inventoryChanged = true;
 	}
 	
 	/**
@@ -761,8 +795,38 @@ public class EntityPlayer extends EntityLiving
 	 */
 	private void checkForNearbyBlocks(World world) 
 	{
-		nearBlock.put(Block.none.getName(), true);
+		Dictionary<String, Boolean> nearby = new Hashtable<String, Boolean>();
+		boolean recalculateRecipes = false;
+		final int detectionRadius = 2; //blocks away a player can detect a crafting_table/furnace/etc
 		
+		//Check if the blocks in CraftingManager.getCraftingBlocks() are nearby
+		for(Block block : CraftingManager.getCraftingBlocks())
+		{
+			nearby.put(block.getName(), 
+					   blockInBounds(world, -detectionRadius, detectionRadius, -detectionRadius, detectionRadius, block)); 
+			if(nearBlock.get(block.getName()) != nearby.get(block.getName())) //and they weren't just near one
+			{ 
+				recalculateRecipes = true; //recipes need recalculated
+			}
+		}
+		nearBlock.put(Block.none.getName(), true);
+			
+		//if the recipes need recalculated or the inventory has changed then recalculate recipes.
+		if(recalculateRecipes || inventoryChanged) 
+		{	
+			for(Block block : CraftingManager.getCraftingBlocks())
+			{
+				if(inventoryChanged || nearBlock.get(block.getName()) != nearby.get(block.getName()))
+				{
+					nearBlock.put(block.getName(), nearby.get(block.getName()));
+					updateRecipes(block);
+				}					
+			}
+		
+			updateRecipes(Block.none); //update inventory recipes
+			setAllRecipeArray(); //set the crafting recipe array to the new recipes
+			inventoryChanged = false;
+		}
 	}
 				
 	/**
@@ -1630,5 +1694,106 @@ public class EntityPlayer extends EntityLiving
 		player.quiver = this.inventory.getQuiver();
 		SaveManager manager = new SaveManager();
 		return manager.convertToXML(player);
+	}
+	
+	/**
+	 * Get every recipe the player is able to craft, based on what they're standing by and what's in 
+	 * their inventory
+	 * @return the allPossibleRecipes[], indicating possible craftable recipes
+	 */
+	public final Recipe[] getAllPossibleRecipes()
+	{
+		return allPossibleRecipes;
+	}
+	
+	/**
+	 * Recreates the allPossibleRecipes[] based on what the player is standing by.
+	 */
+	private void setAllRecipeArray()
+	{
+		//'int size' indicates how many recipes are able to be created, in total
+		//InventoryRecipes are always possible, add their total no matter what
+		int size = possibleRecipesByBlock.get(Block.none.getName()).length;
+		for(Block block : CraftingManager.getCraftingBlocks())
+		{
+			if(nearBlock.get(block.getName()))
+			{
+				size += possibleRecipesByBlock.get(block.getName()).length;
+			}
+		}
+		Recipe[] recipes = new Recipe[size]; //create a temperary Recipe[] to store stuff in.S
+		
+		int i = 0; //used for standard looping. declared here so its value can be known after the loop
+		int k = 0; //the index in recipes[] to begin saving recipes
+		
+		for(Block block : CraftingManager.getCraftingBlocks())
+		{
+			Recipe[] possibleRecipes = possibleRecipesByBlock.get(block.getName());
+			if(nearBlock.get(block.getName()))
+			{
+				for(i = 0; i < possibleRecipes.length; i++)
+				{
+					recipes[k + i] = possibleRecipes[i];
+				}
+				k += i;				
+			}
+		}
+		//Inventory Default recipes
+		Recipe[] possibleRecipes = possibleRecipesByBlock.get(Block.none.getName());
+		if(nearBlock.get(Block.none.getName()))
+		{
+			for(i = 0; i < possibleRecipes.length; i++)
+			{
+				recipes[k + i] = possibleRecipes[i];
+			}
+			k += i;				
+		}
+				
+		allPossibleRecipes = recipes; //set the possible recipes to the temperary Recipe[]
+		if(selectedRecipe >= allPossibleRecipes.length) //Fix the selectedRecipe Integer so that the crafting scroller doesnt go out of bounds
+		{
+			selectedRecipe = (allPossibleRecipes.length > 0) ? allPossibleRecipes.length - 1 : 0;
+		}
+	}
+	
+	/**
+	 * Emergency or init function to brute force calculate all recipes
+	 */
+	public void updateAllPossibleRecipes()
+	{
+		updateAllRecipes();
+		setAllRecipeArray();
+	}
+	
+	/**
+	 * Updates the entire possibleRecipesByBlock to be accurate, after an inventoryChange generally
+	 */
+	private void updateAllRecipes()
+	{
+		for(Block block : CraftingManager.getCraftingBlocks())
+		{
+			possibleRecipesByBlock.put(block.getName(), craftingManager.getPossibleRecipesByBlock(inventory, block));		
+		}
+	}
+	
+	/**
+	 * Updates one crafting block in the possibleRecipesByBlock Dictionary
+	 * @param block the block in possibleRecipesByBlock to update
+	 */
+	private void updateRecipes(Block block)
+	{
+		possibleRecipesByBlock.put(block.getName(), craftingManager.getPossibleRecipesByBlock(inventory, block));		
+	}
+	
+	public boolean isRecipeCraftable(int recipeID)
+	{
+		for(Recipe recipe : allPossibleRecipes)
+		{
+			if(recipe.getID() == recipeID)
+			{
+				return true;
+			}
+		}
+		return true;
 	}
 }

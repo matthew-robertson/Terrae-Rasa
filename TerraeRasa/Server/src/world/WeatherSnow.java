@@ -4,9 +4,7 @@ import java.util.Random;
 
 import utils.MathHelper;
 import utils.Particle;
-
 import blocks.Block;
-import blocks.BlockGrass;
 
 public class WeatherSnow extends Weather
 {

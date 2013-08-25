@@ -90,6 +90,8 @@ public class UIStatusEffects extends UIBase
 	protected static void renderStatusEffects(EntityPlayer player)
 	{
 		//Ensure the icons render in the right place and on the screen (top-right)
+		//The default size of an icon is 1 square, which is 16 pixels
+		int defaultIconTextureSize = 16;
 		
 		int size = 16;
 		int goodEffectHeight = 2;
@@ -103,10 +105,10 @@ public class UIStatusEffects extends UIBase
 			int x = (int) (getCameraX() + (Display.getWidth() * 0.5f) - ((1 + (i % MAX_STATUS_PER_ROW)) * (size + 3)));
 			int y = goodEffectHeight + (int) (getCameraY() + ((i / MAX_STATUS_PER_ROW) * (size + 3)));
 			t.setColorRGBA(255, 255, 255, 255);
-			double tx = (double)goodEffects.get(i).iconX / (double)ICONS_PER_ROW;
-			double ty = (double)goodEffects.get(i).iconY / (double)ICONS_PER_COLUMN;
-			double tw = tx + (double)ICONS_PER_ROW / (double)ICONS_SHEET_WIDTH;
-			double th = ty + (double)ICONS_PER_COLUMN / (double)ICONS_SHEET_HEIGHT;			
+			double tx = (double)goodEffects.get(i).iconX / (defaultIconTextureSize * ICONS_SHEET_WIDTH);
+			double ty = (double)goodEffects.get(i).iconY / (defaultIconTextureSize * ICONS_SHEET_HEIGHT);
+			double tw = tx + (double)goodEffects.get(i).iconWidth / (defaultIconTextureSize * ICONS_SHEET_WIDTH);
+			double th = ty + (double)goodEffects.get(i).iconHeight / (defaultIconTextureSize * ICONS_SHEET_HEIGHT);			
 			t.addVertexWithUV(x, y + size, 0, tx, th);
 			t.addVertexWithUV(x + size, y + size, 0, tw, th);
 			t.addVertexWithUV(x + size, y, 0, tw, ty);
@@ -118,10 +120,10 @@ public class UIStatusEffects extends UIBase
 			int x = (int) (getCameraX() + (Display.getWidth() * 0.5f) - ((1 + (i % MAX_STATUS_PER_ROW)) * (size + 3)));
 			int y = badEffectHeight + (int) (getCameraY() + (i / MAX_STATUS_PER_ROW) * (size + 3));
 			t.setColorRGBA(255, 255, 255, 255);
-			double tx = (double)badEffects.get(i).iconX / ICONS_PER_ROW;
-			double ty = (double)badEffects.get(i).iconY / ICONS_PER_COLUMN;
-			double tw = tx + (double)ICONS_PER_ROW / ICONS_SHEET_WIDTH;
-			double th = ty + (double)ICONS_PER_COLUMN / ICONS_SHEET_HEIGHT;			
+			double tx = (double)badEffects.get(i).iconX / (defaultIconTextureSize * ICONS_SHEET_WIDTH);
+			double ty = (double)badEffects.get(i).iconY / (defaultIconTextureSize * ICONS_SHEET_HEIGHT);
+			double tw = tx + (double)badEffects.get(i).iconWidth / (defaultIconTextureSize * ICONS_SHEET_WIDTH);
+			double th = ty + (double)badEffects.get(i).iconHeight / (defaultIconTextureSize * ICONS_SHEET_HEIGHT);	
 			t.addVertexWithUV(x, y + size, 0, tx, th);
 			t.addVertexWithUV(x + size, y + size, 0, tw, th);
 			t.addVertexWithUV(x + size, y, 0, tw, ty);

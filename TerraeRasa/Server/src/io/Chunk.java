@@ -1,6 +1,5 @@
 package io;
 
-import utils.MathHelper;
 import world.Biome;
 import blocks.Block;
 import blocks.MinimalBlock;

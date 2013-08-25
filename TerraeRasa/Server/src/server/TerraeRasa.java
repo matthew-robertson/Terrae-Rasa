@@ -27,6 +27,7 @@ public class TerraeRasa
 	private ServerSocket serverSocket;
 	private ConsoleInputThread consoleInputThread;
 	private static Object gameEngineLock = new Object();
+	public volatile static boolean canAcceptConnections = false;
 	
 	public static void main(String[] args)
 	{
@@ -47,6 +48,16 @@ public class TerraeRasa
 		consoleInputThread = new ConsoleInputThread();
 		consoleInputThread.start();
 
+		//Deny connections (by blocking this thread) until the world loads.
+		while(!canAcceptConnections)
+		{
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		
 		try {
 			serverSocket = new ServerSocket(settings.port);
 		} catch (IOException e) {
@@ -71,7 +82,6 @@ public class TerraeRasa
 				}
 			}
 		}
-		//Issue cleanup from the game engine thread, this one is locked.
 	}
 	
 	private void handleSocketConnection(Socket socket) throws IOException

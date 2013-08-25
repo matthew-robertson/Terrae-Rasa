@@ -1,22 +1,15 @@
 package ui;
 
-import java.util.Vector;
-
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
-import client.Settings;
-
 import render.TrueTypeFont;
-
-import blocks.BlockChest;
-
 import transmission.ClientUpdate;
 import utils.DisplayableItemStack;
 import utils.MathHelper;
-import utils.MetaDataHelper;
 import utils.Recipe;
 import world.World;
+import client.Settings;
 import entities.EntityPlayer;
 
 /**

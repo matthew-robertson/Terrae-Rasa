@@ -13,7 +13,6 @@ import items.ItemArmorPants;
 import java.io.Serializable;
 import java.util.Hashtable;
 
-import spells.Spell;
 import world.World;
 import blocks.Block;
 import entities.EntityPlayer;
@@ -41,6 +40,9 @@ public class InventoryPlayer
 		 implements Serializable
 {
 	private static final long serialVersionUID = 1L;
+	public final static int MAIN_INVENTORY_SIZE = 48;
+	public final static int ARMOR_INVENTORY_SIZE = 10;
+	public final static int QUIVER_SIZE = 4;
 	private Hashtable<String, Integer> inventoryTotals;
 	private DisplayableItemStack[] trash;
 	private DisplayableItemStack[] mainInventory;
@@ -84,7 +86,7 @@ public class InventoryPlayer
 		armorInventory = new DisplayableItemStack[10];
 		trash = new DisplayableItemStack[1];
 		quiver = new DisplayableItemStack[4];
-		initializeInventoryTotals(false);	
+		initializeInventoryTotals();	
 	}
 	
 	/**
@@ -95,89 +97,113 @@ public class InventoryPlayer
 	 */
 	public InventoryPlayer(DisplayableItemStack[] mainInventory, DisplayableItemStack[] armorInventory, DisplayableItemStack[] quiver)
 	{
-		this.mainInventory = mainInventory;
-		this.armorInventory = armorInventory;
-		trash = new DisplayableItemStack[1];
-		this.quiver = quiver;
+		
+			//Initialize the main inventory
+			this.mainInventory = new DisplayableItemStack[MAIN_INVENTORY_SIZE];
+			if(mainInventory.length < MAIN_INVENTORY_SIZE)
+			{
+				for(int i = 0; i < mainInventory.length; i++)
+				{
+					if(mainInventory[i] != null)
+						this.mainInventory[i] = new DisplayableItemStack(mainInventory[i]);
+				}
+			}
+			else
+			{
+				for(int i = 0; i < MAIN_INVENTORY_SIZE; i++)
+				{
+					if(mainInventory[i] != null)
+						this.mainInventory[i] = new DisplayableItemStack(mainInventory[i]);
+				}
+			}
+			
+			//Initialize the armor inventory
+			this.armorInventory = new DisplayableItemStack[ARMOR_INVENTORY_SIZE];
+			if(armorInventory.length < ARMOR_INVENTORY_SIZE)
+			{
+				for(int i = 0; i < armorInventory.length; i++)
+				{
+					if(armorInventory[i] != null)
+						this.armorInventory[i] = new DisplayableItemStack(armorInventory[i]);
+				}
+			}
+			else
+			{
+				for(int i = 0; i < ARMOR_INVENTORY_SIZE; i++)
+				{
+					if(armorInventory[i] != null)
+						this.armorInventory[i] = new DisplayableItemStack(armorInventory[i]);
+				}
+			}
+			
+			//Initialize the quiver
+			this.quiver = new DisplayableItemStack[QUIVER_SIZE];
+			if(quiver.length < QUIVER_SIZE)
+			{
+				for(int i = 0; i < quiver.length; i++)
+				{
+					if(quiver[i] != null)
+						this.quiver[i] = new DisplayableItemStack(quiver[i]);
+				}
+			}
+			else
+			{
+				for(int i = 0; i < QUIVER_SIZE; i++)
+				{
+					if(quiver[i] != null)
+						this.quiver[i] = new DisplayableItemStack(quiver[i]);
+				}
+			}
+			
+			trash = new DisplayableItemStack[1];
+		
+		initializeInventoryTotals();
 	}
 	
 	/**
 	 * Populates the inventoryTotals Hashtable with every possible item/block that exists (each with a value of 0)
 	 */
-	public void initializeInventoryTotals(boolean isReloaded)
-	{
-		if(isReloaded)
+	private void initializeInventoryTotals()
+	{		
+		inventoryTotals = new Hashtable<String, Integer>();
+		
+		//Put Every existing block and item in the list with a default value of 0.
+		//TODO change name -> id
+		for(int i = 0; i < Item.itemsList.length; i++) //Items
 		{
-			inventoryTotals = new Hashtable<String, Integer>();
-			for(int i = 0; i < Item.itemsList.length; i++) //Items
+			if(Item.itemsList[i] != null && inventoryTotals.get(Item.itemsList[i].getName()) != null) //If the Item exists and is already in inventoryTotals
 			{
-				if(Item.itemsList[i] != null && inventoryTotals.get(Item.itemsList[i].getName()) == null) //A new Item needs added 
+				if(Item.itemsList[i].getName().toLowerCase() != "unnamed") //And it isnt unnamed
 				{
-					inventoryTotals.put(Item.itemsList[i].name, 0);
+					throw new RuntimeException("Item name already exists : " + Item.itemsList[i].getName()); //There is a name conflict, throw an exception
 				}
 			}
-			for(int i = 0; i < Block.blocksList.length; i++) //Blocks
-			{	
-				if(Block.blocksList[i] != null  && inventoryTotals.get(Block.blocksList[i].getName()) == null) //A new Block needs added
-				{
-					inventoryTotals.put(Block.blocksList[i].name, 0);					
-				}
-			}
-			for(int i = 0; i < Spell.spellList.length; i++) //Spell
-			{	
-				if(Spell.spellList[i] != null  && inventoryTotals.get(Spell.spellList[i].getName()) == null) //A new Spell needs added
-				{
-					inventoryTotals.put(Spell.spellList[i].name, 0);					
-				}
+			else if(Item.itemsList[i] != null) //Otherwise if the item exists, add it with a starting value of 0
+			{
+				inventoryTotals.put(Item.itemsList[i].name, 0);
 			}
 		}
-		else
-		{
-			inventoryTotals = new Hashtable<String, Integer>();
-			
-			for(int i = 0; i < Item.itemsList.length; i++) //Items
+		for(int i = 0; i < Block.blocksList.length; i++) //Blocks
+		{	
+			if(Block.blocksList[i] != null && inventoryTotals.get(Block.blocksList[i].getName()) != null) //If the block exists
 			{
-				if(Item.itemsList[i] != null && inventoryTotals.get(Item.itemsList[i].getName()) != null) //If the Item exists and is already in inventoryTotals
+				if(Block.blocksList[i].getName().toLowerCase() != "unnamed") //And it isnt unnamed
 				{
-					if(Item.itemsList[i].getName().toLowerCase() != "unnamed") //And it isnt unnamed
-					{
-						throw new RuntimeException("Item name already exists : " + Item.itemsList[i].getName()); //There is a name conflict, throw an exception
-					}
-				}
-				else if(Item.itemsList[i] != null) //Otherwise if the item exists, add it with a starting value of 0
-				{
-					inventoryTotals.put(Item.itemsList[i].name, 0);
+					throw new RuntimeException("Block name already exists : " + Block.blocksList[i].getName()); //There is a name conflict, throw an exception
 				}
 			}
-			for(int i = 0; i < Block.blocksList.length; i++) //Blocks
-			{	
-				if(Block.blocksList[i] != null && inventoryTotals.get(Block.blocksList[i].getName()) != null) //If the block exists
-				{
-					if(Block.blocksList[i].getName().toLowerCase() != "unnamed") //And it isnt unnamed
-					{
-						throw new RuntimeException("Block name already exists : " + Block.blocksList[i].getName()); //There is a name conflict, throw an exception
-					}
-				}
-				else if(Block.blocksList[i] != null) //Otherwise if the block exists, add it with a starting value of 0
-				{
-					inventoryTotals.put(Block.blocksList[i].name, 0);				
-				}
-			}
-			for(int i = 0; i < Spell.spellList.length; i++) //Spell
+			else if(Block.blocksList[i] != null) //Otherwise if the block exists, add it with a starting value of 0
 			{
-				if(Spell.spellList[i] != null && inventoryTotals.get(Spell.spellList[i].getName()) != null) //If the Item exists and is already in inventoryTotals
-				{
-					if(Spell.spellList[i].getName().toLowerCase() != "unnamed") //And it isnt unnamed
-					{
-						throw new RuntimeException("Spell name already exists : " + Spell.spellList[i].getName()); //There is a name conflict, throw an exception
-					}
-				}
-				else if(Spell.spellList[i] != null) //Otherwise if the item exists, add it with a starting value of 0
-				{
-					inventoryTotals.put(Spell.spellList[i].name, 0);
-				}
+				inventoryTotals.put(Block.blocksList[i].name, 0);				
 			}
 		}
+		
+		for(DisplayableItemStack stack : mainInventory)
+		{
+			if(stack != null && stack.getItemID() < ActionbarItem.spellIndex){
+				inventoryTotals.put(stack.getItemName(), inventoryTotals.get(stack.getItemName()) + stack.getStackSize());
+			}
+		}		
 	}
 		
 	/**

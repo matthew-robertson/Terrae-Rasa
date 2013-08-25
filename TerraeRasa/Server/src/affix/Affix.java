@@ -1,6 +1,5 @@
 package affix;
 
-import java.io.Serializable;
 import java.util.Random;
 import java.util.Vector;
 
@@ -13,10 +12,8 @@ import auras.Aura;
  * @author Matthew Robertson
  *
  */
-public class Affix
-		implements Serializable
+public abstract class Affix
 {
-	private static final long serialVersionUID = 1L;
 	protected Random rng;
 	private String name;
 	private Vector<PassiveBonus> passives;
@@ -117,6 +114,11 @@ public class Affix
 	{
 		return tier;
 	}
+	
+	/**
+	 * This method is called when rebuilding a player, to ensure a given affix is not broken (either overpowered or underpowered)
+	 */
+	public abstract void verify();
 	
 	/**
 	 * Yields a string in the form of "AFFIX_ID" + " " + "Tier". <b>This does not include the actual roll of the stat just the affix and tier.</b>

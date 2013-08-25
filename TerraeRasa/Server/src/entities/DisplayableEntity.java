@@ -29,10 +29,6 @@ public class DisplayableEntity
 	public double width;
 	public double height;	
 	
-	private DisplayableEntity()
-	{
-	}
-	
 	public DisplayableEntity(EntityProjectile entity)
 	{
 		type = TYPE_PROJECTILE;

@@ -40,7 +40,6 @@ import world.WorldSky;
 import audio.SoundEngine;
 import blocks.Block;
 import blocks.MinimalBlock;
-import entities.Entity;
 import entities.EntityPlayer;
 import entities.IEntityTransmitBase;
 import enums.EnumColor;

@@ -85,6 +85,8 @@ public class GameEngine
 			int loops;
 			start = System.currentTimeMillis();
 			
+			TerraeRasa.canAcceptConnections = true;
+			
 		    while(!TerraeRasa.done) //Main Game Loop
 		    {
 		        loops = 0;

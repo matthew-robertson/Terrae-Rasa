@@ -9,11 +9,8 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
-import utils.FileManager;
 import utils.MathHelper;
-import world.World;
 import client.Settings;
-import client.TerraeRasa;
 
 //TODO: Prevent keybinds from overwriting each other
 

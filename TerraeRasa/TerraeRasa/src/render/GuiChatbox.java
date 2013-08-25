@@ -17,7 +17,6 @@ import org.lwjgl.opengl.GL11;
 
 import transmission.ClientUpdate;
 import utils.ColoredText;
-import client.GameEngine;
 import enums.EnumColor;
 
 public class GuiChatbox extends GuiComponent

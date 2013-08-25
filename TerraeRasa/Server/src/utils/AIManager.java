@@ -5,7 +5,6 @@ import java.util.Random;
 import world.World;
 import entities.EntityLiving;
 import entities.EntityNPC;
-import entities.EntityPlayer;
 import entities.EntityProjectile;
 
 public class AIManager {

@@ -27,8 +27,10 @@ public class StatusEffect
 	public int tier;
 	/** If this effect benefits the entity, then this is true. */
 	public boolean isBeneficialEffect;
-	public int iconX;
-	public int iconY;
+	public short iconX;
+	public short iconY;
+	public short iconWidth;
+	public short iconHeight;
 	public boolean stacksIndependantly;
 	public double power;
 	public int ticksBetweenEffect;
@@ -49,6 +51,8 @@ public class StatusEffect
 		this.isBeneficialEffect = true;
 		iconX = 15;
 		iconY = 0;
+		iconWidth = 16;
+		iconHeight = 16;
 		stacksIndependantly = true;
 		this.ticksBetweenEffect = ticksBetweenEffect;
 		this.power = power;
@@ -63,6 +67,8 @@ public class StatusEffect
 		this.power = effect.power;
 		this.ticksBetweenEffect = effect.ticksBetweenEffect;
 		this.id = effect.id;
+		this.iconWidth = effect.iconWidth;
+		this.iconHeight = effect.iconHeight;
 		this.isBeneficialEffect = effect.isBeneficialEffect;
 		this.iconX = effect.iconX;
 		this.iconY = effect.iconY;
@@ -87,7 +93,7 @@ public class StatusEffect
 		return ticksLeft <= 0;
 	}
 	
-	public void setIconPosition(int x, int y)
+	public void setIconPosition(short x, short y)
 	{
 		this.iconX = x;
 		this.iconY = y;

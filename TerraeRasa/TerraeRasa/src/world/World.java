@@ -4,8 +4,6 @@ import io.Chunk;
 import io.ChunkManager;
 import items.Item;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
@@ -15,7 +13,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.lwjgl.opengl.Display;
 
-import savable.SaveManager;
 import transmission.ClientUpdate;
 import transmission.TransmittablePlayer;
 import transmission.WorldData;
@@ -28,7 +25,6 @@ import blocks.BlockGrass;
 import blocks.BlockPillar;
 import blocks.MinimalBlock;
 import entities.DisplayableEntity;
-import entities.Entity;
 import entities.EntityPlayer;
 import entities.IEntityTransmitBase;
 import enums.EnumColor;

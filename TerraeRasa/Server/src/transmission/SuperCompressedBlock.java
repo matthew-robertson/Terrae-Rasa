@@ -2,11 +2,9 @@ package transmission;
 
 import java.io.Serializable;
 
+import utils.DisplayableItemStack;
 import blocks.Block;
 import blocks.BlockChest;
-
-import utils.DisplayableItemStack;
-import utils.ItemStack;
 
 
 public class SuperCompressedBlock 
