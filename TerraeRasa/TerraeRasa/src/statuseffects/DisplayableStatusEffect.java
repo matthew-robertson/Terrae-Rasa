@@ -1,5 +1,7 @@
 package statuseffects;
 
+import java.io.Serializable;
+
 import world.World;
 import entities.EntityLiving;
 
@@ -19,8 +21,10 @@ import entities.EntityLiving;
  * @version     1.0
  * @since       1.0
  */
-public class DisplayableStatusEffect 
+public class DisplayableStatusEffect
+		implements Serializable
 {
+	private static final long serialVersionUID = 1L;
 	public int ticksLeft;
 	/** If this effect benefits the entity, then this is true. */
 	public boolean isBeneficialEffect;

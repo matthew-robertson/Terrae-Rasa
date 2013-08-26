@@ -33,6 +33,7 @@ public class TransmittablePlayer
 	public DisplayableItemStack[] mainInventory;
 	public DisplayableItemStack[] armorInventory;
 	public DisplayableItemStack[] quiver;
+	public DisplayableItemStack heldMouseItem; 
 	
 	public TransmittablePlayer()
 	{
@@ -90,6 +91,14 @@ public class TransmittablePlayer
 		}
 	}
 
+	public void setHeldItem(ItemStack stack)
+	{
+		if(stack != null)
+		{
+			heldMouseItem = new DisplayableItemStack(stack);
+		}
+	}
+	
 	@Override
 	public int getEntityID() {
 		return entityID;

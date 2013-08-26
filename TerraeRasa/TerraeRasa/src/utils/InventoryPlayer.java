@@ -10,7 +10,6 @@ import items.ItemArmorGloves;
 import items.ItemArmorHelmet;
 import items.ItemArmorPants;
 
-import java.io.Serializable;
 import java.util.Hashtable;
 
 import world.World;
@@ -37,9 +36,7 @@ import entities.EntityPlayer;
  * @since       1.0
  */
 public class InventoryPlayer 
-		 implements Serializable
 {
-	private static final long serialVersionUID = 1L;
 	public final static int MAIN_INVENTORY_SIZE = 48;
 	public final static int ARMOR_INVENTORY_SIZE = 10;
 	public final static int QUIVER_SIZE = 4;
@@ -600,6 +597,7 @@ public class InventoryPlayer
 			player.changedInventorySlots.add("i " + index);
 			inventoryTotals.put(mainInventory[index].getItemName(), inventoryTotals.get(mainInventory[index].getItemName()) - mainInventory[index].getStackSize());		
 			mainInventory[index] = null;
+			//TODO fix this issue here -- inventorytotals issue
 		}
 		else if(stack != null)//otherwise put the stack in the inventory
 		{

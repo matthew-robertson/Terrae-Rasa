@@ -292,7 +292,7 @@ public class UITooltips extends UIBase
 	
 	private static void renderDisplayableItemStackTooltip(EntityPlayer player, DisplayableItemStack stack)
 	{
-		if(player.isInventoryOpen && mouseItem == null)
+		if(player.isInventoryOpen && player.getHeldItem() == null)
 		{
 			EnumItemQuality quality = getQuality(stack);			
 			String[] stats = getStats(stack);

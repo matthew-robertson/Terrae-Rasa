@@ -69,8 +69,7 @@ public class TerraeRasa
 	{		
 		osName = System.getProperty("os.name").toLowerCase();
 		
-		try
-		{
+		try {
 			System.out.println(args[0]);
 			if(args[0].equals("no-debug"))
 			{
@@ -80,9 +79,7 @@ public class TerraeRasa
 			{
 				initInDebugMode = true;			
 			}
-		}
-		catch (ArrayIndexOutOfBoundsException e) 
-		{
+		} catch (ArrayIndexOutOfBoundsException e) {
 			initInDebugMode = true;
 		}
 		

@@ -24,7 +24,6 @@ public class UIBase extends Render
 	//Variables for the item picked up by the mouse:
 	protected static boolean shouldDropItem;
 	protected static int mouseItemSize; //How big it is
-	protected static DisplayableItemStack mouseItem; //What it is
 	protected static int mouseXOffset; //How far it should be adjusted to avoid looking bad
 	protected static int mouseYOffset;	
 	//Socket Window Variables
@@ -37,7 +36,6 @@ public class UIBase extends Render
 	{
 		shouldDropItem = false;
 		mouseItemSize = 0; 
-		mouseItem = null; 
 		mouseXOffset = 0; 
 		mouseYOffset = 0;	
 	}

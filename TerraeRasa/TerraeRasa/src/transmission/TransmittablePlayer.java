@@ -30,6 +30,7 @@ public class TransmittablePlayer
 	public DisplayableItemStack[] mainInventory;
 	public DisplayableItemStack[] armorInventory;
 	public DisplayableItemStack[] quiver;
+	public DisplayableItemStack heldMouseItem; 
 	
 	public TransmittablePlayer()
 	{

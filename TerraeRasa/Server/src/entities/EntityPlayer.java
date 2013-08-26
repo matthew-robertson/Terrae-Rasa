@@ -36,6 +36,7 @@ import transmission.UpdateWithObject;
 import utils.Cooldown;
 import utils.CraftingManager;
 import utils.Damage;
+import utils.DisplayableItemStack;
 import utils.GemSocket;
 import utils.InventoryPlayer;
 import utils.ItemStack;
@@ -165,8 +166,9 @@ public class EntityPlayer extends EntityLiving
 	private Recipe[] allPossibleRecipes;
 	private Dictionary<String, Recipe[]> possibleRecipesByBlock;
 
+	public Vector<String> changedInventorySlots = new Vector<String>();
 	private boolean inventoryChanged;
-	
+	private ItemStack heldMouseItem;
 	
 	/**
 	 * Constructs a new instance of EntityPlayer with default settings, inventory (includes 3 basic tools),
@@ -421,6 +423,85 @@ public class EntityPlayer extends EntityLiving
 			statsNeedResent = false;
 			update.addStatUpdate(getStats());
 		}
+		
+		//Inventory updates
+		String[] changes = new String[changedInventorySlots.size()];
+		changedInventorySlots.copyInto(changes);
+		changedInventorySlots.clear();
+		
+		for(String change : changes)
+		{
+			UpdateWithObject objUpdate = new UpdateWithObject();
+			
+			String[] split = change.split(" ");
+			if(split[0].equals("a"))
+			{
+				if(inventory.getArmorInventoryStack(Integer.parseInt(split[1])) != null)
+				{
+					objUpdate.command = "/player " + entityID + " inventoryset 2 " + split[1];
+					objUpdate.object = new DisplayableItemStack(inventory.getArmorInventoryStack(Integer.parseInt(split[1])));
+				}
+				else
+				{
+					objUpdate.command = "/player " + entityID + " inventoryset 2 " + split[1];
+					objUpdate.object = null;
+				}
+			}
+			else if(split[0].equals("q"))
+			{
+				if(inventory.getQuiverStack(Integer.parseInt(split[1])) != null)
+				{
+					objUpdate.command = "/player " + entityID + " inventoryset 3 " + split[1];
+					objUpdate.object = new DisplayableItemStack(inventory.getQuiverStack(Integer.parseInt(split[1])));
+				}
+				else
+				{
+					objUpdate.command = "/player " + entityID + " inventoryset 3 " + split[1];
+					objUpdate.object = null;
+				}
+			}
+			else if(split[0].equals("i") || split[0].equals("m"))
+			{
+				if(inventory.getMainInventoryStack(Integer.parseInt(split[1])) != null)
+				{
+					objUpdate.command = "/player " + entityID + " inventoryset 1 " + split[1];
+					objUpdate.object = new DisplayableItemStack(inventory.getMainInventoryStack(Integer.parseInt(split[1])));
+				}
+				else
+				{
+					objUpdate.command = "/player " + entityID + " inventoryset 1 " + split[1];
+					objUpdate.object = null;
+				}
+			}	
+			else if(split[0].equals("t"))
+			{
+				if(inventory.getTrashStack(Integer.parseInt(split[1])) != null)
+				{
+					objUpdate.command = "/player " + entityID + " inventoryset 4 " + split[1];
+					objUpdate.object = new DisplayableItemStack(inventory.getTrashStack(Integer.parseInt(split[1])));
+				}	
+				else
+				{
+					objUpdate.command = "/player " + entityID + " inventoryset 4 " + split[1];
+					objUpdate.object = null;
+				}
+			}
+			else if(split[0].equals("mouse"))
+			{
+				if(getHeldMouseItem() != null)
+				{
+					objUpdate.command = "/player " + entityID + " mouseitemset";
+					objUpdate.object = new DisplayableItemStack(getHeldMouseItem());
+				}
+				else
+				{
+					objUpdate.command = "/player " + entityID + " mouseitemset";
+					objUpdate.object = null;
+				}
+			}
+			update.addObjectUpdate(objUpdate);
+			
+		}	
 	}
 	
 	/**
@@ -1673,6 +1754,7 @@ public class EntityPlayer extends EntityLiving
 		player.maxMana = this.maxMana;
 		player.addStatusEffects(this.statusEffects);
 		player.cooldowns = this.cooldowns;
+		player.setHeldItem(this.getHeldMouseItem());
 		player.addInventories(this.inventory.getMainInventory(), this.inventory.getArmorInventory(), this.inventory.getQuiver());
 		return player;
 	}
@@ -1692,6 +1774,7 @@ public class EntityPlayer extends EntityLiving
 		player.mainInventory = this.inventory.getMainInventory();
 		player.armorInventory = this.inventory.getArmorInventory();
 		player.quiver = this.inventory.getQuiver();
+		player.heldMouseItem = this.getHeldMouseItem();
 		SaveManager manager = new SaveManager();
 		return manager.convertToXML(player);
 	}
@@ -1796,4 +1879,31 @@ public class EntityPlayer extends EntityLiving
 		}
 		return true;
 	}
+
+	public ItemStack getHeldMouseItem() {
+		return heldMouseItem;
+	}
+
+	public void setHeldMouseItem(ItemStack heldMouseItem) {
+		this.changedInventorySlots.add("mouse");
+		this.heldMouseItem = heldMouseItem;
+	}
+	
+	public void flagHeldItem()
+	{
+		this.changedInventorySlots.add("mouse");
+	}
+	
+	public Recipe getRecipeByID(int recipeID)
+	{
+		for(Recipe recipe : allPossibleRecipes)
+		{
+			if(recipe.getID() == recipeID)
+			{
+				return recipe;
+			}
+		}
+		return null;
+	}
+	
 }

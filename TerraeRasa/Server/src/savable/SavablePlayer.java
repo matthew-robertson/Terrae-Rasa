@@ -20,6 +20,7 @@ public class SavablePlayer
 	public ItemStack[] mainInventory;
 	public ItemStack[] armorInventory;
 	public ItemStack[] quiver;
+	public ItemStack heldMouseItem;
 	
 	public SavablePlayer()
 	{

@@ -51,7 +51,7 @@ public class UI extends UIBase
 		}		
 		UITooltips.renderApplicableTooltip(world, player);
 		UIStatusEffects.renderStatusEffects(player);		
-		renderMouseItem(); //The item held by the mouse, if there is one
+		renderMouseItem(player); //The item held by the mouse, if there is one
 		renderText(world, player); //Health and the 'Save And Quit' button		
 		
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA); //Re-enable this so the lighting renders properly
@@ -61,22 +61,22 @@ public class UI extends UIBase
 	/**
 	 * Renders the item the mouse is holding, should there be one.
 	 */
-	protected static void renderMouseItem()
+	protected static void renderMouseItem(EntityPlayer player)
 	{
-		if(mouseItem != null)
+		if(player.getHeldItem() != null)
 		{
 			int x = (Math.abs(getCameraX()) + MathHelper.getCorrectMouseXPosition()) - mouseXOffset; 
 			int y = (Math.abs(getCameraY()) + MathHelper.getCorrectMouseYPosition()) - mouseYOffset;
 			int newsize = mouseItemSize;
 			
-			if(mouseItem.getItemID() < 2048) //blocks are a slightly different size
+			if(player.getHeldItem().getItemID() < 2048) //blocks are a slightly different size
 			{
 				x += 1;
 				y += 1;
 				newsize -= 2;
 			}
 			
-			textures[mouseItem.getItemID()].bind();
+			textures[player.getHeldItem().getItemID()].bind();
 			t.startDrawingQuads();
 			t.setColorRGBA_F(1.0F, 1.0F, 1.0F, 1.0F);
 			t.addVertexWithUV(x, y + newsize, 0, 0, 1);
@@ -85,10 +85,10 @@ public class UI extends UIBase
 			t.addVertexWithUV(x, y, 0, 0, 0);
 			t.draw();
 			
-			if(mouseItem.getStackSize() > 1)
+			if(player.getHeldItem().getStackSize() > 1)
 			{
 				GL11.glColor4f(0, 1, 0, 1);
-				trueTypeFont.drawString(x - 2, y + 18, "" + mouseItem.getStackSize(), 0.25f, -0.25f);
+				trueTypeFont.drawString(x - 2, y + 18, "" + player.getHeldItem().getStackSize(), 0.25f, -0.25f);
 				GL11.glColor4f(1, 1, 1, 1);
 			}
 		}
@@ -150,43 +150,45 @@ public class UI extends UIBase
 	 * @param yoff how far to offset the rendering of the cursor item (Y)
 	 * @param size how big the image is (16)
 	 */
-	protected static void craftRecipe(World world, EntityPlayer player, int index, int xoff, int yoff, int size)
+	protected static void craftRecipe(ClientUpdate update, World world, EntityPlayer player, int index, int xoff, int yoff, int size)
 	{
 		if(player.getAllPossibleRecipes().length <= 0) 
 		{
 		 	return; //There are no recipes
 		}
 		
-		Recipe whatToCraft = player.getAllPossibleRecipes()[index];
-		
-		if(mouseItem != null && mouseItem.getItemID() != whatToCraft.getResult().getItemID()) //check if it's possible to craft successfully
-		{
-			return;
-		}
-	
-		if(mouseItem != null && mouseItem.getItemID() == whatToCraft.getResult().getItemID()) 
-		{ //does the mouseItem have the same item being crafted already picked up?
-			if(whatToCraft.getResult().getStackSize() + mouseItem.getStackSize() < mouseItem.getMaxStackSize()) //if there's room to pick it up
-			{
-				for(int i = 0; i < whatToCraft.getRecipe().length; i++) //remove the items from the inventory
-				{
-					player.inventory.removeItemsFromInventory(player, whatToCraft.getRecipe()[i]);
-				}
-				mouseItem.addToStack(whatToCraft.getResult().getStackSize()); //pick up the item
-			}
-		}
-		else //the mouseitem is null, so pick up a new itemstack
-		{
-			for(int i = 0; i < whatToCraft.getRecipe().length; i++) //remove items from inventory
-			{
-				player.inventory.removeItemsFromInventory(player, whatToCraft.getRecipe()[i]);
-			}
-			
-			mouseXOffset = xoff;
-			mouseYOffset = yoff;
-			mouseItemSize = size;
-			mouseItem = new DisplayableItemStack(whatToCraft.getResult()); //THIS IS VERY IMPORTANT
-		}
+		String command = "/player " + player.entityID + " craft " + player.getAllPossibleRecipes()[index].getID();
+		update.addCommand(command);
+//		Recipe whatToCraft = player.getAllPossibleRecipes()[index];
+//		
+//		if(player.getHeldItem() != null && player.getHeldItem().getItemID() != whatToCraft.getResult().getItemID()) //check if it's possible to craft successfully
+//		{
+//			return;
+//		}
+//	
+//		if(player.getHeldItem() != null && player.getHeldItem().getItemID() == whatToCraft.getResult().getItemID()) 
+//		{ //does the mouseItem have the same item being crafted already picked up?
+//			if(whatToCraft.getResult().getStackSize() + player.getHeldItem().getStackSize() < player.getHeldItem().getMaxStackSize()) //if there's room to pick it up
+//			{
+//				for(int i = 0; i < whatToCraft.getRecipe().length; i++) //remove the items from the inventory
+//				{
+//					player.inventory.removeItemsFromInventory(player, whatToCraft.getRecipe()[i]);
+//				}
+//				player.getHeldItem().addToStack(whatToCraft.getResult().getStackSize()); //pick up the item
+//			}
+//		}
+//		else //the mouseitem is null, so pick up a new itemstack
+//		{
+//			for(int i = 0; i < whatToCraft.getRecipe().length; i++) //remove items from inventory
+//			{
+//				player.inventory.removeItemsFromInventory(player, whatToCraft.getRecipe()[i]);
+//			}
+//			
+//			mouseXOffset = xoff;
+//			mouseYOffset = yoff;
+//			mouseItemSize = size;
+//			player.getHeldItem() = new DisplayableItemStack(whatToCraft.getResult()); //THIS IS VERY IMPORTANT
+//		}
 	}
 		
 	/**

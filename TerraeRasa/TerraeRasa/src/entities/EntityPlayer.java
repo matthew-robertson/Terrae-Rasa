@@ -82,6 +82,7 @@ public class EntityPlayer extends EntityLiving
 	public Vector<String> changedInventorySlots = new Vector<String>();
 	/** A flag indicating if the player has been forever defeated. If they have, they will not be saved to disk.*/
 	public boolean defeated;
+	public DisplayableItemStack heldMouseItem; 
 	
 	/**
 	 * Constructs a new instance of EntityPlayer with default settings, inventory (includes 3 basic tools),
@@ -173,7 +174,7 @@ public class EntityPlayer extends EntityLiving
 		this.statusEffects = player.statusEffects;
 		this.cooldowns = player.cooldowns;
 		this.inventory = new InventoryPlayer(player.mainInventory, player.armorInventory, player.quiver);
-
+		this.heldMouseItem = player.heldMouseItem;
 		
 	}
 	
@@ -182,33 +183,33 @@ public class EntityPlayer extends EntityLiving
 		checkForNearbyBlocks(world);	
 		verifyChestRange();
 
-		String[] changes = new String[changedInventorySlots.size()];
-		changedInventorySlots.copyInto(changes);
-		changedInventorySlots.clear();
-		
-		for(String change : changes)
-		{
-			UpdateWithObject objUpdate = new UpdateWithObject();
-			
-			String[] split = change.split(" ");
-			if(split[0].equals("a"))
-			{
-				objUpdate.command = "/player " + entityID + " armorreplace " + split[1];
-				objUpdate.object = inventory.getArmorInventoryStack(Integer.parseInt(split[1]));
-			}
-			else if(split[0].equals("q"))
-			{
-				objUpdate.command = "/player " + entityID + " quiverreplace " + split[1];
-				objUpdate.object = inventory.getQuiverStack(Integer.parseInt(split[1]));
-			}
-			else if(split[0].equals("i") || split[0].equals("m"))
-			{
-				objUpdate.command = "/player " + entityID + " inventoryreplace " + split[1];
-				objUpdate.object = inventory.getMainInventoryStack(Integer.parseInt(split[1]));
-			}	
-			update.addObjectUpdate(objUpdate);
-			
-		}
+//		String[] changes = new String[changedInventorySlots.size()];
+//		changedInventorySlots.copyInto(changes);
+//		changedInventorySlots.clear();
+//		
+//		for(String change : changes)
+//		{
+//			UpdateWithObject objUpdate = new UpdateWithObject();
+//			
+//			String[] split = change.split(" ");
+//			if(split[0].equals("a"))
+//			{
+//				objUpdate.command = "/player " + entityID + " armorreplace " + split[1];
+//				objUpdate.object = inventory.getArmorInventoryStack(Integer.parseInt(split[1]));
+//			}
+//			else if(split[0].equals("q"))
+//			{
+//				objUpdate.command = "/player " + entityID + " quiverreplace " + split[1];
+//				objUpdate.object = inventory.getQuiverStack(Integer.parseInt(split[1]));
+//			}
+//			else if(split[0].equals("i") || split[0].equals("m"))
+//			{
+//				objUpdate.command = "/player " + entityID + " inventoryreplace " + split[1];
+//				objUpdate.object = inventory.getMainInventoryStack(Integer.parseInt(split[1]));
+//			}	
+//			update.addObjectUpdate(objUpdate);
+//			
+//		}
 	}
 	
 	public synchronized void clearChangedSlots()
@@ -629,5 +630,10 @@ public class EntityPlayer extends EntityLiving
 	@Override
 	public int getEntityType() {
 		return DisplayableEntity.TYPE_PLAYER;
+	}
+	
+	public DisplayableItemStack getHeldItem()
+	{
+		return heldMouseItem;
 	}
 }

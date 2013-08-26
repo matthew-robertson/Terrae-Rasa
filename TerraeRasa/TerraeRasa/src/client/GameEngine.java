@@ -351,6 +351,40 @@ public class GameEngine
 						EntityPlayer player = ((EntityPlayer)(world.getEntityByID(Integer.parseInt(split[1]))));
 						player.registerStatusEffect((DisplayableStatusEffect)(update.object));
 					}
+					else if(split[2].equals("mouseitemset"))
+					{
+						///player <id> mouseitemset ---> Includes DisplayableItemStack Object
+						((EntityPlayer)(world.getEntityByID(Integer.parseInt(split[1])))).heldMouseItem = (DisplayableItemStack)(update.object);
+					}
+					else if(split[2].equals("inventoryset"))
+					{
+//						/player <id> inventoryset <inventory_id> <inventory_slot_index> ---> Includes ItemStack Object
+//						1- Main
+//						2- Armor
+//						3- Quiver
+//						4- Trash
+
+						EntityPlayer player = ((EntityPlayer)(world.getEntityByID(Integer.parseInt(split[1]))));
+						int inventoryID = Integer.parseInt(split[3]);
+						int index = Integer.parseInt(split[4]);
+						
+						if(inventoryID == 1) //Main
+						{
+							player.inventory.putDisplayableItemStackInSlot(world, player, (DisplayableItemStack)(update.object), index);
+						}
+						else if(inventoryID == 2) //Armor
+						{
+							player.inventory.setArmorInventoryStack(player, (DisplayableItemStack)(update.object), player.inventory.getArmorInventoryStack(index), index);
+						}
+						else if(inventoryID == 3) //Quiver
+						{
+							player.inventory.setQuiverStack(player, (DisplayableItemStack)(update.object), index);
+						}
+						else if(inventoryID == 4) //Trash
+						{
+							player.inventory.setTrashStack((DisplayableItemStack)(update.object), index);
+						}
+					}	
 				}
 				else if(update.command.startsWith("/recievesavable"))
 				{
@@ -476,18 +510,18 @@ public class GameEngine
 			String[] split = command.split(" ");
 			world.addTemporaryText(split[3], Integer.parseInt(split[1]), Integer.parseInt(split[2]), 20, EnumColor.get(split[4]));
 		}
-		else if(command.startsWith("/pickup"))
-		{
-			String[] split = command.split(" ");
-			if(Integer.parseInt(split[1]) != activePlayerID)
-			{
-				return;
-			}
+//		else if(command.startsWith("/pickup"))
+//		{
+//			String[] split = command.split(" ");
+//			if(Integer.parseInt(split[1]) != activePlayerID)
+//			{
+//				return;
+//			}
 			//TODO fix the /pickup command
 //			DisplayableItemStack stack = ((EntityItemStack)(world.getEntityByID(Integer.parseInt(split[2])))).getStack();
 //			player.inventory.pickUpItemStack(world, player, new DisplayableItemStack(stack).setStackSize(Integer.parseInt(split[3])));
 //			stack.removeFromStack(Integer.parseInt(split[3]));
-		}
+//		}
 		else if(command.startsWith("/player"))
 		{
 			String[] split = command.split(" ");
@@ -521,8 +555,7 @@ public class GameEngine
 			{
 				((EntityPlayer)(world.getEntityByID(Integer.parseInt(split[1])))).removeStatusEffectByID(Long.parseLong(split[3]));
 			}
-				
-			
+
 			//These only affect this client's player
 			if(!(activePlayerID == Integer.parseInt(split[1])))
 			{
@@ -536,6 +569,8 @@ public class GameEngine
 			{
 				player.inventory.removeItemsFromInventoryStack(player, Integer.parseInt(split[4]), Integer.parseInt(split[3]));
 			}
+			
+		
 		}
 		else if(command.startsWith("/say"))
 		{

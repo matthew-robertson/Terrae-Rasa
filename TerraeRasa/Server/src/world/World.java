@@ -677,20 +677,20 @@ public class World
 					entityUpdate.updatedEntity = null;
 					update.addEntityUpdate(entityUpdate);
 					
-					UpdateWithObject updateWithObject = new UpdateWithObject();
-					s
-					String command = "/pickup " + player.entityID + " " + stack.entityID + " " + originalSize;
+//					String command = "/pickup " + player.entityID + " " + stack.entityID + " " + originalSize;
+
+//					player.inventory.pickUpItemStack(this, player, stack.getStack());
 					
-					update.addValue(command);
+//					update.addValue(command);
 					it.remove();
 				}
 				else //otherwise, put back what's left
 				{
-					if(originalSize != stack.getStack().getStackSize())
-					{
-						String command = "/pickup " + player.entityID + " " + stack.entityID + " " + (originalSize - stack.getStack().getStackSize());
-						update.addValue(command);
-					}
+//					if(originalSize != stack.getStack().getStackSize())
+//					{
+//						String command = "/pickup " + player.entityID + " " + stack.entityID + " " + (originalSize - stack.getStack().getStackSize());
+//						update.addValue(command);
+//					}
 					stack.setStack(remainingStack);				
 				}
 			}
