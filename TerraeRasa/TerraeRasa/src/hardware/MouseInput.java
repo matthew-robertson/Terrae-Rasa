@@ -26,11 +26,6 @@ public class MouseInput
 	public static void mouse(World world, EntityPlayer player, Vector<String> clientCommands, Vector<EnumHardwareInput> hardwareInput)
 	{
 		try {
-			//TODO fix stuns (client-side temp removal to address compilition errors)
-//			if(player.isStunned())
-//			{
-//				return;
-//			}		
 			int active = player.selectedSlot;
 			int mouseBX = ((Render.getCameraX() + MathHelper.getCorrectMouseXPosition()) / 6);
 			int mouseBY = ((Render.getCameraY() + MathHelper.getCorrectMouseYPosition()) / 6);

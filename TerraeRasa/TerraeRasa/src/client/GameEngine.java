@@ -31,6 +31,7 @@ import transmission.SuperCompressedChunk;
 import transmission.TransmittablePlayer;
 import transmission.UpdateWithObject;
 import utils.ColoredText;
+import utils.Cooldown;
 import utils.DisplayableItemStack;
 import utils.ErrorUtils;
 import utils.FileManager;
@@ -195,7 +196,7 @@ public class GameEngine
 		        		//Hardware inputs
 		        		if(chatbox.isOpen())
 		        		{
-		        			chatbox.keyboard(player.entityID, update);
+		        			chatbox.keyboard(player, player.entityID, update);
 		        		}
 		        		else 
 		        		{
@@ -218,6 +219,10 @@ public class GameEngine
 		        		hardwareInput.clear();
 		        		//Client Updates (String stuff)
 		        		clientCommands.addAll(update.commands);
+		        		if(clientCommands.size() > 0)
+		        		{
+		        			System.out.println();
+		        		}		        		
 		        		if(closeRequested) {
 		        			clientCommands.add("/quit " + activePlayerID);
 		        		}
@@ -344,7 +349,7 @@ public class GameEngine
 					{
 						EntityPlayer player = ((EntityPlayer)(world.getEntityByID(Integer.parseInt(split[1]))));
 						player.selectedSlot = Integer.parseInt(split[3]);
-						player.inventory.putDisplayableItemStackInSlot(world, player, (DisplayableItemStack)(update.object), Integer.parseInt(split[3]));
+						player.inventory.putDisplayableItemStackInSlot(world, player, (DisplayableItemStack)(update.object), Integer.parseInt(split[3]), true);
 					}
 					else if(split[2].equals("statuseffectadd"))
 					{
@@ -370,21 +375,29 @@ public class GameEngine
 						
 						if(inventoryID == 1) //Main
 						{
-							player.inventory.putDisplayableItemStackInSlot(world, player, (DisplayableItemStack)(update.object), index);
+							player.inventory.putDisplayableItemStackInSlot(world, player, (DisplayableItemStack)(update.object), index, false);
 						}
 						else if(inventoryID == 2) //Armor
 						{
-							player.inventory.setArmorInventoryStack(player, (DisplayableItemStack)(update.object), player.inventory.getArmorInventoryStack(index), index);
+							player.inventory.setArmorInventoryStack(player, (DisplayableItemStack)(update.object), player.inventory.getArmorInventoryStack(index), index, false);
+						
+							player.forceDownHMS();
 						}
 						else if(inventoryID == 3) //Quiver
 						{
-							player.inventory.setQuiverStack(player, (DisplayableItemStack)(update.object), index);
+							player.inventory.setQuiverStack(player, (DisplayableItemStack)(update.object), index, false);
 						}
 						else if(inventoryID == 4) //Trash
 						{
 							player.inventory.setTrashStack((DisplayableItemStack)(update.object), index);
 						}
 					}	
+					else if(split[2].equals("putoncooldown"))
+					{
+						EntityPlayer player = ((EntityPlayer)(world.getEntityByID(Integer.parseInt(split[1]))));
+						Cooldown cooldown = (Cooldown)(update.object);
+						player.putOnCooldown(cooldown.id, cooldown.ticksLeft);
+					}
 				}
 				else if(update.command.startsWith("/recievesavable"))
 				{

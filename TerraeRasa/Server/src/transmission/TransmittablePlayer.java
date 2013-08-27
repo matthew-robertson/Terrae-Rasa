@@ -22,6 +22,7 @@ public class TransmittablePlayer
 	public double x;
 	public double y;
 	public String playerName;
+	public int defense = 0;
 	public double mana;
 	public double health;
 	public double specialEnergy;	
@@ -41,6 +42,7 @@ public class TransmittablePlayer
 		playerName = "";
 		x = 0;
 		y = 0;
+		defense = 0;
 		mana = 0;
 		health = 0;
 		specialEnergy = 0;

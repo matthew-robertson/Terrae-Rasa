@@ -30,6 +30,7 @@ import entities.EntityPlayer;
  */
 public class UIMouse extends UIBase
 {
+	
 	/**
 	 * Updates all mouse events on call. Including: chests, the mainInventory, the garbage, 
 	 * and the recipe scroller 
@@ -80,13 +81,15 @@ public class UIMouse extends UIBase
 	protected static void mouseEventRightClickShift(World world, EntityPlayer player, int mouseX, int mouseY)
 	{
 		boolean[] equipped = { false };
-		DisplayableItemStack clickedItem = getClickedStack(world, player, mouseX, mouseY, equipped);
+		int[] positions = { -1, -1 };
+		DisplayableItemStack clickedItem = getClickedStack(world, player, mouseX, mouseY, equipped, positions);
 		socketItemEquipped = equipped[0];
 		if(clickedItem != null && clickedItem.hasSockets())
 		{					
 			isSocketWindowOpen = true;
+			inventoryID = positions[0];
+			inventoryIndex = positions[1];
 			player.clearViewedChest();
-			socketedItem = clickedItem;
 		}
 		else
 		{
@@ -411,60 +414,62 @@ public class UIMouse extends UIBase
 		{
 			chestMouseEvents(world, player, x, y);
 		}
-		//TODO fix gemming
-//		//Socket a gem, if possible.
-//		if(isSocketWindowOpen && mouseItem != null)
-//		{
-//			if(mouseItem.getItemID() < ActionbarItem.spellIndex && 
-//				mouseItem.getItemID() >= ActionbarItem.blockIndex && 
-//				Item.itemsList[mouseItem.getItemID()] instanceof ItemGem)
-//			{
-//				int tooltipHeight = 100;
-//				int frameX = (int) (Display.getWidth() * 0.25) - 80;  
-//				int frameY = (int) (Display.getHeight() * 0.5) - 106; 
-//				
-//				DisplayableItemStack stack = socketedItem;
-//				String itemName = socketedItem.getItemName();
-//				String[] stats = { };        
-//				if(stack.getItemID() >= Item.itemIndex && stack.getItemID() < ActionbarItem.spellIndex)
-//				{
-//					stats = Item.itemsList[stack.getItemID()].getStats();
-//				}
-//				
-//				frameY -= (int) (boldTooltip.getHeight(itemName) + (boldTooltip.getHeight(itemName) * 0.75 * stats.length) + 30);							
-//				float yOffset = frameY + boldTooltip.getHeight(itemName) + 5 * (stats.length) + 
-//						(((tooltipHeight) - (tooltipHeight - boldTooltip.getHeight(itemName))) * 0.5f * (stats.length));
-//				
-//				int numberOfSockets = stack.getGemSockets().length;
-//				for(int i = 0; i < numberOfSockets; i++)
-//				{
-//					size = 30;
-//					double offsetByTotal = (numberOfSockets == 1) ? 65 : (numberOfSockets == 2) ? 47.5 : (numberOfSockets == 3) ? 30 : 10;
-//					double xOffset = frameX + offsetByTotal + (i * (size + 7.5));
-//					if(y > yOffset && y < yOffset + size && x > xOffset && x < xOffset + size)
-//					{	
-//						
-//						if(socketItemEquipped)
-//						{
-//							player.inventory.setArmorInventoryStack(player, null, socketedItem, socketItemIndex);
-//						}
-//						stack.getGemSockets()[i].socket(new DisplayableItemStack(mouseItem));
-//						if(socketItemEquipped)
-//						{
-//							player.inventory.setArmorInventoryStack(player, socketedItem, null, socketItemIndex);
-//						}
-//					
-//						mouseItem.removeFromStack(1);
-//						if(mouseItem.getStackSize() <= 0)
-//						{
-//							mouseItem = null;
-//						}
-//						shouldDropItem = false;
-//					}
-//				}
-//			}
-//		}	
 		
+		if(isSocketWindowOpen && player.getHeldItem() != null)
+		{
+			if(player.getHeldItem().getItemID() < ActionbarItem.spellIndex && 
+					player.getHeldItem().getItemID() >= ActionbarItem.blockIndex && 
+					Item.itemsList[player.getHeldItem().getItemID()] instanceof ItemGem)
+			{
+				int tooltipHeight = 100;
+				int frameX = (int) (Display.getWidth() * 0.25) - 80;  
+				int frameY = (int) (Display.getHeight() * 0.5) - 106; 
+				
+				DisplayableItemStack socketedItem = null;
+				if(inventoryID == 1)
+				{
+					socketedItem = player.inventory.getMainInventoryStack(inventoryIndex);
+				}
+				else if(inventoryID == 2)
+				{
+					socketedItem = player.inventory.getArmorInventoryStack(inventoryIndex);
+				}
+				else if(inventoryID == 3)
+				{
+					socketedItem = player.inventory.getQuiverStack(inventoryIndex);
+				}
+				else if(inventoryID == 4)
+				{
+					socketedItem = player.inventory.getTrashStack(inventoryIndex);
+				}
+				String itemName = socketedItem.getItemName();
+				String[] stats = { };        
+				if(socketedItem.getItemID() >= Item.itemIndex && socketedItem.getItemID() < ActionbarItem.spellIndex)
+				{
+					stats = Item.itemsList[socketedItem.getItemID()].getStats();
+				}
+				
+				frameY -= (int) (boldTooltip.getHeight(itemName) + (boldTooltip.getHeight(itemName) * 0.75 * stats.length) + 30);							
+				float yOffset = frameY + boldTooltip.getHeight(itemName) + 5 * (stats.length) + 
+						(((tooltipHeight) - (tooltipHeight - boldTooltip.getHeight(itemName))) * 0.5f * (stats.length));
+				
+				int numberOfSockets = socketedItem.getGemSockets().length;
+				for(int i = 0; i < numberOfSockets; i++)
+				{
+					size = 30;
+					double offsetByTotal = (numberOfSockets == 1) ? 65 : (numberOfSockets == 2) ? 47.5 : (numberOfSockets == 3) ? 30 : 10;
+					double xOffset = frameX + offsetByTotal + (i * (size + 7.5));
+					if(y > yOffset && y < yOffset + size && x > xOffset && x < xOffset + size)
+					{	
+//						/player <id> socketgem <inventory_id> <index> <gem_socket_index>
+						String command = "/player " + player.entityID + " socketgem " + inventoryID + " " + inventoryIndex + " " + i;
+//						System.out.println(command);
+						update.addCommand(command);
+						shouldDropItem = false;
+					}
+				}
+			}
+		}		
 		
 		//if the player didnt click something, drop their mouseitem
 		if(shouldDropItem)
@@ -573,26 +578,8 @@ public class UIMouse extends UIBase
 			
 			if(x >= x1 && x <= x1 + size && y >= y1 && y <= y1 + size) //Is the click in bounds?
 			{
-				//Ensure it's actually an Item
-				if (player.inventory.getMainInventoryStack(i) != null && 
-				    player.inventory.getMainInventoryStack(i).getItemID() < ActionbarItem.spellIndex)
-				{
-					Item selectedItem = (Item)(Item.itemsList[player.inventory.getMainInventoryStack(i).getItemID()]);
-					if(selectedItem instanceof ItemArmor)
-					{
-						DisplayableItemStack stack = player.inventory.getMainInventoryStack(i);
-						player.inventory.removeEntireStackFromInventory(world, player, i);
-						stack = player.inventory.pickUpArmorDisplayableItemStack(world, player, stack);
-						player.inventory.putDisplayableItemStackInSlot(world, player, stack, i);
-					}
-					else if(selectedItem instanceof ItemAmmo)
-					{
-						DisplayableItemStack stack = player.inventory.getMainInventoryStack(i);
-						player.inventory.removeEntireStackFromInventory(world, player, i);
-						stack = player.inventory.pickUpQuiverDisplayableItemStack(world, player, stack);
-						player.inventory.putDisplayableItemStackInSlot(world, player, stack, i);
-					}					
-				}
+				String command = "/player " + player.entityID + " shiftclick 1 " + i;
+				update.addCommand(command);
 			}		
 		}
 		
@@ -602,13 +589,10 @@ public class UIMouse extends UIBase
 			int x1 = (int) ((Display.getWidth() * 0.25f) + (-7 * size));
 			int y1 = (int) ((Display.getHeight() * 0.5f) - (i * (size)) - (size + 22f));
 			
-			if(x >= x1 && x <= x1 + size && y >= y1 && y <= y1 + size && player.inventory.getQuiverStack(i) != null) 
+			if(x >= x1 && x <= x1 + size && y >= y1 && y <= y1 + size) 
 			{
-				//Try to place that stack in the inventory - leaving what's left in the quiver (if any)
-				player.inventory.setQuiverStack(player, player.inventory.pickUpItemStack(world, 
-						player, 
-						player.inventory.getQuiverStack(i)), 
-						i);
+				String command = "/player " + player.entityID + " shiftclick 3 " + i;
+				update.addCommand(command);
 			}		
 		}
 		
@@ -623,25 +607,20 @@ public class UIMouse extends UIBase
 			int x1 = (int) ((Display.getWidth() * 0.5f) - ((size + 2) * (1.5 + (i / 5))));
 			int y1 = armorOffset + ((i % 5) * (size + 2));	
 			
-			if(x >= x1 && x <= x1 + size && y >= y1 && y <= y1 + size && player.inventory.getArmorInventoryStack(i) != null) 
+			if(x >= x1 && x <= x1 + size && y >= y1 && y <= y1 + size) 
 			{
-				player.inventory.setArmorInventoryStack(player, player.inventory.pickUpItemStack(world, 
-							player, 
-							player.inventory.getArmorInventoryStack(i)),
-						player.inventory.getArmorInventoryStack(i),
-						i);
+				String command = "/player " + player.entityID + " shiftclick 2 " + i;
+				update.addCommand(command);
 			}			
 		}
 		
 		int x1 = (int)(Display.getWidth() * 0.25f) - (6 * 20); 
 		int y1 = (int)(Display.getHeight() * 0.5f) - (6 * 20);
 		
-		if(x >= x1 && x <= x1 + 20 && y >= y1 && y <= y1 + 20 && player.inventory.getTrashStack(0) != null) //Garbage
+		if(x >= x1 && x <= x1 + 20 && y >= y1 && y <= y1 + 20) //Garbage
 		{
-			player.inventory.setTrashStack(player.inventory.pickUpItemStack(world, 
-					player, 
-					player.inventory.getTrashStack(0)), 
-					0);
+			String command = "/player " + player.entityID + " shiftclick 4 0";
+			update.addCommand(command);
 		}			
 		
 		//Recipe Slots:
@@ -818,9 +797,10 @@ public class UIMouse extends UIBase
 	/**
 	 * Checks to see if a mouse click is over something in one of the player's inventories.
 	 * This will return null if nothing appropriate is found.
+	 * @param positions 
 	 * @return the DisplayableItemStack the player is clicking on, or null if none is selected
 	 */
-	protected static DisplayableItemStack getClickedStack(World world, EntityPlayer player, int x, int y, boolean[] equipped)
+	protected static DisplayableItemStack getClickedStack(World world, EntityPlayer player, int x, int y, boolean[] equipped, int[] positions)
 	{		
 		//Inventory
 		for(int i = 0; i < player.inventory.getMainInventoryLength(); i++) 
@@ -832,6 +812,8 @@ public class UIMouse extends UIBase
 			if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
 			{
 				equipped[0] = false;
+				positions[0] = 1;
+				positions[1] = i;
 				return player.inventory.getMainInventoryStack(i);
 			}		
 		}
@@ -846,6 +828,8 @@ public class UIMouse extends UIBase
 			if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
 			{
 				equipped[0] = true;
+				positions[0] = 3;
+				positions[1] = i;
 				return player.inventory.getQuiverStack(i);
 			}		
 		}
@@ -865,7 +849,9 @@ public class UIMouse extends UIBase
 			if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
 			{
 				equipped[0] = true; 
-				socketItemIndex = i;
+//				socketItemIndex = i;
+				positions[0] = 2;
+				positions[1] = i;
 				return player.inventory.getArmorInventoryStack(i);
 			}			
 		}
@@ -878,6 +864,8 @@ public class UIMouse extends UIBase
 		if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) 
 		{
 			equipped[0] = false;
+			positions[0] = 4;
+			positions[1] = 0;
 			return player.inventory.getTrashStack(0);
 		}			
 		
@@ -942,4 +930,7 @@ public class UIMouse extends UIBase
 		}
 		return null;
 	}	
+
+	
+	
 }

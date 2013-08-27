@@ -2,6 +2,7 @@ package entities;
 import items.Item;
 
 import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -9,6 +10,7 @@ import transmission.ClientUpdate;
 import transmission.StatUpdate;
 import transmission.TransmittablePlayer;
 import transmission.UpdateWithObject;
+import ui.UIBase;
 import utils.Cooldown;
 import utils.CraftingManager;
 import utils.DisplayableItemStack;
@@ -165,6 +167,7 @@ public class EntityPlayer extends EntityLiving
 		this.x = player.x;
 		this.y = player.y;
 		this.playerName = player.playerName;
+		this.defense = player.defense;
 		this.mana = player.mana;
 		this.health = player.health;
 		this.specialEnergy = player.specialEnergy;
@@ -182,34 +185,43 @@ public class EntityPlayer extends EntityLiving
 	{
 		checkForNearbyBlocks(world);	
 		verifyChestRange();
-
-//		String[] changes = new String[changedInventorySlots.size()];
-//		changedInventorySlots.copyInto(changes);
-//		changedInventorySlots.clear();
-//		
-//		for(String change : changes)
-//		{
-//			UpdateWithObject objUpdate = new UpdateWithObject();
-//			
-//			String[] split = change.split(" ");
-//			if(split[0].equals("a"))
-//			{
-//				objUpdate.command = "/player " + entityID + " armorreplace " + split[1];
-//				objUpdate.object = inventory.getArmorInventoryStack(Integer.parseInt(split[1]));
-//			}
-//			else if(split[0].equals("q"))
-//			{
-//				objUpdate.command = "/player " + entityID + " quiverreplace " + split[1];
-//				objUpdate.object = inventory.getQuiverStack(Integer.parseInt(split[1]));
-//			}
-//			else if(split[0].equals("i") || split[0].equals("m"))
-//			{
-//				objUpdate.command = "/player " + entityID + " inventoryreplace " + split[1];
-//				objUpdate.object = inventory.getMainInventoryStack(Integer.parseInt(split[1]));
-//			}	
-//			update.addObjectUpdate(objUpdate);
-//			
-//		}
+		updateCooldowns();
+		
+		String[] changes = new String[changedInventorySlots.size()];
+		changedInventorySlots.copyInto(changes);
+		changedInventorySlots.clear();
+		
+		if(UIBase.getIsSocketWindowOpen())
+		{
+			for(String change : changes)
+			{
+				UpdateWithObject objUpdate = new UpdateWithObject();
+				
+				String[] split = change.split(" ");
+				if(split[0].equals("a"))
+				{
+					if(UIBase.getInventoryID() == 2 && UIBase.getInventoryIndex() == Integer.parseInt(split[1]))
+					{						
+						UIBase.clearSocketVariables();						
+					}
+				}
+				else if(split[0].equals("q"))
+				{
+					if(UIBase.getInventoryID() == 3 && UIBase.getInventoryIndex() == Integer.parseInt(split[1]))
+					{
+						UIBase.clearSocketVariables();
+					}
+				}
+				else if(split[0].equals("i") || split[0].equals("m"))
+				{
+					if(UIBase.getInventoryID() == 1 && UIBase.getInventoryIndex() == Integer.parseInt(split[1]))
+					{
+						UIBase.clearSocketVariables();						
+					}
+				}	
+				update.addObjectUpdate(objUpdate);
+			}
+		}
 	}
 	
 	public synchronized void clearChangedSlots()
@@ -606,7 +618,6 @@ public class EntityPlayer extends EntityLiving
 		this.hasSwungTool = newStats.hasSwungTool;
 		this.rotateAngle = newStats.rotateAngle;
 		this.statusEffects = newStats.statusEffects;
-		this.cooldowns = newStats.cooldowns;
 		this.defeated = newStats.defeated;
 	}
 
@@ -635,5 +646,43 @@ public class EntityPlayer extends EntityLiving
 	public DisplayableItemStack getHeldItem()
 	{
 		return heldMouseItem;
+	}
+	
+	/**
+	 * Forces health, mana, and special energy down to their maximum values to prevent bar errors. This will get fixed on the next 
+	 * health/mana/special update if it's not correct.
+	 */
+	public void forceDownHMS()
+	{
+		if(health > maxHealth)
+		{
+			health = maxHealth;
+		}
+		if(mana > maxMana)
+		{
+			mana = maxMana;
+		}
+		if(specialEnergy > maxSpecialEnergy)
+		{
+			specialEnergy = maxSpecialEnergy;
+		}
+	}
+	
+	/**
+	 * Decreases the ticksLeft on each cooldown by 1, and removes that cooldown if it's expired.
+	 */
+	private void updateCooldowns()
+	{
+		Enumeration<String> keys = cooldowns.keys();
+		while (keys.hasMoreElements()) 
+		{
+			String str = (String) keys.nextElement();
+			Cooldown cooldown = cooldowns.get(str);
+			cooldown.ticksLeft--;
+			if(cooldown.ticksLeft <= 0)
+			{
+				cooldowns.remove(str);
+			}
+		}
 	}
 }

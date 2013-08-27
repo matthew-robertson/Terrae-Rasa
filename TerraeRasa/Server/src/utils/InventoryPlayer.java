@@ -218,6 +218,25 @@ public class InventoryPlayer
 	}
 	
 	/**
+	 * Regenerates the passives and auras on an item based on their given affixes.
+	 */
+	public void forceAffixRegeneration()
+	{
+		for(ItemStack stack : mainInventory)
+			if(stack != null)
+				stack.regenerateBonuses();
+		for(ItemStack stack : armorInventory)
+			if(stack != null)
+				stack.regenerateBonuses();
+		for(ItemStack stack : quiver)
+			if(stack != null)
+				stack.regenerateBonuses();
+		for(ItemStack stack : trash)
+			if(stack != null)
+				stack.regenerateBonuses();
+	}
+	
+	/**
 	 * Checks for a partial ItemStack in the inventory
 	 * @param stack the stack to check for
 	 * @return the mainInventory[] slot containing the item, or -1 if the check failed

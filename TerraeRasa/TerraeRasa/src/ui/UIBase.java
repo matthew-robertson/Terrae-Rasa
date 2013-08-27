@@ -29,8 +29,10 @@ public class UIBase extends Render
 	//Socket Window Variables
 	protected static boolean isSocketWindowOpen;
 	protected static boolean socketItemEquipped;
-	protected static int socketItemIndex;
-	protected static DisplayableItemStack socketedItem;
+	protected static int inventoryID;
+	protected static int inventoryIndex;
+//	protected static int socketItemIndex;
+//	protected static DisplayableItemStack socketedItem;
 	
 	public static void init()
 	{
@@ -38,5 +40,27 @@ public class UIBase extends Render
 		mouseItemSize = 0; 
 		mouseXOffset = 0; 
 		mouseYOffset = 0;	
+	}
+	
+	public static void clearSocketVariables()
+	{
+		isSocketWindowOpen = false;
+		inventoryID = -1;
+		inventoryIndex = -1;
+	}
+	
+	public static boolean getIsSocketWindowOpen()
+	{
+		return isSocketWindowOpen;
+	}
+	
+	public static int getInventoryID()
+	{
+		return inventoryID;
+	}
+	
+	public static int getInventoryIndex()
+	{
+		return inventoryIndex;
 	}
 }

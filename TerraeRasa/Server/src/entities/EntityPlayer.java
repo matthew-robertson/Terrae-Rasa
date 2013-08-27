@@ -317,7 +317,7 @@ public class EntityPlayer extends EntityLiving
 		this.baseMaxMana = savable.baseMaxMana;
 		this.cooldowns = savable.cooldowns;
 		this.inventory = new InventoryPlayer(savable.mainInventory, savable.armorInventory, savable.quiver);
-		
+		this.inventory.forceAffixRegeneration();
 		//Safety Check for base maximums
 		verifyBarItegrity();
 		
@@ -1415,11 +1415,21 @@ public class EntityPlayer extends EntityLiving
 			Cooldown current = cooldowns.get("" + id);
 			if(current.ticksLeft < duration)
 			{
-				cooldowns.put("" + id, new Cooldown(id, duration));
+				Cooldown cooldown = new Cooldown(id, duration);
+				cooldowns.put("" + id, cooldown);
+				UpdateWithObject updateWithObject = new UpdateWithObject();
+				updateWithObject.command = "/player " + entityID + " putoncooldown";
+				updateWithObject.object = cooldown;
+				TerraeRasa.terraeRasa.gameEngine.addExtraObjectUpdate(updateWithObject);
 			}		
 			return;	
 		}
-		cooldowns.put("" + id, new Cooldown(id, duration));
+		Cooldown cooldown = new Cooldown(id, duration);
+		cooldowns.put("" + id, cooldown);
+		UpdateWithObject updateWithObject = new UpdateWithObject();
+		updateWithObject.command = "/player " + entityID + " putoncooldown";
+		updateWithObject.object = cooldown;
+		TerraeRasa.terraeRasa.gameEngine.addExtraObjectUpdate(updateWithObject);
 	}
 	
 	/**
@@ -1617,7 +1627,6 @@ public class EntityPlayer extends EntityLiving
 		update.hasSwungTool = this.hasSwungTool;
 		update.rotateAngle = this.rotateAngle;
 		update.statusEffects = convert(this.statusEffects);
-		update.cooldowns = this.cooldowns;
 		update.defeated = this.defeated;
 		return update;
 	}
@@ -1746,6 +1755,7 @@ public class EntityPlayer extends EntityLiving
 		player.y = this.y;
 		player.entityID = this.entityID;
 		player.playerName = this.playerName;
+		player.defense = (int) this.defense;
 		player.mana = this.mana;
 		player.health = this.health;
 		player.specialEnergy = this.specialEnergy;

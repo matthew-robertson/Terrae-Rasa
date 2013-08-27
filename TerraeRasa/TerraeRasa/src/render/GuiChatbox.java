@@ -15,8 +15,11 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
+import client.ClientsideCommands;
+
 import transmission.ClientUpdate;
 import utils.ColoredText;
+import entities.EntityPlayer;
 import enums.EnumColor;
 
 public class GuiChatbox extends GuiComponent
@@ -241,7 +244,7 @@ public class GuiChatbox extends GuiComponent
 	/**
 	 * Handles keyboard input. For the menu this means distributing typing to text boxes.
 	 */
-	public void keyboard(int playerID, ClientUpdate update)
+	public void keyboard(EntityPlayer player, int playerID, ClientUpdate update)
 	{	
 		if(Keyboard.isKeyDown(Keyboard.KEY_BACK) && backspaceCooldown <= 0)
 		{
@@ -251,18 +254,18 @@ public class GuiChatbox extends GuiComponent
 				temporaryValue = removeLastCharacter(temporaryValue);
 			}
 		}
-		for( ; Keyboard.next(); handleKeyboardInput(playerID, update)) { } //Very hacky way of letting all keyboard input be recognized
+		for( ; Keyboard.next(); handleKeyboardInput(player, playerID, update)) { } //Very hacky way of letting all keyboard input be recognized
 	}
 	
 	/**
 	 * Handles keyboard typing, such as that to text boxes
 	 */
-	private void handleKeyboardInput(int playerID, ClientUpdate update)
+	private void handleKeyboardInput(EntityPlayer player, int playerID, ClientUpdate update)
 	{
 		if(Keyboard.getEventKeyState())
 		{
 			//If there're key events (Letters, numbers, etc typed to a textbox), update the temporary text appropriately
-			append(playerID, update, Keyboard.getEventCharacter(), Keyboard.getEventKey());
+			append(player, playerID, update, Keyboard.getEventCharacter(), Keyboard.getEventKey());
 		}
 		else //otherwise, throw away the input
 		{
@@ -271,7 +274,7 @@ public class GuiChatbox extends GuiComponent
 		}
 	}
 	
-	private void append(int playerID, ClientUpdate update, char c, int i)
+	private void append(EntityPlayer player, int playerID, ClientUpdate update, char c, int i)
 	{
 		if(i == Keyboard.KEY_ESCAPE)
 		{
@@ -282,6 +285,10 @@ public class GuiChatbox extends GuiComponent
 		if(i == Keyboard.KEY_RETURN && !temporaryValue.equals(""))
 		{
 			String text = this.temporaryValue;
+			if(text.startsWith("/"))
+			{
+				text = ClientsideCommands.fillOutChatCommand(player, text);
+			}
 			this.temporaryValue = "";
 			String command = "/player " + playerID + " say " + EnumColor.WHITE.toString() + " " + text;
 			update.addCommand(command);

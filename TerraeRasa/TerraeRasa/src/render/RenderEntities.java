@@ -183,8 +183,8 @@ public class RenderEntities extends Render
         double y = (int)enemy.y;
         double eh = enemy.getHeight();
         double ew = enemy.getWidth();
-		double tx = (double)enemy.iconX * (32 / 512);
-		double ty = (double)enemy.iconY * (32 / 256); //TODO magic number fix
+		double tx = (double)enemy.iconX * (32.0 / 512);
+		double ty = (double)enemy.iconY * (32.0 / 256); //TODO magic number fix
 		double tw = (double)enemy.textureWidth / 512;
 		double th = (double)enemy.textureHeight / 256;
         
@@ -209,10 +209,10 @@ public class RenderEntities extends Render
         double y = (int)npc.y;
         double eh = npc.getHeight();
         double ew = npc.getWidth();
-		double tx = (double)npc.iconX / 32;
-		double ty = (double)npc.iconY / 32; //TODO magic number fix
-		double tw = npc.textureWidth;
-		double th = npc.textureHeight;
+        double tx = (double)npc.iconX * (32.0 / 512);
+		double ty = (double)npc.iconY * (32.0 / 256); //TODO magic number fix
+		double tw = (double)npc.textureWidth / 512;
+		double th = (double)npc.textureHeight / 256;
         
 		monsterSheet.bind(); 
         t.startDrawingQuads();

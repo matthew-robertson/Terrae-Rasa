@@ -365,61 +365,61 @@ public class InventoryPlayer
 		if(item instanceof ItemArmorHelmet && armorInventory[0] == null)
 		{
 			player.changedInventorySlots.add("a 0");
-			setArmorInventoryStack(player, stack, armorInventory[0], 0);
+			setArmorInventoryStack(player, stack, armorInventory[0], 0, true);
 			return null;			
 		}
 		else if(item instanceof ItemArmorBody && armorInventory[1] == null)
 		{
 			player.changedInventorySlots.add("a 1");
-			setArmorInventoryStack(player, stack, armorInventory[1], 1);
+			setArmorInventoryStack(player, stack, armorInventory[1], 1, true);
 			return null;
 		}
 		else if(item instanceof ItemArmorBelt && armorInventory[2] == null)
 		{
 			player.changedInventorySlots.add("a 2");
-			setArmorInventoryStack(player, stack, armorInventory[2], 2);
+			setArmorInventoryStack(player, stack, armorInventory[2], 2, true);
 			return null;
 		}
 		else if(item instanceof ItemArmorPants && armorInventory[3] == null)
 		{
 			player.changedInventorySlots.add("a 3");
-			setArmorInventoryStack(player, stack, armorInventory[3], 3);
+			setArmorInventoryStack(player, stack, armorInventory[3], 3, true);
 			return null;
 		}
 		else if(item instanceof ItemArmorBoots && armorInventory[4] == null)
 		{
 			player.changedInventorySlots.add("a 4");
-			setArmorInventoryStack(player, stack, armorInventory[4], 4);
+			setArmorInventoryStack(player, stack, armorInventory[4], 4, true);
 			return null;
 		}
 		else if(item instanceof ItemArmorGloves && armorInventory[5] == null)
 		{
 			player.changedInventorySlots.add("a 5");
-			setArmorInventoryStack(player, stack, armorInventory[5], 5);
+			setArmorInventoryStack(player, stack, armorInventory[5], 5, true);
 			return null;
 		}
 		else if(item instanceof ItemArmorAccessory && armorInventory[6] == null)
 		{
 			player.changedInventorySlots.add("a 6");
-			setArmorInventoryStack(player, stack, armorInventory[6], 6);
+			setArmorInventoryStack(player, stack, armorInventory[6], 6, true);
 			return null;
 		}
 		else if(item instanceof ItemArmorAccessory && armorInventory[7] == null)
 		{
 			player.changedInventorySlots.add("a 7");
-			setArmorInventoryStack(player, stack, armorInventory[7], 7);
+			setArmorInventoryStack(player, stack, armorInventory[7], 7, true);
 			return null;
 		}
 		else if(item instanceof ItemArmorAccessory && armorInventory[8] == null)
 		{
 			player.changedInventorySlots.add("a 8");
-			setArmorInventoryStack(player, stack, armorInventory[8], 8);
+			setArmorInventoryStack(player, stack, armorInventory[8], 8, true);
 			return null;			
 		}
 		else if(item instanceof ItemArmorAccessory && armorInventory[9] == null)
 		{
 			player.changedInventorySlots.add("a 9");
-			setArmorInventoryStack(player, stack, armorInventory[9], 9);
+			setArmorInventoryStack(player, stack, armorInventory[9], 9, true);
 			return null;
 		}
 		
@@ -589,19 +589,25 @@ public class InventoryPlayer
 	 * @param index where to place the stack in mainInventory[]
 	 * @return success of the operation
 	 */
-	public boolean putDisplayableItemStackInSlot(World world, EntityPlayer player, DisplayableItemStack stack, int index)
+	public boolean putDisplayableItemStackInSlot(World world, EntityPlayer player, DisplayableItemStack stack, int index, boolean flagsInventoryChange)
 	{
 		//the stack to be placed is null, so clear the slot in mainInventory[] (this has to get a bit hacky for control reasons)
 		if(stack == null && mainInventory[index] != null) 
 		{
-			player.changedInventorySlots.add("i " + index);
+			if(flagsInventoryChange)
+			{
+				player.changedInventorySlots.add("i " + index);
+			}
 			inventoryTotals.put(mainInventory[index].getItemName(), inventoryTotals.get(mainInventory[index].getItemName()) - mainInventory[index].getStackSize());		
 			mainInventory[index] = null;
 			//TODO fix this issue here -- inventorytotals issue
 		}
 		else if(stack != null)//otherwise put the stack in the inventory
 		{
-			player.changedInventorySlots.add("i " + index);
+			if(flagsInventoryChange)
+			{
+				player.changedInventorySlots.add("i " + index);
+			}
 			inventoryTotals.put(stack.getItemName(), inventoryTotals.get(stack.getItemName()) + stack.getStackSize());		
 			mainInventory[index] = new DisplayableItemStack(stack);	
 		}
@@ -637,9 +643,13 @@ public class InventoryPlayer
 	 * @param index where to place the stack in armorInventory[]
 	 * @return success of the operation
 	 */
-	public boolean setArmorInventoryStack(EntityPlayer player, DisplayableItemStack newStack, DisplayableItemStack oldStack, int index)
+	public boolean setArmorInventoryStack(EntityPlayer player, DisplayableItemStack newStack, DisplayableItemStack oldStack, int index, boolean flagsInventoryChange)
 	{
-		player.changedInventorySlots.add("a " + index);
+		if(flagsInventoryChange)
+		{
+			player.changedInventorySlots.add("a " + index);
+		}
+		
 		if(newStack == null)
 		{
 			armorInventory[index] = null;
@@ -779,7 +789,7 @@ public class InventoryPlayer
 				if(((ItemArmor)(Item.itemsList[armorInventory[i].getItemID()])).getIsSavingRelic())
 				{
 					player.changedInventorySlots.add("a " + i);
-					setArmorInventoryStack(player, null, armorInventory[i], i);
+					setArmorInventoryStack(player, null, armorInventory[i], i, true);
 					return;
 				}
 			}
@@ -812,9 +822,13 @@ public class InventoryPlayer
 	 * @param index where to place the stack in quiver[]
 	 * @return success of the operation
 	 */
-	public boolean setQuiverStack(EntityPlayer player, DisplayableItemStack stack, int index)
+	public boolean setQuiverStack(EntityPlayer player, DisplayableItemStack stack, int index, boolean flagsInventoryChange)
 	{
-		player.changedInventorySlots.add("q " + index);
+		if(flagsInventoryChange)
+		{
+			player.changedInventorySlots.add("q " + index);
+		}
+		
 		if(stack == null)
 		{
 			quiver[index] = null;

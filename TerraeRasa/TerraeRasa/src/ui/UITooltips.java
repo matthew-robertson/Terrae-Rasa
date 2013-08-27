@@ -65,7 +65,7 @@ public class UITooltips extends UIBase
 			return stack;
 		}		
 		//Socketed gems
-		if((stack = UISocketMenu.getMouseoverSocketedGems(mouseX, mouseY)) != null)
+		if((stack = UISocketMenu.getMouseoverSocketedGems(player, mouseX, mouseY)) != null)
 		{
 			return stack;
 		}		

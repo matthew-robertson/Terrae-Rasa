@@ -1,6 +1,8 @@
 package affix;
 
+import passivebonuses.PassiveBonus;
 import passivebonuses.PassiveBonusDamageAll;
+import auras.Aura;
 
 public class AffixDestruction extends Affix{
 
@@ -8,16 +10,22 @@ public class AffixDestruction extends Affix{
 	private double min = 0.02;
 	
 	public AffixDestruction(){
-		super("of destruction");
-		this.id = 3;
-		this.setPrefix(false);
-		double power = rng.nextDouble() * (max - min) + min;
-		this.addPassive(new PassiveBonusDamageAll(power));
+		super("of destruction", 3, false);
+		
 	}
 
-	@Override
-	public void verify() {
-		// TODO Auto-generated method stub
-		
+	//param powers [damage_bonus_value{passive}]
+	public double[] rollPowers() {		
+		return new double[] {  rng.nextDouble() * (max - min) + min };
+	}
+
+	//param powers [damage_bonus_value{passive}]
+	public PassiveBonus[] getPassives(double[] powers) {
+		return new PassiveBonus[] { new PassiveBonusDamageAll(powers[0]) };
+	}
+
+	//param powers [damage_bonus_value{passive}]
+	public Aura[] getAuras(double[] powers) {
+		return new Aura[] { };
 	}
 }

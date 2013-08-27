@@ -27,7 +27,7 @@ public class UISocketMenu extends UIBase
 	 * Returns an applicable DisplayableItemStack if a gem that is being socketed is moused over, otherwise this will yield null.
 	 * @return an applicable DisplayableItemStack if a gem in the socket UI is moused over, otherwise null
 	 */
-	protected static DisplayableItemStack getMouseoverSocketedGems(int mouseX, int mouseY)
+	protected static DisplayableItemStack getMouseoverSocketedGems(EntityPlayer player, int mouseX, int mouseY)
 	{
 		if(isSocketWindowOpen)
 		{
@@ -35,12 +35,28 @@ public class UISocketMenu extends UIBase
 			int frameX = (int) (Display.getWidth() * 0.25) - 80;  
 			int frameY = (int) (Display.getHeight() * 0.5) - 106; 
 			
-			DisplayableItemStack stack = socketedItem;
+			DisplayableItemStack socketedItem = null;
+			if(inventoryID == 1)
+			{
+				socketedItem = player.inventory.getMainInventoryStack(inventoryIndex);
+			}
+			else if(inventoryID == 2)
+			{
+				socketedItem = player.inventory.getArmorInventoryStack(inventoryIndex);
+			}
+			else if(inventoryID == 3)
+			{
+				socketedItem = player.inventory.getQuiverStack(inventoryIndex);
+			}
+			else if(inventoryID == 4)
+			{
+				socketedItem = player.inventory.getTrashStack(inventoryIndex);
+			}
 			String itemName = socketedItem.getRenderedName();
 			String[] stats = { };        
-			if(stack.getItemID() >= Item.itemIndex && stack.getItemID() < ActionbarItem.spellIndex)
+			if(socketedItem.getItemID() >= Item.itemIndex && socketedItem.getItemID() < ActionbarItem.spellIndex)
 			{
-				stats = Item.itemsList[stack.getItemID()].getStats();
+				stats = Item.itemsList[socketedItem.getItemID()].getStats();
 			}
 			
 			final int PADDING = 5;					
@@ -51,7 +67,7 @@ public class UISocketMenu extends UIBase
 			float yOffset = frameY + boldTooltip.getHeight(itemName) + PADDING * (stats.length) + 
 					(((tooltipHeight) - (tooltipHeight - boldTooltip.getHeight(itemName))) * 0.5f * (stats.length));
 			
-			int numberOfSockets = stack.getGemSockets().length;
+			int numberOfSockets = socketedItem.getGemSockets().length;
 			
 			for(int i = 0; i < numberOfSockets; i++)
 			{
@@ -61,9 +77,9 @@ public class UISocketMenu extends UIBase
 				
 				if(mouseY > yOffset && mouseY < yOffset + size && mouseX > xOffset && mouseX < xOffset + size)
 				{
-					if(stack.getGemSockets()[i].getGem() != null)
+					if(socketedItem.getGemSockets()[i].getGem() != null)
 					{
-						return new DisplayableItemStack(stack.getGemSockets()[i].getGem());
+						return new DisplayableItemStack(socketedItem.getGemSockets()[i].getGem());
 					}
 				}
 			}
@@ -84,14 +100,30 @@ public class UISocketMenu extends UIBase
 		int frameX = (int) (Display.getWidth() * 0.25) - (4 * size); 
 		int frameY = (int) (Display.getHeight() * 0.5) - (4 * size) - 26; 
 		
-		DisplayableItemStack stack = socketedItem;
+		DisplayableItemStack socketedItem = null;
+		if(inventoryID == 1)
+		{
+			socketedItem = player.inventory.getMainInventoryStack(inventoryIndex);
+		}
+		else if(inventoryID == 2)
+		{
+			socketedItem = player.inventory.getArmorInventoryStack(inventoryIndex);
+		}
+		else if(inventoryID == 3)
+		{
+			socketedItem = player.inventory.getQuiverStack(inventoryIndex);
+		}
+		else if(inventoryID == 4)
+		{
+			socketedItem = player.inventory.getTrashStack(inventoryIndex);
+		}
 		EnumItemQuality quality = EnumItemQuality.COMMON;			
 		String itemName = socketedItem.getRenderedName();
 		String[] stats = { };        
-		if(stack.getItemID() >= Item.itemIndex && stack.getItemID() < ActionbarItem.spellIndex)
+		if(socketedItem.getItemID() >= Item.itemIndex && socketedItem.getItemID() < ActionbarItem.spellIndex)
 		{
-			quality = (Item.itemsList[stack.getItemID()]).itemQuality;
-			stats = Item.itemsList[stack.getItemID()].getStats();
+			quality = (Item.itemsList[socketedItem.getItemID()]).itemQuality;
+			stats = Item.itemsList[socketedItem.getItemID()].getStats();
 		}
 		
 		//% of total text size to render, in this case sacale to 1/2 size.
@@ -138,7 +170,7 @@ public class UISocketMenu extends UIBase
 		}			
 		
 		yOffset = yOffset + PADDING + (((tooltipHeight) - (tooltipHeight - tooltipFont.getHeight(itemName))) * xScale * (stats.length));
-		int numberOfSockets = stack.getGemSockets().length;
+		int numberOfSockets = socketedItem.getGemSockets().length;
 		
 		icons[8].bind(); //Gem Socket Icon
 		GL11.glColor4f(1, 1, 1, 1); 
@@ -158,13 +190,13 @@ public class UISocketMenu extends UIBase
 		
 		for(int i = 0; i < numberOfSockets; i++)
 		{
-			if(stack.getGemSockets()[i].getGem() != null)
+			if(socketedItem.getGemSockets()[i].getGem() != null)
 			{
 				size = 24;				
 				double offsetByTotal = (numberOfSockets == 1) ? 68 : (numberOfSockets == 2) ? 50.5 : (numberOfSockets == 3) ? 33 : 13;
 				double xoff = offsetByTotal + (i * (size + 6 + 7.5));
 				int yoff = (int) yOffset + 3;
-				textures[stack.getGemSockets()[i].getGem().getItemID()].bind();
+				textures[socketedItem.getGemSockets()[i].getGem().getItemID()].bind();
 				t.startDrawingQuads();
 				t.addVertexWithUV(frameX + xoff, yoff + size, 0, 0, 1);
 				t.addVertexWithUV(frameX + xoff + size, yoff + size, 0, 1, 1);

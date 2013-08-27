@@ -1,11 +1,9 @@
 package transmission;
 
 import java.io.Serializable;
-import java.util.Hashtable;
 import java.util.List;
 
 import statuseffects.DisplayableStatusEffect;
-import utils.Cooldown;
 
 /**
  * a data structure that sends everything relating to stats back to the player.
@@ -29,6 +27,5 @@ public class StatUpdate
 	public boolean hasSwungTool;
 	public double rotateAngle;
 	public List<DisplayableStatusEffect> statusEffects;
-	public Hashtable<String, Cooldown> cooldowns;
 	public boolean defeated;
 }

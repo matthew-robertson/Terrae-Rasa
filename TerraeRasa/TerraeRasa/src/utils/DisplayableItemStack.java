@@ -38,118 +38,104 @@ public class DisplayableItemStack
 	private int stackSize;
 	private int maxStackSize;
 	private int itemID;
-	private GemSocket[] gemSockets;
+	private DisplayableGemSocket[] gemSockets;
 	private String renderedName;
 	private DisplayablePassiveBonus[] bonuses;
 	private DisplayableAura[] auras;
-	private DisplayableAffix affix;
+	private String craftingID;		
 	
-	public DisplayableItemStack(ActionbarItem item)
-	{
+	public DisplayableItemStack(ActionbarItem item) {
 		itemID = item.id;
 		maxStackSize = item.maxStackSize;
 		stackSize = 1;
 		itemName = item.name;
-		gemSockets = new GemSocket[item.getTotalSockets()];
-		for(int i = 0; i < gemSockets.length; i++)
-		{
-			gemSockets[i] = new GemSocket();
+		gemSockets = new DisplayableGemSocket[item.getTotalSockets()];
+		for (int i = 0; i < gemSockets.length; i++) {
+			gemSockets[i] = new DisplayableGemSocket();
 		}
 		bonuses = new DisplayablePassiveBonus[0];
 		auras = new DisplayableAura[0];
 		renderedName = itemName;
+		craftingID = ""+itemID;
 	}
-	
-	public DisplayableItemStack(ActionbarItem item, int stackSize)
-	{
+
+	public DisplayableItemStack(ActionbarItem item, int stackSize) {
 		itemID = item.id;
 		maxStackSize = item.maxStackSize;
-		this.stackSize = stackSize; 
-		if(stackSize > maxStackSize) 
-		{
+		this.stackSize = stackSize;
+		if (stackSize > maxStackSize) {
 			stackSize = maxStackSize;
 		}
 		itemName = item.name;
-		gemSockets = new GemSocket[item.getTotalSockets()];
-		for(int i = 0; i < gemSockets.length; i++)
-		{
-			gemSockets[i] = new GemSocket();
-		}	
+		gemSockets = new DisplayableGemSocket[item.getTotalSockets()];
+		for (int i = 0; i < gemSockets.length; i++) {
+			gemSockets[i] = new DisplayableGemSocket();
+		}
 		bonuses = new DisplayablePassiveBonus[0];
 		auras = new DisplayableAura[0];
 		renderedName = itemName;
+		craftingID = ""+itemID;
 	}
-		
-	public DisplayableItemStack(int id, int stackSize)
-	{
+
+	public DisplayableItemStack(int id, int stackSize) {
 		itemID = id;
 		this.stackSize = stackSize;
-		
-		if(itemID < ActionbarItem.itemIndex)
-		{
+
+		if (itemID < ActionbarItem.itemIndex) {
 			itemName = Block.blocksList[id].name;
 			maxStackSize = Block.blocksList[id].maxStackSize;
-			gemSockets = new GemSocket[Block.blocksList[id].getTotalSockets()];
-		}
-		else if(itemID >= ActionbarItem.itemIndex && itemID < ActionbarItem.spellIndex)
-		{
+			gemSockets = new DisplayableGemSocket[Block.blocksList[id].getTotalSockets()];
+		} else if (itemID >= ActionbarItem.itemIndex
+				&& itemID < ActionbarItem.spellIndex) {
 			itemName = Item.itemsList[id].name;
-			maxStackSize = Item.itemsList[id].maxStackSize;			
-			gemSockets = new GemSocket[Item.itemsList[id].getTotalSockets()];
-		}		
-		else
-		{
+			maxStackSize = Item.itemsList[id].maxStackSize;
+			gemSockets = new DisplayableGemSocket[Item.itemsList[id].getTotalSockets()];
+		} else {
 			itemName = Spell.spellList[id].name;
 			maxStackSize = Spell.spellList[id].maxStackSize;
-			gemSockets = new GemSocket[Spell.spellList[id].getTotalSockets()];
+			gemSockets = new DisplayableGemSocket[Spell.spellList[id].getTotalSockets()];
 		}
-		for(int i = 0; i < gemSockets.length; i++)
-		{
-			gemSockets[i] = new GemSocket();
+		for (int i = 0; i < gemSockets.length; i++) {
+			gemSockets[i] = new DisplayableGemSocket();
 		}
 		bonuses = new DisplayablePassiveBonus[0];
 		auras = new DisplayableAura[0];
 		renderedName = itemName;
+		craftingID = ""+itemID;
 	}
-	
-	public DisplayableItemStack(int id)
-	{
+
+	public DisplayableItemStack(int id) {
 		itemID = id;
 		stackSize = 1;
-		
-		if(itemID < ActionbarItem.itemIndex)
-		{
+
+		if (itemID < ActionbarItem.itemIndex) {
 			itemName = Block.blocksList[id].name;
 			maxStackSize = Block.blocksList[id].maxStackSize;
-			gemSockets = new GemSocket[Block.blocksList[id].getTotalSockets()];
-		}
-		else if(itemID >= ActionbarItem.itemIndex && itemID < ActionbarItem.spellIndex)
-		{
+			gemSockets = new DisplayableGemSocket[Block.blocksList[id].getTotalSockets()];
+		} else if (itemID >= ActionbarItem.itemIndex
+				&& itemID < ActionbarItem.spellIndex) {
 			itemName = Item.itemsList[id].name;
-			maxStackSize = Item.itemsList[id].maxStackSize;		
-			gemSockets = new GemSocket[Item.itemsList[id].getTotalSockets()];
-		}		
-		else
-		{
+			maxStackSize = Item.itemsList[id].maxStackSize;
+			gemSockets = new DisplayableGemSocket[Item.itemsList[id].getTotalSockets()];
+		} else {
 			itemName = Spell.spellList[id].name;
 			maxStackSize = Spell.spellList[id].maxStackSize;
-			gemSockets = new GemSocket[Spell.spellList[id].getTotalSockets()];
+			gemSockets = new DisplayableGemSocket[Spell.spellList[id].getTotalSockets()];
 		}
-		for(int i = 0; i < gemSockets.length; i++)
-		{
-			gemSockets[i] = new GemSocket();
+		for (int i = 0; i < gemSockets.length; i++) {
+			gemSockets[i] = new DisplayableGemSocket();
 		}
 		bonuses = new DisplayablePassiveBonus[0];
 		auras = new DisplayableAura[0];
 		renderedName = itemName;
+		craftingID = ""+itemID;
 	}
-	
-	public DisplayableItemStack(DisplayableItemStack stack)
-	{
-		if(stack == null) 
-		{
+
+	public DisplayableItemStack(DisplayableItemStack stack) {
+		if (stack == null) {
 			System.err.println("DO NOT COPY A NULL ITEMSTACK.");
-			throw new RuntimeException("Dont do this. It's physically painful to copy a null ItemStack.");
+			throw new RuntimeException(
+					"Dont do this. It's physically painful to copy a null ItemStack.");
 		}
 		this.itemName = stack.getItemName();
 		this.stackSize = stack.getStackSize();
@@ -159,16 +145,7 @@ public class DisplayableItemStack
 		this.bonuses = stack.getBonuses();
 		this.auras = stack.getAuras();
 		this.renderedName = stack.getRenderedName();
-		this.affix = stack.getAffix();
-	}
-	
-	/**
-	 * Gets the affix for this specific ItemStack
-	 * @return the affix assigned to this specific ItemStack
-	 */ 
-	public DisplayableAffix getAffix() 
-	{
-		return affix;
+		this.craftingID = ""+itemID;
 	}
 
 	/**
@@ -245,7 +222,7 @@ public class DisplayableItemStack
 	 * Gets all the GemSockets for this ItemStack
 	 * @return all the GemSockets for this ItemStack
 	 */
-	public GemSocket[] getGemSockets()
+	public DisplayableGemSocket[] getGemSockets()
 	{
 		return gemSockets;
 	}
@@ -255,21 +232,10 @@ public class DisplayableItemStack
 	 * @param index the index of the GemSocket
 	 * @return the GemSocket at the specified index
 	 */
-	public GemSocket getSocket(int index)
+	public DisplayableGemSocket getSocket(int index)
 	{
 		return gemSockets[index];
 	}
-//	
-//	/**
-//	 * Sockets the specified gem to the specified index. This will overwrite previous
-//	 * gems.
-//	 * @param gem the ItemGem to socket
-//	 * @param index the index to socket the gem at
-//	 */
-//	public void socketGem(DisplayableItemStack gem, int index)
-//	{
-//		gemSockets[index].socket(gem);
-//	}
 	
 	/**
 	 * Indicates if the ItemStack has any gem sockets
@@ -352,7 +318,7 @@ public class DisplayableItemStack
 		{
 			if(bonuses[i] != null)
 			{
-				System.out.println("null bonus @" + renderedName);
+//				System.out.println("null bonus @" + renderedName);
 				allBonuses[i] = bonuses[i].toString();
 			}
 		}
@@ -378,6 +344,6 @@ public class DisplayableItemStack
 	 */
 	public String getCraftingID()
 	{
-		return this.itemID + " " + affix.getCraftingID();
+		return craftingID;
 	}
 }

@@ -93,9 +93,12 @@ public class ClientConnectionThread extends Thread
 				socket.close();
 			} catch (IOException e) {
 				e.printStackTrace();
-			}			
-		}
-		
+			}		
+			
+			TerraeRasa.isMainMenuOpen = true;
+			TerraeRasa.terraeRasa.gameEngine.resetMainMenu();
+			
+		}		
 	}
 	
 	private void requestBasicData()

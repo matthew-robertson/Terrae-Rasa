@@ -34,36 +34,27 @@ public class DisplayableItemStack
 	private int stackSize;
 	private int maxStackSize;
 	private int itemID;
-	private GemSocket[] gemSockets;
+	private DisplayableGemSocket[] gemSockets;
 	private String renderedName;
 	private DisplayablePassiveBonus[] bonuses;
 	private DisplayableAura[] auras;
-	private DisplayableAffix affix;
-		
+	private String craftingID;	
+	
 	public DisplayableItemStack(ItemStack stack)
 	{
 		this.itemName = stack.getItemName();
 		this.stackSize = stack.getStackSize();
 		this.maxStackSize = stack.getMaxStackSize();
 		this.itemID = stack.getItemID();
-		this.gemSockets = stack.getGemSockets();
-		this.renderedName = stack.getRenderedName();
-		//TODO fix this?
-		if(stack.getAffix() != null)
+		this.gemSockets = new DisplayableGemSocket[stack.getGemSockets().length];
+		for(int i = 0; i < stack.getGemSockets().length; i++)
 		{
-			this.affix = new DisplayableAffix(stack.getAffix());
+			this.gemSockets[i] = new DisplayableGemSocket(stack.getGemSockets()[i]);
 		}
+		this.renderedName = stack.getRenderedName();
 		this.bonuses = new DisplayablePassiveBonus[stack.getBonuses().length];
 		this.auras = new DisplayableAura[stack.getAuras().length];
-	}
-	
-	/**
-	 * Gets the affix for this specific ItemStack
-	 * @return the affix assigned to this specific ItemStack
-	 */ 
-	public DisplayableAffix getAffix() 
-	{
-		return affix;
+		this.craftingID = stack.getCraftingID();
 	}
 
 	/**
@@ -140,7 +131,7 @@ public class DisplayableItemStack
 	 * Gets all the GemSockets for this ItemStack
 	 * @return all the GemSockets for this ItemStack
 	 */
-	public GemSocket[] getGemSockets()
+	public DisplayableGemSocket[] getGemSockets()
 	{
 		return gemSockets;
 	}
@@ -150,7 +141,7 @@ public class DisplayableItemStack
 	 * @param index the index of the GemSocket
 	 * @return the GemSocket at the specified index
 	 */
-	public GemSocket getSocket(int index)
+	public DisplayableGemSocket getSocket(int index)
 	{
 		return gemSockets[index];
 	}
@@ -258,6 +249,6 @@ public class DisplayableItemStack
 	 */
 	public String getCraftingID()
 	{
-		return this.itemID + " " + affix.getCraftingID();
+		return craftingID;
 	}
 }

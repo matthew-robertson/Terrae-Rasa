@@ -4,6 +4,8 @@ import items.Item;
 import passivebonuses.PassiveBonus;
 import spells.Spell;
 import affix.Affix;
+import affix.AffixData;
+import affix.AffixGenerator;
 import auras.Aura;
 import blocks.Block;
 
@@ -35,9 +37,12 @@ public class ItemStack
 	private int itemID;
 	private GemSocket[] gemSockets;
 	private String renderedName;
+	//These come from affixes
 	private PassiveBonus[] bonuses;
+	//These come from affixes
 	private Aura[] auras;
-	private Affix affix;
+	private AffixData affix;
+	private String craftingID;
 	
 	public ItemStack(ActionbarItem item)
 	{
@@ -53,6 +58,7 @@ public class ItemStack
 		bonuses = new PassiveBonus[0];
 		auras = new Aura[0];
 		renderedName = itemName;
+		craftingID = ""+itemID;
 	}
 	
 	public ItemStack(ActionbarItem item, int stackSize)
@@ -73,6 +79,7 @@ public class ItemStack
 		bonuses = new PassiveBonus[0];
 		auras = new Aura[0];
 		renderedName = itemName;
+		craftingID = ""+itemID;
 	}
 		
 	public ItemStack(int id, int stackSize)
@@ -105,6 +112,7 @@ public class ItemStack
 		bonuses = new PassiveBonus[0];
 		auras = new Aura[0];
 		renderedName = itemName;
+		craftingID = ""+itemID;
 	}
 	
 	public ItemStack(int id)
@@ -137,6 +145,7 @@ public class ItemStack
 		bonuses = new PassiveBonus[0];
 		auras = new Aura[0];
 		renderedName = itemName;
+		craftingID = ""+itemID;
 	}
 	
 	public ItemStack(ItemStack stack)
@@ -155,13 +164,14 @@ public class ItemStack
 		this.auras = stack.getAuras();
 		this.renderedName = stack.getRenderedName();
 		this.affix = stack.getAffix();
+		this.craftingID = stack.getCraftingID();
 	}
 	
 	/**
 	 * Gets the affix for this specific ItemStack
 	 * @return the affix assigned to this specific ItemStack
 	 */ 
-	public Affix getAffix() 
+	public AffixData getAffix() 
 	{
 		return affix;
 	}
@@ -283,59 +293,42 @@ public class ItemStack
 	{
 		this.bonuses = bonuses;
 	}
-	
-	public ItemStack setAffix(Affix affix){
-		this.affix = affix;
-		 
-		if (affix.getPrefix()){
-			this.setRenderedName(affix.getName() + " " + this.getItemName());
-		}
-		else{
-			this.setRenderedName(this.getItemName() + " " + affix.getName());
-		}
 		
-		updateAuras(affix);
-		updatePassives(affix);
-		this.maxStackSize = 1;
-		return this;
+	public void rollAffixBonuses(Affix affix){
+		AffixData data = new AffixData();
+		data.affixID = affix.getID();
+		data.power = AffixGenerator.getPowers(affix.getID());
+		this.affix = data;
+
+		PassiveBonus[] passives = AffixGenerator.getPassiveBonuses(this.affix.affixID, this.affix.power);
+		Aura[] auras = AffixGenerator.getAuras(this.affix.affixID, this.affix.power);
+		this.bonuses = passives;
+		this.auras = auras;
+		
 	}
 	
-	public void updateAuras(Affix affix){
-		Aura[] aura = auras;
-		if (aura != null && affix.getAuras() != null){
-			auras = new Aura[affix.getAuras().length + auras.length];
-			for (int i = 0; i < aura.length; i++){
-				auras[i] = aura[i];
-			}
-			for (int i = 0; i < affix.getAuras().length; i++){
-				auras[i + aura.length] = affix.getAuras()[i];
-			}
-		}
-		else if (aura != null){
-			auras = aura;
-		}
-		else if (affix.getAuras() != null){
-			auras = affix.getAuras();
-		}
+	public void rollAffixBonuses(int affixID){
+		AffixData data = new AffixData();
+		data.affixID = affixID;
+		data.power = AffixGenerator.getPowers(affixID);
+		this.affix = data;
+
+		PassiveBonus[] passives = AffixGenerator.getPassiveBonuses(this.affix.affixID, this.affix.power);
+		Aura[] auras = AffixGenerator.getAuras(this.affix.affixID, this.affix.power);
+		this.bonuses = passives;
+		this.auras = auras;
+		
 	}
 	
-	public void updatePassives(Affix affix){
-		PassiveBonus[] passive = bonuses;
-		
-		if (passive != null && affix.getPassives() != null){
-			bonuses = new PassiveBonus[affix.getPassives().length + passive.length];			
-			for (int i = 0; i < passive.length; i++){
-				bonuses[i] = passive[i];
-			}
-			for (int i = 0; i < affix.getPassives().length; i++){
-				bonuses[i + passive.length] = affix.getPassives()[i];
-			}
-		}
-		else if (bonuses != null){
-			bonuses = passive;
-		}
-		else if (affix.getPassives() != null){
-			bonuses = affix.getPassives();
+	
+	public void regenerateBonuses()
+	{
+		if(this.affix != null)
+		{
+			PassiveBonus[] passives = AffixGenerator.getPassiveBonuses(this.affix.affixID, this.affix.power);
+			Aura[] auras = AffixGenerator.getAuras(this.affix.affixID, this.affix.power);
+			this.bonuses = passives;
+			this.auras = auras;
 		}
 	}
 	
@@ -419,6 +412,6 @@ public class ItemStack
 	 */
 	public String getCraftingID()
 	{
-		return this.itemID + " " + affix.getCraftingID();
+		return craftingID;
 	}
 }

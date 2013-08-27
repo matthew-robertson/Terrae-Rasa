@@ -15,6 +15,10 @@ public class ClientUpdate {
 		
 	public synchronized void addCommand(String com)
 	{
+		if(com.equals(null) || com == null)
+		{
+			System.out.println("Null command issued");
+		}
 		this.commands.add(com);
 	}
 	

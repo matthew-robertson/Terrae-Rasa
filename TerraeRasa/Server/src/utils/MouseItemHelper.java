@@ -2,6 +2,7 @@ package utils;
 
 import items.Item;
 import items.ItemAmmo;
+import items.ItemArmor;
 import items.ItemArmorAccessory;
 import items.ItemArmorBelt;
 import items.ItemArmorBody;
@@ -9,14 +10,19 @@ import items.ItemArmorBoots;
 import items.ItemArmorGloves;
 import items.ItemArmorHelmet;
 import items.ItemArmorPants;
+import items.ItemGem;
 import transmission.EntityUpdate;
 import transmission.ServerUpdate;
-import transmission.UpdateWithObject;
 import world.World;
 import entities.DisplayableEntity;
 import entities.EntityItemStack;
 import entities.EntityPlayer;
 
+/**
+ * This is basically a transplant of all the code from the UI that used to do each of these functions.
+ * @author alec
+ *
+ */
 public class MouseItemHelper {
 
 	public static void craftRecipe(World world, EntityPlayer player, int recipeID)
@@ -361,6 +367,118 @@ public class MouseItemHelper {
 		
 	}
 	
-	
+	public static void handleShiftClick(World world, EntityPlayer player, int inventoryID, int index)
+	{
+		if(inventoryID == 1) //Main Inventory
+		{
+			//Ensure it's actually an Item
+			if (player.inventory.getMainInventoryStack(index) != null && 
+			    player.inventory.getMainInventoryStack(index).getItemID() < ActionbarItem.spellIndex)
+			{
+				Item selectedItem = (Item)(Item.itemsList[player.inventory.getMainInventoryStack(index).getItemID()]);
+				if(selectedItem instanceof ItemArmor)
+				{
+					ItemStack stack = player.inventory.getMainInventoryStack(index);
+					player.inventory.removeEntireStackFromInventory(world, player, index);
+					stack = player.inventory.pickUpArmorItemStack(world, player, stack);
+					player.inventory.putItemStackInSlot(world, player, stack, index);
+				}
+				else if(selectedItem instanceof ItemAmmo)
+				{
+					ItemStack stack = player.inventory.getMainInventoryStack(index);
+					player.inventory.removeEntireStackFromInventory(world, player, index);
+					stack = player.inventory.pickUpQuiverItemStack(world, player, stack);
+					player.inventory.putItemStackInSlot(world, player, stack, index);
+				}					
+			}
+		}
+		else if(inventoryID == 2) //Armor Inventory
+		{
+			if(player.inventory.getArmorInventoryStack(index) != null)
+			{
+				player.inventory.setArmorInventoryStack(player, 
+						player.inventory.pickUpItemStack(world, 
+							player, 
+							player.inventory.getArmorInventoryStack(index)),
+						player.inventory.getArmorInventoryStack(index),
+						index);
+			}	
+		}
+		else if(inventoryID == 3) //Quiver
+		{
+			if(player.inventory.getQuiverStack(index) != null)
+			{	
+				//Try to place that stack in the inventory - leaving what's left in the quiver (if any)
+				player.inventory.setQuiverStack(player, player.inventory.pickUpItemStack(world, 
+						player, 
+						player.inventory.getQuiverStack(index)), 
+						index);
+			}
+		}
+		else if(inventoryID == 4) //Trash
+		{
+			if(player.inventory.getTrashStack(0) != null)
+			{
+				player.inventory.setTrashStack(player, 
+						player.inventory.pickUpItemStack(world, 
+								player, 
+								player.inventory.getTrashStack(0)), 
+						0);
+			}		
+		}
+	}
+
+	public static void socketGem(World world, EntityPlayer player, int inventoryID, int index, int gemSocketIndex)
+	{
+//		TODO fix gemming
+		//Socket a gem, if possible.
+		if(player.getHeldMouseItem() != null)
+		{
+			if(player.getHeldMouseItem().getItemID() < ActionbarItem.spellIndex && 
+					player.getHeldMouseItem().getItemID() >= ActionbarItem.blockIndex && 
+					Item.itemsList[player.getHeldMouseItem().getItemID()] instanceof ItemGem)
+			{			
+				ItemStack stack = null;
+				if(inventoryID == 1)
+				{
+					stack = player.inventory.getMainInventoryStack(index);
+					player.changedInventorySlots.add("i " + index);
+				}
+				else if(inventoryID == 2)
+				{
+					stack = player.inventory.getArmorInventoryStack(index);
+					player.changedInventorySlots.add("a " + index);
+				}
+				else if(inventoryID == 3)
+				{
+					stack = player.inventory.getQuiverStack(index);
+					player.changedInventorySlots.add("q " + index);
+				}
+				else if(inventoryID == 4)
+				{
+					stack = player.inventory.getTrashStack(index);
+					player.changedInventorySlots.add("t " + index);
+				}
+				
+				if(inventoryID == 2)
+				{
+					player.inventory.setArmorInventoryStack(player, null, stack, index);
+				}
+				stack.getGemSockets()[gemSocketIndex].socket(new ItemStack(player.getHeldMouseItem()));
+				if(inventoryID == 2)
+				{
+					player.inventory.setArmorInventoryStack(player, stack, null, index);
+				}
+					
+				player.getHeldMouseItem().removeFromStack(1);
+				if(player.getHeldMouseItem().getStackSize() <= 0)
+				{
+					player.setHeldMouseItem(null);
+				}
+				player.flagHeldItem();
+			}
+		}	
+	}
+
 
 }
