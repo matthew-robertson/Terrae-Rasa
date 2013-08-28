@@ -161,12 +161,14 @@ public class MouseInput
 		        if (wheelMovement > 0) //If mouse scrolled up
 		        {
 		        	player.selectedSlot--; //Decrease selected slot (actionbar)
+		        	clientCommands.add("/player " + player.entityID + " setactionbarslot " + player.selectedSlot);
 		        	player.clearSwing();
 		        	clientCommands.add("/player " + player.entityID + " cancelswing");
 		        }
 		        else if(wheelMovement < 0) //If mouse scrolled down
 		        {
 		        	player.selectedSlot++; //Increase selected slot (actionbar)
+		        	clientCommands.add("/player " + player.entityID + " setactionbarslot " + player.selectedSlot);
 		        	player.clearSwing();
 		        	clientCommands.add("/player " + player.entityID + " cancelswing");
 		        }

@@ -142,7 +142,12 @@ public class Keys
         	if(Keyboard.isKeyDown(actionKeyValues[i]) && !actionKeys[i])
         	{
         		actionKeys[i] = true;
+        		int selectedSlot = player.selectedSlot;
         		player.selectedSlot = i;
+        		if(selectedSlot != player.selectedSlot)
+        		{
+		        	update.addCommand("/player " + player.entityID + " setactionbarslot " + player.selectedSlot);
+        		}
         		player.clearSwing();
 	        	update.addCommand("/player " + player.entityID + " cancelswing");
         	}

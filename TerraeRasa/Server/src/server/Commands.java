@@ -540,6 +540,12 @@ public class Commands
 				{
 					MouseItemHelper.socketGem(world, player, Integer.parseInt(split[3]), Integer.parseInt(split[4]), Integer.parseInt(split[5]));
 				}
+				else if(split[2].equals("setactionbarslot"))
+				{
+//					/player <id> setactionbarslot <slot>
+					player.selectedSlot = Integer.parseInt(split[3]);
+					update.addValue(command);
+				}
 			}
 			else if(command.startsWith("/quit"))
 			{

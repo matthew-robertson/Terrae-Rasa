@@ -267,7 +267,7 @@ public class GameEngine
 		        {		        
 //		        	if(renderMode == RENDER_MODE_WORLD_EARTH)
 //		    		{
-		        	RenderWorld.render(update, world, player, settings); //Renders Everything on the screen for the game
+		        	RenderWorld.render(update, world, world.otherPlayers, player, settings); //Renders Everything on the screen for the game
 		     		if(chatbox.isOpen())
 		     		{
 		     			chatbox.draw();
@@ -539,6 +539,11 @@ public class GameEngine
 			else if(split[2].equals("statuseffectremove"))
 			{
 				((EntityPlayer)(world.getEntityByID(Integer.parseInt(split[1])))).removeStatusEffectByID(Long.parseLong(split[3]));
+			}
+			else if(split[2].equals("setactionbarslot"))
+			{
+//				/player <id> setactionbarslot <slot>
+				((EntityPlayer)(world.getEntityByID(Integer.parseInt(split[1])))).selectedSlot = Integer.parseInt(split[3]);
 			}
 
 			//These only affect this client's player

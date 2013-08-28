@@ -1,6 +1,9 @@
 package render;
 
 
+import java.util.List;
+import java.util.Vector;
+
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
@@ -32,7 +35,7 @@ public class RenderWorld extends Render
         t.draw();
 	}
 	
-	public static void render(ClientUpdate update, World world, EntityPlayer player, Settings settings) 
+	public static void render(ClientUpdate update, World world, List<EntityPlayer> otherPlayers, EntityPlayer player, Settings settings) 
 	{		
 		GL11.glEnable(GL11.GL_BLEND);
 
@@ -52,7 +55,7 @@ public class RenderWorld extends Render
 		renderEntities.renderTemperaryText(world);		
 		//renderToolSwing(world, player);
 		renderParticles.render(world);
-		renderLight.render(world, player);
+		renderLight.render(world, otherPlayers, player);
 
 		//
 		//
