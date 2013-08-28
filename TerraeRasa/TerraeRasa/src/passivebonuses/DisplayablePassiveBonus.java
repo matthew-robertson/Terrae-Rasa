@@ -1,5 +1,7 @@
 package passivebonuses;
 
+import java.io.Serializable;
+
 import entities.EntityPlayer;
 
 /**
@@ -13,7 +15,9 @@ import entities.EntityPlayer;
  * @since       1.0
  */
 public class DisplayablePassiveBonus 
+		implements Serializable
 {
+	private static final long serialVersionUID = 1L;
 	/** The number of pieces required to activate this set bonus. */
 	protected int piecesRequiredToActivate;
 	protected String description;

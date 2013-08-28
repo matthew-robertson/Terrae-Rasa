@@ -3,7 +3,9 @@ package utils;
 import java.io.Serializable;
 
 import passivebonuses.DisplayablePassiveBonus;
+import passivebonuses.PassiveBonus;
 import affix.DisplayableAffix;
+import auras.Aura;
 import auras.DisplayableAura;
 
 /**
@@ -53,7 +55,17 @@ public class DisplayableItemStack
 		}
 		this.renderedName = stack.getRenderedName();
 		this.bonuses = new DisplayablePassiveBonus[stack.getBonuses().length];
+		for(int i = 0; i < stack.getBonuses().length; i++)
+		{
+			PassiveBonus bonus = stack.getBonuses()[i];
+			this.bonuses[i] = new DisplayablePassiveBonus(bonus);
+		}
 		this.auras = new DisplayableAura[stack.getAuras().length];
+		for(int i = 0; i < stack.getAuras().length; i++)
+		{
+			Aura aura = stack.getAuras()[i];
+			this.auras[i] = new DisplayableAura(aura);
+		}
 		this.craftingID = stack.getCraftingID();
 	}
 

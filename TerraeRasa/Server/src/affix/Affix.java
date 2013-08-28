@@ -71,4 +71,5 @@ public abstract class Affix
 	
 	public abstract Aura[] getAuras(double[] powers);
 	
+	public abstract void verifyPowers(double[] powers);
 }

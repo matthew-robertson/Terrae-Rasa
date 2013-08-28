@@ -10,10 +10,28 @@ public class AffixDestruction extends Affix{
 	private double min = 0.02;
 	
 	public AffixDestruction(){
-		super("of destruction", 3, false);
+		super("of destruction", getAffixID(), false);
 		
 	}
 
+	public static int getAffixID()
+	{
+		return 3;
+	}
+	
+	//param powers [damage_bonus_value{passive}]
+	public void verifyPowers(double[] powers)
+	{
+		if(powers[0] > max)
+		{
+			powers[0] = max;
+		}
+		if(powers[0] < min)
+		{
+			powers[0] = min;
+		}
+	}
+	
 	//param powers [damage_bonus_value{passive}]
 	public double[] rollPowers() {		
 		return new double[] {  rng.nextDouble() * (max - min) + min };

@@ -600,7 +600,7 @@ public class InventoryPlayer
 			}
 			inventoryTotals.put(mainInventory[index].getItemName(), inventoryTotals.get(mainInventory[index].getItemName()) - mainInventory[index].getStackSize());		
 			mainInventory[index] = null;
-			//TODO fix this issue here -- inventorytotals issue
+			player.inventoryChanged = true;
 		}
 		else if(stack != null)//otherwise put the stack in the inventory
 		{
@@ -610,6 +610,7 @@ public class InventoryPlayer
 			}
 			inventoryTotals.put(stack.getItemName(), inventoryTotals.get(stack.getItemName()) + stack.getStackSize());		
 			mainInventory[index] = new DisplayableItemStack(stack);	
+			player.inventoryChanged = true;
 		}
 
 		return true;

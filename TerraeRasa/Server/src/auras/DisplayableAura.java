@@ -1,5 +1,7 @@
 package auras;
 
+import java.io.Serializable;
+
 import entities.EntityPlayer;
 
 /**
@@ -19,8 +21,10 @@ import entities.EntityPlayer;
  * @version     1.0
  * @since       1.0
  */
-public class DisplayableAura  
+public class DisplayableAura
+		implements Serializable
 {
+	private static final long serialVersionUID = 1L;
 	/** A number unique to this aura, used to distinguish it from other auras it. */
 	private final long id;
 	protected String description;

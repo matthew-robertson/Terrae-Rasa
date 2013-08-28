@@ -18,6 +18,17 @@ public class AffixGenerator
 			new AffixFrenzied()			
 	};
 	
+	public static Affix getAffix(int affixID)
+	{
+		return getByID(affixID);
+	}
+	
+	public static void verifyPowers(int affixID, double[] powers)
+	{
+		Affix affix = getByID(affixID);
+		affix.verifyPowers(powers);
+	}
+	
 	public static PassiveBonus[] getPassiveBonuses(int affixID, double[] powers)
 	{
 		Affix affix = getByID(affixID);

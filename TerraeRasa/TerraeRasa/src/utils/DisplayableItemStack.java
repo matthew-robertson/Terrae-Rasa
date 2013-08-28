@@ -273,9 +273,10 @@ public class DisplayableItemStack
 	 * Sets the rendered name of this ItemStack, which is what will be displayed in the tooltip
 	 * @param name the name to be displayed in the tooltip
 	 */
-	public void setRenderedName(String name)
+	public DisplayableItemStack setRenderedName(String name)
 	{
 		this.renderedName = name;
+		return this;
 	}
 	
 	/**

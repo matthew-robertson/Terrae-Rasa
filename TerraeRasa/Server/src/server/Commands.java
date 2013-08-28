@@ -203,7 +203,7 @@ public class Commands
 			{
 				String[] split = command.split(" ");
 				//Check if the player is stunned. If so, block this action.
-				if(((EntityPlayer)(world.getEntityByID(Integer.parseInt(split[3])))).isStunned())
+				if(((EntityPlayer)(world.getEntityByID(Integer.parseInt(split[2])))).isStunned())
 				{
 					return "";
 				}
@@ -239,7 +239,7 @@ public class Commands
 			{
 				String[] split = command.split(" ");
 				//Check if the player is stunned. If so, block this action.
-				if(((EntityPlayer)(world.getEntityByID(Integer.parseInt(split[3])))).isStunned())
+				if(((EntityPlayer)(world.getEntityByID(Integer.parseInt(split[2])))).isStunned())
 				{
 					return "";
 				}
@@ -298,7 +298,7 @@ public class Commands
 				else if(split[2].equals("startswing"))
 				{
 					//Check if the player is stunned. If so, block this action.
-					if(((EntityPlayer)(world.getEntityByID(Integer.parseInt(split[3])))).isStunned())
+					if(player.isStunned())
 					{
 						return "";
 					}
@@ -357,7 +357,7 @@ public class Commands
 				else if(split[2].equals("use")) //Uses the currently held item
 				{
 					//Check if the player is stunned. If so, block this action.
-					if(((EntityPlayer)(world.getEntityByID(Integer.parseInt(split[3])))).isStunned())
+					if(player.isStunned())
 					{
 						return "";
 					}

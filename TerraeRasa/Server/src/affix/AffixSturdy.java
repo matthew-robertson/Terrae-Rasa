@@ -10,10 +10,28 @@ public class AffixSturdy extends Affix{
 	private int min = 2;
 	
 	public AffixSturdy() {
-		super("Sturdy", 1, true);
+		super("Sturdy", getAffixID(), true);
 		
 	}
+	
+	public final static int getAffixID()
+	{
+		return 1;
+	}
 
+	//[defense_value{passive}]
+	public void verifyPowers(double[] powers)
+	{
+		if(powers[0] > max)
+		{
+			powers[0] = max;
+		}
+		if(powers[0] < min)
+		{
+			powers[0] = min;
+		}
+	}
+	
 	//[defense_value{passive}]
 	public double[] rollPowers() {
 		return new double[] { rng.nextInt(max - min) + min };

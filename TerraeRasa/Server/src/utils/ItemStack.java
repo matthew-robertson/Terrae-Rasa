@@ -305,6 +305,12 @@ public class ItemStack
 		this.bonuses = passives;
 		this.auras = auras;
 		
+		if (affix.getPrefix()){
+			this.setRenderedName(affix.getName() + " " + this.getItemName());
+		}
+		else{
+			this.setRenderedName(this.getItemName() + " " + affix.getName());
+		}
 	}
 	
 	public void rollAffixBonuses(int affixID){
@@ -317,7 +323,17 @@ public class ItemStack
 		Aura[] auras = AffixGenerator.getAuras(this.affix.affixID, this.affix.power);
 		this.bonuses = passives;
 		this.auras = auras;
-		
+
+		Affix affix = AffixGenerator.getAffix(affixID);
+		if(affix != null)
+		{
+			if (affix.getPrefix()){
+				this.setRenderedName(affix.getName() + " " + this.getItemName());
+			}
+			else{
+				this.setRenderedName(this.getItemName() + " " + affix.getName());
+			}
+		}
 	}
 	
 	
@@ -325,6 +341,7 @@ public class ItemStack
 	{
 		if(this.affix != null)
 		{
+			AffixGenerator.verifyPowers(this.affix.affixID, this.affix.power);
 			PassiveBonus[] passives = AffixGenerator.getPassiveBonuses(this.affix.affixID, this.affix.power);
 			Aura[] auras = AffixGenerator.getAuras(this.affix.affixID, this.affix.power);
 			this.bonuses = passives;

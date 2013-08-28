@@ -64,7 +64,7 @@ public class EntityPlayer extends EntityLiving
 	private CraftingManager craftingManager;
 	private Recipe[] allPossibleRecipes;
 	private final String playerName;
-	private boolean inventoryChanged;
+	public boolean inventoryChanged;
 	private final int MAX_BLOCK_PLACE_DISTANCE = 42;
 	private Hashtable<String, Cooldown> cooldowns;
 	private Dictionary<String, Boolean> nearBlock;

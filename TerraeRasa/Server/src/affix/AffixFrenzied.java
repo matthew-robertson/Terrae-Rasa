@@ -13,11 +13,39 @@ public class AffixFrenzied extends Affix{
 	private double minSpd = 0.02;
 	
 	public AffixFrenzied(){
-		super("Frenzied", 2, true);
+		super("Frenzied", getAffixID(), true);
 		
 		
 	}
+	
+	public static int getAffixID()
+	{
+		return 2;
+	}
 
+	//[strength_value{passive}, attack_speed_value{passive}
+	public void verifyPowers(double[] powers)
+	{
+		//Check strength
+		if(powers[0] > maxStr)
+		{
+			powers[0] = maxStr;
+		}
+		if(powers[0] < minStr)
+		{
+			powers[0] = minStr;
+		}
+		//Check attack speed
+		if(powers[0] > maxSpd)
+		{
+			powers[0] = maxSpd;
+		}
+		if(powers[0] < minSpd)
+		{
+			powers[0] = minSpd;
+		}
+	}
+	
 	//[strength_value{passive}, attack_speed_value{passive}
 	public double[] rollPowers() {
 		return new double[] { (int) (rng.nextDouble() * (maxStr - minStr) + minStr), rng.nextDouble() * (maxSpd - minSpd) + minSpd};

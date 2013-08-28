@@ -219,10 +219,6 @@ public class GameEngine
 		        		hardwareInput.clear();
 		        		//Client Updates (String stuff)
 		        		clientCommands.addAll(update.commands);
-		        		if(clientCommands.size() > 0)
-		        		{
-		        			System.out.println();
-		        		}		        		
 		        		if(closeRequested) {
 		        			clientCommands.add("/quit " + activePlayerID);
 		        		}
@@ -375,20 +371,23 @@ public class GameEngine
 						
 						if(inventoryID == 1) //Main
 						{
+							player.inventoryChanged = true;
 							player.inventory.putDisplayableItemStackInSlot(world, player, (DisplayableItemStack)(update.object), index, false);
 						}
 						else if(inventoryID == 2) //Armor
 						{
+							player.inventoryChanged = true;
 							player.inventory.setArmorInventoryStack(player, (DisplayableItemStack)(update.object), player.inventory.getArmorInventoryStack(index), index, false);
-						
 							player.forceDownHMS();
 						}
 						else if(inventoryID == 3) //Quiver
 						{
+							player.inventoryChanged = true;
 							player.inventory.setQuiverStack(player, (DisplayableItemStack)(update.object), index, false);
 						}
 						else if(inventoryID == 4) //Trash
 						{
+							player.inventoryChanged = true;
 							player.inventory.setTrashStack((DisplayableItemStack)(update.object), index);
 						}
 					}	

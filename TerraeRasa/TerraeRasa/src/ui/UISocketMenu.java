@@ -1,5 +1,7 @@
 package ui;
 
+import java.util.Stack;
+
 import items.Item;
 
 import org.lwjgl.opengl.Display;
@@ -117,6 +119,12 @@ public class UISocketMenu extends UIBase
 		{
 			socketedItem = player.inventory.getTrashStack(inventoryIndex);
 		}
+		//A minor safety to prevent crashes
+		if(socketedItem == null)
+		{
+			clearSocketVariables();
+			return;
+		}				
 		EnumItemQuality quality = EnumItemQuality.COMMON;			
 		String itemName = socketedItem.getRenderedName();
 		String[] stats = { };        

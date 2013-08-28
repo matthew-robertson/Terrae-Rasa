@@ -15,7 +15,7 @@ public class Recipe
 {
 	public static int RECIPE_ID_GEN = 0;
 	/** What the recipe yields */
-	private ItemStack result; 
+	private RecipeResult result; 
 	/** What the recipe requires. */
 	private ItemStack[] recipe; 
 	/** The block that has to be nearby to craft this. Block.none indicates no nearby block is needed. */
@@ -29,7 +29,7 @@ public class Recipe
 	 * @param requiredBlock the required nearby Block to craft this Recipe - Block.none means no nearby Block requirement
 	 * @param stacks the materials required to craft this Recipe
 	 */
-	public Recipe(RecipeManager manager, ItemStack result, Block requiredBlock, ItemStack[] stacks)
+	public Recipe(RecipeManager manager, RecipeResult result, Block requiredBlock, ItemStack[] stacks)
 	{
 		this.recipe = stacks;
 		this.result = result;
@@ -40,7 +40,7 @@ public class Recipe
 	
 	public final ItemStack getResult()
 	{
-		return new ItemStack(result);
+		return result.getResult();
 	}
 	
 	public final ItemStack[] getRecipe()
@@ -64,6 +64,6 @@ public class Recipe
 	 */
 	public String toString()
 	{
-		return result.getItemName();
+		return result.getResult().getItemName();
 	}
 }

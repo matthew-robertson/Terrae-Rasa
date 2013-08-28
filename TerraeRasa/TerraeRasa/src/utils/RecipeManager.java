@@ -273,18 +273,18 @@ public class RecipeManager
 	
 	//TODO: Fix recipes with affixes
 	// Gemcrafting Bench (currently crafting bench)	
-//	Recipe frenziedRubyRing1 = new Recipe(this, new DisplayableItemStack(Item.rubyRing).setAffix(new AffixFrenzied()), Block.gemcraftingBench, new DisplayableItemStack[]{
-//		new DisplayableItemStack(Item.berserkersEssence), new DisplayableItemStack(Item.rubyRing)
-//	});
-//	Recipe frenziedRuby = new Recipe(this, new DisplayableItemStack(Item.ruby).setAffix(new AffixFrenzied()), Block.gemcraftingBench, new DisplayableItemStack[]{
-//		new DisplayableItemStack(Item.berserkersEssence), new DisplayableItemStack(Item.ruby)
-//	});
-//	Recipe sturdyOpalRing = new Recipe(this, new DisplayableItemStack(Item.opalRing).setAffix(new AffixSturdy()), Block.gemcraftingBench, new DisplayableItemStack[]{
-//		new DisplayableItemStack(Item.steadfastShield), new DisplayableItemStack(Item.opalRing)
-//	});
-//	Recipe sturdyRuby = new Recipe(this, new DisplayableItemStack(Item.opal).setAffix(new AffixSturdy()), Block.gemcraftingBench, new DisplayableItemStack[]{
-//		new DisplayableItemStack(Item.steadfastShield), new DisplayableItemStack(Item.opal)
-//	});
+	Recipe frenziedRubyRing = new Recipe(this, new DisplayableItemStack(Item.rubyRing).setRenderedName("Frenzied Ruby Ring"), Block.gemcraftingBench, new DisplayableItemStack[]{
+		new DisplayableItemStack(Item.berserkersEssence), new DisplayableItemStack(Item.rubyRing)
+	});
+	Recipe frenziedRuby = new Recipe(this, new DisplayableItemStack(Item.ruby).setRenderedName("Frenzied Ruby"), Block.gemcraftingBench, new DisplayableItemStack[]{
+		new DisplayableItemStack(Item.berserkersEssence), new DisplayableItemStack(Item.ruby)
+	});
+	Recipe sturdyOpalRing = new Recipe(this, new DisplayableItemStack(Item.opalRing).setRenderedName("Sturdy Opal Ring"), Block.gemcraftingBench, new DisplayableItemStack[]{
+		new DisplayableItemStack(Item.steadfastShield), new DisplayableItemStack(Item.opalRing)
+	});
+	Recipe sturdyRuby = new Recipe(this, new DisplayableItemStack(Item.opal).setRenderedName("Sturdy Opal"), Block.gemcraftingBench, new DisplayableItemStack[]{
+		new DisplayableItemStack(Item.steadfastShield), new DisplayableItemStack(Item.opal)
+	});
 	
 	Recipe sapphireRing = new Recipe(this, new DisplayableItemStack(Item.sapphireRing), Block.gemcraftingBench, new DisplayableItemStack[]{
 		new DisplayableItemStack(Item.goldRing), new DisplayableItemStack(Item.sapphire)
