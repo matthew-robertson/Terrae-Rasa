@@ -204,7 +204,7 @@ public class World
 		temporaryText = new ArrayList<WorldText>(100);
 		itemsList = new ArrayList<DisplayableEntity>(250);
 		chunksLoaded= new Hashtable<String, Boolean>(25);
-		worldTime = (long) (6.5 * GAMETICKSPERHOUR);
+		setWorldTime((long) (6.5 * GAMETICKSPERHOUR));
 		worldName = "Earth";
 		totalBiomes = 0;
 		previousLightLevel = getLightLevel();
@@ -247,7 +247,7 @@ public class World
 		this.temporaryText = new ArrayList<WorldText>();
 		
 		this.worldName = data.worldName;
-		this.worldTime = data.worldTime;
+		this.setWorldTime(data.worldTime);
 		this.previousLightLevel = data.previousLightLevel;
 		this.chunkWidth = data.chunkWidth;
 		this.lightingUpdateRequired = data.lightingUpdateRequired;
@@ -345,10 +345,10 @@ public class World
 	 */
 	public void updateWorldTime(EntityPlayer player)
 	{		
-		worldTime++;
-		if(worldTime >= GAMETICKSPERDAY)//If the time exceeds 24:00, reset it to 0:00
+		setWorldTime(getWorldTime() + 1);
+		if(getWorldTime() >= GAMETICKSPERDAY)//If the time exceeds 24:00, reset it to 0:00
 		{
-			worldTime = 0;
+			setWorldTime(0);
 		}
 		
 		if(getLightLevel() != previousLightLevel) //if the sunlight has changed, update it
@@ -366,7 +366,7 @@ public class World
 		//LightLevel of 1.0f is full darkness (it's reverse due to blending mechanics)
 		//Light Levels By Time: 20:00-4:00->20%; 4:00-8:00->20% to 100%; 8:00-16:00->100%; 16:00-20:00->20% to 100%;  
 		
-		double time = (double)(worldTime) / GAMETICKSPERHOUR; 
+		double time = (double)(getWorldTime()) / GAMETICKSPERHOUR; 
 		
 		return (time > 8 && time < 16) ? 1.0f : (time >= 4 && time <= 8) ? MathHelper.roundDowndouble20th(((((time - 4) / 4.0F) * 0.8F) + 0.2F)) : (time >= 16 && time <= 20) ? MathHelper.roundDowndouble20th(1.0F - ((((time - 16) / 4.0F) * 0.8F) + 0.2F)) : 0.2f;
 	}
@@ -498,7 +498,7 @@ public class World
 		//Update the time
 		updateWorldTime(player);
 		
-		if(worldTime % 20 == 0) {
+		if(getWorldTime() % 20 == 0) {
 			updateChunks(update, player);
 		}
 		//TODO client side light recognizes torches that already exist
@@ -1421,5 +1421,9 @@ public class World
 	{
 		MinimalBlock block = getChunks().get(""+(x / Chunk.getChunkWidth())).getBlock(x % Chunk.getChunkWidth(), (y));
 		block.setBitMap(bitMap);
+	}
+
+	public void setWorldTime(long worldTime) {
+		this.worldTime = worldTime;
 	}
 }

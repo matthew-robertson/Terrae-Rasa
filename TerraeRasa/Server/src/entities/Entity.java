@@ -329,13 +329,13 @@ public class Entity
 	public void moveEntityUp(World world, double movementValue)
 	{		
 		int loops = (int) (movementValue / 6) + 1;
-		
 		if(isStunned())
 		{
 			isJumping = false;
 			return;
 		}
 		
+		onMovement();
 		for(int i = 0; i < loops; i++)
 		{
 			double f = canMoveUp(world);
@@ -383,7 +383,7 @@ public class Entity
 	public void moveEntityDown(World world, double movementValue)  
 	{		
 		int loops = (int) (movementValue / 6) + 1;
-		
+		onMovement();
 		for(int i = 0; i < loops; i++)
 		{
 			double f = canMoveDown(world);
@@ -417,12 +417,12 @@ public class Entity
 	{
 		double movementValue = MathHelper.roundDowndouble20th(getBaseSpeed() * getMovementSpeedModifier());
 		int loops = (int) (movementValue / 6) + 1;
-		
 		if(isStunned())
 		{
 			return;
 		}
 		
+		onMovement();
 		for(int i = 0; i < loops; i++)
 		{
 			double possibleMovement = canMoveRight(world);
@@ -453,12 +453,12 @@ public class Entity
 	{
 		double movementValue = (int)(getBaseSpeed() * getMovementSpeedModifier());
 		int loops = (int) (movementValue / 6) + 1;
-		
 		if(isStunned())
 		{
 			return;
 		}
 		
+		onMovement();
 		for(int i = 0; i < loops; i++)
 		{
 			double possibleMovement = canMoveLeft(world);
@@ -487,12 +487,12 @@ public class Entity
 	public void moveEntityRight(World world, double movementValue)
 	{
 		int loops = (int) (movementValue / 6) + 1;
-		
 		if(isStunned())
 		{
 			return;
 		}
 		
+		onMovement();
 		for(int i = 0; i < loops; i++)
 		{
 			double possibleMovement = canMoveRight(world);
@@ -520,12 +520,12 @@ public class Entity
 	public void moveEntityLeft(World world, double movementValue) 
 	{
 		int loops = (int) (movementValue / 6) + 1;
-		
 		if(isStunned())
 		{
 			return;
 		}
 		
+		onMovement();
 		for(int i = 0; i < loops; i++)
 		{
 			double possibleMovement = canMoveLeft(world);
@@ -769,4 +769,9 @@ public class Entity
 		return false;
 	}
 
+	public void onMovement()
+	{
+			
+	}
+	
 }

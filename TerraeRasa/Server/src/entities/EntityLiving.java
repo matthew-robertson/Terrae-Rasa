@@ -9,6 +9,7 @@ import enums.EnumDamageType;
 
 import blocks.Block;
 
+import server.TerraeRasa;
 import statuseffects.StatusEffect;
 import statuseffects.StatusEffectAbsorb;
 import utils.Damage;
@@ -173,7 +174,7 @@ public class EntityLiving extends Entity
 	public void damage(World world, Damage damage, boolean showWorldText)
 	//World world, int d, boolean isCrit, boolean isDodgeable, boolean showWorldText)
 	{
-		if(invincibilityTicks <= 0) //If it's possible to take damage
+		if(!isImmuneToDamage()) //If it's possible to take damage
 		{
 			//Check if the damage can be dodged, then attempt a roll to see if it will be dodged
 			if(damage.isDodgeable() && (Math.random() < dodgeChance || dodgeChance >= 1.0f)) 
@@ -281,6 +282,7 @@ public class EntityLiving extends Entity
 	 */
 	public void onDeath(World world)
 	{		
+		TerraeRasa.terraeRasa.gameEngine.addCommandUpdate("/soundeffect " + deathSound);
 	}	
 			
 	/**

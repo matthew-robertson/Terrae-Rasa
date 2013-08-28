@@ -169,6 +169,8 @@ public class EntityPlayer extends EntityLiving
 	public Vector<String> changedInventorySlots = new Vector<String>();
 	private boolean inventoryChanged;
 	private ItemStack heldMouseItem;
+	private boolean hasMoved = false;
+	private final String associatedIP;
 	
 	/**
 	 * Constructs a new instance of EntityPlayer with default settings, inventory (includes 3 basic tools),
@@ -177,9 +179,10 @@ public class EntityPlayer extends EntityLiving
 	 * @param name the player's name
 	 * @param difficulty the difficulty setting the player has selected (EnumDifficulty)
 	 */
-	public EntityPlayer(String name, EnumPlayerDifficulty difficulty)
+	public EntityPlayer(String name, EnumPlayerDifficulty difficulty, String associatedIP)
 	{
-		super();		
+		super();	
+		this.associatedIP = associatedIP;
 		stamina = 0;
 		specialEnergy = 100;
 		isJumping = false;
@@ -236,6 +239,10 @@ public class EntityPlayer extends EntityLiving
 		jumpSound = "Player Jump";
 		deathSound = "Player Death";
 		
+		inventory.pickUpItemStack(null, this, new ItemStack(Item.copperSword));
+		inventory.pickUpItemStack(null, this, new ItemStack(Item.copperAxe));
+		inventory.pickUpItemStack(null, this, new ItemStack(Item.copperPickaxe));
+		inventory.pickUpItemStack(null, this, new ItemStack(Block.craftingTable));
 
 		craftingManager = new CraftingManager();
 		nearBlock = new Hashtable<String, Boolean>();
@@ -252,9 +259,11 @@ public class EntityPlayer extends EntityLiving
 		allPossibleRecipes = new Recipe[0];
 	}
 	
-	public EntityPlayer(World world, SavablePlayer savable)
+	public EntityPlayer(World world, SavablePlayer savable, String associatedIP)
 	{
-		super();		
+		super();	
+		this.associatedIP = associatedIP;
+		hasMoved = false;
 		stamina = 0;
 		specialEnergy = 100;
 		isJumping = false;
@@ -611,7 +620,7 @@ public class EntityPlayer extends EntityLiving
 	 */
 	public void damage(World world, Damage damage, boolean showWorldText)
 	{
-		if(invincibilityTicks <= 0) //If it's possible to take damage
+		if(!isImmuneToDamage()) //If it's possible to take damage
 		{
 			//Check if the damage can be dodged, then attempt a roll to see if it will be dodged
 			if(damage.isDodgeable() && (Math.random() < dodgeChance || dodgeChance >= 1.0f)) 
@@ -794,6 +803,7 @@ public class EntityPlayer extends EntityLiving
 		if(health <= 0)
 		{
 			triggerDifficultyEffect(world);
+			TerraeRasa.terraeRasa.gameEngine.addCommandUpdate("/soundeffect " + deathSound);
 		}
 	}
 	
@@ -1470,11 +1480,16 @@ public class EntityPlayer extends EntityLiving
 	 * @param restore the amount restored
 	 * @return whether or not any special energy was restored
 	 */
-	public boolean restoreSpecialEnergy(int restore)
+	public boolean restoreSpecialEnergy(World world, int restore, boolean rendersText)
 	{
 		if(specialEnergy == maxSpecialEnergy)
 		{
 			return false;
+		}
+		
+		if(rendersText)
+		{
+			world.addTemporaryText(""+(int)restore, (int)x - 2, (int)y - 3, 20, EnumColor.YELLOW); //add temperary text to be rendered, for the healing done
 		}
 		
 		specialEnergy += restore;
@@ -1915,5 +1930,23 @@ public class EntityPlayer extends EntityLiving
 		}
 		return null;
 	}
+
+	/**
+	 * Gets whether or not the entity is immune to damage. An entity is immune to damage if invincibilityTicks > 0.
+	 * @return true if the entity is immune to damage, otherwise false
+	 */
+	public boolean isImmuneToDamage()
+	{
+		return (invincibilityTicks > 0) ? true : (!hasMoved) ? true : false;
+	}	
 	
+	public void onMovement()
+	{
+		hasMoved = true;
+	}
+	
+	public String getIP()
+	{
+		return associatedIP;
+	}
 }

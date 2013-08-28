@@ -2,8 +2,6 @@ package ui;
 
 import hardware.Keys;
 import items.Item;
-import items.ItemAmmo;
-import items.ItemArmor;
 import items.ItemGem;
 
 import org.lwjgl.LWJGLException;
@@ -11,7 +9,6 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 
 import transmission.ClientUpdate;
-import transmission.UpdateWithObject;
 import utils.ActionbarItem;
 import utils.DisplayableItemStack;
 import utils.MathHelper;
@@ -181,6 +178,9 @@ public class UIMouse extends UIBase
 				UIInventory.placeOneItemIntoInventory(update, world, player, 4, 0);
 			}
 		}	
+		
+		
+		
 //TODO chests are fucked
 //		if(player.isViewingChest)
 //		{
@@ -415,60 +415,86 @@ public class UIMouse extends UIBase
 			chestMouseEvents(world, player, x, y);
 		}
 		
-		if(isSocketWindowOpen && player.getHeldItem() != null)
-		{
-			if(player.getHeldItem().getItemID() < ActionbarItem.spellIndex && 
-					player.getHeldItem().getItemID() >= ActionbarItem.blockIndex && 
-					Item.itemsList[player.getHeldItem().getItemID()] instanceof ItemGem)
+		if(isSocketWindowOpen)
+		{			
+			int tooltipWidth = 8 * 20;
+			int tooltipHeight = 100;
+			int frameX = (int) (Display.getWidth() * 0.25) - 80;  
+			int frameY = (int) (Display.getHeight() * 0.5) - 106; 
+			
+			DisplayableItemStack socketedItem = null;
+			if(inventoryID == 1)
 			{
-				int tooltipHeight = 100;
-				int frameX = (int) (Display.getWidth() * 0.25) - 80;  
-				int frameY = (int) (Display.getHeight() * 0.5) - 106; 
-				
-				DisplayableItemStack socketedItem = null;
-				if(inventoryID == 1)
+				socketedItem = player.inventory.getMainInventoryStack(inventoryIndex);
+			}
+			else if(inventoryID == 2)
+			{
+				socketedItem = player.inventory.getArmorInventoryStack(inventoryIndex);
+			}
+			else if(inventoryID == 3)
+			{
+				socketedItem = player.inventory.getQuiverStack(inventoryIndex);
+			}
+			else if(inventoryID == 4)
+			{
+				socketedItem = player.inventory.getTrashStack(inventoryIndex);
+			}
+			String itemName = socketedItem.getItemName();
+			String[] stats = { };        
+			if(socketedItem.getItemID() >= Item.itemIndex && socketedItem.getItemID() < ActionbarItem.spellIndex)
+			{
+				stats = Item.itemsList[socketedItem.getItemID()].getStats();
+			}
+			
+			//% of total text size to render, in this case sacale to 1/2 size.
+			float xScale = 0.25F;
+			
+			//Find out how long does the tooltip actually has to be
+			double requiredHeight = 10 + 
+					tooltipFont.getHeight(itemName) * xScale * 1.5F + 				
+					(tooltipFont.getHeight(itemName) * xScale * stats.length) 
+					+ 30;
+			
+			tooltipHeight = (int) requiredHeight;
+			frameY -= tooltipHeight;
+			
+			//Check if a gem should be socketted
+			float yOffset = frameY + boldTooltip.getHeight(itemName) + 5 * (stats.length) + 
+					(((tooltipHeight) - (tooltipHeight - boldTooltip.getHeight(itemName))) * 0.5f * (stats.length));	
+			
+			//Check if a gem could be socketed
+			if(player.getHeldItem() != null)
+			{
+				if(player.getHeldItem().getItemID() < ActionbarItem.spellIndex && 
+						player.getHeldItem().getItemID() >= ActionbarItem.blockIndex && 
+						Item.itemsList[player.getHeldItem().getItemID()] instanceof ItemGem)
 				{
-					socketedItem = player.inventory.getMainInventoryStack(inventoryIndex);
-				}
-				else if(inventoryID == 2)
-				{
-					socketedItem = player.inventory.getArmorInventoryStack(inventoryIndex);
-				}
-				else if(inventoryID == 3)
-				{
-					socketedItem = player.inventory.getQuiverStack(inventoryIndex);
-				}
-				else if(inventoryID == 4)
-				{
-					socketedItem = player.inventory.getTrashStack(inventoryIndex);
-				}
-				String itemName = socketedItem.getItemName();
-				String[] stats = { };        
-				if(socketedItem.getItemID() >= Item.itemIndex && socketedItem.getItemID() < ActionbarItem.spellIndex)
-				{
-					stats = Item.itemsList[socketedItem.getItemID()].getStats();
-				}
-				
-				frameY -= (int) (boldTooltip.getHeight(itemName) + (boldTooltip.getHeight(itemName) * 0.75 * stats.length) + 30);							
-				float yOffset = frameY + boldTooltip.getHeight(itemName) + 5 * (stats.length) + 
-						(((tooltipHeight) - (tooltipHeight - boldTooltip.getHeight(itemName))) * 0.5f * (stats.length));
-				
-				int numberOfSockets = socketedItem.getGemSockets().length;
-				for(int i = 0; i < numberOfSockets; i++)
-				{
-					size = 30;
-					double offsetByTotal = (numberOfSockets == 1) ? 65 : (numberOfSockets == 2) ? 47.5 : (numberOfSockets == 3) ? 30 : 10;
-					double xOffset = frameX + offsetByTotal + (i * (size + 7.5));
-					if(y > yOffset && y < yOffset + size && x > xOffset && x < xOffset + size)
-					{	
-//						/player <id> socketgem <inventory_id> <index> <gem_socket_index>
-						String command = "/player " + player.entityID + " socketgem " + inventoryID + " " + inventoryIndex + " " + i;
-//						System.out.println(command);
-						update.addCommand(command);
-						shouldDropItem = false;
+					
+					int numberOfSockets = socketedItem.getGemSockets().length;
+					for(int i = 0; i < numberOfSockets; i++)
+					{
+						size = 30;
+						double offsetByTotal = (numberOfSockets == 1) ? 65 : (numberOfSockets == 2) ? 47.5 : (numberOfSockets == 3) ? 30 : 10;
+						double xOffset = frameX + offsetByTotal + (i * (size + 7.5));
+						if(y > yOffset && y < yOffset + size && x > xOffset && x < xOffset + size)
+						{	
+	//						/player <id> socketgem <inventory_id> <index> <gem_socket_index>
+							String command = "/player " + player.entityID + " socketgem " + inventoryID + " " + inventoryIndex + " " + i;
+							update.addCommand(command);
+							shouldDropItem = false;
+						}
 					}
 				}
-			}
+			}			
+			
+			double width = 12;
+			double height = 12;
+			double xBound = frameX + tooltipWidth - width - 4;
+			double yBound = frameY + 4;
+			if(x >= xBound && x <= xBound + width && y >= yBound && y <= yBound + height)
+			{
+				clearSocketVariables();
+			}	
 		}		
 		
 		//if the player didnt click something, drop their mouseitem

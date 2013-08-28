@@ -1,5 +1,6 @@
 package items;
 
+import server.TerraeRasa;
 import entities.EntityPlayer;
 import world.World;
 
@@ -20,6 +21,7 @@ public class ItemPotionMana extends Item
 		if(success)
 		{
 			player.inventory.removeItemsFromInventoryStack(player, 1, player.selectedSlot);
+			TerraeRasa.terraeRasa.gameEngine.addCommandUpdate("/soundeffect " + onUseSound);
 		}
 	}
 	

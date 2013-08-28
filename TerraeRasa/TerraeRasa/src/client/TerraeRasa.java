@@ -307,7 +307,7 @@ public class TerraeRasa
 	
 	public synchronized static void terminateClientConnection()
 	{
-		terraeRasa.thread.end();
+		terraeRasa.thread.kill();
 	}
 }
 

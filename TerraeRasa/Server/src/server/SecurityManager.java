@@ -8,11 +8,13 @@ public class SecurityManager
 	{
 		String ip = (socket.getInetAddress().toString()).substring(1);
 
-		if(settings.useWhitelist)
+		if(settings.usePassword)
 		{
-			boolean whitelisted = isWhitelisted(settings, ip);
-			message[0] = (whitelisted) ? "Allowed : whitelisted" : "Not Allowed : no-whitelist";
-			return whitelisted;
+			//TODO: make passwords and bans work properly
+			return true;
+//			boolean whitelisted = isWhitelisted(settings, ip);
+//			message[0] = (whitelisted) ? "Allowed : whitelisted" : "Not Allowed : no-whitelist";
+//			return whitelisted;
 		}		
 		else
 		{
@@ -20,18 +22,6 @@ public class SecurityManager
 			message[0] = (!banned) ? "Allowed : no-banned" : "Not Allowed : banned";
 			return !banned;
 		}
-	}
-	
-	private static boolean isWhitelisted(ServerSettings settings, String ip)
-	{
-		for(String str : settings.whitelist)
-		{
-			if(str.equals(ip))
-			{
-				return true;
-			}
-		}
-		return false;
 	}
 	
 	private static boolean isBanned(ServerSettings settings, String ip)

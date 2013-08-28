@@ -89,6 +89,8 @@ public class Render
 	public static Texture menuButtonBackground;
 	public static Texture starAnimationSheet;	
 	
+	public static Texture redX;
+	
 	public static Texture monsterSheet;
 	/** 
 	 * cameraX is a relatively unique variable. It's where the camera is moved to on the X axis, based on player location. 
@@ -186,7 +188,7 @@ public class Render
 		tooltipBackground = loader.getTexture("Resources/tooltip_background.png");
 		
 		icons = loader.getIcons();
-		
+		redX = loader.getTexture("Resources/red_x.png");
 		
 //		zombie_test_animation = new Animation(loader.getTexture("Resources/test_animation.png"), 
 //				new TextureCoords(0, 0, 128F / 256F, 48.0F / 256F), 

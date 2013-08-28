@@ -4,7 +4,6 @@ import java.awt.Font;
 
 import render.Render;
 import render.TrueTypeFont;
-import utils.DisplayableItemStack;
 
 /**
  * UIBase holds common variables that the entire UI shares.

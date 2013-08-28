@@ -1,7 +1,6 @@
 package blocks;
 
 import savable.SavableBlock;
-import transmission.SuperCompressedBlock;
 import utils.ItemStack;
 
 /**

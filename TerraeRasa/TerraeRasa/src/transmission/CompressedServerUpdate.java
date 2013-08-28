@@ -1,7 +1,6 @@
 package transmission;
 
 import java.io.Serializable;
-import java.util.Vector;
 
 public class CompressedServerUpdate 
 		implements Serializable

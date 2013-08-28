@@ -581,14 +581,20 @@ public class InventoryPlayer
 		{
 			player.changedInventorySlots.add("i " + index);
 			mainInventory[index].removeFromStack(howMany);
-			inventoryTotals.put(mainInventory[index].getItemName(), inventoryTotals.get(mainInventory[index].getItemName()) - howMany); //adjust totals
+			if(mainInventory[index].getItemID() < ActionbarItem.spellIndex)
+			{
+				inventoryTotals.put(mainInventory[index].getItemName(), inventoryTotals.get(mainInventory[index].getItemName()) - howMany); //adjust totals
+			}
 			return true;
 		}
 		else if(howMany == mainInventory[index].getStackSize())
 		{
 			player.changedInventorySlots.add("i " + index);
 			mainInventory[index].removeFromStack(howMany);
-			inventoryTotals.put(mainInventory[index].getItemName(), inventoryTotals.get(mainInventory[index].getItemName()) - howMany); //adjust totals
+			if(mainInventory[index].getItemID() < ActionbarItem.spellIndex)
+			{
+				inventoryTotals.put(mainInventory[index].getItemName(), inventoryTotals.get(mainInventory[index].getItemName()) - howMany); //adjust totals
+			}
 			mainInventory[index] = null;
 			return true;
 		}
@@ -627,7 +633,10 @@ public class InventoryPlayer
 		else if(stack != null)//otherwise put the stack in the inventory
 		{
 			player.changedInventorySlots.add("i " + index);
-			inventoryTotals.put(stack.getItemName(), inventoryTotals.get(stack.getItemName()) + stack.getStackSize());		
+			if(stack.getItemID() < ActionbarItem.spellIndex)
+			{
+				inventoryTotals.put(stack.getItemName(), inventoryTotals.get(stack.getItemName()) + stack.getStackSize());		
+			}
 			mainInventory[index] = new ItemStack(stack);	
 		}
 

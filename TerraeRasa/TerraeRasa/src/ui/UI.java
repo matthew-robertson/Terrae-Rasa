@@ -5,9 +5,7 @@ import org.lwjgl.opengl.GL11;
 
 import render.TrueTypeFont;
 import transmission.ClientUpdate;
-import utils.DisplayableItemStack;
 import utils.MathHelper;
-import utils.Recipe;
 import world.World;
 import client.Settings;
 import entities.EntityPlayer;

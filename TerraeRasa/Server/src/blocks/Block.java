@@ -174,7 +174,7 @@ public class Block extends ActionbarItem
 	}
 
 	/**
-	 * @deprecated Overrides Object.clone() to provide better and public cloning
+	 * Overrides Object.clone() to provide better and public cloning
 	 *             functionality for Block. Cloned objects, using Block.clone()
 	 *             should return a deep copy, at a new reference.
 	 * @return a deep copy of the current Block

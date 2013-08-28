@@ -23,7 +23,7 @@ import client.TerraeRasa;
 public class ClientConnectionThread extends Thread
 {
 	private Socket socket;
-	private boolean done = false;
+	private volatile boolean done = false;
 	private EngineLock engineLock;
 	private ObjectOutputStream os;
 	private ObjectInputStream is;
@@ -95,9 +95,9 @@ public class ClientConnectionThread extends Thread
 				e.printStackTrace();
 			}		
 			
-			TerraeRasa.isMainMenuOpen = true;
-			TerraeRasa.terraeRasa.gameEngine.resetMainMenu();
 			
+			TerraeRasa.terraeRasa.gameEngine.resetMainMenu();
+			TerraeRasa.isMainMenuOpen = true;
 		}		
 	}
 	
@@ -138,7 +138,7 @@ public class ClientConnectionThread extends Thread
 		}		
 	}
 
-	public void end()
+	public void kill()
 	{
 		done = true;
 	}

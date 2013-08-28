@@ -1,7 +1,5 @@
 package ui;
 
-import java.util.Stack;
-
 import items.Item;
 
 import org.lwjgl.opengl.Display;
@@ -22,7 +20,7 @@ public class UISocketMenu extends UIBase
 	 */
 	public static void closeSocketWindow()
 	{
-		isSocketWindowOpen = false;
+		clearSocketVariables();
 	}
 
 	/**
@@ -213,5 +211,18 @@ public class UISocketMenu extends UIBase
 				t.draw();
 			}
 		}	
+		
+		redX.bind();			
+		GL11.glColor4f(1, 1, 1, 1.0f); 
+		double width = 10;
+		double height = 10;
+		double x = frameX + tooltipWidth - width - 4;
+		double y = frameY + 4;
+		t.startDrawingQuads();
+		t.addVertexWithUV(x, y + height, 0, 0, 1);
+		t.addVertexWithUV(x + width, y + height, 0, 1, 1);
+		t.addVertexWithUV(x + width, y, 0, 1, 0);
+		t.addVertexWithUV(x, y, 0, 0, 0);
+		t.draw();
 	}
 }

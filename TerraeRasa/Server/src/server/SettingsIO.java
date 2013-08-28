@@ -54,11 +54,6 @@ public class SettingsIO
 		return getFileContents(TerraeRasa.getBasePath() + "/banlist.txt");
 	}
 	
-	private static String[] loadWhiteList()
-	{
-		return getFileContents(TerraeRasa.getBasePath() + "/whitelist.txt");
-	}
-	
 	private static String[] loadMods()
 	{
 		return getFileContents(TerraeRasa.getBasePath() + "/mods.txt");
@@ -74,9 +69,6 @@ public class SettingsIO
 		ServerSettings settings = new ServerSettings();
 		for(String str : SettingsIO.loadBanned()) {
 			settings.banlist.add(str);
-		}
-		for(String str : SettingsIO.loadWhiteList()) {
-			settings.whitelist.add(str);
 		}
 		for(String str : SettingsIO.loadMods()) {
 			settings.mods.add(str);
@@ -154,9 +146,13 @@ public class SettingsIO
 		{
 			settings.seed = Integer.parseInt(remainingLine);
 		}
-		else if(line.startsWith("whitelist="))
+		else if(line.startsWith("password="))
 		{
-			settings.useWhitelist = Boolean.parseBoolean(remainingLine);
+			settings.setPassword(remainingLine);
+		}
+		else if(line.startsWith("use_password"))
+		{
+			settings.usePassword = Boolean.parseBoolean(remainingLine);
 		}
 		else if(line.startsWith("spawn_monsters="))
 		{
@@ -191,10 +187,12 @@ public class SettingsIO
 			writer.write("server_port=48615" + '\n');
 			writer.write("world_difficulty=normal" + '\n');
 			writer.write("world_size=mini");
-			writer.write("whitelist=false" + '\n');
+			writer.write("use_password=false" + '\n');
+			writer.write("password=" + '\n');
 			writer.write("spawn_monsters=true" + '\n');
 			writer.write("load_distance=4" + '\n');
 			writer.write("message=Just your ordinary Terrae Rasa server..." + '\n');
+			
 			writer.close();
 		}		
 	}
@@ -206,7 +204,6 @@ public class SettingsIO
 			writeFile(TerraeRasa.getBasePath() + "/admins.txt", settings.admins);
 			writeFile(TerraeRasa.getBasePath() + "/mods.txt", settings.mods);
 			writeFile(TerraeRasa.getBasePath() + "/banlist.txt", settings.banlist);
-			writeFile(TerraeRasa.getBasePath() + "/whitelist.txt", settings.whitelist);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

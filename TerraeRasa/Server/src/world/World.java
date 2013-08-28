@@ -34,7 +34,6 @@ import transmission.EntityUpdate;
 import transmission.PositionUpdate;
 import transmission.ServerUpdate;
 import transmission.SuperCompressedBlock;
-import transmission.UpdateWithObject;
 import transmission.WorldData;
 import utils.ActionbarItem;
 import utils.ChestLootGenerator;
@@ -100,8 +99,8 @@ import enums.EnumWorldDifficulty;
  */
 public class World
 {
-	private static final int GAMETICKSPERDAY = 28800; 
-	private static final int GAMETICKSPERHOUR = 1200;
+	public static final int GAMETICKSPERDAY = 28800; 
+	public static final int GAMETICKSPERHOUR = GameEngine.TICKS_PER_SECOND * 60;
 	public final double g = 1.8;
 	public Hashtable<String, Boolean> chunksLoaded;
 	
@@ -665,7 +664,7 @@ public class World
 			//Check if the itemstack is near the player and able to be picked up
 			if(distance <= stack.width * 2 * player.pickupRangeModifier && stack.canBePickedUp()) 
 			{
-				int originalSize = stack.getStack().getStackSize();
+//				int originalSize = stack.getStack().getStackSize();
 				ItemStack remainingStack = player.inventory.pickUpItemStack(this, player, stack.getStack()); //if so try to pick it up
 				
 				if(remainingStack == null) //nothing's left, remove the null element
@@ -726,15 +725,21 @@ public class World
 				npcList.remove(i);
 				continue;
 			}
-			
+								
+			double x = npcList.get(i).x;
+			double y = npcList.get(i).y;
 			npcList.get(i).applyAI(this);
 			
 			//TODO re-enable onPlayerNear() for NPCs and possibly fixates for NPCS
 //			if(npcList.get(i).inBounds(player.x, player.y, player.width, player.height)){
 //				npcList.get(i).onPlayerNear();
 //			}
+			
 			npcList.get(i).applyGravity(this);
-			update.addPositionUpdate(new PositionUpdate(entityList.get(i).entityID, entityList.get(i).x, entityList.get(i).y));
+			if(npcList.get(i).x != x || npcList.get(i).y != y)
+			{
+				update.addPositionUpdate(new PositionUpdate(npcList.get(i).entityID, npcList.get(i).x, npcList.get(i).y));
+			}
 		}
 	}
 	
@@ -892,9 +897,15 @@ public class World
 		//final int OUT_OF_RANGE = 1200;//(int) ((Display.getHeight() > Display.getWidth()) ? Display.getHeight() * 0.75 : Display.getWidth() * 0.75);
 		for(int i = 0; i < projectileList.size(); i++)
 		{
+			boolean positionUpdateValid = true;
 			if (projectileList.get(i).active){
+				double x = projectileList.get(i).x;
+				double y = projectileList.get(i).y;
 				projectileList.get(i).moveProjectile(this);
-				update.addPositionUpdate(new PositionUpdate(projectileList.get(i).entityID, projectileList.get(i).x, projectileList.get(i).y));
+				if(projectileList.get(i).x != x || projectileList.get(i).y != y)
+				{
+					positionUpdateValid = false;
+				}
 			}
 			else if (!projectileList.get(i).active){
 				projectileList.get(i).ticksNonActive++;
@@ -931,6 +942,10 @@ public class World
 				update.addEntityUpdate(entityUpdate);
 				projectileList.remove(i);
 				continue;
+			}
+			if(positionUpdateValid)
+			{
+				update.addPositionUpdate(new PositionUpdate(projectileList.get(i).entityID, projectileList.get(i).x, projectileList.get(i).y));
 			}
 		}
 	}
@@ -2456,5 +2471,14 @@ public class World
 	{
 		MinimalBlock block = getChunks().get(""+(x / Chunk.getChunkWidth())).getBlock(x % Chunk.getChunkWidth(), (y));
 		block.setBitMap(bitMap);
+	}
+	
+	/**
+	 * Sets the game time based on an hour in game ticks.
+	 * @param timeInTicks the time in game ticks
+	 */
+	public void setTime(int timeInTicks)
+	{
+		this.worldTime = timeInTicks;
 	}
 }

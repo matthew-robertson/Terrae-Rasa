@@ -1,5 +1,6 @@
 package items;
 
+import server.TerraeRasa;
 import entities.EntityPlayer;
 import world.World;
 
@@ -21,6 +22,7 @@ public class ItemHeartCrystal extends Item
 		if(success)
 		{
 			player.inventory.removeEntireStackFromInventory(world, player, player.selectedSlot);
+			TerraeRasa.terraeRasa.gameEngine.addCommandUpdate("/soundeffect " + onUseSound);
 		}
 	}
 }

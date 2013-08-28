@@ -18,6 +18,7 @@ import transmission.SuperCompressedChunk;
 import transmission.UpdateWithObject;
 import transmission.WorldData;
 import entities.EntityPlayer;
+import enums.EnumPlayerDifficulty;
 
 public class ServerConnectionThread extends Thread
 {
@@ -93,17 +94,8 @@ public class ServerConnectionThread extends Thread
 			e.printStackTrace();
 		} finally {
 			TerraeRasa.requestClientConnectionClosed(this, worldLock.getRelevantPlayer());
-			try {
-				Thread.sleep(10000);
-			} catch (InterruptedException e1) {
-				e1.printStackTrace();
-			}
-			try {
-				os.close();
-				is.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			
+			
 		}
 	}
 	
@@ -118,8 +110,21 @@ public class ServerConnectionThread extends Thread
 			if(message.equals("/sendplayer"))
 			{
 				String savableXML = is.readUTF();
-				//TODO this is dangerous (the world access)
-				player = new EntityPlayer(TerraeRasa.terraeRasa.gameEngine.getWorld(), (SavablePlayer)new SaveManager().xmlToObject(savableXML));
+				//A new player is an XML file with just the following string of text in it:
+				//"type=newplayer;name=NAME;difficulty=DIFFICULTY;"
+				if(savableXML.startsWith("type="))
+				{
+					String[] split = savableXML.split(";");
+					String name = split[1].split("=")[1];
+					EnumPlayerDifficulty difficulty = EnumPlayerDifficulty.getDifficulty(split[2].split("=")[1]);
+					System.out.println(split[1].split("=")[1] + " " + split[2].split("=")[1]);
+					player = new EntityPlayer(name, difficulty, getIP());
+				}
+				else
+				{
+					//TODO this is dangerous (the world access)
+					player = new EntityPlayer(TerraeRasa.terraeRasa.gameEngine.getWorld(), (SavablePlayer)new SaveManager().xmlToObject(savableXML), getIP());
+				}
 				player.setEntityID(playerID);
 				player.verifyName();
 				worldLock.addPlayerToWorld(player);
@@ -189,5 +194,10 @@ public class ServerConnectionThread extends Thread
 	public final int getAssociatedPlayerID()
 	{
 		return associatedPlayerID;
+	}
+	
+	public String getIP()
+	{
+		return (socket.getInetAddress().toString()).substring(1);
 	}
 }

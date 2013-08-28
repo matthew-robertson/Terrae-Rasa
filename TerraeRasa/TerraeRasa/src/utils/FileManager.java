@@ -1,7 +1,9 @@
 package utils;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
@@ -31,11 +33,9 @@ public class FileManager
 	public void generateAndSavePlayer(String name, EnumPlayerDifficulty difficulty)
 	{
 		try {
-			String xml = generateNewEntityPlayer(name, difficulty);
-			savePlayer(name, xml);
+			String newPlayer = generateNewEntityPlayer(name, difficulty);
+			savePlayer(name, newPlayer);
 		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
 	}
@@ -48,9 +48,9 @@ public class FileManager
 	 * @throws IOException 
 	 * @throws URISyntaxException 
 	 */
-	private String generateNewEntityPlayer(String name, EnumPlayerDifficulty difficulty) throws URISyntaxException, IOException
+	private String generateNewEntityPlayer(String name, EnumPlayerDifficulty difficulty) 
 	{
-		return manager.getFileXML("Resources/player.xml", true);
+		return "type=newplayer;name=" + name + ";difficulty=" + difficulty.toString() + ";";
 	}
 	
 	/**
@@ -63,7 +63,10 @@ public class FileManager
 			throws FileNotFoundException, IOException
 	{
 		verifyDirectoriesExist();
-		manager.saveFileXML("/Player Saves/" + name + ".xml", xml);
+		
+		BufferedWriter writer = new BufferedWriter(new FileWriter(new File(TerraeRasa.getBasePath() + "/Player Saves/" + name + ".xml")));
+		writer.write(xml);
+		writer.close();
 	}
 	
 	/**

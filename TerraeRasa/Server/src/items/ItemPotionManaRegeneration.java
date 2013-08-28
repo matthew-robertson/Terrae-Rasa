@@ -1,6 +1,7 @@
 package items;
 
 import entities.EntityPlayer;
+import server.TerraeRasa;
 import statuseffects.StatusEffectManaRegeneration;
 import world.World;
 
@@ -15,5 +16,6 @@ public class ItemPotionManaRegeneration extends ItemPotion
 	{
 		player.registerStatusEffect(world, new StatusEffectManaRegeneration(durationSeconds, tier, power, ticksBetweenEffect));
 		player.inventory.removeItemsFromInventoryStack(player, 1, player.selectedSlot);
+		TerraeRasa.terraeRasa.gameEngine.addCommandUpdate("/soundeffect " + onUseSound);
 	}
 }

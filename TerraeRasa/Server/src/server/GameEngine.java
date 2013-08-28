@@ -405,4 +405,17 @@ public class GameEngine
 		
 	}
 	
+	public EntityPlayer getPlayer(String playerName)
+	{
+		Iterator<EntityPlayer> it = players.iterator();
+		while(it.hasNext())
+		{
+			EntityPlayer player = it.next();
+			if(player.getName().equalsIgnoreCase(playerName))
+			{
+				return player;
+			}
+		}
+		return null;
+	}
 }

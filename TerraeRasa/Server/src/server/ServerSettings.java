@@ -10,7 +10,6 @@ public class ServerSettings
 {
 	private static int entityID = 0;
 	private static int connectionID = 0;
-	private static int statusEffectID = 0;
 	
 	public boolean forcePlayerDifficultiesNormal;
 	public int maxPlayers;
@@ -21,14 +20,14 @@ public class ServerSettings
 	public EnumWorldDifficulty worldDifficulty;
 	public EnumWorldSize worldSize;
 	public int seed;
-	public boolean useWhitelist;
+	public boolean usePassword;
 	public boolean spawnMonsters;
 	public int loadDistance;
 	public String serverMessage;
 	public Vector<String> banlist;
-	public Vector<String> whitelist;
 	public Vector<String> mods;
 	public Vector<String> admins;
+	public String password;
 	
 	public ServerSettings()
 	{
@@ -41,14 +40,14 @@ public class ServerSettings
 		worldDifficulty = EnumWorldDifficulty.NORMAL;
 		worldSize = EnumWorldSize.MEDIUM;
 		seed = Math.abs(new Random().nextInt());
-		useWhitelist = false;
+		usePassword = false;
 		spawnMonsters = true;
 		loadDistance = 4;
 		serverMessage = "Just your ordinary Terrae Rasa server...";
-		whitelist = new Vector<String>();
 		banlist = new Vector<String>();
 		mods = new Vector<String>();
 		admins = new Vector<String>();
+		password = "";
 	}
 	
 	public String[] toStringArray()
@@ -65,51 +64,46 @@ public class ServerSettings
 				"server_port=" + port,
 				"world_difficulty=" + worldDifficulty.toString().toLowerCase(),
 				"world_size=" + worldSize.toString().toLowerCase(),
-				"whitelist=" + useWhitelist,
+				"use_password=" + usePassword,
+				"password=" + password,
 				"spawn_monsters=" + spawnMonsters,
 				"load_distance=" + loadDistance,
 				"message=" + serverMessage
 		};
 	}
 	
-	public void addMod(String name)
+	public void addMod(String ip)
 	{
-		mods.add(name);
+		mods.add(ip);
 	}
 	
-	public void addWhitelist(String name)
+	public void ban(String ip)
 	{
-		whitelist.add(name);
+		banlist.add(ip);
 	}
 	
-	public void addBanlist(String name)
+	public void addAdmin(String ip)
 	{
-		banlist.add(name);
+		admins.add(ip);
 	}
 	
-	public void addAdmin(String name)
+	public void removeMod(String ip)
 	{
-		admins.add(name);
+		mods.remove(ip);
 	}
 	
-	public void removeMod(String name)
+	/**
+	 * This might also be known as unban
+	 * @param 
+	 */
+	public void pardon(String ip)
 	{
-		mods.remove(name);
+		banlist.remove(ip);
 	}
 	
-	public void removeWhitelist(String name)
+	public void removeAdmin(String ip)
 	{
-		whitelist.remove(name);
-	}
-	
-	public void removeBanlist(String name)
-	{
-		banlist.remove(name);
-	}
-	
-	public void removeAdmin(String name)
-	{
-		admins.remove(name);
+		admins.remove(ip);
 	}
 	
 	public static int getEntityID()
@@ -122,8 +116,13 @@ public class ServerSettings
 		return connectionID++;
 	}
 	
-//	public static int getStatusEffectID()
-//	{
-//		return statusEffectID++;
-//	}
+	public String getPassword()
+	{
+		return password;
+	}
+	
+	public void setPassword(String password)
+	{
+		this.password = password;
+	}
 }

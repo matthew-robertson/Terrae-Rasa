@@ -1,5 +1,6 @@
 package items;
 
+import server.TerraeRasa;
 import entities.EntityPlayer;
 import world.World;
 
@@ -22,6 +23,7 @@ public class ItemPotionHealth extends Item
 			{
 				player.inventory.removeItemsFromInventoryStack(player, 1, player.selectedSlot);
 				player.putOnCooldown(id, 60);
+				TerraeRasa.terraeRasa.gameEngine.addCommandUpdate("/soundeffect " + onUseSound);
 			}
 		}
 	}

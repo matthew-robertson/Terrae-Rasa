@@ -4,6 +4,7 @@ import items.Item;
 import items.ItemMagic;
 import items.ItemRanged;
 import items.ItemThrown;
+import items.ItemTool;
 
 import java.util.List;
 import java.util.Vector;
@@ -12,11 +13,14 @@ import transmission.BlockUpdate;
 import transmission.ServerUpdate;
 import transmission.SuperCompressedBlock;
 import transmission.UpdateWithObject;
+import utils.ActionbarItem;
 import utils.DisplayableItemStack;
+import utils.ItemStack;
 import utils.MouseItemHelper;
 import world.World;
 import blocks.Block;
 import entities.EntityPlayer;
+import enums.EnumColor;
 
 public class Commands 
 {
@@ -53,17 +57,44 @@ public class Commands
 					//player <x,y> tp
 				}
 			}
-			if(command.startsWith("/time-set"))
+			if(command.startsWith("/settime"))
 			{
-				
+//				/time-set <hour>
+				String[] split = command.split(" ");
+				double hour = Double.parseDouble(split[1]) % 24;
+				int timeInTicks = (int) (hour * World.GAMETICKSPERHOUR);
+				world.setTime(timeInTicks);
+				TerraeRasa.terraeRasa.gameEngine.addCommandUpdate("/worldtimeset " + timeInTicks);
 			}
 			if(command.startsWith("/mod"))
 			{
-				
+//				/mod <name|ip> 
+//				This will take an argument of a player name if that player is logged on. Otherwise, it will take an IP at any time.
+				String[] split = command.split(" ");
+				EntityPlayer player = engine.getPlayer(split[1]);
+				if(player != null)
+				{
+					settings.addMod(player.getIP());
+				}
+				else if(player == null)
+				{
+					settings.addMod(split[1]);
+				}
 			}
 			if(command.startsWith("/unmod"))
 			{
-				
+//				/unmod <name|ip> 
+//				This will take an argument of a player name if that player is logged on. Otherwise, it will take an IP at any time.
+				String[] split = command.split(" ");
+				EntityPlayer player = engine.getPlayer(split[1]);
+				if(player != null)
+				{
+					settings.removeMod(player.getIP());
+				}
+				else if(player == null)
+				{
+					settings.removeMod(split[1]);
+				}
 			}
 			if(command.startsWith("/kick"))
 			{
@@ -71,11 +102,33 @@ public class Commands
 			}
 			if(command.startsWith("/ban"))
 			{
-				
+//				/ban <name|ip>
+//				This will take an argument of a player name if that player is logged on. Otherwise, it will take an IP at any time.
+				String[] split = command.split(" ");
+				EntityPlayer player = engine.getPlayer(split[1]);
+				if(player != null)
+				{
+					settings.ban(player.getIP());
+				}
+				else if(player == null)
+				{
+					settings.ban(split[1]);
+				}
 			}
 			if(command.startsWith("/unban"))
 			{
-				
+//				/unban <name|ip>
+//				This will take an argument of a player name if that player is logged on. Otherwise, it will take an IP at any time.
+				String[] split = command.split(" ");
+				EntityPlayer player = engine.getPlayer(split[1]);
+				if(player != null)
+				{
+					settings.pardon(player.getIP());
+				}
+				else if(player == null)
+				{
+					settings.pardon(split[1]);
+				}
 			}
 			if(command.startsWith("/stop"))
 			{
@@ -85,34 +138,121 @@ public class Commands
 			{
 				
 			}
-			if(command.startsWith("/whitelist"))
-			{
-				
-			}
+			
 			//Admin only
 			if(command.startsWith("/admin"))
 			{
-	
+//				/admin <name|ip> 
+//				This will take an argument of a player name if that player is logged on. Otherwise, it will take an IP at any time.
+				String[] split = command.split(" ");
+				EntityPlayer player = engine.getPlayer(split[1]);
+				if(player != null)
+				{
+					settings.addAdmin(player.getIP());
+				}
+				else if(player == null)
+				{
+					settings.addAdmin(split[1]);
+				}				
 			}
 			if(command.startsWith("/unadmin"))
 			{
-				
+//				/unadmin <name|ip> 
+//				This will take an argument of a player name if that player is logged on. Otherwise, it will take an IP at any time.
+				String[] split = command.split(" ");
+				EntityPlayer player = engine.getPlayer(split[1]);
+				if(player != null)
+				{
+					settings.removeAdmin(player.getIP());
+				}
+				else if(player == null)
+				{
+					settings.removeAdmin(split[1]);
+				}
 			}
 			if(command.startsWith("/heal"))
 			{
-				
+//				/heal <player-name> <amount>
+				String[] split = command.split(" ");
+				EntityPlayer player = engine.getPlayer(split[1]);
+				if(player != null)
+				{
+					player.heal(world, Integer.parseInt(split[2]), true);
+					String newStats = "/player " + player.entityID + " sethms " + player.getHealth() + " " + player.mana + " " + player.specialEnergy;
+					update.addValue(newStats);
+				}
+				else
+				{
+					Log.log("player " + split[1] + " not found.");
+				}
 			}
 			if(command.startsWith("/mana"))
 			{
-				
+//				/mana <player-name> <amount>
+				String[] split = command.split(" ");
+				EntityPlayer player = engine.getPlayer(split[1]);
+				if(player != null)
+				{
+					player.restoreMana(world, Integer.parseInt(split[2]), true);
+					String newStats = "/player " + player.entityID + " sethms " + player.getHealth() + " " + player.mana + " " + player.specialEnergy;
+					update.addValue(newStats);
+				}
+				else
+				{
+					Log.log("player " + split[1] + " not found.");
+				}
 			}
 			if(command.startsWith("/special"))
 			{
-				
+//				/special <player-name> <amount>
+				String[] split = command.split(" ");
+				EntityPlayer player = engine.getPlayer(split[1]);
+				if(player != null)
+				{
+					player.restoreSpecialEnergy(world, Integer.parseInt(split[2]), true);
+					String newStats = "/player " + player.entityID + " sethms " + player.getHealth() + " " + player.mana + " " + player.specialEnergy;
+					update.addValue(newStats);
+				}
+				else
+				{
+					Log.log("player " + split[1] + " not found.");
+				}				
 			}
 			if(command.startsWith("/give"))
 			{
-				
+//				/give <player> <id> <amount>
+//				If the player cannot hold all the items, they simply wont be given.
+				String[] split = command.split(" ");
+				EntityPlayer player = engine.getPlayer(split[1]);
+				if(player != null)
+				{
+					int itemID = Integer.parseInt(split[2]);
+					int amount = Integer.parseInt(split[3]);
+					if(itemID >= ActionbarItem.blockIndex && itemID <= ActionbarItem.itemIndex)
+					{
+						if(Block.blocksList[itemID] != null)
+						{
+							ItemStack stack = new ItemStack(Block.blocksList[itemID], amount);
+							player.inventory.pickUpItemStack(world, player, stack);
+							String logMessage = "Giving " + player.getName() + " " + stack.toString();
+							Log.log(logMessage);
+							String clientCommand = "/servermessage " + EnumColor.WHITE.toString() + " " + logMessage;
+							update.addValue(clientCommand);
+						}
+					}
+					else if(itemID >= ActionbarItem.itemIndex && itemID < ActionbarItem.spellIndex)
+					{
+						if(Item.itemsList[itemID] != null)
+						{
+							ItemStack stack = new ItemStack(Item.itemsList[itemID], amount);
+							player.inventory.pickUpItemStack(world, player, stack);
+							String logMessage = "Giving " + player.getName() + " " + stack.toString();
+							Log.log(logMessage);
+							String clientCommand = "/servermessage " + EnumColor.WHITE.toString() + " " + logMessage;
+							update.addValue(clientCommand);
+						}
+					}				
+				}
 			}
 			if(command.startsWith("/weather"))
 			{
@@ -129,8 +269,6 @@ public class Commands
 				String[] split = command.split(" ");
 				EntityPlayer player = (EntityPlayer)(world.getEntityByID(Integer.parseInt(split[2])));
 				player.inventory.getMainInventory()[Integer.parseInt(split[3])].rollAffixBonuses(Integer.parseInt(split[1]));
-				
-			
 			}
 			if(command.startsWith("/say"))
 			{
@@ -153,18 +291,18 @@ public class Commands
 		try {
 			if(command.startsWith("/placefrontblock"))
 			{
-				// /place(front/back)block x,y playerid blockid
+				///placefrontblock <block-x> <block-y> <player-id> <blockID> <player's selected slot> 
 				String[] split = command.split(" ");
 				//Check if the player is stunned. If so, block this action.
 				if(((EntityPlayer)(world.getEntityByID(Integer.parseInt(split[3])))).isStunned())
 				{
 					return "";
 				}
-				boolean success = world.placeBlock((EntityPlayer)(world.getEntityByID(Integer.parseInt(split[3]))), 
+				EntityPlayer player = (EntityPlayer)(world.getEntityByID(Integer.parseInt(split[3])));
+				boolean success = world.placeBlock(player, 
 						Integer.parseInt(split[1]), 
 						Integer.parseInt(split[2]), 
 						Block.blocksList[Integer.parseInt(split[4])]);
-				
 				if(success)
 				{
 					BlockUpdate blockUpdate = new BlockUpdate();
@@ -172,23 +310,25 @@ public class Commands
 					blockUpdate.y = Short.parseShort(split[2]);
 					blockUpdate.block = new SuperCompressedBlock(world.getBlockGenerate(blockUpdate.x, blockUpdate.y));
 					update.addBlockUpdate(blockUpdate);
+					player.inventory.removeItemsFromInventoryStack(player, 1, Integer.parseInt(split[5]));
 				}
 				
 				return command + " " + success;
 			}
 			else if(command.startsWith("/placebackblock"))
 			{
+				///placebackblock <block-x> <block-y> <player-id> <blockID> <player's selected slot> 
 				String[] split = command.split(" ");
 				//Check if the player is stunned. If so, block this action.
 				if(((EntityPlayer)(world.getEntityByID(Integer.parseInt(split[3])))).isStunned())
 				{
 					return "";
 				}
-				boolean success = world.placeBackWall((EntityPlayer)(world.getEntityByID(Integer.parseInt(split[3]))), 
+				EntityPlayer player = (EntityPlayer)(world.getEntityByID(Integer.parseInt(split[3])));
+				boolean success = world.placeBackWall(player, 
 						Integer.parseInt(split[1]), 
 						Integer.parseInt(split[2]), 
 						Block.blocksList[Integer.parseInt(split[4])]);
-			
 				if(success)
 				{
 					BlockUpdate blockUpdate = new BlockUpdate();
@@ -196,6 +336,7 @@ public class Commands
 					blockUpdate.y = Short.parseShort(split[2]);
 					blockUpdate.block = new SuperCompressedBlock(world.getBackWallGenerate(blockUpdate.x, blockUpdate.y));
 					update.addBlockUpdate(blockUpdate);
+					player.inventory.removeItemsFromInventoryStack(player, 1, Integer.parseInt(split[5]));
 				}
 				return command + " " + success;
 			}
@@ -297,6 +438,7 @@ public class Commands
 				}
 				else if(split[2].equals("startswing"))
 				{
+					///player <playerID> startswing <selected_slot>
 					//Check if the player is stunned. If so, block this action.
 					if(player.isStunned())
 					{
@@ -310,6 +452,8 @@ public class Commands
 						objUpdate.object = new DisplayableItemStack(player.inventory.getMainInventoryStack(player.selectedSlot));
 						update.addObjectUpdate(objUpdate);
 						player.startSwingingTool();
+						ItemTool tool = (ItemTool) Item.itemsList[player.inventory.getMainInventoryStack(Integer.parseInt(split[3])).getItemID()];
+						update.addValue("/soundeffect " + tool.hitSound);
 					}
 				}
 				else if(split[2].equals("cancelswing"))

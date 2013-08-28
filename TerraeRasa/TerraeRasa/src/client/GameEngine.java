@@ -415,6 +415,7 @@ public class GameEngine
 						world = null;
 						TerraeRasa.isMainMenuOpen = true;
 						resetMainMenu();
+						TerraeRasa.terminateClientConnection();
 					}
 				}
 			}
@@ -501,39 +502,11 @@ public class GameEngine
 	
 	private void processCommand(EntityPlayer player, String command)
 	{
-		if(command.startsWith("/placefrontblock"))
-		{
-			String[] split = command.split(" ");
-			if(Boolean.parseBoolean(split[6]) && Integer.parseInt(split[3]) == activePlayerID)
-			{
-				player.inventory.removeItemsFromInventory(player, new DisplayableItemStack(Integer.parseInt(split[4]), 1)); //take the item from the player's inventory
-			}
-		}
-		else if(command.startsWith("/placebackblock"))
-		{
-			String[] split = command.split(" ");
-			if(Boolean.parseBoolean(split[6]) && Integer.parseInt(split[3]) == activePlayerID)
-			{
-				player.inventory.removeItemsFromInventory(player, new DisplayableItemStack(Integer.parseInt(split[4]), 1)); //take the item from the player's inventory
-			}
-		}
-		else if(command.startsWith("/worldtext"))
+		if(command.startsWith("/worldtext"))
 		{
 			String[] split = command.split(" ");
 			world.addTemporaryText(split[3], Integer.parseInt(split[1]), Integer.parseInt(split[2]), 20, EnumColor.get(split[4]));
 		}
-//		else if(command.startsWith("/pickup"))
-//		{
-//			String[] split = command.split(" ");
-//			if(Integer.parseInt(split[1]) != activePlayerID)
-//			{
-//				return;
-//			}
-			//TODO fix the /pickup command
-//			DisplayableItemStack stack = ((EntityItemStack)(world.getEntityByID(Integer.parseInt(split[2])))).getStack();
-//			player.inventory.pickUpItemStack(world, player, new DisplayableItemStack(stack).setStackSize(Integer.parseInt(split[3])));
-//			stack.removeFromStack(Integer.parseInt(split[3]));
-//		}
 		else if(command.startsWith("/player"))
 		{
 			String[] split = command.split(" ");
@@ -606,6 +579,19 @@ public class GameEngine
 							command.indexOf(" ") + 1)) + 1);
 			ColoredText text = new ColoredText(color, remaining);
 			chatbox.log(text);
+		}
+		else if(command.startsWith("/soundeffect"))
+		{
+			///soundeffect <effect_name>
+			String effectName = command.substring(command.indexOf(" ") + 1);
+			System.out.println("Playing effect : " + effectName);
+			SoundEngine.playSoundEffect(effectName);
+		}
+		else if(command.startsWith("/worldtimeset"))
+		{
+//			/worldtimeset <time_in_ticks>
+			String[] split = command.split(" ");
+			world.setWorldTime(Integer.parseInt(split[1]));
 		}
 	}
 	

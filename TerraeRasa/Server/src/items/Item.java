@@ -301,93 +301,93 @@ public class Item extends ActionbarItem
 	public static Item silverBoots = new ItemArmorBoots(221).setArmorType(EnumArmor.SILVER).setIconPosition(19, 3).setName("Silver Boots");
 	public static Item silverGloves = new ItemArmorGloves(222).setArmorType(EnumArmor.SILVER).setIconPosition(19, 4).setName("Silver Gloves");
 	public static Item silverBelt = new ItemArmorBelt(223).setArmorType(EnumArmor.SILVER).setIconPosition(19, 5).setName("Silver Belt");
-	public static Item goldHelmet = new ItemArmorHelmet(224).setArmorType(EnumArmor.GOLD).setIconPosition(20, 0).setName("Gold Helmet").setItemQuality(EnumItemQuality.RARE).setTotalSockets(1);
-	public static Item goldBody = new ItemArmorBody(225).setArmorType(EnumArmor.GOLD).setIconPosition(20, 1).setName("Gold Body").setItemQuality(EnumItemQuality.RARE).setTotalSockets(1);
-	public static Item goldPants = new ItemArmorPants(226).setArmorType(EnumArmor.GOLD).setIconPosition(0, 0).setName("Gold Legguards").setItemQuality(EnumItemQuality.RARE).setTotalSockets(1);	
-	public static Item goldBoots = new ItemArmorBoots(227).setArmorType(EnumArmor.GOLD).setIconPosition(20, 3).setName("Gold Boots").setItemQuality(EnumItemQuality.RARE);
-	public static Item goldGloves = new ItemArmorGloves(228).setArmorType(EnumArmor.GOLD).setIconPosition(20, 4).setName("Gold Gloves").setItemQuality(EnumItemQuality.RARE);
-	public static Item goldBelt = new ItemArmorBelt(229).setArmorType(EnumArmor.GOLD).setIconPosition(20, 5).setName("Gold Belt").setItemQuality(EnumItemQuality.RARE);
+	public static Item goldHelmet = new ItemArmorHelmet(224).setStamina(1).setArmorType(EnumArmor.GOLD).setIconPosition(20, 0).setName("Gold Helmet").setItemQuality(EnumItemQuality.RARE).setTotalSockets(1);
+	public static Item goldBody = new ItemArmorBody(225).setStamina(1).setArmorType(EnumArmor.GOLD).setIconPosition(20, 1).setName("Gold Body").setItemQuality(EnumItemQuality.RARE).setTotalSockets(1);
+	public static Item goldPants = new ItemArmorPants(226).setStamina(1).setArmorType(EnumArmor.GOLD).setIconPosition(0, 0).setName("Gold Legguards").setItemQuality(EnumItemQuality.RARE).setTotalSockets(1);	
+	public static Item goldBoots = new ItemArmorBoots(227).setStamina(0).setArmorType(EnumArmor.GOLD).setIconPosition(20, 3).setName("Gold Boots").setItemQuality(EnumItemQuality.RARE);
+	public static Item goldGloves = new ItemArmorGloves(228).setStamina(0).setArmorType(EnumArmor.GOLD).setIconPosition(20, 4).setName("Gold Gloves").setItemQuality(EnumItemQuality.RARE);
+	public static Item goldBelt = new ItemArmorBelt(229).setStamina(0).setArmorType(EnumArmor.GOLD).setIconPosition(20, 5).setName("Gold Belt").setItemQuality(EnumItemQuality.RARE);
 
-	public static Item lunariumHelmet = new ItemArmorHelmet(230).setArmorType(EnumArmor.LUNARIUM).setIntellect(3).passiveBonuses(new PassiveBonus[]{
+	public static Item lunariumHelmet = new ItemArmorHelmet(230).setStamina(2).setArmorType(EnumArmor.LUNARIUM).setIntellect(3).passiveBonuses(new PassiveBonus[]{
 			new PassiveBonusCriticalStrike(0.03)
 	}).setIconPosition(22, 0).setName("Lunarium Crown").setTotalSockets(1);
-	public static Item lunariumBody = new ItemArmorBody(231).setArmorType(EnumArmor.LUNARIUM).setIntellect(2).setIconPosition(22, 1).setName("Lunarum Robe").setTotalSockets(1);
-	public static Item lunariumPants = new ItemArmorPants(232).setArmorType(EnumArmor.LUNARIUM).setIntellect(2).setIconPosition(22, 2).setName("Lunarium Pants").setTotalSockets(1);	
-	public static Item lunariumBoots = new ItemArmorBoots(233).setArmorType(EnumArmor.LUNARIUM).setIntellect(1).passiveBonuses(new PassiveBonus[]{
+	public static Item lunariumBody = new ItemArmorBody(231).setStamina(3).setArmorType(EnumArmor.LUNARIUM).setIntellect(2).setIconPosition(22, 1).setName("Lunarum Robe").setTotalSockets(1);
+	public static Item lunariumPants = new ItemArmorPants(232).setStamina(2).setArmorType(EnumArmor.LUNARIUM).setIntellect(2).setIconPosition(22, 2).setName("Lunarium Pants").setTotalSockets(1);	
+	public static Item lunariumBoots = new ItemArmorBoots(233).setStamina(1).setArmorType(EnumArmor.LUNARIUM).setIntellect(1).passiveBonuses(new PassiveBonus[]{
 			new PassiveBonusSpeed(0.03)
 	}).setIconPosition(22, 3).setName("Lunarium Boots");
-	public static Item lunariumGloves = new ItemArmorGloves(234).setArmorType(EnumArmor.LUNARIUM).setIntellect(1).setIconPosition(22, 4).setName("Lunarium Gloves");
-	public static Item lunariumBelt = new ItemArmorBelt(235).setArmorType(EnumArmor.LUNARIUM).setIntellect(1).setIconPosition(22, 5).setName("Lunarium Belt");
+	public static Item lunariumGloves = new ItemArmorGloves(234).setStamina(1).setArmorType(EnumArmor.LUNARIUM).setIntellect(1).setIconPosition(22, 4).setName("Lunarium Gloves");
+	public static Item lunariumBelt = new ItemArmorBelt(235).setStamina(1).setArmorType(EnumArmor.LUNARIUM).setIntellect(1).setIconPosition(22, 5).setName("Lunarium Belt");
 	
-	public static Item archer_1_Helmet = new ItemArmorHelmet(236).setArmorType(EnumArmor.RANGE_SET_1).setDexterity(3).passiveBonuses(new PassiveBonus[]{
+	public static Item archer_1_Helmet = new ItemArmorHelmet(236).setStamina(2).setArmorType(EnumArmor.RANGE_SET_1).setDexterity(3).passiveBonuses(new PassiveBonus[]{
 			new PassiveBonusCriticalStrike(0.03)
 	}).setIconPosition(22, 0).setName("Archer_Helmet_1").setTotalSockets(1);
-	public static Item archer_1_Body = new ItemArmorBody(237).setArmorType(EnumArmor.RANGE_SET_1).setDexterity(2).setIconPosition(22, 1).setName("Archer_Body_1").setTotalSockets(1);
-	public static Item archer_1_Pants = new ItemArmorPants(238).setArmorType(EnumArmor.RANGE_SET_1).setDexterity(2).setIconPosition(22, 2).setName("Archer_Pants_1").setTotalSockets(1);	
-	public static Item archer_1_Boots = new ItemArmorBoots(239).setArmorType(EnumArmor.RANGE_SET_1).setDexterity(1).passiveBonuses(new PassiveBonus[]{
+	public static Item archer_1_Body = new ItemArmorBody(237).setStamina(3).setArmorType(EnumArmor.RANGE_SET_1).setDexterity(2).setIconPosition(22, 1).setName("Archer_Body_1").setTotalSockets(1);
+	public static Item archer_1_Pants = new ItemArmorPants(238).setStamina(2).setArmorType(EnumArmor.RANGE_SET_1).setDexterity(2).setIconPosition(22, 2).setName("Archer_Pants_1").setTotalSockets(1);	
+	public static Item archer_1_Boots = new ItemArmorBoots(239).setStamina(1).setArmorType(EnumArmor.RANGE_SET_1).setDexterity(1).passiveBonuses(new PassiveBonus[]{
 			new PassiveBonusSpeed(0.03)
 	}).setIconPosition(22, 3).setName("Archer_Boots_1");
-	public static Item archer_1_Gloves = new ItemArmorGloves(240).setArmorType(EnumArmor.RANGE_SET_1).setDexterity(1).setIconPosition(22, 4).setName("Archer_Gloves_1");
-	public static Item archer_1_Belt = new ItemArmorBelt(241).setArmorType(EnumArmor.RANGE_SET_1).setDexterity(1).setIconPosition(22, 5).setName("Archer_Belt_1");
+	public static Item archer_1_Gloves = new ItemArmorGloves(240).setStamina(1).setArmorType(EnumArmor.RANGE_SET_1).setDexterity(1).setIconPosition(22, 4).setName("Archer_Gloves_1");
+	public static Item archer_1_Belt = new ItemArmorBelt(241).setStamina(1).setArmorType(EnumArmor.RANGE_SET_1).setDexterity(1).setIconPosition(22, 5).setName("Archer_Belt_1");
 	
-	public static Item warrior_1_Helmet = new ItemArmorHelmet(242).setArmorType(EnumArmor.STRENGTH_SET_1).setStrength(3).passiveBonuses(new PassiveBonus[]{
+	public static Item warrior_1_Helmet = new ItemArmorHelmet(242).setStamina(2).setArmorType(EnumArmor.STRENGTH_SET_1).setStrength(3).passiveBonuses(new PassiveBonus[]{
 			new PassiveBonusCriticalStrike(0.03)
 	}).setIconPosition(22, 0).setName("Warrior_Helm5et_1").setTotalSockets(1);
-	public static Item warrior_1_Body = new ItemArmorBody(243).setArmorType(EnumArmor.STRENGTH_SET_1).setStrength(2).setIconPosition(22, 1).setName("Warrior_Helme4t_1").setTotalSockets(1);
-	public static Item warrior_1_Pants = new ItemArmorPants(244).setArmorType(EnumArmor.STRENGTH_SET_1).setStrength(2).setIconPosition(22, 2).setName("Warrior_He3lmet_1").setTotalSockets(1);	
-	public static Item warrior_1_Boots = new ItemArmorBoots(245).setArmorType(EnumArmor.STRENGTH_SET_1).setStrength(1).passiveBonuses(new PassiveBonus[]{
+	public static Item warrior_1_Body = new ItemArmorBody(243).setStamina(3).setArmorType(EnumArmor.STRENGTH_SET_1).setStrength(2).setIconPosition(22, 1).setName("Warrior_Helme4t_1").setTotalSockets(1);
+	public static Item warrior_1_Pants = new ItemArmorPants(244).setStamina(2).setArmorType(EnumArmor.STRENGTH_SET_1).setStrength(2).setIconPosition(22, 2).setName("Warrior_He3lmet_1").setTotalSockets(1);	
+	public static Item warrior_1_Boots = new ItemArmorBoots(245).setStamina(1).setArmorType(EnumArmor.STRENGTH_SET_1).setStrength(1).passiveBonuses(new PassiveBonus[]{
 			new PassiveBonusSpeed(0.03)
 	}).setIconPosition(22, 3).setName("Warrior_Helmet_1");
-	public static Item warrior_1_Gloves = new ItemArmorGloves(246).setArmorType(EnumArmor.STRENGTH_SET_1).setStrength(1).setIconPosition(22, 4).setName("Warrior_H2elmet_1");
-	public static Item warrior_1_Belt = new ItemArmorBelt(247).setArmorType(EnumArmor.STRENGTH_SET_1).setStrength(1).setIconPosition(22, 5).setName("Warrior_Helm1et_1");
+	public static Item warrior_1_Gloves = new ItemArmorGloves(246).setStamina(1).setArmorType(EnumArmor.STRENGTH_SET_1).setStrength(1).setIconPosition(22, 4).setName("Warrior_H2elmet_1");
+	public static Item warrior_1_Belt = new ItemArmorBelt(247).setStamina(1).setArmorType(EnumArmor.STRENGTH_SET_1).setStrength(1).setIconPosition(22, 5).setName("Warrior_Helm1et_1");
 	
-	public static Item celestialHelmet = new ItemArmorHelmet(248).setArmorType(EnumArmor.CELESTIAL_SET).setIntellect(5).passiveBonuses(new PassiveBonus[]{
+	public static Item celestialHelmet = new ItemArmorHelmet(248).setStamina(4).setArmorType(EnumArmor.CELESTIAL_SET).setIntellect(5).passiveBonuses(new PassiveBonus[]{
 			new PassiveBonusCriticalStrike(0.05)
 	}).setIconPosition(22, 0).setName("Celestial Crown").setTotalSockets(2);
-	public static Item celestialBody = new ItemArmorBody(249).setArmorType(EnumArmor.CELESTIAL_SET).setIntellect(3).setIconPosition(22, 1).setName("Celestial Robetop").setTotalSockets(1);
-	public static Item celestialPants = new ItemArmorPants(250).setArmorType(EnumArmor.CELESTIAL_SET).setIntellect(3).setIconPosition(22, 2).setName("Celestial Robebottom").setTotalSockets(1);	
-	public static Item celestialBoots = new ItemArmorBoots(251).setArmorType(EnumArmor.CELESTIAL_SET).setIntellect(1).passiveBonuses(new PassiveBonus[]{
+	public static Item celestialBody = new ItemArmorBody(249).setStamina(5).setArmorType(EnumArmor.CELESTIAL_SET).setIntellect(3).setIconPosition(22, 1).setName("Celestial Robetop").setTotalSockets(1);
+	public static Item celestialPants = new ItemArmorPants(250).setStamina(4).setArmorType(EnumArmor.CELESTIAL_SET).setIntellect(3).setIconPosition(22, 2).setName("Celestial Robebottom").setTotalSockets(1);	
+	public static Item celestialBoots = new ItemArmorBoots(251).setStamina(2).setArmorType(EnumArmor.CELESTIAL_SET).setIntellect(1).passiveBonuses(new PassiveBonus[]{
 			new PassiveBonusSpeed(0.05)
 	}).setIconPosition(22, 3).setName("Celestial Boots");
-	public static Item celestialGloves = new ItemArmorGloves(252).setArmorType(EnumArmor.CELESTIAL_SET).setIntellect(2).setIconPosition(22, 4).setName("Celestial Gloves");
-	public static Item celestialBelt = new ItemArmorBelt(253).setArmorType(EnumArmor.CELESTIAL_SET).setIntellect(1).setIconPosition(22, 5).setName("Celestial Belt");
+	public static Item celestialGloves = new ItemArmorGloves(252).setStamina(2).setArmorType(EnumArmor.CELESTIAL_SET).setIntellect(2).setIconPosition(22, 4).setName("Celestial Gloves");
+	public static Item celestialBelt = new ItemArmorBelt(253).setStamina(3).setArmorType(EnumArmor.CELESTIAL_SET).setIntellect(1).setIconPosition(22, 5).setName("Celestial Belt");
 	
-	public static Item artemisHelmet = new ItemArmorHelmet(254).setArmorType(EnumArmor.ARTEMIS_SET).setDexterity(5).passiveBonuses(new PassiveBonus[]{
+	public static Item artemisHelmet = new ItemArmorHelmet(254).setStamina(4).setArmorType(EnumArmor.ARTEMIS_SET).setDexterity(5).passiveBonuses(new PassiveBonus[]{
 			new PassiveBonusCriticalStrike(0.05)
 	}).setIconPosition(22, 0).setName("Artemis Helmet").setTotalSockets(2);
-	public static Item artemisBody = new ItemArmorBody(255).setArmorType(EnumArmor.ARTEMIS_SET).setDexterity(3).setIconPosition(22, 1).setName("Artemis Body").setTotalSockets(1);
-	public static Item artemisPants = new ItemArmorPants(256).setArmorType(EnumArmor.ARTEMIS_SET).setDexterity(3).setIconPosition(22, 2).setName("Artemis Pants").setTotalSockets(1);	
-	public static Item artemisBoots = new ItemArmorBoots(257).setArmorType(EnumArmor.ARTEMIS_SET).setDexterity(1).passiveBonuses(new PassiveBonus[]{
+	public static Item artemisBody = new ItemArmorBody(255).setStamina(5).setArmorType(EnumArmor.ARTEMIS_SET).setDexterity(3).setIconPosition(22, 1).setName("Artemis Body").setTotalSockets(1);
+	public static Item artemisPants = new ItemArmorPants(256).setStamina(4).setArmorType(EnumArmor.ARTEMIS_SET).setDexterity(3).setIconPosition(22, 2).setName("Artemis Pants").setTotalSockets(1);	
+	public static Item artemisBoots = new ItemArmorBoots(257).setStamina(2).setArmorType(EnumArmor.ARTEMIS_SET).setDexterity(1).passiveBonuses(new PassiveBonus[]{
 			new PassiveBonusSpeed(0.05)
 	}).setIconPosition(22, 3).setName("Artemis Boots");
-	public static Item artemisGloves = new ItemArmorGloves(258).setArmorType(EnumArmor.ARTEMIS_SET).setDexterity(2).setIconPosition(22, 4).setName("Artemis Gloves");
-	public static Item artemisBelt = new ItemArmorBelt(259).setArmorType(EnumArmor.ARTEMIS_SET).setDexterity(1).setIconPosition(22, 5).setName("Artemis Belt");
+	public static Item artemisGloves = new ItemArmorGloves(258).setStamina(2).setArmorType(EnumArmor.ARTEMIS_SET).setDexterity(2).setIconPosition(22, 4).setName("Artemis Gloves");
+	public static Item artemisBelt = new ItemArmorBelt(259).setStamina(3).setArmorType(EnumArmor.ARTEMIS_SET).setDexterity(1).setIconPosition(22, 5).setName("Artemis Belt");
 	
-	public static Item berserkerHelmet = new ItemArmorHelmet(260).setArmorType(EnumArmor.BERSERKER_SET).setStrength(5).passiveBonuses(new PassiveBonus[]{
+	public static Item berserkerHelmet = new ItemArmorHelmet(260).setStamina(4).setArmorType(EnumArmor.BERSERKER_SET).setStrength(5).passiveBonuses(new PassiveBonus[]{
 			new PassiveBonusCriticalStrike(0.05)
 	}).setIconPosition(22, 0).setName("Berserker Helmet").setTotalSockets(2);
-	public static Item berserkerBody = new ItemArmorBody(261).setArmorType(EnumArmor.BERSERKER_SET).setStrength(3).setIconPosition(22, 1).setName("Berserker Body").setTotalSockets(1);
-	public static Item berserkerPants = new ItemArmorPants(262).setArmorType(EnumArmor.BERSERKER_SET).setStrength(3).setIconPosition(22, 2).setName("Berserker Platelegs").setTotalSockets(1);	
-	public static Item berserkerBoots = new ItemArmorBoots(263).setArmorType(EnumArmor.BERSERKER_SET).setStrength(1).passiveBonuses(new PassiveBonus[]{
+	public static Item berserkerBody = new ItemArmorBody(261).setStamina(5).setArmorType(EnumArmor.BERSERKER_SET).setStrength(3).setIconPosition(22, 1).setName("Berserker Body").setTotalSockets(1);
+	public static Item berserkerPants = new ItemArmorPants(262).setStamina(4).setArmorType(EnumArmor.BERSERKER_SET).setStrength(3).setIconPosition(22, 2).setName("Berserker Platelegs").setTotalSockets(1);	
+	public static Item berserkerBoots = new ItemArmorBoots(263).setStamina(2).setArmorType(EnumArmor.BERSERKER_SET).setStrength(1).passiveBonuses(new PassiveBonus[]{
 			new PassiveBonusSpeed(0.05)
 	}).setIconPosition(22, 3).setName("Berserker Boots");
-	public static Item berserkerGloves = new ItemArmorGloves(264).setArmorType(EnumArmor.BERSERKER_SET).setStrength(2).setIconPosition(22, 4).setName("Berserker Gauntlets");
-	public static Item berserkerBelt = new ItemArmorBelt(265).setArmorType(EnumArmor.BERSERKER_SET).setStrength(1).setIconPosition(22, 5).setName("Berserker Platebelt");
+	public static Item berserkerGloves = new ItemArmorGloves(264).setStamina(2).setArmorType(EnumArmor.BERSERKER_SET).setStrength(2).setIconPosition(22, 4).setName("Berserker Gauntlets");
+	public static Item berserkerBelt = new ItemArmorBelt(265).setStamina(3).setArmorType(EnumArmor.BERSERKER_SET).setStrength(1).setIconPosition(22, 5).setName("Berserker Platebelt");
 		
-	public static Item guardiansHelmet = new ItemArmorHelmet(266).setArmorType(EnumArmor.GUARDIAN_SET).passiveBonuses(new PassiveBonus[]{
+	public static Item guardiansHelmet = new ItemArmorHelmet(266).setStamina(5).setArmorType(EnumArmor.GUARDIAN_SET).passiveBonuses(new PassiveBonus[]{
 			new PassiveBonusCriticalStrike(0.05)
 	}).setIconPosition(22, 0).setName("Guardian Platehelm").setTotalSockets(2);
-	public static Item guardiansBody = new ItemArmorBody(267).setArmorType(EnumArmor.GUARDIAN_SET).setIconPosition(22, 1).setName("Guardian Platemail").setTotalSockets(1);
-	public static Item guardiansPants = new ItemArmorPants(268).setArmorType(EnumArmor.GUARDIAN_SET).setIconPosition(22, 2).setName("Guardian Platelegs").setTotalSockets(1);	
-	public static Item guardiansBoots = new ItemArmorBoots(269).setArmorType(EnumArmor.GUARDIAN_SET).passiveBonuses(new PassiveBonus[]{
+	public static Item guardiansBody = new ItemArmorBody(267).setStamina(6).setArmorType(EnumArmor.GUARDIAN_SET).setIconPosition(22, 1).setName("Guardian Platemail").setTotalSockets(1);
+	public static Item guardiansPants = new ItemArmorPants(268).setStamina(5).setArmorType(EnumArmor.GUARDIAN_SET).setIconPosition(22, 2).setName("Guardian Platelegs").setTotalSockets(1);	
+	public static Item guardiansBoots = new ItemArmorBoots(269).setStamina(3).setArmorType(EnumArmor.GUARDIAN_SET).passiveBonuses(new PassiveBonus[]{
 			new PassiveBonusSpeed(0.05)
 	}).setIconPosition(22, 3).setName("Guardian Plateboots");
-	public static Item guardiansGloves = new ItemArmorGloves(270).setArmorType(EnumArmor.GUARDIAN_SET).setIconPosition(22, 4).setName("Guardian Gauntlets");
-	public static Item guardiansBelt = new ItemArmorBelt(271).setArmorType(EnumArmor.GUARDIAN_SET).setIconPosition(22, 5).setName("Guardian Platebelt");
+	public static Item guardiansGloves = new ItemArmorGloves(270).setStamina(3).setArmorType(EnumArmor.GUARDIAN_SET).setIconPosition(22, 4).setName("Guardian Gauntlets");
+	public static Item guardiansBelt = new ItemArmorBelt(271).setStamina(4).setArmorType(EnumArmor.GUARDIAN_SET).setIconPosition(22, 5).setName("Guardian Platebelt");
 	
-	public static Item spiritualistHelmet = new ItemArmorHelmet(272).setArmorType(EnumArmor.SPIRITUALIST_SET).setIconPosition(22, 0).setName("Spiritualist Crown").setTotalSockets(2);
-	public static Item spiritualistBody = new ItemArmorBody(273).setArmorType(EnumArmor.SPIRITUALIST_SET).setIconPosition(22, 1).setName("Spiritualist Robetop").setTotalSockets(1);
-	public static Item spiritualistPants = new ItemArmorPants(274).setArmorType(EnumArmor.SPIRITUALIST_SET).setIconPosition(22, 2).setName("Spiritualist Robebottom").setTotalSockets(1);	
+	public static Item spiritualistHelmet = new ItemArmorHelmet(272).setStamina(6).setArmorType(EnumArmor.SPIRITUALIST_SET).setIconPosition(22, 0).setName("Spiritualist Crown").setTotalSockets(2);
+	public static Item spiritualistBody = new ItemArmorBody(273).setStamina(8).setArmorType(EnumArmor.SPIRITUALIST_SET).setIconPosition(22, 1).setName("Spiritualist Robetop").setTotalSockets(1);
+	public static Item spiritualistPants = new ItemArmorPants(274).setStamina(6).setArmorType(EnumArmor.SPIRITUALIST_SET).setIconPosition(22, 2).setName("Spiritualist Robebottom").setTotalSockets(1);	
 	//275
 	//276
 	//277
