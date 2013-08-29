@@ -178,7 +178,7 @@ public class EntityPlayer extends EntityLiving
 		this.cooldowns = player.cooldowns;
 		this.inventory = new InventoryPlayer(player.mainInventory, player.armorInventory, player.quiver);
 		this.heldMouseItem = player.heldMouseItem;
-		
+		this.selectedSlot = player.selectedSlot;
 	}
 	
 	public void onClientTick(ClientUpdate update, World world)

@@ -1,7 +1,9 @@
 package savable;
 
 import java.io.Serializable;
+import java.util.List;
 
+import utils.Position;
 import blocks.Block;
 
 /**
@@ -36,6 +38,5 @@ public class SavableChunk
 	public int x;
 	public boolean wasChanged;
 	public int height;
-	public boolean lightUpdated;
-	public boolean flaggedForLightingUpdate;
+	public List<Position> lightPositions;
 }

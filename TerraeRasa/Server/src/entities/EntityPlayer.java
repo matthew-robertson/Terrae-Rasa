@@ -1777,6 +1777,7 @@ public class EntityPlayer extends EntityLiving
 		player.maxSpecialEnergy = (int) this.maxSpecialEnergy;
 		player.maxHealth = this.maxHealth;
 		player.maxMana = this.maxMana;
+		player.selectedSlot = this.selectedSlot;
 		player.addStatusEffects(this.statusEffects);
 		player.cooldowns = this.cooldowns;
 		player.setHeldItem(this.getHeldMouseItem());

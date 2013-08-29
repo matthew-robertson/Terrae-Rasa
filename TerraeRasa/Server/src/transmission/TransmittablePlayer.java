@@ -29,6 +29,7 @@ public class TransmittablePlayer
 	public int maxSpecialEnergy;		
 	public int maxHealth;
 	public int maxMana;	
+	public int selectedSlot;
 	public List<DisplayableStatusEffect> statusEffects;	
 	public Hashtable<String, Cooldown> cooldowns;
 	public DisplayableItemStack[] mainInventory;

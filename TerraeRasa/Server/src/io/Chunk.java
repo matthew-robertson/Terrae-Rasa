@@ -1,5 +1,9 @@
 package io;
 
+import java.util.Iterator;
+import java.util.Vector;
+
+import utils.Position;
 import world.Biome;
 import blocks.Block;
 import blocks.MinimalBlock;
@@ -27,7 +31,6 @@ import blocks.MinimalBlock;
  * @since       1.0
  */
 public class Chunk 
-		 
 {
 	private Biome biome;
 	public MinimalBlock[][] backWalls;
@@ -36,8 +39,7 @@ public class Chunk
 	private boolean wasChanged;
 	private static final int CHUNK_WIDTH = 100;
 	private final int height;
-	private boolean lightUpdated;
-	private boolean flaggedForLightingUpdate;
+	private Vector<Position> lightSources;
 	
 	/**
 	 * Constructs a new Chunk. Chunks are initialized with blocks[][] fully set to air, and backwalls[][]
@@ -62,8 +64,8 @@ public class Chunk
 			}
 		}
 		
-		setFlaggedForLightingUpdate(false);
 		this.x = x;
+		this.lightSources = new Vector<Position>();
 	}
 	
 	/**
@@ -154,9 +156,49 @@ public class Chunk
 	 */
 	public synchronized void setBlock(Block block, int x, int y)
 	{
+		if(Block.blocksList[blocks[x][y].id].lightStrength > 0)
+		{
+			removeLightSource(x, y);
+		}
+		if(block.lightStrength > 0)
+		{
+			addLightSource(x, y);
+		}
 		blocks[x][y] = new MinimalBlock(block.clone());
 	}
 		
+	/**
+	 * Registers a light source at the given position.
+	 * @param x the x position, in blocks, relative to the start of this chunk (IE a value 0 <= x < Chunk_width)
+	 * @param y the y position, in blocks
+	 */
+	private void addLightSource(int x, int y)
+	{
+		lightSources.add(new Position((this.x * CHUNK_WIDTH) + x, y));
+	}
+	
+	/**
+	 * Removes a light source at the given position. This will make the game mad if it fails to locate the given light source.
+	 * @param x the x position, in blocks, relative to the start of this chunk (IE a value 0 <= x < Chunk_width)
+	 * @param y the y position, in blocks
+	 */
+	private void removeLightSource(int x, int y)
+	{
+		int adjustedX = this.x * CHUNK_WIDTH + x;
+		//(adjustedX,y)
+		Iterator<Position> it = lightSources.iterator();
+		while(it.hasNext())
+		{
+			Position position = it.next();
+			if(position.equals(adjustedX, y))
+			{
+				it.remove();
+				return;
+			}
+		}		
+		throw new RuntimeException("Illegal light source removal at (" + (adjustedX) + "," + y + ")");
+	}
+	
 	/**
 	 * Sets the wasChanged variable of this chunk to the given boolean
 	 * @param flag the new value for this Chunk's wasChanged field
@@ -174,40 +216,15 @@ public class Chunk
 	{
 		return x;
 	}
-	
-	/**
-	 * Gets the Chunk's flaggedForLightUpdate field
-	 * @return this Chunk's flaggedForLightUpdate field
-	 */
-	public final boolean isFlaggedForLightingUpdate() 
+
+	public Vector<Position> getLightPositions()
 	{
-		return flaggedForLightingUpdate;
+		return lightSources;
 	}
 
-	/**
-	 * Sets this Chunk's flaggedForLightingUpdate field to the given boolean
-	 * @param flaggedForLightingUpdate the new value for this Chunk's flaggedForLightingUpdate field
-	 */
-	public synchronized void setFlaggedForLightingUpdate(boolean flaggedForLightingUpdate) 
-	{
-		this.flaggedForLightingUpdate = flaggedForLightingUpdate;
+	public Position[] getLightSourcesAsArray() {
+		Position[] positions = new Position[lightSources.size()];
+		lightSources.copyInto(positions);
+		return positions;
 	}
-
-	/**
-	 * Gets whether or not the light was updated
-	 * @return a boolean describing whether or not the light has been updated
-	 */
-	public final boolean isLightUpdated() 
-	{
-		return lightUpdated;
-	}
-
-	/**
-	 * Sets this Chunk's lightUpdated field to the given boolean
-	 * @param lightUpdated the new value for this Chunk's lightUpdated field
-	 */
-	public synchronized void setLightUpdated(boolean lightUpdated) 
-	{
-		this.lightUpdated = lightUpdated;
-	}	
 }

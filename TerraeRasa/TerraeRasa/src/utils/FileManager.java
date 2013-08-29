@@ -16,12 +16,10 @@ import enums.EnumPlayerDifficulty;
 public class FileManager
 {		
 	private final String BASE_PATH;
-	private SaveManager manager;
 	
 	public FileManager()
 	{
 		BASE_PATH = TerraeRasa.getBasePath();
-		manager = new SaveManager();
 	}
 
 	/**

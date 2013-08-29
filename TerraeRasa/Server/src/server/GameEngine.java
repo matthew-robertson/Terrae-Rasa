@@ -81,7 +81,6 @@ public class GameEngine
 			final int MAX_FRAMESKIP = 5;
 			long next_game_tick = System.currentTimeMillis();
 			long start, end;
-			long fps = 0;
 			int loops;
 			start = System.currentTimeMillis();
 			
@@ -158,7 +157,6 @@ public class GameEngine
 		        {
 		        	start = System.currentTimeMillis();
 	        		end = System.currentTimeMillis();     
-	        		fps = 0;
 		    	}
 //	        	System.out.println(end - start);
 		    }     

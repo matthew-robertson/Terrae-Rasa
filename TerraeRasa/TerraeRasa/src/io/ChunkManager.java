@@ -239,7 +239,7 @@ public class ChunkManager
 				{
 					e.printStackTrace();
 				}
-				chunk.setFlaggedForLightingUpdate(true);
+				chunk.setRequiresAmbientLightingUpdate(true);
 				
 				String key = ""+chunk.getX();
 				chunks.put(key, chunk);

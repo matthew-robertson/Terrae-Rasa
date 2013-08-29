@@ -21,7 +21,9 @@ public class ChunkExpander
 		chunk.blocks = expand(compressedChunk.blocks);
 		chunk.setChanged(compressedChunk.wasChanged);
 		chunk.setLightUpdated(false);
-		chunk.setFlaggedForLightingUpdate(true);
+		chunk.setRequiresAmbientLightingUpdate(true);
+		chunk.addLightSources(compressedChunk.lightSources);
+		chunk.setRequiresDiffuseApplied(true);
 		return chunk;
 	}
 	

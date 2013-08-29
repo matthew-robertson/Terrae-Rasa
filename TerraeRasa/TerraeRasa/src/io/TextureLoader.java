@@ -458,7 +458,8 @@ public class TextureLoader
      * @param texture The texture to store the data into
      * @return A buffer containing the data
      */
-    private ByteBuffer convertImageData(BufferedImage bufferedImage,Texture texture) 
+    @SuppressWarnings("rawtypes")
+	private ByteBuffer convertImageData(BufferedImage bufferedImage,Texture texture) 
     {
         ByteBuffer imageBuffer;
         WritableRaster raster;

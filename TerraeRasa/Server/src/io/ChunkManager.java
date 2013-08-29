@@ -251,7 +251,6 @@ public class ChunkManager
 					System.err.println(">>> NULL CHUNK ");
 					continue;
 				}
-				chunk.setFlaggedForLightingUpdate(true);
 				
 				String key = ""+chunk.getX();
 				chunks.put(key, chunk);
@@ -376,8 +375,6 @@ public class ChunkManager
 		savable.x = chunk.getX();
 		savable.wasChanged = chunk.getChanged();
 		savable.height = chunk.getHeight();
-		savable.lightUpdated = true;
-		savable.flaggedForLightingUpdate = true;
 			
 		String basepath = "/" + universeName + "/" + directory;
 		

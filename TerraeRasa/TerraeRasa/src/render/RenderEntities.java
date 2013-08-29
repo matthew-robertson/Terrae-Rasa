@@ -7,7 +7,7 @@ import org.lwjgl.opengl.GL11;
 
 import utils.ActionbarItem;
 import utils.MathHelper;
-import utils.Point;
+import utils.Position;
 import utils.Vector2F;
 import utils.WorldText;
 import world.World;
@@ -78,7 +78,7 @@ public class RenderEntities extends Render
 		double[] y_bounds = heldItem.yBounds;
 		
 		Vector2F[] scaled_points = new Vector2F[x_bounds.length];
-		Point[] points = { new Point(0, 0), new Point((int)size, 0), new Point((int)size, (int)-size), new Point(0, (int)-size) };
+		Position[] points = { new Position(0, 0), new Position((int)size, 0), new Position((int)size, (int)-size), new Position(0, (int)-size) };
 			
 		
 		for(int i = 0; i < scaled_points.length; i++)

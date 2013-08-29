@@ -28,7 +28,6 @@ public class CallableLoadChunk implements Callable<Chunk>
 		chunk.backWalls = convertFromSavable(savable.backWalls);
 		chunk.blocks = convertFromSavable(savable.blocks);
 		chunk.setChanged(savable.wasChanged);
-		chunk.setFlaggedForLightingUpdate(true);
 		Log.log("Chunk Loaded From File Path : " + basepath + "/" + x + ".trc");
 		manager.unlockChunk(chunk.getX());
 		return chunk;

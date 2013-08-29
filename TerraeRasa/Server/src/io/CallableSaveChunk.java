@@ -31,9 +31,8 @@ public class CallableSaveChunk implements Callable<Boolean>
 		savable.x = chunk.getX();
 		savable.wasChanged = chunk.getChanged();
 		savable.height = chunk.getHeight();
-		savable.lightUpdated = true;
-		savable.flaggedForLightingUpdate = true;
-			
+		savable.lightPositions = chunk.getLightPositions();
+		
 		SaveManager smanager = new SaveManager();
 		smanager.saveCompressedFile(basepath + "/" + x + ".trc", savable);
 		Log.log("Chunk Saved to: " + basepath + "/" + x + ".trc");

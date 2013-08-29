@@ -19,6 +19,7 @@ import transmission.WorldData;
 import utils.DisplayableItemStack;
 import utils.LightUtils;
 import utils.MathHelper;
+import utils.Position;
 import utils.WorldText;
 import blocks.Block;
 import blocks.BlockGrass;
@@ -1402,10 +1403,19 @@ public class World
             Chunk chunk = chunks.get(str);
                         
             //If the chunk has been flagged for an ambient lighting update, update the lighting
-            if(chunk.isFlaggedForLightingUpdate())
+            if(chunk.requiresAmbientLightingUpdate())
             {
             	utils.applyAmbientChunk(this, chunk);
-            	chunk.setFlaggedForLightingUpdate(false);
+            	chunk.setRequiresAmbientLightingUpdate(false);
+            }
+            if(chunk.requiresDiffuseApplied())
+            {
+            	for(Position position : chunk.getLightSources())
+            	{
+            		Block block = Block.blocksList[getBlock(position.x, position.y).id];
+            		utils.applyLightSource(this, position.x, position.y, block.lightRadius, block.lightStrength);
+            	}
+            	chunk.setRequiresDiffuseApplied(false);
             }
                     
             //If the light in the chunk has changed, update the light[][] used for rendering

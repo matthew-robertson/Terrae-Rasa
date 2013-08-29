@@ -2,7 +2,6 @@ package render;
 
 
 import java.util.List;
-import java.util.Vector;
 
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;

@@ -39,6 +39,7 @@ public class TrueTypeFont {
 	private IntObject[] charArray = new IntObject[256];
 	
 	/** Map of user defined font characters (Character <-> IntObject) */
+	@SuppressWarnings("rawtypes")
 	private Map customChars = new HashMap();
 
 	/** Boolean flag on whether AntiAliasing is enabled or not */
@@ -144,6 +145,7 @@ public class TrueTypeFont {
 		return fontImage;
 
 	}
+	@SuppressWarnings("unchecked")
 	private void createSet( char[] customCharsArray ) {
 		// If there are custom chars then I expand the font texture twice		
 		if	(customCharsArray != null && customCharsArray.length > 0) {

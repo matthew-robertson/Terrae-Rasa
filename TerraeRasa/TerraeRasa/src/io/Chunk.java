@@ -1,6 +1,10 @@
 package io;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import utils.MathHelper;
+import utils.Position;
 import world.Biome;
 import blocks.Block;
 import blocks.MinimalBlock;
@@ -28,7 +32,6 @@ import blocks.MinimalBlock;
  * @since       1.0
  */
 public class Chunk 
-		 
 {
 	private Biome biome;
 	/** Light is the total of ambient and diffuse light. This value is inverted (0.0F becomes 1.0F, etc) to optimize rendering */
@@ -44,7 +47,9 @@ public class Chunk
 	private static final int CHUNK_WIDTH = 100;
 	private final int height;
 	private boolean lightUpdated;
-	private boolean flaggedForLightingUpdate;
+	private boolean requiresAmbientLightingUpdate;
+	private List<Position> lightSources;
+	private boolean requiresDiffuseApplied;
 	
 	/**
 	 * Constructs a new Chunk. Chunks are initialized with blocks[][] fully set to air, and backwalls[][]
@@ -69,11 +74,13 @@ public class Chunk
 			}
 		}
 		
-		setFlaggedForLightingUpdate(false);
+		setRequiresAmbientLightingUpdate(false);
 		light = new float[CHUNK_WIDTH][height];
 		diffuseLight = new float[CHUNK_WIDTH][height];
 		ambientLight = new float[CHUNK_WIDTH][height];
 		this.x = x;
+		this.lightSources = new ArrayList<Position>();
+		this.setRequiresDiffuseApplied(true);
 	}
 	
 	/**
@@ -185,6 +192,14 @@ public class Chunk
 	 */
 	public synchronized void setBlock(Block block, int x, int y)
 	{
+//		if(Block.blocksList[blocks[x][y].id].lightStrength > 0)
+//		{
+//			removeLightSource(x, y);
+//		}
+//		if(block.lightStrength > 0)
+//		{
+//			addLightSource(x, y);
+//		}
 		blocks[x][y] = new MinimalBlock(block.clone());
 	}
 	
@@ -285,18 +300,18 @@ public class Chunk
 	 * Gets the Chunk's flaggedForLightUpdate field
 	 * @return this Chunk's flaggedForLightUpdate field
 	 */
-	public final boolean isFlaggedForLightingUpdate() 
+	public final boolean requiresAmbientLightingUpdate() 
 	{
-		return flaggedForLightingUpdate;
+		return requiresAmbientLightingUpdate;
 	}
 
 	/**
 	 * Sets this Chunk's flaggedForLightingUpdate field to the given boolean
 	 * @param flaggedForLightingUpdate the new value for this Chunk's flaggedForLightingUpdate field
 	 */
-	public synchronized void setFlaggedForLightingUpdate(boolean flaggedForLightingUpdate) 
+	public synchronized void setRequiresAmbientLightingUpdate(boolean requiresAmbientLightingUpdate) 
 	{
-		this.flaggedForLightingUpdate = flaggedForLightingUpdate;
+		this.requiresAmbientLightingUpdate = requiresAmbientLightingUpdate;
 	}
 
 	/**
@@ -316,4 +331,56 @@ public class Chunk
 	{
 		this.lightUpdated = lightUpdated;
 	}	
+	
+//	/**
+//	 * Registers a light source at the given position.
+//	 * @param x the x position, in blocks, relative to the start of this chunk (IE a value 0 <= x < Chunk_width)
+//	 * @param y the y position, in blocks
+//	 */
+//	private void addLightSource(int x, int y)
+//	{
+//		getLightSources().add(new Position((this.x * CHUNK_WIDTH) + x, y));
+//	}
+//	
+//	/**
+//	 * Removes a light source at the given position. This will make the game mad if it fails to locate the given light source.
+//	 * @param x the x position, in blocks, relative to the start of this chunk (IE a value 0 <= x < Chunk_width)
+//	 * @param y the y position, in blocks
+//	 */
+//	private void removeLightSource(int x, int y)
+//	{
+//		int adjustedX = this.x * CHUNK_WIDTH + x;
+//		//(adjustedX,y)
+//		Iterator<Position> it = getLightSources().iterator();
+//		while(it.hasNext())
+//		{
+//			Position position = it.next();
+//			if(position.equals(adjustedX, y))
+//			{
+//				it.remove();
+//				return;
+//			}
+//		}		
+//		throw new RuntimeException("Illegal light source removal at (" + (adjustedX) + "," + y + ")");
+//	}
+	
+	public void addLightSources(Position[] lightSources)
+	{
+		for(Position position : lightSources)
+		{
+			this.lightSources.add(position);
+		}
+	}
+
+	public List<Position> getLightSources() {
+		return lightSources;
+	}
+
+	public boolean requiresDiffuseApplied() {
+		return requiresDiffuseApplied;
+	}
+
+	public void setRequiresDiffuseApplied(boolean requiresDiffuseApplied) {
+		this.requiresDiffuseApplied = requiresDiffuseApplied;
+	}
 }

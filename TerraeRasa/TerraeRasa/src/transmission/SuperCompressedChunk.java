@@ -2,6 +2,7 @@ package transmission;
 
 import java.io.Serializable;
 
+import utils.Position;
 import world.Biome;
 
 
@@ -16,4 +17,5 @@ public class SuperCompressedChunk
 	public boolean wasChanged;
 	public static final int CHUNK_WIDTH = 100;
 	public int height;		
+	public Position[] lightSources;
 }

@@ -36,8 +36,6 @@ import utils.DisplayableItemStack;
 import utils.ErrorUtils;
 import utils.FileManager;
 import world.World;
-import world.WorldHell;
-import world.WorldSky;
 import audio.SoundEngine;
 import blocks.Block;
 import blocks.MinimalBlock;
@@ -71,18 +69,18 @@ public class GameEngine
 {
 	/** The number of game ticks per second - this will always be 20 */
 	public static final int TICKS_PER_SECOND = 20;
-	/** In single player one render mode can be active. This decides what world is updated, loaded, and rendered. The names
-	 * correspond directly to that respective world. */
-	public final static int RENDER_MODE_WORLD_EARTH = 1,
-							   RENDER_MODE_WORLD_HELL = 2,
-							   RENDER_MODE_WORLD_SKY  = 3;
-	/** The currently selected RENDER_MODE_WORLD value, detailing what world to update, load, and render.*/
-	private int renderMode;
+//	/** In single player one render mode can be active. This decides what world is updated, loaded, and rendered. The names
+//	 * correspond directly to that respective world. */
+//	public final static int RENDER_MODE_WORLD_EARTH = 1,
+//							   RENDER_MODE_WORLD_HELL = 2,
+//							   RENDER_MODE_WORLD_SKY  = 3;
+//	/** The currently selected RENDER_MODE_WORLD value, detailing what world to update, load, and render.*/
+//	private int renderMode;
 	//private GuiMainMenu mainMenu;
 	private MainMenu mainMenu;
 	private World world;
-	private WorldHell worldHell;
-	private WorldSky worldSky;
+//	private WorldHell worldHell;
+//	private WorldSky worldSky;
 //	private EntityPlayer sentPlayer;
 	private EntityPlayer activePlayer;
 	private String activePlayerName;
@@ -107,7 +105,7 @@ public class GameEngine
 	 */
 	public GameEngine()
 	{
-		renderMode = RENDER_MODE_WORLD_EARTH;
+//		renderMode = RENDER_MODE_WORLD_EARTH;
 		activePlayerName = "";
 		try {
 			loadSettings();
@@ -856,26 +854,27 @@ public class GameEngine
 	public void changeWorld(int newMode)
 			throws IOException, ClassNotFoundException
 	{
-		String worldName = "";
-		if(renderMode == RENDER_MODE_WORLD_EARTH)
-		{
-			world.saveRemainingWorld();
-			world = null;
-		}
-		else if(renderMode == RENDER_MODE_WORLD_HELL)
-		{
-			worldHell.saveRemainingWorld();
-			worldHell = null;
-		}
-		else if(renderMode == RENDER_MODE_WORLD_SKY)
-		{
-			worldName = worldSky.getWorldName();
-			worldSky.saveRemainingWorld();
-			worldSky = null;
-		}
-		
-		this.renderMode = newMode;
-		FileManager manager = new FileManager();
+		System.out.println("GameEngine.changeWorld(int) - This does nothing");
+//		String worldName = "";
+//		if(renderMode == RENDER_MODE_WORLD_EARTH)
+//		{
+//			world.saveRemainingWorld();
+//			world = null;
+//		}
+//		else if(renderMode == RENDER_MODE_WORLD_HELL)
+//		{
+//			worldHell.saveRemainingWorld();
+//			worldHell = null;
+//		}
+//		else if(renderMode == RENDER_MODE_WORLD_SKY)
+//		{
+//			worldName = worldSky.getWorldName();
+//			worldSky.saveRemainingWorld();
+//			worldSky = null;
+//		}
+//		
+//		this.renderMode = newMode;
+//		FileManager manager = new FileManager();
 		
 //		if(renderMode == RENDER_MODE_WORLD_EARTH)
 //		{
@@ -926,5 +925,10 @@ public class GameEngine
 
 	public String getActivePlayerName() {
 		return activePlayerName;
+	}
+	
+	public String getUniverseName()
+	{
+		return universeName;
 	}
 }
