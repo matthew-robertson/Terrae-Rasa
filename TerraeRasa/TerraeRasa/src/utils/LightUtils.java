@@ -360,6 +360,10 @@ public class LightUtils
 	
 	public void applyAmbientChunk(World world, Chunk chunk)
 	{
+		if(chunk == null)
+		{
+			return;
+		}
 		chunk.clearAmbientLight();
 		double lightStrength = world.getLightLevel();
 		

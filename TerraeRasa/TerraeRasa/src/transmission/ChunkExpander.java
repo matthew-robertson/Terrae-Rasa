@@ -24,6 +24,7 @@ public class ChunkExpander
 		chunk.setRequiresAmbientLightingUpdate(true);
 		chunk.addLightSources(compressedChunk.lightSources);
 		chunk.setRequiresDiffuseApplied(true);
+		chunk.weather = compressedChunk.weather;
 		return chunk;
 	}
 	

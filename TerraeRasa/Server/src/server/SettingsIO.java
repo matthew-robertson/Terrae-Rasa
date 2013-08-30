@@ -68,13 +68,13 @@ public class SettingsIO
 	{
 		ServerSettings settings = new ServerSettings();
 		for(String str : SettingsIO.loadBanned()) {
-			settings.banlist.add(str);
+			settings.ban(str);
 		}
 		for(String str : SettingsIO.loadMods()) {
-			settings.mods.add(str);
+			settings.addMod(str);
 		}
 		for(String str : SettingsIO.loadAdmins()) {
-			settings.admins.add(str);
+			settings.addAdmin(str);
 		}
 
 		File file = new File(TerraeRasa.getBasePath() + "/server.properties");
@@ -201,9 +201,9 @@ public class SettingsIO
 	{
 		try {
 			writeFile(TerraeRasa.getBasePath() + "/server.properties", settings.toStringArray());
-			writeFile(TerraeRasa.getBasePath() + "/admins.txt", settings.admins);
-			writeFile(TerraeRasa.getBasePath() + "/mods.txt", settings.mods);
-			writeFile(TerraeRasa.getBasePath() + "/banlist.txt", settings.banlist);
+			writeFile(TerraeRasa.getBasePath() + "/admins.txt", settings.getAdminsAsArray());
+			writeFile(TerraeRasa.getBasePath() + "/mods.txt", settings.getModsAsArray());
+			writeFile(TerraeRasa.getBasePath() + "/banlist.txt", settings.getBansAsArray());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -219,13 +219,13 @@ public class SettingsIO
 		writer.close();		
 	}
 	
-	private static void writeFile(String filepath, Vector<String> contents) throws IOException
-	{
-		BufferedWriter writer = new BufferedWriter(new FileWriter(new File(filepath)));
-		for(int i = 0; i < contents.size(); i++)
-		{
-			writer.write(contents.get(i) + '\n');
-		}
-		writer.close();
-	}
+//	private static void writeFile(String filepath, Vector<String> contents) throws IOException
+//	{
+//		BufferedWriter writer = new BufferedWriter(new FileWriter(new File(filepath)));
+//		for(int i = 0; i < contents.size(); i++)
+//		{
+//			writer.write(contents.get(i) + '\n');
+//		}
+//		writer.close();
+//	}
 }

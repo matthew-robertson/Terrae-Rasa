@@ -24,6 +24,7 @@ public class ChunkCompressor
 		compressedChunk.wasChanged = chunk.getChanged();
 		compressedChunk.height = chunk.getHeight();
 		compressedChunk.lightSources = chunk.getLightSourcesAsArray();
+		compressedChunk.weather = chunk.weather;
 		return compressedChunk;
 	}
 

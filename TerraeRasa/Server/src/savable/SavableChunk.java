@@ -1,7 +1,7 @@
 package savable;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Vector;
 
 import utils.Position;
 import blocks.Block;
@@ -38,5 +38,5 @@ public class SavableChunk
 	public int x;
 	public boolean wasChanged;
 	public int height;
-	public List<Position> lightPositions;
+	public Vector<Position> lightPositions;
 }

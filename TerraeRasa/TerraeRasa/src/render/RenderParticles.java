@@ -1,5 +1,9 @@
 package render;
 
+import io.Chunk;
+
+import java.util.Enumeration;
+
 import world.WeatherSnow;
 import world.World;
 
@@ -10,24 +14,26 @@ public class RenderParticles extends Render
 	 */
 	public void render(World world)
 	{
-		if(world.weather == null) //if there's no weather, prevent an exception
-		{
-			return;
-		}
-		
-		if(world.weather instanceof WeatherSnow) //if there's snow, render it and call a weather update from world
-		{
-			renderSnow(world);
-			world.updateWeather();
-		}
+		Enumeration<String> keys = world.getChunks().keys();
+        while (keys.hasMoreElements()) 
+        {
+            Chunk chunk = (Chunk)world.getChunks().get((String)(keys.nextElement()));
+            if(chunk.weather != null)
+            {
+        		if(chunk.weather instanceof WeatherSnow) //if there's snow, render it and call a weather update from world
+        		{
+        			renderSnow((WeatherSnow)chunk.weather);
+        		}
+        	}
+        }
 	}
 	
 	/**
 	 * Draw all particles contained in world.weather. In this case the particles must be of type snow.
 	 */
-	public void renderSnow(World world)
+	public void renderSnow(WeatherSnow weather)
 	{
-		WeatherSnow weatherSnow = (WeatherSnow) world.weather;		
+		WeatherSnow weatherSnow = weather;		
 		snow_tex.bind();
 		final int size = 2; //Ortho size of the particles
 		

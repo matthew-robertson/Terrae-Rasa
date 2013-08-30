@@ -35,6 +35,7 @@ import utils.Cooldown;
 import utils.DisplayableItemStack;
 import utils.ErrorUtils;
 import utils.FileManager;
+import world.Weather;
 import world.World;
 import audio.SoundEngine;
 import blocks.Block;
@@ -415,6 +416,20 @@ public class GameEngine
 						resetMainMenu();
 						TerraeRasa.terminateClientConnection();
 					}
+				}
+				else if(update.command.startsWith("/causeweather"))
+				{
+//					/causeweather <chunk_x> <weatherID>
+					String[] split = update.command.split(" ");
+					Chunk chunk = world.getChunk(Integer.parseInt(split[1]));
+					Weather weather = Weather.generateWeatherByID(Integer.parseInt(split[2]), chunk, world.getAverageSkyHeight());
+					chunk.weather = weather;				
+				}
+				else if(update.command.startsWith("/stopweather"))
+				{
+//					/stopweather <chunk_x>
+					String[] split = update.command.split(" ");
+					world.getChunk(Integer.parseInt(split[1])).weather = null;
 				}
 			}
 			for(String command : serverupdate.values)

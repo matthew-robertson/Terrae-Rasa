@@ -1,11 +1,11 @@
 package io;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Vector;
 
 import utils.MathHelper;
 import utils.Position;
 import world.Biome;
+import world.Weather;
 import blocks.Block;
 import blocks.MinimalBlock;
 
@@ -48,8 +48,9 @@ public class Chunk
 	private final int height;
 	private boolean lightUpdated;
 	private boolean requiresAmbientLightingUpdate;
-	private List<Position> lightSources;
+	private Vector<Position> lightSources;
 	private boolean requiresDiffuseApplied;
+	public Weather weather;
 	
 	/**
 	 * Constructs a new Chunk. Chunks are initialized with blocks[][] fully set to air, and backwalls[][]
@@ -79,7 +80,7 @@ public class Chunk
 		diffuseLight = new float[CHUNK_WIDTH][height];
 		ambientLight = new float[CHUNK_WIDTH][height];
 		this.x = x;
-		this.lightSources = new ArrayList<Position>();
+		this.lightSources = new Vector<Position>();
 		this.setRequiresDiffuseApplied(true);
 	}
 	
@@ -366,13 +367,17 @@ public class Chunk
 	
 	public void addLightSources(Position[] lightSources)
 	{
+		if(lightSources == null)
+		{
+			return;
+		}
 		for(Position position : lightSources)
 		{
 			this.lightSources.add(position);
 		}
 	}
 
-	public List<Position> getLightSources() {
+	public Vector<Position> getLightSources() {
 		return lightSources;
 	}
 

@@ -9,9 +9,12 @@ import java.util.Calendar;
 import java.util.Iterator;
 import java.util.Vector;
 
+import enums.EnumColor;
+
 /**
  * Log records console output, and prints it out in a formated way. The method {@link #log(String)} has this functionality. 
- * Calling {@link #writeWithTimestamp()} writes the server log to file.
+ * If a command should both be written to the server console and broadcast to all clients, then the method {@link #broadcast(String)}
+ * should be used. Calling {@link #writeWithTimestamp()} writes the server log to file.
  * @author      Alec Sobeck
  * @author      Matthew Robertson
  * @version     1.0
@@ -40,6 +43,10 @@ public class Log
 		serverLog.add(output);
 	}
 	
+	/**
+	 * Gets a current timestamp for when a command was issued
+	 * @return the current time in the form DD-MM-YYYY HH-MM-SS
+	 */
 	private static String getServerTimeStamp()
 	{
 		Calendar cal = Calendar.getInstance();
@@ -67,5 +74,16 @@ public class Log
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * Writes a message to console with a date and time stamp, and then records it in the server log. After this, the message
+	 * is broadcast to the client.
+	 * @param message the message to issue
+	 */
+	public static void broadcast(String message)
+	{
+		log(message);
+		TerraeRasa.addServerIssuedCommand("/say " + EnumColor.YELLOW.toString() + " " + message);	
 	}
 }

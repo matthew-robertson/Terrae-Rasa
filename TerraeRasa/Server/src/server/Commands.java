@@ -28,18 +28,14 @@ public class Commands
 	public synchronized static void processConsoleCommand(ServerSettings settings, ServerUpdate update, World world, GameEngine engine, String command)
 	{	
 		try {
-			System.out.println("Most server commands are NYI");
-			System.out.println("TODO: Make this command work: " + command);
 			
 			String[] commandComponents = command.split(" ");
-			//Everyone or above
-			if(command.startsWith("/help"))
-			{
-				
-			}
+			//Everyone or above			
 			if(command.startsWith("/kill"))
 			{
-				
+				String[] split = command.split(" ");
+				EntityPlayer player = (EntityPlayer)(world.getEntityByID(Integer.parseInt(split[1])));
+				player.kill();
 			}
 			if(command.startsWith("/whisper"))
 			{
@@ -98,7 +94,9 @@ public class Commands
 			}
 			if(command.startsWith("/kick"))
 			{
-				
+//				/kick <player-name>
+				String[] split = command.split(" ");
+				TerraeRasa.kick(split[1]);
 			}
 			if(command.startsWith("/ban"))
 			{
@@ -472,10 +470,20 @@ public class Commands
 						
 						//Put what the player said onto the console
 						String[] remainingSplit = remaining.split(" ");
-						String message = remainingSplit[1] + ": " + remaining.substring(remaining.indexOf(" ", 
-								remaining.indexOf(" ", 
+						
+						String message = "";
+						if(remainingSplit.length == 1)
+						{
+							message = remaining;
+						}
+						else
+						{
+							message = remainingSplit[1] + ": " + remaining.substring(remaining.indexOf(" ", 
+									remaining.indexOf(" ", 
 										remaining.indexOf(" ", 
 												remaining.indexOf(" ") + 1)) + 1) + 1);
+							
+						}
 						Log.log(message);
 						
 						//TODO: check for permissions

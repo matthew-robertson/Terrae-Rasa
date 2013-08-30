@@ -1,7 +1,13 @@
 package world;
 
+import io.Chunk;
+
+import java.io.Serializable;
+
 public abstract class Weather 
+		implements Serializable
 {
+	private static final long serialVersionUID = 1L;
 	protected int ticksLeft;
 	protected int averageGroundLevel;
 	protected int y;
@@ -12,7 +18,7 @@ public abstract class Weather
 	
 	public abstract void update(World world);
 	
-	public abstract void initialize(World world);
+	public abstract void initialize();
 	
 	/**
 	 * Decreases game ticks left for the weather effect by the specified amount
@@ -21,5 +27,23 @@ public abstract class Weather
 	public void reduceTicksLeft(int i)
 	{
 		ticksLeft -= i;
+	}
+	
+	/**
+	 * Determines if the weather effect is done.
+	 * @return true if the effect is done, otherwise false
+	 */
+	public boolean isFinished()
+	{
+		return ticksLeft <= 0;
+	}
+	
+	public static Weather generateWeatherByID(int id, Chunk chunk, int averageWorldHeight)
+	{
+		if(id == WeatherSnow.ID)
+		{
+			return new WeatherSnow(chunk, averageWorldHeight);
+		}
+		return null;
 	}
 }

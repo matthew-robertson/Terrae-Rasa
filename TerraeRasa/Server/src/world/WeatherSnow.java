@@ -1,28 +1,35 @@
 package world;
 
+import io.Chunk;
+
 import java.util.Random;
 
+import transmission.BlockUpdate;
+import transmission.ServerUpdate;
+import transmission.SuperCompressedBlock;
 import utils.MathHelper;
 import utils.Particle;
 import blocks.Block;
 
 public class WeatherSnow extends Weather
 {
+	private static final long serialVersionUID = 1L;
 	public Particle[] snow;
 	private Random random = new Random();
+	public static final int ID = 1;
+	
 	/**
 	 * Gives the WeatherSnow instance all the information it needs to create a decent snow effect
 	 * then initializes all the particles appropriately. 
 	 * @param biome the biome the weather is occuring in
 	 * @param averageGroundLevel the average ground level of the world (pre-calculated)
 	 */
-	public WeatherSnow(World world, Biome biome, int averageGroundLevel)
+	public WeatherSnow(World world, Chunk chunk, int averageGroundLevel)
 	{
-		this.weatherLocation = biome;
-		this.x = (int) biome.getX();
-		this.width = (int) biome.getWidth();
-		this.height = (int) biome.getHeight();
-		this.y = (int) biome.getY();
+		this.x = (int) chunk.getX() * Chunk.getChunkWidth(); 
+		this.width = (int) Chunk.getChunkWidth();
+		this.height = (int) chunk.getHeight();
+		this.y = 0;
 		this.averageGroundLevel = averageGroundLevel;
 		this.snow = new Particle[(int) (width * 2.75f)];
 		initialize(world);
@@ -80,7 +87,7 @@ public class WeatherSnow extends Weather
 	 * Updates all the particles (applies gravity). Additionally, if a snow particle hits a block then a snow cover will be applied, or the block will
 	 * be converted to snowy grass
 	 */
-	public void update(World world)
+	public void update(World world, ServerUpdate update)
 	{
 		for(int i = 0; i < snow.length; i++)
 		{
@@ -92,13 +99,21 @@ public class WeatherSnow extends Weather
 				if(getBlockAtPosition(world, snow[i].x, snow[i].y).isSolid && snow[i].x > 0 && snow[i].y > 0)
 				{
 					
-					//Adding snow cover
-					if(world.getBlockGenerate(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)snow[i].x / 6), 
-							MathHelper.returnIntegerInWorldMapBounds_Y(world, (int)((snow[i].y - 6) / 6))).getID() == Block.air.getID())
+					//Adding snow cover, with ~10% chance
+					if(random.nextInt(10) == 0 && 
+							world.getBlockGenerate(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)snow[i].x / 6), 
+									MathHelper.returnIntegerInWorldMapBounds_Y(world, (int)((snow[i].y - 6) / 6))).getID() == Block.air.getID())
 					{
+						int x = MathHelper.returnIntegerInWorldMapBounds_X(world, (int)snow[i].x / 6);
+						int y = MathHelper.returnIntegerInWorldMapBounds_Y(world, (int)((snow[i].y - 6) / 6));
 						world.setBlockGenerate(Block.snowCover, 
-								MathHelper.returnIntegerInWorldMapBounds_X(world, (int)snow[i].x / 6), 
-								MathHelper.returnIntegerInWorldMapBounds_Y(world, (int)((snow[i].y - 6) / 6)));						
+								x, 
+								y);						
+						BlockUpdate blockUpdate = new BlockUpdate();
+						blockUpdate.x = x;
+						blockUpdate.y = (short) y;
+						blockUpdate.block = new SuperCompressedBlock(world.getBlockGenerate(blockUpdate.x, blockUpdate.y));
+						update.addBlockUpdate(blockUpdate);
 					}
 					
 					Block block = world.getBlockGenerate(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)snow[i].x / 6),
@@ -111,13 +126,23 @@ public class WeatherSnow extends Weather
 						int y = MathHelper.returnIntegerInWorldMapBounds_Y(world, (int)((snow[i].y - 6) / 6) + 1);
 						Block requestedBlock = world.getBlockGenerate(x, y);
 						world.setBitMap(x, y, requestedBlock.getBitMap() + 16);					
+
+						BlockUpdate blockUpdate = new BlockUpdate();
+						blockUpdate.x = x;
+						blockUpdate.y = (short) y;
+						blockUpdate.block = new SuperCompressedBlock(world.getBlockGenerate(blockUpdate.x, blockUpdate.y));
+						update.addBlockUpdate(blockUpdate);
 					}					
-					
 				}
 				
 				snow[i].x = (random.nextInt(width) + x) * 6;
 				snow[i].y = (random.nextInt(25) + averageGroundLevel - 40) * 6;
 			}
 		} 	
+	}
+
+	public int getID()
+	{
+		return ID;
 	}
 }

@@ -264,4 +264,19 @@ public class TerraeRasa
 	{
 		done = true;
 	}
+	
+	/**
+	 * Kicks a player from the server with the given name.
+	 * @param name the name of the player to kick
+	 */
+	public static void kick(String name)
+	{
+		EntityPlayer player = terraeRasa.gameEngine.getPlayer(name);
+		if(player != null)
+		{
+			requestThreadCloseByID(player.entityID);			
+			String message = "Kicked " + player.getName();			
+			Log.broadcast(message);
+		}		
+	}
 }

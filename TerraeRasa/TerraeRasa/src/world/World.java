@@ -74,7 +74,6 @@ public class World
 	public final double g = 1.8;
 	public Hashtable<String, Boolean> chunksLoaded;
 	
-	public Weather weather;
 	public List<DisplayableEntity> itemsList;
 	public List<WorldText> temporaryText; 
 	public List<DisplayableEntity> enemyList;
@@ -496,6 +495,8 @@ public class World
 		
 		updateTemporaryText();
 		
+		updateWeather();
+		
 		//Update the time
 		updateWorldTime(player);
 		
@@ -649,20 +650,19 @@ public class World
 	}
 
 	/**
-	 * Updates the weather object(s) in the world or do nothing if one doesnt exist
+	 * Tries to make weather happen on each game tick
 	 */
-	public void updateWeather()
+	private void updateWeather()
 	{
-		if(weather == null) //No weather
-		{
-			return;
-		}
-		if(weather instanceof WeatherSnow) //Snow
-		{ 
-			WeatherSnow weatherSnow = (WeatherSnow)(weather);
-			weatherSnow.update(this);
-			weather = weatherSnow;
-		}
+		Enumeration<String> keys = chunks.keys();
+        while (keys.hasMoreElements()) 
+        {
+            Chunk chunk = (Chunk)chunks.get((String)(keys.nextElement()));
+            if(chunk.weather != null)
+            {
+	            chunk.weather.update(this);
+            }
+        }
 	}
 	
 	/**
@@ -1377,8 +1377,11 @@ public class World
 	{
 		utils.fixDiffuseLightRemove(this, x, y);
 		setBlock(block, x, y);
-		utils.blockUpdateAmbient(this, x, y, eventType);		
-		utils.fixDiffuseLightApply(this, x, y);
+		if(block != null);
+		{
+			utils.blockUpdateAmbient(this, x, y, eventType);		
+			utils.fixDiffuseLightApply(this, x, y);
+		}
 	}
 	
 	/**
@@ -1429,8 +1432,13 @@ public class World
 	
 	public void setBitMap(int x, int y, int bitMap)
 	{
-		MinimalBlock block = getChunks().get(""+(x / Chunk.getChunkWidth())).getBlock(x % Chunk.getChunkWidth(), (y));
-		block.setBitMap(bitMap);
+		try {
+			MinimalBlock block = getChunks().get(""+(x / Chunk.getChunkWidth())).getBlock(x % Chunk.getChunkWidth(), (y));
+			block.setBitMap(bitMap);
+		} catch (Exception e) {
+			
+		}
+		
 	}
 
 	public void setWorldTime(long worldTime) {

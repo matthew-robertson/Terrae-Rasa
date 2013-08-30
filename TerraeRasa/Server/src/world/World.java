@@ -104,7 +104,6 @@ public class World
 	public final double g = 1.8;
 	public Hashtable<String, Boolean> chunksLoaded;
 	
-	public Weather weather;
 	private List<EntityItemStack> itemsList;
 	private List<EntityNPCEnemy> entityList;
 	public List<WorldText> temporaryText; 
@@ -118,7 +117,6 @@ public class World
 	private int chunkWidth;
 	private int chunkHeight;
 	public ChunkManager chunkManager;
-	private boolean weatherFinished;
 	private EnumWorldDifficulty difficulty;
 	private final Random random = new Random();
 	protected String worldName;
@@ -357,8 +355,7 @@ public class World
 		requestRequiredChunks(settings, getWorldCenterBlock(), averageSkyHeight);
 		//chunkManager.addAllLoadedChunks_Wait(this, getChunks());
 		spawnPlayer(settings, player);
-		Log.log(player.getName() + " joined the game with entityID " + player.entityID);
-		TerraeRasa.addServerIssuedCommand("/say " + EnumColor.YELLOW.toString() + " " + player.getName() + " joined the game.");
+		Log.broadcast(player.getName() + " joined the game with entityID " + player.entityID);
 		return "";
 	}
 	
@@ -539,7 +536,7 @@ public class World
 	public void onWorldTick(ServerUpdate update, Vector<EntityPlayer> players)
 	{		
 		spawnMonsters(update, players);				
-		//causeWeather();		
+		updateWeather(update);		
 		//TODO: weather		
 		
 		updateChunks(players);
@@ -1134,35 +1131,38 @@ public class World
 	/**
 	 * Tries to make weather happen on each game tick
 	 */
-	private void causeWeather()
+	private void updateWeather(ServerUpdate update)
 	{
-		if(weatherFinished) //clear finished weather
-		{
-			weather = null;
-		}
-		if(weather != null) //If there's weather
-		{
-			if(--weather.ticksLeft <= 0) //decrease time left
-			{
-				disableWeather();
-			}
-		}
-	
-		for(ConcurrentHashMap.Entry<String, Chunk> entry: getChunks().entrySet())
-		{
-			Biome biome = entry.getValue().getBiome();			
-			if(biome != null && biome.biomeID == Biome.arctic.biomeID) //if the biome is arctic
-			{
-				if(random.nextInt(150000) == 0) //and a random chance is met
-				{
-					if(weather == null) //and it's null (not in use)
-					{
-						weather = new WeatherSnow(this, biome, averageSkyHeight); //cause weather!
-						weatherFinished = false;
-					}
-				}
-			}
-		}	
+		Enumeration<String> keys = chunks.keys();
+        while (keys.hasMoreElements()) 
+        {
+            Chunk chunk = (Chunk)chunks.get((String)(keys.nextElement()));
+
+            if(chunk.weather != null)
+            {
+            	chunk.weather.update(this, update);
+            	if(chunk.weather.isFinished())
+            	{
+            		chunk.weather = null;
+            		String command = "/stopweather " + chunk.getX();
+            		update.addValue(command);
+            	}      
+            }
+            else
+            {
+    			Biome biome = chunk.getBiome();			
+    			if(biome != null && biome.biomeID == Biome.arctic.biomeID) //if the biome is arctic
+    			{
+    				if(random.nextInt(150000) == 0) //and a random chance is met
+    				{
+    					//cause weather!
+						chunk.weather = new WeatherSnow(this, chunk, averageSkyHeight); 
+	            		String command = "/causeweather " + chunk.getX() + " " + chunk.weather.getID();
+	            		update.addValue(command);
+    				}
+    			}            	
+            }
+        }
 	}
 	
 	/**
@@ -1738,23 +1738,6 @@ public class World
 		
 		System.out.println("Average World Height: " + average);
 	}
-
-	/**
-	 * Updates the weather object(s) in the world or do nothing if one doesnt exist
-	 */
-	public void updateWeather()
-	{
-		if(weather == null) //No weather
-		{
-			return;
-		}
-		if(weather instanceof WeatherSnow) //Snow
-		{ 
-			WeatherSnow weatherSnow = (WeatherSnow)(weather);
-			weatherSnow.update(this);
-			weather = weatherSnow;
-		}
-	}
 		
 	/**
 	 * Breaks a cactus, from bottom to top.
@@ -1768,14 +1751,6 @@ public class World
 			handleBlockBreakEvent(update, player, mx, my-1);
 			my--;
 		}
-	}
-		
-	/**
-	 * Makes the weather field null, to stop weather
-	 */
-	public void disableWeather()
-	{
-		weatherFinished = true;
 	}
 	
 	/**

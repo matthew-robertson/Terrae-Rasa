@@ -1,7 +1,13 @@
 package world;
 
+import java.io.Serializable;
+
+import transmission.ServerUpdate;
+
 public abstract class Weather 
+		implements Serializable
 {
+	private static final long serialVersionUID = 1L;
 	protected int ticksLeft;
 	protected int averageGroundLevel;
 	protected int y;
@@ -10,7 +16,7 @@ public abstract class Weather
 	protected int width;
 	protected Biome weatherLocation;
 	
-	public abstract void update(World world);
+	public abstract void update(World world, ServerUpdate update);
 	
 	public abstract void initialize(World world);
 	
@@ -22,4 +28,15 @@ public abstract class Weather
 	{
 		ticksLeft -= i;
 	}
+	
+	/**
+	 * Determines if the weather effect is done.
+	 * @return true if the effect is done, otherwise false
+	 */
+	public boolean isFinished()
+	{
+		return ticksLeft <= 0;
+	}
+	
+	public abstract int getID();
 }

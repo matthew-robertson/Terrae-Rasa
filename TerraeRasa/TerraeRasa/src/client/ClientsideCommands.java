@@ -12,7 +12,11 @@ public class ClientsideCommands
 	 */
 	public static String fillOutChatCommand(EntityPlayer player, String originalCommand)
 	{
-		if(originalCommand.startsWith("/affix"))
+		if(originalCommand.startsWith("/kill"))
+		{
+			return originalCommand.trim() + " " + player.entityID;
+		}
+		else if(originalCommand.startsWith("/affix"))
 		{
 			String[] split = originalCommand.split(" ");
 //			/affix <id> 

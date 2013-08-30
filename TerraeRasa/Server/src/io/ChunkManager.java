@@ -375,7 +375,8 @@ public class ChunkManager
 		savable.x = chunk.getX();
 		savable.wasChanged = chunk.getChanged();
 		savable.height = chunk.getHeight();
-			
+		savable.lightPositions = chunk.getLightPositions();
+		
 		String basepath = "/" + universeName + "/" + directory;
 		
 		SaveManager smanager = new SaveManager();

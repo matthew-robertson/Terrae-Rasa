@@ -24,11 +24,14 @@ public class ServerSettings
 	public boolean spawnMonsters;
 	public int loadDistance;
 	public String serverMessage;
-	public Vector<String> banlist;
-	public Vector<String> mods;
-	public Vector<String> admins;
-	public String password;
+	private Vector<String> banlist;
+	private Vector<String> mods;
+	private Vector<String> admins;
+	private String password;
 	
+	/**
+	 * Creates a new server settings object with default settings.
+	 */
 	public ServerSettings()
 	{
 		forcePlayerDifficultiesNormal = true;
@@ -125,4 +128,67 @@ public class ServerSettings
 	{
 		this.password = password;
 	}
+	
+	public boolean isMod(String playerIP)
+	{
+		for(String ip : mods)
+		{
+			if(ip.equals(playerIP))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean isAdmin(String playerIP)
+	{
+		for(String ip : admins)
+		{
+			if(ip.equals(playerIP))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public String[] getModsAsArray() 
+	{
+		String[] values = new String[mods.size()];
+		mods.copyInto(values);
+		return values;
+	}
+	
+	public String[] getAdminsAsArray() 
+	{
+		String[] values = new String[admins.size()];
+		admins.copyInto(values);
+		return values;
+	}
+	
+	public String[] getBansAsArray() 
+	{
+		String[] values = new String[banlist.size()];
+		banlist.copyInto(values);
+		return values;
+	}
+	
+	/**
+	 * Determines if an IP is banned.
+	 * @param ip the IP to check for a ban
+	 * @return true if the IP is banned, otherwise false
+	 */
+	public boolean isBanned(String ip)
+	{
+		for(String str : banlist)
+		{
+			if(str.equals(ip))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
 }

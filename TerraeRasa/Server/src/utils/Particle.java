@@ -1,10 +1,14 @@
 package utils;
 
+import java.io.Serializable;
+
 import enums.EnumColor;
 
 
 public class Particle 
-{                      
+		implements Serializable
+{      
+	private static final long serialVersionUID = 1L;
 	public double index;
     public boolean active;               // Active (Yes/No)
     public double life;                   // Particle Life

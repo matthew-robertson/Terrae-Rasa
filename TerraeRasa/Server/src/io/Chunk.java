@@ -5,6 +5,7 @@ import java.util.Vector;
 
 import utils.Position;
 import world.Biome;
+import world.Weather;
 import blocks.Block;
 import blocks.MinimalBlock;
 
@@ -40,6 +41,7 @@ public class Chunk
 	private static final int CHUNK_WIDTH = 100;
 	private final int height;
 	private Vector<Position> lightSources;
+	public Weather weather;
 	
 	/**
 	 * Constructs a new Chunk. Chunks are initialized with blocks[][] fully set to air, and backwalls[][]
@@ -226,5 +228,17 @@ public class Chunk
 		Position[] positions = new Position[lightSources.size()];
 		lightSources.copyInto(positions);
 		return positions;
+	}
+	
+	public void addLightSources(Vector<Position> lightSources)
+	{
+		if(lightSources == null)
+		{
+			return;
+		}
+		for(Position position : lightSources)
+		{
+			this.lightSources.add(position);
+		}
 	}
 }
