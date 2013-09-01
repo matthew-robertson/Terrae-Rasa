@@ -2,6 +2,7 @@ package io;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -143,8 +144,26 @@ public class ChunkManager
 		
 		lockChunk(x);
 		
-		submitSaveOperation(chunk, directory, x);
+		submitSaveOperation(chunk, directory, x, true);
 		return true;
+	}
+	
+	public void saveAllChunksWithoutUnload(String directory, ConcurrentHashMap<String, Chunk> chunks)
+	{
+		verifyFolderExists(directory);
+
+		Enumeration<String> keys = chunks.keys();
+        while (keys.hasMoreElements()) 
+        {
+            Chunk chunk = (Chunk)chunks.get((String) keys.nextElement());
+    		if(chunkLocked(chunk.getX()))
+    		{
+    			continue;
+    		}
+    		
+    		lockChunk(chunk.getX());
+    		submitSaveOperation(chunk, directory, chunk.getX(), false);
+        }
 	}
 	
 	/**
@@ -188,11 +207,11 @@ public class ChunkManager
 		}
 	}
 		
-	private void submitSaveOperation(Chunk chunk, String dir, int x)
+	private void submitSaveOperation(Chunk chunk, String dir, int x, boolean removeChunk)
 	{
 		Future<Boolean> event = threadPool.submit(new CallableSaveChunk(this,
 				chunk, x, "/" + universeName + "/" + dir,
-				universeName));
+				universeName, removeChunk));
 		scheduledSaveOperations.add(event);
 	}
 	

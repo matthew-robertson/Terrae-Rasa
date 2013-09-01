@@ -99,6 +99,7 @@ import enums.EnumWorldDifficulty;
  */
 public class World
 {
+	private final Object playerInputLock = new Object();
 	public static final int GAMETICKSPERDAY = 28800; 
 	public static final int GAMETICKSPERHOUR = GameEngine.TICKS_PER_SECOND * 60;
 	public final double g = 1.8;
@@ -515,19 +516,25 @@ public class World
 		temporaryText.add(new WorldText(message, x, y, ticksLeft, color, true));
 	}
 	
-	private synchronized void handlePlayerMovement(ServerUpdate update)
+	private void handlePlayerMovement(ServerUpdate update)
 	{
-		for(PlayerInput input : playerInputs)
+		synchronized(playerInputLock)
 		{
-			input.handle(this);
-			update.addPositionUpdate(new PositionUpdate(input.getAssociatedID(), input.newX(), input.newY()));
+			for(PlayerInput input : playerInputs)
+			{
+				input.handle(this);
+				update.addPositionUpdate(new PositionUpdate(input.getAssociatedID(), input.newX(), input.newY()));
+			}
+			playerInputs.clear();
 		}
-		playerInputs.clear();
 	}
 	
-	public synchronized void registerPlayerMovement(PlayerInput input)
+	public void registerPlayerMovement(PlayerInput input)
 	{
-		playerInputs.add(input);
+		synchronized(playerInputLock)
+		{
+			playerInputs.add(input);
+		}
 	}
 	
 	/**
@@ -2475,5 +2482,29 @@ public class World
 	public void setTime(int timeInTicks)
 	{
 		this.worldTime = timeInTicks;
+	}
+
+	/**
+	 * Gets the world time in hours, between 0 and 24
+	 * @return gets the world time in hours, between 0 and 24
+	 */
+	public double getWorldTimeInHours()
+	{
+		return (double)(worldTime) / GAMETICKSPERHOUR;
+	}
+
+	public void turnOffWeather(ServerUpdate update)
+	{
+		Enumeration<String> keys = chunks.keys();
+        while (keys.hasMoreElements()) 
+        {
+            Chunk chunk = (Chunk)chunks.get((String)(keys.nextElement()));
+            if(chunk.weather != null)
+            {
+        		chunk.weather = null;
+        		String command = "/stopweather " + chunk.getX();
+        		update.addValue(command);
+            }
+        }
 	}
 }

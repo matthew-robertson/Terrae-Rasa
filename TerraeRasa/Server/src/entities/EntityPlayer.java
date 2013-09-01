@@ -172,6 +172,9 @@ public class EntityPlayer extends EntityLiving
 	private boolean hasMoved = false;
 	private final String associatedIP;
 	
+	private boolean isAdmin;
+	private boolean isMod;
+	
 	/**
 	 * Constructs a new instance of EntityPlayer with default settings, inventory (includes 3 basic tools),
 	 * and the specified name/difficulty. The default reset position is set to (50, 0), but this
@@ -1972,6 +1975,30 @@ public class EntityPlayer extends EntityLiving
 	 */
 	public String getIP()
 	{
+		return associatedIP;
+	}
+	
+	public boolean isMod()
+	{
+		return isMod;
+	}
+	
+	public boolean isAdmin()
+	{
+		return isAdmin;
+	}
+	
+	public void setIsAdmin(boolean isAdmin)
+	{
+		this.isAdmin = isAdmin;
+	}
+	
+	public void setIsMod(boolean isMod)
+	{
+		this.isMod = isMod;
+	}
+
+	public String getAssociatedIP() {
 		return associatedIP;
 	}
 }

@@ -96,11 +96,13 @@ public class MainMenu extends Render
 	private GuiTitle deleteServerMessage;
 	private GuiTextbox newServerName;
 	private GuiTextbox newServerIP;
+	private GuiTextbox newServerPassword;
 	private GuiTextbox newServerPort;
 	private GuiTitle newServerBack;
 	private GuiTitle newServerConfirm;
 	private GuiTextbox editServerName;
 	private GuiTextbox editServerIP;
+	private GuiTextbox editServerPassword;
 	private GuiTitle editServerBack;
 	private GuiTitle editServerConfirm;
 	private GuiTextbox editServerPort;
@@ -163,15 +165,17 @@ public class MainMenu extends Render
 		//Server Creation Menu:
 		newServerName = (GuiTextbox) new GuiTextbox(0.225, 70, 0.55, 0.1).setStopVerticalScaling(true);
 		newServerIP = (GuiTextbox) new GuiTextbox(0.225, 100, 0.55, 0.1).setStopVerticalScaling(true);
-		newServerPort = (GuiTextbox) new GuiTextbox(0.225, 130, 0.55, 0.1).setStopVerticalScaling(true);
-		newServerBack = (GuiTitle) new GuiTitle("Back", .25, 160, .20, 0.1).setStopVerticalScaling(true);
-		newServerConfirm = (GuiTitle) new GuiTitle("Confirm", 0.55, 160, 0.2, 0.1).setStopVerticalScaling(true);
+		newServerPassword = (GuiTextbox) new GuiTextbox(0.225, 130, 0.55, 0.1).setStopVerticalScaling(true);
+		newServerPort = (GuiTextbox) new GuiTextbox(0.225, 160, 0.55, 0.1).setStopVerticalScaling(true);
+		newServerBack = (GuiTitle) new GuiTitle("Back", .25, 190, .20, 0.1).setStopVerticalScaling(true);
+		newServerConfirm = (GuiTitle) new GuiTitle("Confirm", 0.55, 190, 0.2, 0.1).setStopVerticalScaling(true);
 		//Edit Server Menu:
 		editServerName = (GuiTextbox) new GuiTextbox(0.225, 70, 0.55, 0.1).setStopVerticalScaling(true);
 		editServerIP = (GuiTextbox) new GuiTextbox(0.225, 100, 0.55, 0.1).setStopVerticalScaling(true);
-		editServerPort = (GuiTextbox) new GuiTextbox(0.225, 130, 0.55, 0.1).setStopVerticalScaling(true);
-		editServerBack = (GuiTitle) new GuiTitle("Back", .25, 160, .20, 0.1).setStopVerticalScaling(true);
-		editServerConfirm = (GuiTitle) new GuiTitle("Confirm", 0.55, 160, 0.2, 0.1).setStopVerticalScaling(true);
+		editServerPassword = (GuiTextbox) new GuiTextbox(0.225, 130, 0.55, 0.1).setStopVerticalScaling(true);
+		editServerPort = (GuiTextbox) new GuiTextbox(0.225, 160, 0.55, 0.1).setStopVerticalScaling(true);
+		editServerBack = (GuiTitle) new GuiTitle("Back", .25, 190, .20, 0.1).setStopVerticalScaling(true);
+		editServerConfirm = (GuiTitle) new GuiTitle("Confirm", 0.55, 190, 0.2, 0.1).setStopVerticalScaling(true);
 		//Character Creation Menu:
 		characterName = (GuiTextbox) new GuiTextbox(0.225, 70, 0.55, 0.1).setStopVerticalScaling(true);
 		characterName.setRenderTexture(Render.menuButtonBackground);
@@ -821,6 +825,7 @@ public class MainMenu extends Render
 				isEditServerMenuOpen = true;
 				editServerName.setText(selectedServer.getName());
 				editServerIP.setText(selectedServer.getIP());
+				editServerPassword.setText(selectedServer.getPassword());
 				editServerPort.setText(selectedServer.getPort());
 				isWaitingToEdit = false;
 			}
@@ -918,7 +923,7 @@ public class MainMenu extends Render
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			connect.requestGameConnection(message, socket, os, is);
+			connect.requestGameConnection(selectedServer.getPassword(), message, socket, os, is);
 			ClientConnectionThread thread = new ClientConnectionThread(socket, TerraeRasa.terraeRasa.gameEngine.getEngineLock(), os, is);
 			thread.start();
 			TerraeRasa.registerClientThread(thread);
@@ -947,6 +952,12 @@ public class MainMenu extends Render
 			freeFocuses();
 			newServerIP.setFocused();
 		}	
+		//Password Text Box
+		if(newServerPassword.inBounds(mouseX, mouseY))
+		{
+			freeFocuses();
+			newServerPassword.setFocused();
+		}
 		//Port Text Box
 		if(newServerPort.inBounds(mouseX, mouseY))
 		{
@@ -958,11 +969,12 @@ public class MainMenu extends Render
 		{
 			if(!newServerName.getText().equals(""))
 			{
-				settings.registerServer(new ServerInfo(newServerName.getText(), newServerIP.getText(), newServerPort.getText()));
+				settings.registerServer(new ServerInfo(newServerName.getText(), newServerIP.getText(), newServerPassword.getText(), newServerPort.getText()));
 			}
 			updateMenus(settings);
 			newServerName.setText("");
 			newServerIP.setText("");
+			newServerPassword.setText("");
 			newServerPort.setText("");
 			isNewServerMenuOpen = false;
 		}
@@ -971,6 +983,7 @@ public class MainMenu extends Render
 		{
 			isNewServerMenuOpen = false;
 			newServerName.setText("");
+			newServerPassword.setText("");
 			newServerIP.setText("");
 			newServerPort.setText("");
 			freeFocuses();
@@ -996,6 +1009,12 @@ public class MainMenu extends Render
 			freeFocuses();
 			editServerIP.setFocused();
 		}
+		//Password Text Box
+		if(editServerPassword.inBounds(mouseX, mouseY))
+		{
+			freeFocuses();
+			editServerPassword.setFocused();
+		}
 		//Port text box
 		if(editServerPort.inBounds(mouseX, mouseY))
 		{
@@ -1008,12 +1027,13 @@ public class MainMenu extends Render
 			if(!editServerName.getText().equals(""))
 			{
 				settings.removeServer(selectedServer);
-				settings.registerServer(new ServerInfo(editServerName.getText(), editServerIP.getText(), editServerPort.getText()));
+				settings.registerServer(new ServerInfo(editServerName.getText(), editServerIP.getText(), editServerPassword.getText(), editServerPort.getText()));
 			}
 			updateMenus(settings);
 			isEditServerMenuOpen = false;
 			editServerName.setText("");
 			editServerIP.setText("");
+			editServerPassword.setText("");
 			editServerPort.setText("");
 		}
 		//Back button
@@ -1022,6 +1042,7 @@ public class MainMenu extends Render
 			isEditServerMenuOpen = false;
 			editServerName.setText("");
 			editServerIP.setText("");
+			editServerPassword.setText("");
 			editServerPort.setText("");
 			freeFocuses();
 		}
@@ -1195,6 +1216,10 @@ public class MainMenu extends Render
 			{
 				newServerIP.updateText(Keyboard.getEventCharacter(), Keyboard.getEventKey());
 			}
+			else if(newServerPassword.isFocused())
+			{
+				newServerPassword.updateText(Keyboard.getEventCharacter(), Keyboard.getEventKey());
+			}
 			else if(editServerName.isFocused())
 			{
 				editServerName.updateText(Keyboard.getEventCharacter(), Keyboard.getEventKey());
@@ -1202,6 +1227,10 @@ public class MainMenu extends Render
 			else if(editServerIP.isFocused())
 			{
 				editServerIP.updateText(Keyboard.getEventCharacter(), Keyboard.getEventKey());
+			}
+			else if(editServerPassword.isFocused())
+			{
+				editServerPassword.updateText(Keyboard.getEventCharacter(), Keyboard.getEventKey());
 			}
 			else if(editServerPort.isFocused())
 			{
@@ -1228,6 +1257,7 @@ public class MainMenu extends Render
 		{
 			newServerName.draw();
 			newServerIP.draw();
+			newServerPassword.draw();
 			newServerPort.draw();
 			newServerBack.draw();
 			newServerConfirm.draw();
@@ -1236,6 +1266,7 @@ public class MainMenu extends Render
 		{
 			editServerName.draw();
 			editServerIP.draw();
+			editServerPassword.draw();
 			editServerPort.draw();
 			editServerBack.draw();
 			editServerConfirm.draw();
@@ -1310,10 +1341,12 @@ public class MainMenu extends Render
 		characterName.freeFocused();
 		newServerName.freeFocused();
 		newServerIP.freeFocused();
+		newServerPassword.freeFocused();
 		newServerPort.freeFocused();
 		editServerPort.freeFocused();
 		editServerName.freeFocused();
 		editServerIP.freeFocused();
+		editServerPassword.freeFocused();
 	}
 	
 	/**

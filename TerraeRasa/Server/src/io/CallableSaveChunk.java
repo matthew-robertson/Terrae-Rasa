@@ -9,17 +9,19 @@ import blocks.MinimalBlock;
 
 public class CallableSaveChunk implements Callable<Boolean>
 {
+	private boolean removeChunk;
 	private String basepath;
 	private Chunk chunk;
 	private int x;
 	private ChunkManager manager;
 	
-	public CallableSaveChunk(ChunkManager manager, Chunk chunk, int x, String basepath, String worldName)
+	public CallableSaveChunk(ChunkManager manager, Chunk chunk, int x, String basepath, String worldName, boolean removeChunk)
 	{
 		this.chunk = chunk;
 		this.x = x;
 		this.basepath = basepath;
 		this.manager = manager;
+		this.removeChunk = removeChunk;
 	}
 	
 	public Boolean call() throws Exception 
@@ -37,7 +39,10 @@ public class CallableSaveChunk implements Callable<Boolean>
 		smanager.saveCompressedFile(basepath + "/" + x + ".trc", savable);
 		Log.log("Chunk Saved to: " + basepath + "/" + x + ".trc");
 		manager.unlockChunk(chunk.getX());
-		this.chunk = null;
+		if(removeChunk)
+		{
+			this.chunk = null;
+		}
 		savable = null;
 		return true;
 	}

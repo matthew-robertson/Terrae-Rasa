@@ -8,9 +8,9 @@ import java.net.UnknownHostException;
 
 public class ServerConnect 
 {
-	public Socket requestGameConnection(String[] message, Socket socket, ObjectOutputStream os, ObjectInputStream is) throws IOException
+	public Socket requestGameConnection(String password, String[] message, Socket socket, ObjectOutputStream os, ObjectInputStream is) throws IOException
 	{
-		os.writeUTF("/connect");
+		os.writeUTF("/connect " + password);
 		os.flush();
 		
 		String response = is.readUTF();

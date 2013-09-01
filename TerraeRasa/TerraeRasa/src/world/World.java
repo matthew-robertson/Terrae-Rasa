@@ -492,19 +492,16 @@ public class World
 	 */
 	public void onClientWorldTick(ClientUpdate update, EntityPlayer player)
 	{		
-		player.onClientTick(update, this); 
-		
 		updateTemporaryText();
-		
 		updateWeather();
-		
 		//Update the time
 		updateWorldTime(player);
-		
 		if(getWorldTime() % 20 == 0) {
 			updateChunks(update, player);
 		}
-		//TODO client side light recognizes torches that already exist
+
+		player.onClientTick(update, this); 
+		
 		applyLightingUpdates(player);
 	}
 		

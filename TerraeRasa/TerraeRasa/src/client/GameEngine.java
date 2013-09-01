@@ -476,7 +476,6 @@ public class GameEngine
 						world.setBitMap(update.x, update.y, world.updateBlockBitMap(update.x, update.y));
 						world.setBitMap(update.x+1, update.y, world.updateBlockBitMap(update.x+1, update.y));
 						world.setBitMap(update.x, update.y+1, world.updateBlockBitMap(update.x, update.y+1));
-						
 					}
 				}
 				else 

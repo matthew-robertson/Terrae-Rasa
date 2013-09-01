@@ -86,23 +86,11 @@ public class WorldLock
 			}
 			compressedUpdate.chunks = compressedChunks;
 			compressedUpdate.blockUpdates = update.getBlockUpdates();
-			compressedUpdate.entityUpdates = update.getUpdates();
+			compressedUpdate.entityUpdates = update.getEntityUpdates();
 			compressedUpdate.positionUpdates = update.getPositionUpdates();
 			compressedUpdate.statUpdates = update.getStatUpdates();
 			compressedUpdate.objectUpdates = update.getObjectUpdates();
 			
-//			System.out.println("---------Debug Compressed Update start--------");
-//			
-//			for(String str : compressedUpdate.values)
-//			{
-//				System.out.println("String: " + str);
-//			}
-//			for(UpdateWithObject str : compressedUpdate.objectUpdates)
-//			{
-//				System.out.println("String_withobj_: " + str.command);
-//			}
-//			
-//			System.out.println("---------Debug Compressed Update end----------");
 //			
 			serverUpdates.add(compressedUpdate);
 			

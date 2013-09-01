@@ -23,6 +23,12 @@ public class ClientsideCommands
 //			/affix <affix_id> <player_id> <main_inventory_index> #server command
 			return split[0] + " " + split[1] + " " + player.entityID + " " + player.selectedSlot;
 		}
+		else if(originalCommand.startsWith("/effect"))
+		{
+//			/effect <id> <time> <power> 
+//			/effect <id> <time> <power> <player_id> 
+			return originalCommand + " " + player.entityID;
+		}
 		return originalCommand;
 	}
 }

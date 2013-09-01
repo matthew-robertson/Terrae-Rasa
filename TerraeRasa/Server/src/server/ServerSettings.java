@@ -191,4 +191,8 @@ public class ServerSettings
 		return false;
 	}
 
+	public boolean passwordCorrect(String password)
+	{
+		return this.password.equalsIgnoreCase(password);
+	}
 }

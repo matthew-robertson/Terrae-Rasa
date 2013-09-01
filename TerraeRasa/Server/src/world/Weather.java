@@ -38,5 +38,10 @@ public abstract class Weather
 		return ticksLeft <= 0;
 	}
 	
+	public void setTicksLeft(int ticksLeft)
+	{
+		this.ticksLeft = ticksLeft;
+	}
+	
 	public abstract int getID();
 }

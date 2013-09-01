@@ -6,17 +6,24 @@ import java.util.Vector;
 
 public class ServerUpdate
 {
-	private Vector<String> values; 
+	private final Object commandLock = new Object();
+	private final Object entityUpdateLock = new Object();
+	private final Object positionUpdateLock = new Object();
+	private final Object blockUpdateLock = new Object();
+	private final Object statUpdateLock = new Object();
+	private final Object chunkUpdateLock = new Object();
+	private final Object objectUpdateLock = new Object();
+	private Vector<String> commands; 
 	private Vector<EntityUpdate> entityUpdates;
 	private Vector<PositionUpdate> positionUpdates;
 	private Vector<BlockUpdate> blockUpdates;
 	private Vector<StatUpdate> statUpdates;
 	private Vector<Chunk> chunkUpdates;
-	public Vector<UpdateWithObject> objectUpdates;
+	private Vector<UpdateWithObject> objectUpdates;
 	
 	public ServerUpdate()
 	{
-		this.values = new Vector<String>();
+		this.commands = new Vector<String>();
 		this.entityUpdates = new Vector<EntityUpdate>();
 		this.positionUpdates = new Vector<PositionUpdate>();
 		this.blockUpdates = new Vector<BlockUpdate>();
@@ -25,87 +32,129 @@ public class ServerUpdate
 		this.objectUpdates = new Vector<UpdateWithObject>();
 	}
 	
-	public synchronized void addValue(String val)
+	public void addValue(String val)
 	{
-		this.values.add(val);
+		synchronized(commandLock)
+		{
+			this.commands.add(val);
+		}
 	}
 	
-	public synchronized String[] getValues()
+	public String[] getValues()
 	{
-		String[] vals = new String[values.size()];
-		values.copyInto(vals);
-		return vals;
+		synchronized(commandLock)
+		{
+			String[] vals = new String[commands.size()];
+			commands.copyInto(vals);
+			return vals;
+		}
 	}
 	
-	public synchronized void addEntityUpdate(EntityUpdate update)
+	public void addEntityUpdate(EntityUpdate update)
 	{
-		entityUpdates.add(update);
+		synchronized(entityUpdateLock)
+		{
+			entityUpdates.add(update);
+		}
 	}
 	
-	public synchronized EntityUpdate[] getUpdates()
+	public EntityUpdate[] getEntityUpdates()
 	{
-		EntityUpdate[] updates = new EntityUpdate[entityUpdates.size()];
-		entityUpdates.copyInto(updates);
-		return updates;
+		synchronized(entityUpdateLock)
+		{
+			EntityUpdate[] updates = new EntityUpdate[entityUpdates.size()];
+			entityUpdates.copyInto(updates);
+			return updates;
+		}
 	}
 	
-	public synchronized void addPositionUpdate(PositionUpdate update)
+	public void addPositionUpdate(PositionUpdate update)
 	{
-		positionUpdates.add(update);
+		synchronized(positionUpdateLock)
+		{
+			positionUpdates.add(update);
+		}
 	}
 	
-	public synchronized PositionUpdate[] getPositionUpdates()
+	public PositionUpdate[] getPositionUpdates()
 	{
-		PositionUpdate[] updates = new PositionUpdate[positionUpdates.size()];
-		positionUpdates.copyInto(updates);
-		return updates;
+		synchronized(positionUpdateLock)
+		{
+			PositionUpdate[] updates = new PositionUpdate[positionUpdates.size()];
+			positionUpdates.copyInto(updates);
+			return updates;
+		}
 	}
 	
-	public synchronized void addBlockUpdate(BlockUpdate update)
+	public void addBlockUpdate(BlockUpdate update)
 	{
-		this.blockUpdates.add(update);
+		synchronized(blockUpdateLock)
+		{
+			this.blockUpdates.add(update);
+		}
 	}
 	
-	public synchronized BlockUpdate[] getBlockUpdates()
+	public BlockUpdate[] getBlockUpdates()
 	{
-		BlockUpdate[] vals = new BlockUpdate[blockUpdates.size()];
-		blockUpdates.copyInto(vals);
-		return vals;
+		synchronized(blockUpdateLock)
+		{
+			BlockUpdate[] vals = new BlockUpdate[blockUpdates.size()];
+			blockUpdates.copyInto(vals);
+			return vals;
+		}
 	}
 	
-	public synchronized void addStatUpdate(StatUpdate update)
+	public void addStatUpdate(StatUpdate update)
 	{
-		statUpdates.add(update);
+		synchronized(statUpdateLock)
+		{
+			statUpdates.add(update);
+		}
 	}
 	
-	public synchronized StatUpdate[] getStatUpdates()
+	public StatUpdate[] getStatUpdates()
 	{
-		StatUpdate[] updates = new StatUpdate[statUpdates.size()];
-		statUpdates.copyInto(updates);
-		return updates;
+		synchronized(statUpdateLock)
+		{
+			StatUpdate[] updates = new StatUpdate[statUpdates.size()];
+			statUpdates.copyInto(updates);
+			return updates;
+		}
 	}
 	
-	public synchronized void addChunkUpdate(Chunk chunk)
+	public void addChunkUpdate(Chunk chunk)
 	{
-		chunkUpdates.add(chunk);
+		synchronized(chunkUpdateLock)
+		{
+			chunkUpdates.add(chunk);
+		}
 	}
 	
-	public synchronized Chunk[] getChunks()
+	public Chunk[] getChunks()
 	{
-		Chunk[] updates = new Chunk[chunkUpdates.size()];
-		chunkUpdates.copyInto(updates);
-		return updates;
+		synchronized(chunkUpdateLock)
+		{
+			Chunk[] updates = new Chunk[chunkUpdates.size()];
+			chunkUpdates.copyInto(updates);
+			return updates;
+		}
 	}
 	
-	public synchronized void addObjectUpdate(UpdateWithObject update)
+	public void addObjectUpdate(UpdateWithObject update)
 	{
-		objectUpdates.add(update);
+		synchronized(objectUpdateLock)
+		{
+			objectUpdates.add(update);
+		}
 	}
 	
-	public synchronized UpdateWithObject[] getObjectUpdates()
+	public UpdateWithObject[] getObjectUpdates()
 	{
-		UpdateWithObject[] updates = new UpdateWithObject[objectUpdates.size()];
-		objectUpdates.copyInto(updates);
-		return updates;
+		synchronized(objectUpdateLock)
+		{
+			UpdateWithObject[] updates = new UpdateWithObject[objectUpdates.size()];
+			objectUpdates.copyInto(updates);
+			return updates;
+		}
 	}
 }
