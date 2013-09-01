@@ -22,6 +22,7 @@ import utils.MathHelper;
 import utils.Position;
 import utils.WorldText;
 import blocks.Block;
+import blocks.BlockChest;
 import blocks.BlockGrass;
 import blocks.BlockPillar;
 import blocks.MinimalBlock;
@@ -954,28 +955,34 @@ public class World
 	 */
 	public Block getBlockGenerate(int x, int y)
 	{
-		try
-		{
+		try {
 			MinimalBlock block = getChunks().get(""+(int)(x / Chunk.getChunkWidth())).getBlock((int)x % Chunk.getChunkWidth(), (int)y);
-			Block tmp = Block.blocksList[block.id].mergeOnto(block);
-			return tmp;
-		}
-		catch (Exception e)
-		{
-			System.out.println(4);
+			if(Block.blocksList[block.id] instanceof BlockChest)
+			{
+				return new BlockChest((BlockChest)(Block.blocksList[block.id])).mergeOnto(block);
+			}
+			else
+			{
+				return Block.blocksList[block.id].mergeOnto(block);
+			}
+		} catch (Exception e) {
 		}
 		return Block.air;
 	}
 
 	public Block getBlockGenerate(double x, double y)
 	{
-		try
-		{
+		try {
 			MinimalBlock block = getChunks().get(""+(int)(x / Chunk.getChunkWidth())).getBlock((int)x % Chunk.getChunkWidth(), (int)y);
-			return Block.blocksList[block.id].mergeOnto(block);
-		}
-		catch (Exception e)
-		{
+			if(Block.blocksList[block.id] instanceof BlockChest)
+			{
+				return new BlockChest((BlockChest)(Block.blocksList[block.id])).mergeOnto(block);
+			}
+			else
+			{
+				return Block.blocksList[block.id].mergeOnto(block);
+			}
+		} catch (Exception e) { 
 		}
 		return Block.air;
 	}

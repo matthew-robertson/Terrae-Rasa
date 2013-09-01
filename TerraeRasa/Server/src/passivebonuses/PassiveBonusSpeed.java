@@ -13,6 +13,11 @@ import entities.EntityPlayer;
 public class PassiveBonusSpeed extends PassiveBonus
 {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public PassiveBonusSpeed(double power) 
 	{
 		super(power);

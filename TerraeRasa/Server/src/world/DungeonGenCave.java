@@ -20,7 +20,7 @@ public class DungeonGenCave extends WorldGen{
 		
 		for(int j = world.getHeight() - 1; j > 0; j--){ //go through the the y-axis of the world
 			for(int k = 1; k < world.getWidth() - 1; k++){ //x-axis
-				if (world.getBlockGenerate(k,j).isSolid){
+				if (world.getBlock(k,j).isSolid){
 					world.setBitMap(k, j, world.updateBlockBitMap(k, j)); //set the appropriate texture
 				}
 				

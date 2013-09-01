@@ -17,6 +17,10 @@ import entities.EntityPlayer;
  */
 public class AuraReflectiveAbsorb extends Aura 
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private boolean percentile;
 	private double absorbAmount;
 	private int durationSeconds;

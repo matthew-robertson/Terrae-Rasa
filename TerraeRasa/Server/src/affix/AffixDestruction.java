@@ -6,6 +6,10 @@ import auras.Aura;
 
 public class AffixDestruction extends Affix{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private double max = 0.06;
 	private double min = 0.02;
 	

@@ -6,6 +6,7 @@ import server.ServerSettings;
 import utils.MathHelper;
 import world.World;
 import blocks.Block;
+import blocks.MinimalBlock;
 
 /**
  * This class is a base class for Entities, and contains some basic information and methods. Any Entity that exists
@@ -557,17 +558,17 @@ public class Entity
 			return 6;
 		}
 		
-		Block[] blocks = new Block[(int) (blockWidth + ((x % 6 == 0) ? 0 : 1))]; //blocks to check	
+		MinimalBlock[] blocks = new MinimalBlock[(int) (blockWidth + ((x % 6 == 0) ? 0 : 1))]; //blocks to check	
 		boolean flag = true;
 		
 		for(int i = 0; i < blocks.length; i++) //get blocks to check
 		{
-			blocks[i] = world.getBlockGenerate((x / 6) + i, ((y - jumpSpeed) / 6));
+			blocks[i] = world.getBlock((x / 6) + i, ((y - jumpSpeed) / 6));
 		}
 		
 		for(int i = 0; i < blocks.length; i++)
 		{
-			if(blocks[i].getIsSolid()) //hittest has failed
+			if(blocks[i].isSolid()) //hittest has failed
 			{
 				flag = false;
 				break;
@@ -606,16 +607,16 @@ public class Entity
 		
 		boolean flag = false;
 		int offset = (int) ((x % 6 == 0) ? blockWidth : (blockWidth + 1)); //How far right are the blocks for the hit test, if the player is perfectly on a block 2, otherwise 3		
-		Block[] blocks = new Block[(int) (blockHeight + ((y % 6 == 0) ? 0 : 1))]; //blocks to check
+		MinimalBlock[] blocks = new MinimalBlock[(int) (blockHeight + ((y % 6 == 0) ? 0 : 1))]; //blocks to check
 		
 		for(int i = 0; i < blocks.length; i++) //get the blocks to check against
 		{
-			blocks[i] = world.getBlockGenerate(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)(x / 6) + offset), MathHelper.returnIntegerInWorldMapBounds_Y(world, (int)(y / 6) + i));
+			blocks[i] = world.getBlock(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)(x / 6) + offset), MathHelper.returnIntegerInWorldMapBounds_Y(world, (int)(y / 6) + i));
 		}
 		
 		for(int i = 0; i < blocks.length; i++)
 		{
-			if(blocks[i].getIsSolid()) //the hittest has failed
+			if(blocks[i].isSolid()) //the hittest has failed
 			{
 				flag = false;
 				break;
@@ -640,16 +641,16 @@ public class Entity
 			return 6;
 		
 		boolean flag = false;				
-		Block[] blocks = new Block[(int) (blockHeight + ((y % 6 == 0) ? 0 : 1))]; //blocks to check
+		MinimalBlock[] blocks = new MinimalBlock[(int) (blockHeight + ((y % 6 == 0) ? 0 : 1))]; //blocks to check
 
 		for(int i = 0; i < blocks.length; i++) //get the blocks to check against
 		{
-			blocks[i] =  world.getBlockGenerate(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)(x / 6) - 1), MathHelper.returnIntegerInWorldMapBounds_Y(world, ((int)(y / 6) + i)));
+			blocks[i] =  world.getBlock(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)(x / 6) - 1), MathHelper.returnIntegerInWorldMapBounds_Y(world, ((int)(y / 6) + i)));
 		}
 		
 		for(int i = 0; i < blocks.length; i++)
 		{
-			if(blocks[i].getIsSolid()) //is the block isnt passable, the hittest has failed
+			if(blocks[i].isSolid()) //is the block isnt passable, the hittest has failed
 			{
 				flag = false;
 				break;
@@ -676,17 +677,17 @@ public class Entity
 			return 0F;
 		}
 		
-		Block[] blocks = new Block[(int) (blockWidth + ((x % 6 == 0) ? 0 : 1))]; //blocks to check
+		MinimalBlock[] blocks = new MinimalBlock[(int) (blockWidth + ((x % 6 == 0) ? 0 : 1))]; //blocks to check
 		boolean flag = true;
 		
 		for(int i = 0; i < blocks.length; i++) //get blocks to check
 		{
-			blocks[i] = world.getBlockGenerate((x / 6) + i, (int)(y / 6) + offset); 
+			blocks[i] = world.getBlock((x / 6) + i, (int)(y / 6) + offset); 
 		}		
 
 		for(int i = 0; i < blocks.length; i++)
 		{
-			if(blocks[i].getIsSolid()) //hittest has failed
+			if(blocks[i].isSolid()) //hittest has failed
 			{
 				flag = false;
 				break;
@@ -696,7 +697,6 @@ public class Entity
 				flag = true;
 			}
 		}
-		
 		
 		if(flag && y < world.getHeight() * 6) //Normal Gravity
 		{

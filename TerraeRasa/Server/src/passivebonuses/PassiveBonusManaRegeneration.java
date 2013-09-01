@@ -12,6 +12,11 @@ import entities.EntityPlayer;
  */
 public class PassiveBonusManaRegeneration extends PassiveBonus
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public PassiveBonusManaRegeneration(double power) 
 	{
 		super(power);

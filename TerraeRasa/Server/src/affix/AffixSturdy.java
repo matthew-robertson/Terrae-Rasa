@@ -6,6 +6,10 @@ import passivebonuses.PassiveBonusDefense;
 
 public class AffixSturdy extends Affix{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private int max = 10;
 	private int min = 2;
 	

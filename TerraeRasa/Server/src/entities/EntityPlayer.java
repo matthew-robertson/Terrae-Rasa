@@ -1055,7 +1055,7 @@ public class EntityPlayer extends EntityLiving
 	 */
 	public void breakBlock (ServerUpdate update, World world, int mx, int my, Item item)
 	{
-		Block block = world.getBlockGenerate(mx,  my);
+		Block block = world.getFullBlock(mx,  my);
 		if(item == null)
 		{
 			return;
@@ -1102,7 +1102,7 @@ public class EntityPlayer extends EntityLiving
 							world.breakBlock(update, this, mx, my);
 							
 							//Overwrite snow/flowers/etc...
-							if (world.getBlockGenerate(mx, my-1).getIsOveridable() == true && world.getBlock(mx, my-1).id != Block.air.getID())
+							if (world.getFullBlock(mx, my-1).getIsOveridable() == true && world.getBlock(mx, my-1).id != Block.air.getID())
 							{
 								world.breakBlock(update, this, mx, my-1);
 							}

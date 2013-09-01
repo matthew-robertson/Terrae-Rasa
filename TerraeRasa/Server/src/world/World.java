@@ -818,14 +818,14 @@ public class World
 	 */
 	
 	public int updateBlockBitMap(int x, int y){
-		int bit = getBlockGenerate(x,y).getBitMap();
+		int bit = getBlock(x,y).getBitMap();
 		//If the block is standard
-		if (getBlockGenerate(x, y).getTileMap() == 'g'){
+		if (getFullBlock(x, y).getTileMap() == 'g'){
 			return updateGeneralBitMap(x, y);
 		}
 		//if the block requires special actions
 		//If the block is a pillar
-		else if (getBlockGenerate(x, y).getTileMap() == 'p'){
+		else if (getFullBlock(x, y).getTileMap() == 'p'){
 			return updatePillarBitMap(x, y);	
 		}
 		return bit;
@@ -839,19 +839,19 @@ public class World
 	 */
 	private int updateGeneralBitMap(int x, int y){
 		int bit = 0;
-		if (getBlockGenerate(x, y - 1).isSolid){
+		if (getBlock(x, y - 1).isSolid){
 			bit += 1;
 		}
-		if (getBlockGenerate(x, y + 1).isSolid){
+		if (getBlock(x, y + 1).isSolid){
 			bit += 4;
 		}
-		if (getBlockGenerate(x - 1, y).isSolid){
+		if (getBlock(x - 1, y).isSolid){
 			bit += 8;
 		}
-		if (getBlockGenerate(x + 1, y).isSolid){
+		if (getBlock(x + 1, y).isSolid){
 			bit += 2;
 		}
-		if (getBlockGenerate(x, y) instanceof BlockGrass && (bit == 15 || bit == 11 || bit == 27 || bit == 31)){
+		if (getFullBlock(x, y) instanceof BlockGrass && (bit == 15 || bit == 11 || bit == 27 || bit == 31)){
 			setBlockGenerate(Block.dirt, x,y);
 			setBitMap(x, y, bit);
 		}
@@ -867,7 +867,7 @@ public class World
 	
 	private int updatePillarBitMap(int x, int y){
 		int bit;
-		if (getBlockGenerate(x, y + 1) instanceof BlockPillar){
+		if (getFullBlock(x, y + 1) instanceof BlockPillar){
 			bit = 1;
 		}
 		
@@ -875,11 +875,11 @@ public class World
 			bit = 2;
 		}
 		
-		if (!getBlockGenerate(x, y - 1).isOveridable && !(getBlockGenerate(x, y - 1) instanceof BlockPillar)){
+		if (!getFullBlock(x, y - 1).isOveridable && !(getFullBlock(x, y - 1) instanceof BlockPillar)){
 			bit = 0;					
 		}
 		
-		if (!getBlockGenerate(x, y - 1).isOveridable && !getBlockGenerate(x, y + 1).isOveridable && !(getBlockGenerate(x, y + 1) instanceof BlockPillar) && !(getBlockGenerate(x, y - 1) instanceof BlockPillar)){
+		if (!getFullBlock(x, y - 1).isOveridable && !getFullBlock(x, y + 1).isOveridable && !(getFullBlock(x, y + 1) instanceof BlockPillar) && !(getFullBlock(x, y - 1) instanceof BlockPillar)){
 			bit = 3;
 		}
 		return bit;
@@ -1196,74 +1196,80 @@ public class World
 	 */
 	private void performEnemyToolHittests(ServerUpdate update, EntityPlayer player) 
 	{
-		//Conditions which indicate the player is not swinging or able to swing
-		if(player.inventory.getMainInventoryStack(player.selectedSlot) == null ||
-				player.inventory.getMainInventoryStack(player.selectedSlot).getItemID() >= ActionbarItem.spellIndex ||
-				!player.isSwingingTool() || 
-				(player.inventory.getMainInventoryStack(player.selectedSlot) == null) || 
-				!(Item.itemsList[player.inventory.getMainInventoryStack(player.selectedSlot).getItemID()] instanceof ItemTool))
-		{
-			return;
-		}
-		
-		ItemTool heldItem = ((ItemTool)(Item.itemsList[player.inventory.getMainInventoryStack(player.selectedSlot).getItemID()]));
-		double size = heldItem.size;		     
-		double angle = player.getToolRotationAngle();		
-		double const_ = 9;
-		double[] x_bounds = heldItem.xBounds;
-		double[] y_bounds = heldItem.yBounds;
-		Vector2F[] scaled_points = new Vector2F[x_bounds.length];
-		for(int i = 0; i < scaled_points.length; i++)
-		{
-			scaled_points[i] = new Vector2F((float)(size * x_bounds[i]), (float)(size * ((float)y_bounds[i])) - (float)size );
-		}
-		double[] x_points = new double[scaled_points.length];
-		double[] y_points = new double[scaled_points.length];
-		
-		//Rotate the points
-		for(int i = 0; i < scaled_points.length; i++)
-		{
-			x_points[i] =  player.x + const_ + (scaled_points[i].x * Math.cos(angle)) - 
-					(scaled_points[i].y * Math.sin(angle));
-			y_points[i] = player.y + const_ + (scaled_points[i].x * Math.sin(angle)) + 
-					( scaled_points[i].y * Math.cos(angle));
-		}
-		
-		for(int i = 0; i < entityList.size(); i++)
-		{
-			if(entityList.get(i).isImmuneToDamage())
-			{
-				continue;
-			}	
+		try {
 			
-			if(pnpoly(scaled_points.length, 
-					x_points, y_points, 
-					entityList.get(i).x + entityList.get(i).width, 
-					entityList.get(i).y + entityList.get(i).height)
-			){	
-				Damage damage = new Damage(heldItem.getDamageDone() * player.allDamageModifier * player.meleeDamageModifier, 
-						new EnumDamageType[] { EnumDamageType.NONE },
-						EnumDamageSource.MELEE)
-						.setIsCrit(((Math.random() < player.criticalStrikeChance) ? true : false));
-				player.inflictedDamageToMonster(this, damage);
-				entityList.get(i).damage(this, damage, true);
-				
-				int knockBackValue = (int) (player.knockbackModifier * 12);
-				String direction = player.getDirectionOfQuadRelativeToEntityPosition(entityList.get(i).x, entityList.get(i).y, entityList.get(i).width, entityList.get(i).height);
-				
-				if(direction.equals("right"))
-				{
-					entityList.get(i).moveEntityRight(this, knockBackValue);	
-				}
-				else
-				{
-					entityList.get(i).moveEntityLeft(this, knockBackValue);
-				}
-				entityList.get(i).registerStatusEffect(this, new StatusEffectStun(0.45, 1, 1, 1));
+			//Conditions which indicate the player is not swinging or able to swing
+			if(player.inventory.getMainInventoryStack(player.selectedSlot) == null ||
+					player.inventory.getMainInventoryStack(player.selectedSlot).getItemID() >= ActionbarItem.spellIndex ||
+					!player.isSwingingTool() || 
+					(player.inventory.getMainInventoryStack(player.selectedSlot) == null) || 
+					!(Item.itemsList[player.inventory.getMainInventoryStack(player.selectedSlot).getItemID()] instanceof ItemTool))
+			{
+				return;
 			}
+			
+			ItemTool heldItem = ((ItemTool)(Item.itemsList[player.inventory.getMainInventoryStack(player.selectedSlot).getItemID()]));
+			double size = heldItem.size;		     
+			double angle = player.getToolRotationAngle();		
+			double const_ = 9;
+			double[] x_bounds = heldItem.xBounds;
+			double[] y_bounds = heldItem.yBounds;
+			Vector2F[] scaled_points = new Vector2F[x_bounds.length];
+			for(int i = 0; i < scaled_points.length; i++)
+			{
+				scaled_points[i] = new Vector2F((float)(size * x_bounds[i]), (float)(size * ((float)y_bounds[i])) - (float)size );
+			}
+			double[] x_points = new double[scaled_points.length];
+			double[] y_points = new double[scaled_points.length];
+			
+			//Rotate the points
+			for(int i = 0; i < scaled_points.length; i++)
+			{
+				x_points[i] =  player.x + const_ + (scaled_points[i].x * Math.cos(angle)) - 
+						(scaled_points[i].y * Math.sin(angle));
+				y_points[i] = player.y + const_ + (scaled_points[i].x * Math.sin(angle)) + 
+						( scaled_points[i].y * Math.cos(angle));
+			}
+			
+			for(int i = 0; i < entityList.size(); i++)
+			{
+				if(entityList.get(i).isImmuneToDamage())
+				{
+					continue;
+				}	
+				
+				if(pnpoly(scaled_points.length, 
+						x_points, y_points, 
+						entityList.get(i).x + entityList.get(i).width, 
+						entityList.get(i).y + entityList.get(i).height)
+				){	
+					Damage damage = new Damage(heldItem.getDamageDone() * player.allDamageModifier * player.meleeDamageModifier, 
+							new EnumDamageType[] { EnumDamageType.NONE },
+							EnumDamageSource.MELEE)
+							.setIsCrit(((Math.random() < player.criticalStrikeChance) ? true : false));
+					player.inflictedDamageToMonster(this, damage);
+					entityList.get(i).damage(this, damage, true);
+					
+					int knockBackValue = (int) (player.knockbackModifier * 12);
+					String direction = player.getDirectionOfQuadRelativeToEntityPosition(entityList.get(i).x, entityList.get(i).y, entityList.get(i).width, entityList.get(i).height);
+					
+					if(direction.equals("right"))
+					{
+						entityList.get(i).moveEntityRight(this, knockBackValue);	
+					}
+					else
+					{
+						entityList.get(i).moveEntityLeft(this, knockBackValue);
+					}
+					entityList.get(i).registerStatusEffect(this, new StatusEffectStun(0.45, 1, 1, 1));
+				}
+			}
+			
+			player.updateSwing(update);		
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		
-		player.updateSwing(update);		
+
 	}
 	
 	/**
@@ -1273,8 +1279,8 @@ public class World
 	 */
 	private void handleBlockBreakEvent(ServerUpdate update, EntityPlayer player, int mx, int my)
 	{
-		Block block = getBlockGenerate(mx, my);
-		if(!getBlock(mx, my).hasMetaData) //normal block
+		Block block = getFullBlock(mx, my);
+		if(block.hasMetaData) //normal block
 		{
 			ItemStack stack = block.getDroppedItem();
 			if(stack != null) //if there's an item to drop, add it to the list of dropped items
@@ -1336,7 +1342,7 @@ public class World
 						}
 					}			
 					
-					chest = (BlockChest)(getBlockGenerate(mx - x1, my - y1));
+					chest = (BlockChest)(getFullBlock(mx - x1, my - y1));
 					mx -= x1;
 					my -= y1;
 				}	
@@ -1453,7 +1459,7 @@ public class World
 	 * @param my y position in the worldmap array, of the block being placed
 	 * @param block the block to be placed
 	 */
-	public void placeLargeBlockWorld(int mx, int my, Block block)
+	public void generateLargeBlock(int x, int y, Block block)
 	{
 		if(block.hasMetaData) //if the block is large
 		{
@@ -1465,7 +1471,7 @@ public class World
 			{
 				for(int j = 0; j < blockHeight; j++)
 				{
-					if(getBlock(mx + i, my + j).id != Block.air.id && !getBlockGenerate(mx + i, my + j).getIsOveridable())
+					if(getBlock(x + i, y + j).id != Block.air.id && !getFullBlock(x + i, y + j).getIsOveridable())
 					{
 						return;
 					}
@@ -1476,7 +1482,7 @@ public class World
 			//Check for at least one solid block on some side of the placement:
 			for(int i = 0; i < blockWidth; i++) //Bottom
 			{
-				if(getBlock(mx + i, my + blockHeight).isSolid)
+				if(getBlock(x + i, y + blockHeight).isSolid)
 				{
 					canBePlaced = true;
 				}
@@ -1493,13 +1499,13 @@ public class World
 					if(block instanceof BlockChest)
 					{
 						BlockChest chest = new BlockChest((BlockChest) block);						
-						setBlock(chest, mx + i, my + j);
+						setBlock(chest, x + i, y + j);
 					}
 					else
 					{
-						setBlock(block.clone(), mx + i, my + j);
+						setBlock(block, x + i, y + j);
 					}
-					getBlock(mx + i, my + j).metaData = (byte)metadata[i][j];
+					getBlock(x + i, y + j).metaData = (byte)metadata[i][j];
 				}
 			}
 		}	
@@ -1511,7 +1517,7 @@ public class World
 	 * @param my y position in the worldmap array, of the block being placed
 	 * @param block the block to be placed
 	 */
-	public boolean placeBlock(EntityPlayer player, int mx, int my, Block block)
+	public boolean placeBlock(ServerUpdate update, EntityPlayer player, int mx, int my, Block block)
 	{
 		if(block.hasMetaData) //if the block is large
 		{
@@ -1523,7 +1529,7 @@ public class World
 			{
 				for(int j = 0; j < blockHeight; j++)
 				{
-					if(getBlock(mx + i, my + j).id != Block.air.id && !getBlockGenerate(mx + i, my + j).getIsOveridable())
+					if(getBlock(mx + i, my + j).id != Block.air.id && !getFullBlock(mx + i, my + j).getIsOveridable())
 					{
 						return false;
 					}
@@ -1584,9 +1590,16 @@ public class World
 					}
 					else
 					{
-						setBlock(block.clone(), mx + i, my + j, EnumEventType.EVENT_BLOCK_PLACE);
+						setBlock(block, mx + i, my + j, EnumEventType.EVENT_BLOCK_PLACE);
 					}
 					getBlock(mx + i, my + j).metaData = (byte)metadata[i][j];
+					
+					//Cause a block update
+					BlockUpdate blockUpdate = new BlockUpdate();
+					blockUpdate.x = mx + i;
+					blockUpdate.y = (short) (my + j);
+					blockUpdate.block = new SuperCompressedBlock(getFullBlock(blockUpdate.x, blockUpdate.y));
+					update.addBlockUpdate(blockUpdate);
 				}
 			}
 			
@@ -1601,7 +1614,7 @@ public class World
 		}
 		else
 		{
-			if ((getBlockGenerate(mx, my).getIsOveridable() == true || getBlock(mx, my).id == Block.air.id) && 
+			if ((getFullBlock(mx, my).getIsOveridable() == true || getBlock(mx, my).id == Block.air.id) && 
 				(getBlock(mx-1, my).isSolid || getBlock(mx, my-1).isSolid || getBlock(mx, my+1).isSolid || getBlock(mx+1, my).isSolid ||
 				getBackBlock(mx, my).getIsSolid())) //can the block be placed
 			{
@@ -1610,12 +1623,10 @@ public class World
 				if(block.lightStrength > 0)
 				{
 					setBlock(block, mx, my, EnumEventType.EVENT_BLOCK_PLACE_LIGHT); //place it
-					//		applyLightSource(player, block, mx, my, ((BlockLight)(block)).lightRadius,  ((BlockLight)(block)).lightStrength);
 				}
 				else
 				{
 					setBlock(block, mx, my, EnumEventType.EVENT_BLOCK_PLACE); //place it
-					//	setBlock(block, mx, my, EnumEventType.EVENT_BLOCK_PLACE); //place it
 				}
 				
 				setBitMap(mx-1,my, updateBlockBitMap(mx-1, my));
@@ -1623,6 +1634,13 @@ public class World
 				setBitMap(mx,my, updateBlockBitMap(mx, my));
 				setBitMap(mx+1,my, updateBlockBitMap(mx+1, my));
 				setBitMap(mx,my+1, updateBlockBitMap(mx, my+1));
+
+				//Cause a block update
+				BlockUpdate blockUpdate = new BlockUpdate();
+				blockUpdate.x = mx;
+				blockUpdate.y = (short) (my);
+				blockUpdate.block = new SuperCompressedBlock(getFullBlock(blockUpdate.x, blockUpdate.y));
+				update.addBlockUpdate(blockUpdate);
 				return true;
 			}
 		}
@@ -1645,7 +1663,7 @@ public class World
 			getBlock(mx, my).isSolid)) //can the block be placed
 		{
 			player.inventory.removeItemsFromInventory(player, new ItemStack(block, 1)); //remove the items from inventory		
-			setBackBlock(block.clone(), mx, my); //place it	
+			setBackBlock(block, mx, my); //place it	
 			return true;
 		}
 		return false;
@@ -1904,7 +1922,7 @@ public class World
 		//If there is room for the tree up and to the left/right	
 		for (int j = y; j >= y - height - space; j--){
 			for (int i = x - space; i <= x + space; i++){
-				if (!getBlockGenerate(i, j).getIsOveridable()){
+				if (!getFullBlock(i, j).getIsOveridable()){
 					isOpen = false;
 					break;
 				}
@@ -1915,20 +1933,20 @@ public class World
 			setBlockGenerate(Block.dirt, x, y + 1);
 			int count = 1;
 			
-			if ((getBlockGenerate(x-1, y+1).getID() == Block.grass.getID()|| getBlockGenerate(x-1, y+1).getID() == Block.dirt.getID())){
+			if ((getBlock(x-1, y+1).getID() == Block.grass.getID()|| getBlock(x-1, y+1).getID() == Block.dirt.getID())){
 				setBlockGenerate(Block.treebase, x-1, y);
 				setBitMap(x-1, y, 0);
 				setBlockGenerate(Block.dirt, x-1, y+1);
 			}
 			
-			if ((getBlockGenerate(x+1, y+1).getID() == Block.grass.getID()|| getBlockGenerate(x+1, y+1).getID() == Block.dirt.getID())){
+			if ((getBlock(x+1, y+1).getID() == Block.grass.getID()|| getBlock(x+1, y+1).getID() == Block.dirt.getID())){
 				setBlockGenerate(Block.treebase, x+1, y);
 				setBitMap(x+1, y, 3);
 				setBlockGenerate(Block.dirt, x+1, y+1);
 			}
 			
 			for (int k = y; k >= y - height; k--){ //Place the tree
-				if (getBlockGenerate(x, k).getID() == Block.air.getID()){ //If the cell is empty
+				if (getBlock(x, k).getID() == Block.air.getID()){ //If the cell is empty
 					if (k == y-height){ //If at the top of the tree
 						setBlockGenerate(Block.treetopr2, x+1, k); //Place the tree top
 						setBlockGenerate(Block.treetopr1, x+1, k-1);
@@ -1975,19 +1993,19 @@ public class World
 		for(int j = maxHeight; j > minHeight; j--){ //go through the the y-axis of the world
 			for(int k = 1; k < x + w; k++){ //x-axis	
 				//Search above, left and right of dirt block for air
-				if (getBlockGenerate(k, j).getID() == Block.dirt.getID()){
+				if (getBlock(k, j).getID() == Block.dirt.getID()){
 					if (k > 0 && k < getWidth() && j > 0){
-						if (getBlockGenerate(k - 1, j).getID() == Block.air.getID()){
+						if (getBlock(k - 1, j).getID() == Block.air.getID()){
 							setBlockGenerate(Block.grass, k, j);
 						}
 					}
 					if (k < getWidth()){
-						if (getBlockGenerate(k + 1, j).getID() == Block.air.getID()){
+						if (getBlock(k + 1, j).getID() == Block.air.getID()){
 							setBlockGenerate(Block.grass, k, j);
 						}
 					}
 					if (j > 0){
-						if (getBlockGenerate(k, j-1).getID() == Block.air.getID()){
+						if (getBlock(k, j-1).getID() == Block.air.getID()){
 							setBlockGenerate(Block.grass, k, j);
 						}
 					}
@@ -2059,28 +2077,36 @@ public class World
 	 * @param y the block's y location in the new world map
 	 * @return the block at the location specified, or null if there isnt one.
 	 */
-	public Block getBlockGenerate(int x, int y)
+	public Block getFullBlock(int x, int y)
 	{
-		try
-		{
+		try {
 			MinimalBlock block = getChunks().get(""+(int)(x / Chunk.getChunkWidth())).getBlock((int)x % Chunk.getChunkWidth(), (int)y);
-			return Block.blocksList[block.id].mergeOnto(block);
-		}
-		catch (Exception e)
-		{
+			if(Block.blocksList[block.id] instanceof BlockChest)
+			{
+				return new BlockChest((BlockChest)(Block.blocksList[block.id])).mergeOnto(block);
+			}
+			else
+			{
+				return Block.blocksList[block.id].mergeOnto(block);
+			}
+		} catch (Exception e) {
 		}
 		return Block.air;
 	}
 
-	public Block getBlockGenerate(double x, double y)
+	public Block getFullBlock(double x, double y)
 	{
-		try
-		{
+		try {
 			MinimalBlock block = getChunks().get(""+(int)(x / Chunk.getChunkWidth())).getBlock((int)x % Chunk.getChunkWidth(), (int)y);
-			return Block.blocksList[block.id].mergeOnto(block);
-		}
-		catch (Exception e)
-		{
+			if(Block.blocksList[block.id] instanceof BlockChest)
+			{
+				return new BlockChest((BlockChest)(Block.blocksList[block.id])).mergeOnto(block);
+			}
+			else
+			{
+				return Block.blocksList[block.id].mergeOnto(block);
+			}
+		} catch (Exception e) { 
 		}
 		return Block.air;
 	}
@@ -2096,24 +2122,18 @@ public class World
 	 */
 	public void setBackWallGenerate(Block block, int x, int y)
 	{
-		try
-		{ //Ensure the chunk exists
+		try { //Ensure the chunk exists
 			if(getChunks().get(""+(x / Chunk.getChunkWidth())) == null)
 			{
 				registerChunk(new Chunk(Biome.forest, (int)(x / Chunk.getChunkWidth()), height), (int)(x / Chunk.getChunkWidth()));
 			}
-		}
-		catch(Exception e) 
-		{
+		} catch(Exception e)  {
 			e.printStackTrace();
 		}
 		
-		try 
-		{ //Set the block
+		try  { //Set the block
 			chunks.get(""+(x / Chunk.getChunkWidth())).setBackWall(block, x % Chunk.getChunkWidth(), y);
-		}
-		catch(Exception e) 
-		{
+		} catch(Exception e) {
 			e.printStackTrace();
 		}
 	}

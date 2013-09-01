@@ -13,6 +13,11 @@ import entities.EntityPlayer;
 public class PassiveBonusCriticalStrike extends PassiveBonus
 {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public PassiveBonusCriticalStrike(double power) 
 	{
 		super(power);

@@ -15,6 +15,10 @@ import entities.EntityPlayer;
  */
 public class AuraSmartMana extends Aura 
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private boolean percentile;
 	private double manaAmount;
 	private double activationThreshold;

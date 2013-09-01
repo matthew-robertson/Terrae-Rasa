@@ -17,6 +17,10 @@ import enums.EnumDamageType;
  */
 public class AuraDamageAmplifier extends Aura
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private EnumDamageType amplifiedType;
 	private double damageModifier;
 	private boolean percentileIncrease;

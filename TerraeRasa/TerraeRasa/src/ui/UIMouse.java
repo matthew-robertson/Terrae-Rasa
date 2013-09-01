@@ -179,66 +179,10 @@ public class UIMouse extends UIBase
 			}
 		}	
 		
-		
-		
-//TODO chests are fucked
-//		if(player.isViewingChest)
-//		{
-//			BlockChest chest = (BlockChest)world.getBlockGenerate(player.viewedChestX, player.viewedChestY).clone();
-//			
-//			if(chest.metaData != 1) //Make sure its metadata is 1 (otherwise it doesnt technically exist)
-//			{
-//				//Get the metadata for the block's size
-//				int[][] metadata = MetaDataHelper.getMetaDataArray((int)(Block.blocksList[world.getBlock(player.viewedChestX, player.viewedChestY).id].blockWidth / 6), 
-//						(int)(Block.blocksList[world.getBlock(player.viewedChestX, player.viewedChestY).id].blockHeight / 6)); //metadata used by the block of size (x,y)
-//				int metaWidth = metadata.length; 
-//				int metaHeight = metadata[0].length;	
-//				x1 = 0;
-//				y1 = 0;				
-//				
-//				//Loop until a the current chest's metadata value is found
-//				//This provides the offset to find the 'real' chest, with the actual items in it
-//				for(int i = 0; i < metaWidth; i++) 
-//				{
-//					for(int j = 0; j < metaHeight; j++)
-//					{
-//						if(metadata[i][j] == world.getBlock(player.viewedChestX - x1, player.viewedChestY - y1).metaData)
-//						{
-//							x1 = i; 
-//							y1 = j;
-//							break;
-//						}
-//					}
-//				}			
-//				
-//				//Update the chest
-//				chest = (BlockChest)(world.getBlockGenerate(player.viewedChestX - x1, player.viewedChestY - y1));
-//			}	
-//			
-//			int totalRows = chest.getInventorySize() / 4;
-//			for(int i = 0; i < chest.getInventorySize(); i++) //for each DisplayableItemStack in the chest
-//			{
-//				size = 20;
-//				x1 = (int) ((Display.getWidth() * 0.25f) + ((((i % totalRows) - (totalRows / 2)) * (size))));
-//				y1 = (int) ((Display.getHeight() * 0.5f) - ((4 + (i / totalRows)) * (size)) - (size + 22f));
-//				
-//				if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
-//				{
-//					if(chest.getDisplayableItemStack(i) != null && mouseItem == null) //The mouse doesn't have something picked up, so this is straightforward
-//					{
-//						pickUpHalfMouseItemChest(chest, i, x - x1 - 2, y - y1 - 2, 16);
-//					}
-//					else if(mouseItem != null) //The mouse has something picked up, things need swapped
-//					{
-//						//Reference safe swap
-//						DisplayableItemStack stack = new DisplayableItemStack(mouseItem);
-//						mouseItem = chest.takeDisplayableItemStack(i);
-//						chest.placeDisplayableItemStack(stack, i);
-//						shouldDropItem = false;
-//					}
-//				}		
-//			}	
-//		}
+		if(player.isViewingChest)
+		{
+			chestMouseEvents(update, world, player, x, y, false);
+		}
 	}
 	
 	/**
@@ -412,7 +356,7 @@ public class UIMouse extends UIBase
 		
 		if(player.isViewingChest)
 		{
-			chestMouseEvents(world, player, x, y);
+			chestMouseEvents(update, world, player, x, y, true);
 		}
 		
 		if(isSocketWindowOpen)
@@ -522,26 +466,6 @@ public class UIMouse extends UIBase
 		
 		String command = "/player " + player.entityID + " mousepickup " + whichInventory + " " + index + " all";
 		update.addCommand(command);
-//		if(whichInventory == 1) //Main Inventory
-//		{
-//			mouseItem = player.inventory.getMainInventoryStack(index);
-//			player.inventory.putDisplayableItemStackInSlot(world, player, null, index);
-//		}
-//		else if(whichInventory == 2) //Armor Inventory
-//		{
-//			mouseItem = player.inventory.getArmorInventoryStack(index);
-//			player.inventory.setArmorInventoryStack(player, null, player.inventory.getArmorInventoryStack(index), index);
-//		}
-//		else if(whichInventory == 3) //Trash
-//		{
-//			mouseItem = player.inventory.getTrashStack(index);
-//			player.inventory.setTrashStack(null, index);
-//		}
-//		else if(whichInventory == 4) //Quiver
-//		{
-//			mouseItem = player.inventory.getQuiverStack(index);
-//			player.inventory.setQuiverStack(player, null, index);
-//		}			
 	}
 	
 	/**
@@ -563,29 +487,6 @@ public class UIMouse extends UIBase
 		
 		String command = "/player " + player.entityID + " mousepickup " + whichInventory + " " + index + " 1/2";
 		update.addCommand(command);
-//		if(whichInventory == 1) //Main Inventory
-//		{
-//			mouseItem = new DisplayableItemStack(player.inventory.getMainInventoryStack(index));
-//			mouseItem.setStackSize((int)(MathHelper.floorOne(mouseItem.getStackSize() / 2)));
-//			player.inventory.removeItemsFromInventoryStack(player, mouseItem.getStackSize(), index); 
-//		}
-//		else if(whichInventory == 2) //Armor Inventory
-//		{
-//			mouseItem = player.inventory.getArmorInventoryStack(index);
-//			player.inventory.setArmorInventoryStack(player, null, player.inventory.getArmorInventoryStack(index), index);
-//		}
-//		else if(whichInventory == 3) //Trash
-//		{
-//			mouseItem = new DisplayableItemStack(player.inventory.getTrashStack(index));
-//			mouseItem.setStackSize((int)(MathHelper.floorOne(mouseItem.getStackSize() / 2)));
-//			player.inventory.removeItemsFromTrashStack(mouseItem.getStackSize(), index);
-//		}
-//		else if(whichInventory == 4) //Quiver
-//		{
-//			mouseItem = new DisplayableItemStack(player.inventory.getQuiverStack(index));
-//			mouseItem.setStackSize((int)(MathHelper.floorOne(mouseItem.getStackSize() / 2)));
-//			player.inventory.removeItemsFromQuiverStack(player, mouseItem.getStackSize(), index);
-//		}			
 	}
 	
 	/**
@@ -696,7 +597,7 @@ public class UIMouse extends UIBase
 		
 		if(player.isViewingChest)
 		{
-			chestMouseEvents(world, player, x, y);
+			chestMouseEvents(update, world, player, x, y, true);
 		}
 	}
 		
@@ -706,65 +607,150 @@ public class UIMouse extends UIBase
 	 * @param x the x position of the mouse (not including getCameraX())
 	 * @param y the y position of the mouse (not including getCameraY())
 	 */
-	protected static void chestMouseEvents(World world, EntityPlayer player, int x, int y)
+	protected static void chestMouseEvents(ClientUpdate update, World world, EntityPlayer player, int x, int y, boolean leftClick)
 	{
-		//TODO chest mouse events fix
-//		//Get the initial block the player is viewing
-//		BlockChest chest = (BlockChest)world.getBlockGenerate(player.viewedChestX, player.viewedChestY).clone();
-//		
-//		if(chest.metaData != 1) //Make sure its metadata is 1 (otherwise it doesnt technically exist)
-//		{
-//			//Get the metadata for the block's size
-//			int[][] metadata = MetaDataHelper.getMetaDataArray((int)(Block.blocksList[world.getBlock(player.viewedChestX, player.viewedChestY).id].blockWidth / 6), 
-//					(int)(Block.blocksList[world.getBlock(player.viewedChestX, player.viewedChestY).id].blockHeight / 6)); //metadata used by the block of size (x,y)
-//			int metaWidth = metadata.length; 
-//			int metaHeight = metadata[0].length;	
-//			int x1 = 0;
-//			int y1 = 0;				
-//			
-//			//Loop until a the current chest's metadata value is found
-//			//This provides the offset to find the 'real' chest, with the actual items in it
-//			for(int i = 0; i < metaWidth; i++) 
-//			{
-//				for(int j = 0; j < metaHeight; j++)
-//				{
-//					if(metadata[i][j] == world.getBlock(player.viewedChestX - x1, player.viewedChestY - y1).metaData)
+		if(leftClick)
+		{
+			//Get the initial block the player is viewing
+			Block block = world.getBlockGenerate(player.viewedChestX, player.viewedChestY);
+			if(!(block instanceof BlockChest))
+			{
+				player.clearViewedChest();
+				return;
+			}
+			BlockChest chest = (BlockChest)block;
+			
+			int xOffset = 0;
+			int yOffset = 0;		
+			
+			if(chest.metaData != 1) //Make sure its metadata is 1 (otherwise it doesnt technically exist)
+			{
+				//Get the metadata for the block's size
+				int[][] metadata = MetaDataHelper.getMetaDataArray((int)(Block.blocksList[world.getBlock(player.viewedChestX, player.viewedChestY).id].blockWidth / 6), 
+						(int)(Block.blocksList[world.getBlock(player.viewedChestX, player.viewedChestY).id].blockHeight / 6)); //metadata used by the block of size (x,y)
+				int metaWidth = metadata.length; 
+				int metaHeight = metadata[0].length;	
+								
+				//Loop until a the current chest's metadata value is found
+				//This provides the offset to find the 'real' chest, with the actual items in it
+				for(int i = 0; i < metaWidth; i++) 
+				{
+					for(int j = 0; j < metaHeight; j++)
+					{
+						if(metadata[i][j] == world.getBlock(player.viewedChestX - xOffset, player.viewedChestY - yOffset).metaData)
+						{
+							xOffset = i; 
+							yOffset = j;
+							break;
+						}
+					}
+				}			
+				
+				//Update the chest
+				chest = (BlockChest)(world.getBlockGenerate(player.viewedChestX - xOffset, player.viewedChestY - yOffset));
+			}	
+			
+			int totalRows = chest.getInventorySize() / 4;
+			for(int i = 0; i < chest.getInventorySize(); i++) //for each DisplayableItemStack in the chest
+			{
+				int size = 20;
+				int x1 = (int) ((Display.getWidth() * 0.25f) + ((((i % totalRows) - (totalRows / 2)) * (size))));
+				int y1 = (int) ((Display.getHeight() * 0.5f) - ((4 + (i / totalRows)) * (size)) - (size + 22f));
+				
+				if(x >= x1 && x <= x1 + size && y >= y1 && y <= y1 + size) //Is the click in bounds?
+				{
+//					if(chest.getDisplayableItemStack(i) != null && player.getHeldItem() == null) //The mouse doesn't have something picked up, so this is straightforward
 //					{
-//						x1 = i; 
-//						y1 = j;
-//						break;
+						pickUpMouseItemChest(chest, i, x - x1 - 2, y - y1 - 2, 16);
+//						/player <id> chestevent <x> <y> <index> <qty>
+						String command = "/player " + player.entityID + " chestevent " + (player.viewedChestX - xOffset) + " " + (player.viewedChestY - yOffset) + " " + i + " all";
+						update.addCommand(command);
+						shouldDropItem = false;
 //					}
-//				}
-//			}			
-//			
-//			//Update the chest
-//			chest = (BlockChest)(world.getBlockGenerate(player.viewedChestX - x1, player.viewedChestY - y1));
-//		}	
-//		
-//		int totalRows = chest.getInventorySize() / 4;
-//		for(int i = 0; i < chest.getInventorySize(); i++) //for each DisplayableItemStack in the chest
-//		{
-//			int size = 20;
-//			int x1 = (int) ((Display.getWidth() * 0.25f) + ((((i % totalRows) - (totalRows / 2)) * (size))));
-//			int y1 = (int) ((Display.getHeight() * 0.5f) - ((4 + (i / totalRows)) * (size)) - (size + 22f));
-//			
-//			if(x >= x1 && x <= x1 + size && y >= y1 && y <= y1 + size) //Is the click in bounds?
-//			{
-//				if(chest.getDisplayableItemStack(i) != null && player.getHeldItem() == null) //The mouse doesn't have something picked up, so this is straightforward
-//				{
-//					pickUpMouseItemChest(chest, i, x - x1 - 2, y - y1 - 2, 16);
-//					shouldDropItem = false;
-//				}
-//				else if(mouseItem != null) //The mouse has something picked up, things need swapped
-//				{
-//					//Reference safe swap
-//					DisplayableItemStack stack = new DisplayableItemStack(mouseItem);
-//					mouseItem = chest.takeDisplayableItemStack(i);
-//					chest.placeDisplayableItemStack(stack, i);
-//					shouldDropItem = false;
-//				}
-//			}		
-//		}		
+//					else if(player.getHeldItem() != null) //The mouse has something picked up, things need swapped
+//					{
+						//Reference safe swap
+//						DisplayableItemStack stack = new DisplayableItemStack(mouseItem);
+//						mouseItem = chest.takeDisplayableItemStack(i);
+//						chest.placeDisplayableItemStack(stack, i);
+//						shouldDropItem = false;
+						//TODO fix
+//					}
+				}		
+			}
+		}
+		else
+		{
+			//Get the initial block the player is viewing
+			Block block = world.getBlockGenerate(player.viewedChestX, player.viewedChestY);
+			if(!(block instanceof BlockChest))
+			{
+				player.clearViewedChest();
+				return;
+			}
+			BlockChest chest = (BlockChest)block;
+
+			int xOffset = 0;
+			int yOffset = 0;		
+			
+			if(chest.metaData != 1) //Make sure its metadata is 1 (otherwise it doesnt technically exist)
+			{
+				//Get the metadata for the block's size
+				int[][] metadata = MetaDataHelper.getMetaDataArray((int)(Block.blocksList[world.getBlock(player.viewedChestX, player.viewedChestY).id].blockWidth / 6), 
+						(int)(Block.blocksList[world.getBlock(player.viewedChestX, player.viewedChestY).id].blockHeight / 6)); //metadata used by the block of size (x,y)
+				int metaWidth = metadata.length; 
+				int metaHeight = metadata[0].length;	
+										
+				//Loop until a the current chest's metadata value is found
+				//This provides the offset to find the 'real' chest, with the actual items in it
+				for(int i = 0; i < metaWidth; i++) 
+				{
+					for(int j = 0; j < metaHeight; j++)
+					{
+						if(metadata[i][j] == world.getBlock(player.viewedChestX - xOffset, player.viewedChestY - yOffset).metaData)
+						{
+							xOffset = i; 
+							yOffset = j;
+							break;
+						}
+					}
+				}			
+				
+				//Update the chest
+				chest = (BlockChest)(world.getBlockGenerate(player.viewedChestX - xOffset, player.viewedChestY - yOffset));
+			}	
+			
+			int totalRows = chest.getInventorySize() / 4;
+			for(int i = 0; i < chest.getInventorySize(); i++) //for each DisplayableItemStack in the chest
+			{
+				int size = 20;
+				int x1 = (int) ((Display.getWidth() * 0.25f) + ((((i % totalRows) - (totalRows / 2)) * (size))));
+				int y1 = (int) ((Display.getHeight() * 0.5f) - ((4 + (i / totalRows)) * (size)) - (size + 22f));
+				
+				if(x > x1 && x < x1 + size && y > y1 && y < y1 + size) //Is the click in bounds?
+				{
+//					if(chest.getDisplayableItemStack(i) != null && player.getHeldItem() == null) //The mouse doesn't have something picked up, so this is straightforward
+//					{
+						pickUpHalfMouseItemChest(chest, i, x - x1 - 2, y - y1 - 2, 16);
+
+//						/player <id> chestevent <x> <y> <index> <qty>
+						String command = "/player " + player.entityID + " chestevent " + (player.viewedChestX - xOffset) + " " + (player.viewedChestY - yOffset) + " " + i + " 1/2";
+						update.addCommand(command);
+//					}
+//					else if(player.getHeldItem() != null) //The mouse has something picked up, things need swapped
+//					{
+						//Reference safe swap
+//						DisplayableItemStack stack = new DisplayableItemStack(mouseItem);
+//						mouseItem = chest.takeDisplayableItemStack(i);
+//						chest.placeDisplayableItemStack(stack, i);
+//						shouldDropItem = false;
+						//TODO fix
+//					}
+				}		
+			}	
+			
+			
+		}
 	}
 	
 	/**
@@ -779,22 +765,25 @@ public class UIMouse extends UIBase
 	 */
 	protected static void pickUpMouseItemChest(BlockChest chest, int index, int xOffset, int yOffset, int itemSize)
 	{
-		//TODO chest code disabled
-//		shouldDropItem = false;
-//		mouseItemSize = itemSize;
-//		mouseXOffset = xOffset;
-//		mouseYOffset = yOffset;
+		shouldDropItem = false;
+		mouseItemSize = itemSize;
+		mouseXOffset = xOffset;
+		mouseYOffset = yOffset;
+		
 //		mouseItem = chest.getDisplayableItemStack(index);
 //		chest.removeDisplayableItemStack(index);
 	}
 	
 	protected static void pickUpHalfMouseItemChest(BlockChest chest, int index, int xOffset, int yOffset, int itemSize)
 	{
-		//TODO chest code disabled
-//		shouldDropItem = false;
-//		mouseItemSize = itemSize;
-//		mouseXOffset = xOffset;
-//		mouseYOffset = yOffset;
+		shouldDropItem = false;
+		mouseItemSize = itemSize;
+		mouseXOffset = xOffset;
+		mouseYOffset = yOffset;
+
+
+		
+		
 //		mouseItem = new DisplayableItemStack(chest.getDisplayableItemStack(index));
 //		mouseItem.setStackSize((int)(MathHelper.floorOne(mouseItem.getStackSize() / 2)));
 //		chest.removeItemsFromInventoryStack((mouseItem.getStackSize()), index);
@@ -807,17 +796,6 @@ public class UIMouse extends UIBase
 	{
 		String command = "/player " + player.entityID + " mousethrow " + " all";
 		update.addCommand(command);
-//		if(mouseItem != null)
-//		{
-//			//TODO: throw stacks.
-//			UpdateWithObject objUpdate = new UpdateWithObject();
-//			String command = "/player " + player.entityID + " throw " + " " + player.x + " " + player.y;
-//			objUpdate.command = command;
-//			objUpdate.object = new DisplayableItemStack(mouseItem);
-//			update.addObjectUpdate(objUpdate);
-//			//world.addDisplayableItemStackToItemList(new EntityDisplayableItemStack(player.x, player.y, mouseItem));
-//			mouseItem = null;
-//		}
 	}
 
 	/**

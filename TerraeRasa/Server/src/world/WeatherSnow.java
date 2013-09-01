@@ -10,6 +10,7 @@ import transmission.SuperCompressedBlock;
 import utils.MathHelper;
 import utils.Particle;
 import blocks.Block;
+import blocks.MinimalBlock;
 
 public class WeatherSnow extends Weather
 {
@@ -44,7 +45,7 @@ public class WeatherSnow extends Weather
 	 */
 	private Block getBlockAtPosition(World world, double x, double y)
 	{
-		return world.getBlockGenerate(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)x / 6), MathHelper.returnIntegerInWorldMapBounds_X(world, (int)y / 6));
+		return world.getFullBlock(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)x / 6), MathHelper.returnIntegerInWorldMapBounds_X(world, (int)y / 6));
 	}
 	
 	/**
@@ -56,7 +57,7 @@ public class WeatherSnow extends Weather
 	 */
 	private boolean isInBlock(World world, double x, double y)
 	{
-		return (world.getBlockGenerate(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)x / 6), MathHelper.returnIntegerInWorldMapBounds_X(world, (int)y / 6)).getIsSolid());
+		return (world.getBlock(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)x / 6), MathHelper.returnIntegerInWorldMapBounds_X(world, (int)y / 6)).isSolid());
 	}
 	
 	/**
@@ -101,7 +102,7 @@ public class WeatherSnow extends Weather
 					
 					//Adding snow cover, with ~10% chance
 					if(random.nextInt(10) == 0 && 
-							world.getBlockGenerate(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)snow[i].x / 6), 
+							world.getBlock(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)snow[i].x / 6), 
 									MathHelper.returnIntegerInWorldMapBounds_Y(world, (int)((snow[i].y - 6) / 6))).getID() == Block.air.getID())
 					{
 						int x = MathHelper.returnIntegerInWorldMapBounds_X(world, (int)snow[i].x / 6);
@@ -112,11 +113,11 @@ public class WeatherSnow extends Weather
 						BlockUpdate blockUpdate = new BlockUpdate();
 						blockUpdate.x = x;
 						blockUpdate.y = (short) y;
-						blockUpdate.block = new SuperCompressedBlock(world.getBlockGenerate(blockUpdate.x, blockUpdate.y));
+						blockUpdate.block = new SuperCompressedBlock(world.getFullBlock(blockUpdate.x, blockUpdate.y));
 						update.addBlockUpdate(blockUpdate);
 					}
 					
-					Block block = world.getBlockGenerate(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)snow[i].x / 6),
+					MinimalBlock block = world.getBlock(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)snow[i].x / 6),
 							MathHelper.returnIntegerInWorldMapBounds_Y(world, (int)((snow[i].y - 6) / 6) + 1));
 					
 					//Converting grass to snowy-grass:
@@ -124,13 +125,13 @@ public class WeatherSnow extends Weather
 					{
 						int x = MathHelper.returnIntegerInWorldMapBounds_X(world, (int)(snow[i].x / 6));
 						int y = MathHelper.returnIntegerInWorldMapBounds_Y(world, (int)((snow[i].y - 6) / 6) + 1);
-						Block requestedBlock = world.getBlockGenerate(x, y);
+						Block requestedBlock = world.getFullBlock(x, y);
 						world.setBitMap(x, y, requestedBlock.getBitMap() + 16);					
 
 						BlockUpdate blockUpdate = new BlockUpdate();
 						blockUpdate.x = x;
 						blockUpdate.y = (short) y;
-						blockUpdate.block = new SuperCompressedBlock(world.getBlockGenerate(blockUpdate.x, blockUpdate.y));
+						blockUpdate.block = new SuperCompressedBlock(world.getFullBlock(blockUpdate.x, blockUpdate.y));
 						update.addBlockUpdate(blockUpdate);
 					}					
 				}

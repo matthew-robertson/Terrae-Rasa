@@ -12,6 +12,11 @@ import entities.EntityPlayer;
 public class PassiveBonusStamina extends PassiveBonus
 {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public PassiveBonusStamina(double power) 
 	{
 		super(power);

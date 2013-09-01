@@ -1,5 +1,6 @@
 package affix;
 
+import java.io.Serializable;
 import java.util.Random;
 
 import passivebonuses.PassiveBonus;
@@ -12,7 +13,9 @@ import auras.Aura;
  *
  */
 public abstract class Affix
+		implements Serializable
 {
+	private static final long serialVersionUID = 1L;
 	protected Random rng = new Random();
 	private String name;
 	private boolean prefix;

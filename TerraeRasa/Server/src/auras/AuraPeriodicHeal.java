@@ -18,6 +18,10 @@ import entities.EntityPlayer;
  */
 public class AuraPeriodicHeal extends Aura 
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private boolean percentile;
 	private double healAmount;
 	private int durationSeconds;

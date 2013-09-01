@@ -538,19 +538,18 @@ public class Block extends ActionbarItem
 		return this;
 	}
 
+	/**
+	 * Creates a full block based on a given MinimalBlock
+	 * @param block the MinimalBlock to fully expand to a Block
+	 * @return a Block, expanded from the MinimalBlock
+	 */
 	public Block mergeOnto(MinimalBlock block)
 	{
+		setBitMap(block.bitMap);
 		this.id = block.id;
 		this.metaData = block.metaData;
-		this.iconX = (int) block.iconX;
-		this.iconY = (int) block.iconY;
 		this.hasMetaData = block.hasMetaData;
-		if(this instanceof BlockChest)
-		{
-			((BlockChest)(this)).setInventory(block.mainInventory);
-		}
-		setBitMap(block.bitMap);
-		return this;
+ 		return this;
 	}
 	
 	public static final Block[] blocksList = new Block[2048];

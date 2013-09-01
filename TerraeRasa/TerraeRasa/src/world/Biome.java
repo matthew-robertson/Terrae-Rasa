@@ -29,7 +29,7 @@ public class Biome
 	}
 		
 	/**
-	 * Copy constructor, an alternative to clone()
+	 * Copy constructor
 	 * @param biome the biome to duplicate
 	 */
 	public Biome(Biome biome) 

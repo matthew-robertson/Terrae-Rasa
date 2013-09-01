@@ -12,6 +12,11 @@ import entities.EntityPlayer;
  */
 public class PassiveBonusPickupRangeModifier extends PassiveBonus
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public PassiveBonusPickupRangeModifier(double power) 
 	{
 		super(power);

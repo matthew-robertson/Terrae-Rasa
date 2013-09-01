@@ -128,7 +128,12 @@ public class UIInventory extends UIBase
 		if(player.isViewingChest)
 		{
 			//Get the initial block the player is viewing
-			BlockChest chest = (BlockChest)world.getBlockGenerate(player.viewedChestX, player.viewedChestY);
+			Block block = world.getBlockGenerate(player.viewedChestX, player.viewedChestY);
+			if(!(block instanceof BlockChest))
+			{
+				return null;
+			}
+			BlockChest chest = (BlockChest)block;
 			
 			if(chest.metaData != 1) //Make sure its metadata is 1 (otherwise it doesnt technically exist)
 			{
@@ -175,12 +180,6 @@ public class UIInventory extends UIBase
 		return null;
 	}
 	
-	
-	
-	
-	
-	
-	
 	/**
 	 * Renders the selected chest(s), based on the chest's attachment. This function is relatively long
 	 * and tedious, due to there being multiple unique states a chest can have.
@@ -188,7 +187,12 @@ public class UIInventory extends UIBase
 	protected static void renderChest(World world, EntityPlayer player)
 	{
 		//Get the initial block the player is viewing
-		BlockChest chest = (BlockChest)world.getBlockGenerate(player.viewedChestX, player.viewedChestY).clone();
+		Block block = world.getBlockGenerate(player.viewedChestX, player.viewedChestY);
+		if(!(block instanceof BlockChest))
+		{
+			return;
+		}
+		BlockChest chest = (BlockChest)block;
 		
 		if(chest.metaData != 1)
 		{
@@ -266,11 +270,7 @@ public class UIInventory extends UIBase
 		
 		GL11.glColor4f(1, 1, 1, 1);
 	}
-	
-	
-	
-	
-	
+
 	/**
 	 * Renders the actionbar (only if the inventory is closed)
 	 */
@@ -634,145 +634,6 @@ public class UIInventory extends UIBase
 		shouldDropItem = false;
 		String command = "/player " + player.entityID + " mouseplace " + whichInventory + " " + index + " 1";
 		update.addCommand(command);
-//		try {
-//			if(whichInventory == 1) //Main Inventory
-//			{
-//				if(player.inventory.getMainInventoryStack(index) == null) //There's nothing there, so the mouse doesnt have to pickup something
-//				{
-//					player.inventory.putDisplayableItemStackInSlot(world, player, new DisplayableItemStack(mouseItem).setStackSize(1), index);
-//					mouseItem.removeFromStack(1);
-//					if(mouseItem.getStackSize() <= 0)
-//					{
-//						mouseItem = null;
-//					}
-//				}
-//				else if(player.inventory.getMainInventoryStack(index).getItemID() == mouseItem.getItemID())
-//				{
-//					if(player.inventory.getMainInventoryStack(index).getStackSize() + 1
-//							<= player.inventory.getMainInventoryStack(index).getMaxStackSize())
-//					{
-//						player.inventory.combineDisplayableItemStacksInSlot(world, player, new DisplayableItemStack(mouseItem).setStackSize(1), index);
-//						mouseItem.removeFromStack(1);
-//						if(mouseItem.getStackSize() <= 0)
-//						{
-//							mouseItem = null;
-//						}
-//					}
-//				}
-//			}
-//			else if(whichInventory == 2) //Armor && Accessories
-//			{
-//				Item item = Item.itemsList[mouseItem.getItemID()];			
-//				//Check if the item is actually valid for the selected slot:
-//				if(index == InventoryPlayer.HELMET_INDEX) //Helmet
-//				{
-//					if(!(item != null) || !(item instanceof ItemArmorHelmet))
-//					{
-//						return;
-//					}	
-//				}
-//				else if(index == InventoryPlayer.BODY_INDEX) //Body
-//				{
-//					if(!(item != null) || !(item instanceof ItemArmorBody))
-//					{
-//						return;
-//					}	
-//				}
-//				else if(index == InventoryPlayer.BELT_INDEX) //Belt
-//				{
-//					if(!(item != null) || !(item instanceof ItemArmorBelt))
-//					{
-//						return;
-//					}	
-//				}			
-//				else if(index == InventoryPlayer.PANTS_INDEX) //Pants
-//				{
-//					if(!(item != null) || !(item instanceof ItemArmorPants))
-//					{
-//						return;
-//					}	
-//				}
-//				else if(index == InventoryPlayer.BOOTS_INDEX) //Boots
-//				{
-//					if(!(item != null) || !(item instanceof ItemArmorBoots))
-//					{
-//						return;
-//					}	
-//				}
-//				else if(index == InventoryPlayer.GLOVES_INDEX) //Gloves
-//				{
-//					if(!(item != null) || !(item instanceof ItemArmorGloves))
-//					{
-//						return;
-//					}	
-//				}
-//				else //Accessory
-//				{
-//					if(!(item != null) || !(item instanceof ItemArmorAccessory))
-//					{
-//						return;
-//					}	
-//				}
-//				
-//				if(player.inventory.getArmorInventoryStack(index) == null) //There's nothing there, so the mouse doesnt have to pickup something
-//				{
-//					player.inventory.setArmorInventoryStack(player, mouseItem, player.inventory.getArmorInventoryStack(index), index);
-//					mouseItem = null;
-//				}
-//				else //If there is an item there, swap that slot's item and the mouse's item.
-//				{
-//					DisplayableItemStack stack = player.inventory.getArmorInventoryStack(index);
-//					player.inventory.setArmorInventoryStack(player, mouseItem, player.inventory.getArmorInventoryStack(index), index);
-//					mouseItem = stack;
-//				}
-//			}
-//			else if(whichInventory == 3) //Trash
-//			{
-//				player.inventory.setTrashStack(new DisplayableItemStack(mouseItem).setStackSize(1), index);
-//				mouseItem.removeFromStack(1);
-//				if(mouseItem.getStackSize() <= 0)
-//				{
-//					mouseItem = null;
-//				}
-//			}
-//			else if(whichInventory == 4) //Quiver
-//			{								
-//				Item item = Item.itemsList[mouseItem.getItemID()];
-//				if(!(item instanceof ItemAmmo))
-//				{
-//					return;
-//				}
-//				
-//				if(player.inventory.getQuiverStack(index) == null) //There's nothing there, so the mouse doesnt have to pickup something
-//				{
-//					player.inventory.setQuiverStack(player, new DisplayableItemStack(mouseItem).setStackSize(1), index);
-//					mouseItem.removeFromStack(1);
-//					if(mouseItem.getStackSize() <= 0)
-//					{
-//						mouseItem = null;
-//					}
-//				}
-//				else if(player.inventory.getQuiverStack(index).getItemID() == mouseItem.getItemID())
-//				{
-//					if(player.inventory.getQuiverStack(index).getStackSize() + 1 
-//							<= player.inventory.getQuiverStack(index).getMaxStackSize())
-//					{
-//						player.inventory.combineDisplayableItemStacksInQuiverSlot(world, player, new DisplayableItemStack(mouseItem).setStackSize(1), index);
-//						mouseItem.removeFromStack(1);
-//						if(mouseItem.getStackSize() <= 0)
-//						{
-//							mouseItem = null;
-//						}
-//					}
-//				}
-//			}
-//			else //If something's added to no inventory, then obviously something's wrong.
-//			{
-//				throw new RuntimeException("Tried to place item into inventory " + whichInventory + " but failed");
-//			}
-//		} catch(Exception e) {
-//			e.printStackTrace();
-//		}
 	}
 	
 	/**
@@ -786,156 +647,6 @@ public class UIInventory extends UIBase
 		String command = "/player " + player.entityID + " mouseplace " + whichInventory + " " + index + " all";
 		update.addCommand(command);
 		
-//		try
-//		{
-//			if(whichInventory == 1) //Main Inventory
-//			{
-//				if(player.inventory.getMainInventoryStack(index) == null) //There's nothing there, so the mouse doesnt have to pickup something
-//				{
-//					player.inventory.putDisplayableItemStackInSlot(world, player, mouseItem, index);
-//					mouseItem = null;
-//				}
-//				else if(player.inventory.getMainInventoryStack(index).getItemID() == mouseItem.getItemID())
-//				{
-//					if(player.inventory.getMainInventoryStack(index).getStackSize() + mouseItem.getStackSize() 
-//							<= player.inventory.getMainInventoryStack(index).getMaxStackSize())
-//					{
-//						player.inventory.combineDisplayableItemStacksInSlot(world, player, mouseItem, index);
-//						mouseItem = null;
-//					}
-//					else
-//					{
-//						mouseItem.removeFromStack((player.inventory.getMainInventoryStack(index).getMaxStackSize() - 
-//								player.inventory.getMainInventoryStack(index).getStackSize()));
-//						player.inventory.adjustMainInventoryStackSize(player, index, player.inventory.getMainInventoryStack(index).getMaxStackSize());
-//					}
-//				}
-//				else //If there is an item there, swap that slot's item and the mouse's item.
-//				{
-//					DisplayableItemStack stack = new DisplayableItemStack(player.inventory.getMainInventoryStack(index));
-//					player.inventory.putDisplayableItemStackInSlot(world, player, mouseItem, index);
-//					mouseItem = stack;
-//				}
-//			}
-//			else if(whichInventory == 2) //Armor && Accessories
-//			{
-//				Item item = Item.itemsList[mouseItem.getItemID()];			
-//				//Check if the item is actually valid for the selected slot:
-//				if(index == InventoryPlayer.HELMET_INDEX) //Helmet
-//				{
-//					if(!(item != null) || !(item instanceof ItemArmorHelmet))
-//					{
-//						return;
-//					}	
-//				}
-//				else if(index == InventoryPlayer.BODY_INDEX) //Body
-//				{
-//					if(!(item != null) || !(item instanceof ItemArmorBody))
-//					{
-//						return;
-//					}	
-//				}
-//				else if(index == InventoryPlayer.BELT_INDEX) //Belt
-//				{
-//					if(!(item != null) || !(item instanceof ItemArmorBelt))
-//					{
-//						return;
-//					}	
-//				}			
-//				else if(index == InventoryPlayer.PANTS_INDEX) //Pants
-//				{
-//					if(!(item != null) || !(item instanceof ItemArmorPants))
-//					{
-//						return;
-//					}	
-//				}
-//				else if(index == InventoryPlayer.BOOTS_INDEX) //Boots
-//				{
-//					if(!(item != null) || !(item instanceof ItemArmorBoots))
-//					{
-//						return;
-//					}	
-//				}
-//				else if(index == InventoryPlayer.GLOVES_INDEX) //Gloves
-//				{
-//					if(!(item != null) || !(item instanceof ItemArmorGloves))
-//					{
-//						return;
-//					}	
-//				}
-//				else //Accessory
-//				{
-//					if(!(item != null) || !(item instanceof ItemArmorAccessory))
-//					{
-//						return;
-//					}	
-//				}
-//				
-//				if(player.inventory.getArmorInventoryStack(index) == null) //There's nothing there, so the mouse doesnt have to pickup something
-//				{
-//					player.inventory.setArmorInventoryStack(player, mouseItem, player.inventory.getArmorInventoryStack(index), index);
-//					mouseItem = null;
-//				}
-//				else //If there is an item there, swap that slot's item and the mouse's item.
-//				{
-//					DisplayableItemStack stack = player.inventory.getArmorInventoryStack(index);
-//					player.inventory.setArmorInventoryStack(player, mouseItem, player.inventory.getArmorInventoryStack(index), index);
-//					mouseItem = stack;
-//				}
-//			}
-//			else if(whichInventory == 3) //Trash
-//			{
-//				//The mouse doesnt swap items in this instance, so just place the item there
-//				player.inventory.setTrashStack(mouseItem, index);
-//				mouseItem = null;
-//			}
-//			else if(whichInventory == 4) //Quiver
-//			{								
-//				Item item = Item.itemsList[mouseItem.getItemID()];
-//				if(!(item instanceof ItemAmmo))
-//				{
-//					return;
-//				}
-//				
-//				if(player.inventory.getQuiverStack(index) == null) //There's nothing there, so the mouse doesnt have to pickup something
-//				{
-//					player.inventory.setQuiverStack(player, mouseItem, index);
-//					mouseItem = null;
-//				}
-//				else if(player.inventory.getQuiverStack(index).getItemID() == mouseItem.getItemID())
-//				{
-//				
-//					if(player.inventory.getQuiverStack(index).getStackSize() + mouseItem.getStackSize() 
-//							<= player.inventory.getQuiverStack(index).getMaxStackSize())
-//					{
-//						player.inventory.combineDisplayableItemStacksInQuiverSlot(world, player, mouseItem, index);
-//						mouseItem = null;
-//					}
-//					else
-//					{
-//						mouseItem.removeFromStack((player.inventory.getQuiverStack(index).getMaxStackSize() - 
-//								player.inventory.getQuiverStack(index).getStackSize()));
-//						player.inventory.adjustQuiverStackSize(player, index, player.inventory.getQuiverStack(index).getMaxStackSize());
-//					}
-//				}
-//				
-//				
-//				else //If there is an item there, swap that slot's item and the mouse's item.
-//				{
-//					DisplayableItemStack stack = player.inventory.getQuiverStack(index);
-//					player.inventory.setQuiverStack(player, mouseItem, index);
-//					mouseItem = stack;
-//				}
-//			}
-//			else //If something's added to no inventory, then obviously something's wrong.
-//			{
-//				throw new RuntimeException("Tried to place item into inventory " + whichInventory + " but failed");
-//			}
-//		}
-//		catch(Exception e)
-//		{
-//			e.printStackTrace();
-//		}
 	}
 	
 	/**

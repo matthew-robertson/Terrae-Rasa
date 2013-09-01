@@ -39,6 +39,7 @@ import world.Weather;
 import world.World;
 import audio.SoundEngine;
 import blocks.Block;
+import blocks.BlockChest;
 import blocks.MinimalBlock;
 import entities.EntityPlayer;
 import entities.IEntityTransmitBase;
@@ -447,7 +448,18 @@ public class GameEngine
 			{
 				if(update.type == 0)
 				{
-					Block block = Block.blocksList[update.block.id].clone().mergeOnto(new MinimalBlock(update.block));
+					Block block;
+					if(update.block.mainInventory.length > 0)
+					{
+						BlockChest chest = new BlockChest((BlockChest)Block.blocksList[update.block.id]);
+						chest.mergeOnto(new MinimalBlock(update.block));
+						block = chest;
+					}
+					else
+					{
+						 block = Block.blocksList[update.block.id].clone().mergeOnto(new MinimalBlock(update.block));
+					}
+					
 					if(block.lightStrength > 0) {
 						world.setBlock(block, update.x, update.y, EnumEventType.EVENT_BLOCK_PLACE_LIGHT);
 						world.setBitMap(update.x-1, update.y, world.updateBlockBitMap(update.x-1, update.y));

@@ -55,7 +55,7 @@ public class BlockChest extends Block
 	{
 		if(mainInventory[index] == null)
 		{
-			mainInventory[index] = stack;
+			mainInventory[index] = new ItemStack(stack);
 			return null;
 		}
 		else if(stack.getItemID() == mainInventory[index].getItemID())
@@ -121,12 +121,20 @@ public class BlockChest extends Block
 	}
 		
 	/**
-	 * Returns a reference to the chest's mainInventory[].
-	 * @return a reference to the chest's mainInventory[]
+	 * Returns a deep copy of the chest's mainInventory[].
+	 * @return a deep copy to the chest's mainInventory[]
 	 */
 	public ItemStack[] getMainInventory()
 	{
-		return mainInventory;
+		ItemStack[] stacks = new ItemStack[mainInventory.length];
+		for(int i = 0; i < stacks.length; i++)
+		{
+			if(this.mainInventory[i] != null)
+			{
+				stacks[i] = new ItemStack(this.mainInventory[i]);
+			}
+		}		
+		return stacks;
 	}
 	
 	public DisplayableItemStack[] getDisplayableInventory()
@@ -134,7 +142,10 @@ public class BlockChest extends Block
 		DisplayableItemStack[] displayables = new DisplayableItemStack[mainInventory.length];
 		for(int i = 0; i < mainInventory.length; i++)
 		{
-			displayables[i] = new DisplayableItemStack(mainInventory[i]);
+			if(this.mainInventory[i] != null)
+			{
+				displayables[i] = new DisplayableItemStack(mainInventory[i]);
+			}
 		}
 		return displayables;
 	}
@@ -159,7 +170,10 @@ public class BlockChest extends Block
 		{
 			if(i < stacks.length)
 			{
-				mainInventory[i] = new ItemStack(stacks[i]);
+				if(stacks[i] != null)
+				{
+					mainInventory[i] = new ItemStack(stacks[i]);
+				}
 			}
 		}
 	}
@@ -189,5 +203,21 @@ public class BlockChest extends Block
 		}
 		return false;
 	}
+	
+	/**
+	 * Creates a full BlockChest based on a given MinimalBlock
+	 * @param block the MinimalBlock to fully expand to a BlockChest
+	 * @return a BlockChest, expanded from the MinimalBlock
+	 */
+	public BlockChest mergeOnto(MinimalBlock block)
+	{
+		setBitMap(block.bitMap);
+		this.id = block.id;
+		this.metaData = block.metaData;
+		this.hasMetaData = block.hasMetaData;
+		this.setInventory(block.mainInventory);
+ 		return this;
+	}
+	
 	
 }

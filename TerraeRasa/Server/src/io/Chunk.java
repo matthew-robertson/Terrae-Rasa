@@ -147,7 +147,7 @@ public class Chunk
 	 */
 	public synchronized void setBackWall(Block block, int x, int y)
 	{
-		backWalls[x][y] = new MinimalBlock(block.clone());
+		backWalls[x][y] = new MinimalBlock(block);
 	}
 	
 	/**
@@ -166,7 +166,7 @@ public class Chunk
 		{
 			addLightSource(x, y);
 		}
-		blocks[x][y] = new MinimalBlock(block.clone());
+		blocks[x][y] = new MinimalBlock(block);
 	}
 		
 	/**

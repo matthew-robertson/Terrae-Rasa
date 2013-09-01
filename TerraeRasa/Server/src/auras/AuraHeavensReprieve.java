@@ -16,6 +16,11 @@ public class AuraHeavensReprieve extends Aura
 {
 
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * Constructs a new AuraHeavensReprieve.
 	 */
 	public AuraHeavensReprieve()

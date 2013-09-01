@@ -40,7 +40,7 @@ public class MinimalBlock
 	 */
 	public MinimalBlock(SavableBlock savedBlock)
 	{
-		Block block = Block.blocksList[savedBlock.id].clone();
+		Block block = Block.blocksList[savedBlock.id];
 		this.id = (short) block.getID();
 		this.metaData = (byte) savedBlock.metaData;
 		this.mainInventory = savedBlock.mainInventory; //??????
@@ -48,18 +48,7 @@ public class MinimalBlock
 		this.isSolid = block.isSolid;
 		this.setBitMap(savedBlock.bitMap);
 	}
-	
-//	public MinimalBlock(SuperCompressedBlock compressedBlock)
-//	{
-//		Block block = Block.blocksList[compressedBlock.id].clone();
-//		this.id = (short) block.getID();
-//		this.metaData = (byte) compressedBlock.metaData;
-//		this.mainInventory = compressedBlock.mainInventory; //??????
-//		this.hasMetaData = block.hasMetaData;
-//		this.isSolid = block.isSolid;
-//		this.setBitMap(compressedBlock.bitMap);
-//	}
-	
+		
 	public int getID()
 	{
 		return id;
@@ -74,5 +63,13 @@ public class MinimalBlock
 	{
 		bitMap = (byte)i;		
 		return this;
+	}
+
+	public boolean isSolid() {
+		return isSolid;
+	}
+
+	public int getBitMap() {
+		return bitMap;
 	}
 }

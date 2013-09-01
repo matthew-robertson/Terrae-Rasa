@@ -174,21 +174,6 @@ public class Block extends ActionbarItem
 	}
 
 	/**
-	 * Overrides Object.clone() to provide better and public cloning
-	 *             functionality for Block. Cloned objects, using Block.clone()
-	 *             should return a deep copy, at a new reference.
-	 * @return a deep copy of the current Block
-	 */
-	public Block clone() {
-		try {
-			return (Block) super.clone();
-		} catch (CloneNotSupportedException e) {
-			e.printStackTrace();
-			return this;
-		}
-	}
-
-	/**
 	 * Creates a deep copy of a Block. Objects are copied, but will not have the same reference, though, Enums references are directly
 	 * copied to the new Block.
 	 * @param block the Block to be copied
@@ -536,16 +521,17 @@ public class Block extends ActionbarItem
 		return this;
 	}
 
+	/**
+	 * Creates a full block based on a given MinimalBlock
+	 * @param block the MinimalBlock to fully expand to a Block
+	 * @return a Block, expanded from the MinimalBlock
+	 */
 	public Block mergeOnto(MinimalBlock block)
 	{
 		setBitMap(block.bitMap);
 		this.id = block.id;
 		this.metaData = block.metaData;
 		this.hasMetaData = block.hasMetaData;
-		if(this instanceof BlockChest)
-		{
-			((BlockChest)(this)).setInventory(block.mainInventory);
-		}
  		return this;
 	}
 	
@@ -690,7 +676,7 @@ public class Block extends ActionbarItem
 			.setIconIndex(1, 1).setBlockType(3)
 			.setBothBlockWidthAndHeight(2, 2)
 			.setDroppedItem(new ItemStack(Item.heartCrystal), 1, 1);
-	public static Block chest = new BlockChest(56, 20).setName("Chest")
+	public final static Block chest = new BlockChest(56, 20).setName("Chest")
 			.setBothBlockWidthAndHeight(2, 2).setBlockHardness(40.0f)
 			.setIconIndex(11, 1).setBlockType(2).setIsOveridable(false)
 			.setIsSolid(true);

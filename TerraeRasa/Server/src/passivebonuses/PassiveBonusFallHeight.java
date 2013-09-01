@@ -14,6 +14,11 @@ import entities.EntityPlayer;
 public class PassiveBonusFallHeight extends PassiveBonus
 {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public PassiveBonusFallHeight(double power) 
 	{
 		super(power);

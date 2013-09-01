@@ -12,7 +12,7 @@ import enums.EnumMonsterType;
 
 /**
  * <code>EntityNPCEnemy</code> implements many of the features and fields needed for a monster.
- * It provides a public implementation of {@link #clone()}, so that monsters
+ * It provides a public implementation of a copy constructor so that monsters
  * can be added to world, from their public final static declarations here.
  * <br><br>
  * The other main method of interest here is {@link #applyAI(World)}. This method is the main method to 

@@ -54,7 +54,7 @@ public class BlockChest extends Block
 	{
 		if(mainInventory[index] == null)
 		{
-			mainInventory[index] = stack;
+			mainInventory[index] = new DisplayableItemStack(stack);
 			return null;
 		}
 		else if(stack.getItemID() == mainInventory[index].getItemID())
@@ -125,7 +125,15 @@ public class BlockChest extends Block
 	 */
 	public DisplayableItemStack[] getMainInventory()
 	{
-		return mainInventory;
+		DisplayableItemStack[] stacks = new DisplayableItemStack[mainInventory.length];
+		for(int i = 0; i < stacks.length; i++)
+		{
+			if(this.mainInventory[i] != null)
+			{
+				stacks[i] = new DisplayableItemStack(this.mainInventory[i]);
+			}
+		}		
+		return stacks;
 	}
 	
 	/**
@@ -179,4 +187,18 @@ public class BlockChest extends Block
 		return false;
 	}
 	
+	/**
+	 * Creates a full BlockChest based on a given MinimalBlock
+	 * @param block the MinimalBlock to fully expand to a BlockChest
+	 * @return a BlockChest, expanded from the MinimalBlock
+	 */
+	public BlockChest mergeOnto(MinimalBlock block)
+	{
+		setBitMap(block.bitMap);
+		this.id = block.id;
+		this.metaData = block.metaData;
+		this.hasMetaData = block.hasMetaData;
+		this.setInventory(block.mainInventory);
+ 		return this;
+	}
 }

@@ -13,6 +13,11 @@ import entities.EntityPlayer;
 public class PassiveBonusDodge extends PassiveBonus
 {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public PassiveBonusDodge(double power) 
 	{
 		super(power);

@@ -16,9 +16,12 @@ import transmission.UpdateWithObject;
 import utils.ActionbarItem;
 import utils.DisplayableItemStack;
 import utils.ItemStack;
+import utils.MathHelper;
+import utils.MetaDataHelper;
 import utils.MouseItemHelper;
 import world.World;
 import blocks.Block;
+import blocks.BlockChest;
 import entities.EntityPlayer;
 import enums.EnumColor;
 
@@ -297,17 +300,25 @@ public class Commands
 					return "";
 				}
 				EntityPlayer player = (EntityPlayer)(world.getEntityByID(Integer.parseInt(split[3])));
-				boolean success = world.placeBlock(player, 
+				boolean success = world.placeBlock(update,
+						player, 
 						Integer.parseInt(split[1]), 
 						Integer.parseInt(split[2]), 
 						Block.blocksList[Integer.parseInt(split[4])]);
 				if(success)
 				{
-					BlockUpdate blockUpdate = new BlockUpdate();
-					blockUpdate.x = Integer.parseInt(split[1]);
-					blockUpdate.y = Short.parseShort(split[2]);
-					blockUpdate.block = new SuperCompressedBlock(world.getBlockGenerate(blockUpdate.x, blockUpdate.y));
-					update.addBlockUpdate(blockUpdate);
+					/**
+					 * Possible issue here or with block cloning when a block is placed. Other blocks work
+					 * but chests fail. World has an error for this at a possible location
+					 * 
+					 * 
+					 * 
+					 * 
+					 * 
+					 * 
+					 * 
+					 */
+					
 					player.inventory.removeItemsFromInventoryStack(player, 1, Integer.parseInt(split[5]));
 				}
 				
@@ -553,6 +564,89 @@ public class Commands
 //					/player <id> setactionbarslot <slot>
 					player.selectedSlot = Integer.parseInt(split[3]);
 					update.addValue(command);
+				}
+				else if(split[2].equals("chestevent"))
+				{
+//					/player <id> chestpickup <x> <y> <index> <qty>
+					int x = Integer.parseInt(split[3]);
+					int y = Integer.parseInt(split[4]);
+					int index = Integer.parseInt(split[5]);
+					
+					//Get the metadata for the block's size
+					int[][] metadata = MetaDataHelper.getMetaDataArray((int)(Block.blocksList[world.getBlock(x, y).id].blockWidth / 6), 
+							(int)(Block.blocksList[world.getBlock(x, y).id].blockHeight / 6)); //metadata used by the block of size (x,y)
+					int metaWidth = metadata.length; 
+					int metaHeight = metadata[0].length;	
+					int xOffset = 0;
+					int yOffset = 0;					
+					BlockChest chest = (BlockChest)world.getFullBlock(x, y);
+					if(chest.metaData != 1) //Make sure its metadata is 1 (otherwise it doesnt technically exist)
+					{
+						//Loop until a the current chest's metadata value is found
+						//This provides the offset to find the 'real' chest, with the actual items in it
+						for(int i = 0; i < metaWidth; i++) 
+						{
+							for(int j = 0; j < metaHeight; j++)
+							{
+								if(metadata[i][j] == world.getBlock(x - xOffset, y - yOffset).metaData)
+								{
+									xOffset = i; 
+									yOffset = j;
+									break;
+								}
+							}
+						}			
+						//Update the chest
+						chest = (BlockChest)(world.getFullBlock(x - xOffset, y - yOffset));
+					}	
+					
+					if(chest.getItemStack(index) != null && player.getHeldMouseItem() == null) //The mouse doesn't have something picked up, so this is straightforward
+					{
+						if(split[6].equals("all"))
+						{
+							ItemStack mouseItem = new ItemStack(chest.getItemStack(index));
+							chest.removeItemStack(index);
+							player.setHeldMouseItem(mouseItem);
+						}
+						else if(split[6].equals("1/2"))
+						{
+							ItemStack mouseItem = new ItemStack(chest.getItemStack(index));
+							mouseItem.setStackSize((int)(MathHelper.floorOne(mouseItem.getStackSize() / 2)));
+							chest.removeItemsFromInventoryStack((mouseItem.getStackSize()), index);
+							player.setHeldMouseItem(mouseItem);
+						}
+						else
+						{
+							throw new RuntimeException("This will not work -- NYI");
+//							int qty = Integer.parseInt(split[6]);
+//							chest.removeItemsFromInventoryStack(qty, index);
+						}
+						
+						//Cause a block update for the chest
+						BlockUpdate blockUpdate = new BlockUpdate();
+						blockUpdate.x = x - xOffset;
+						blockUpdate.y = (short) (y - yOffset);
+						blockUpdate.block = new SuperCompressedBlock(chest);
+						update.addBlockUpdate(blockUpdate);
+						world.setBlock(chest, x - xOffset, y - yOffset);
+					}
+					else if(player.getHeldMouseItem() != null) //The mouse has something picked up, things need swapped
+					{
+						//Reference safe swap
+						ItemStack mouseItem = new ItemStack(player.getHeldMouseItem());
+						ItemStack chestItem = chest.takeItemStack(index);
+						chest.placeItemStack(mouseItem, index);
+						player.setHeldMouseItem(chestItem);
+
+						//Cause a block update for the chest
+						BlockUpdate blockUpdate = new BlockUpdate();
+						blockUpdate.x = x - xOffset;
+						blockUpdate.y = (short) (y - yOffset);
+						blockUpdate.block = new SuperCompressedBlock(chest);
+						update.addBlockUpdate(blockUpdate);
+						world.setBlock(chest, x - xOffset, y - yOffset);
+					}
+				
 				}
 			}
 			else if(command.startsWith("/quit"))

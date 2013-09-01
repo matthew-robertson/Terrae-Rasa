@@ -161,7 +161,7 @@ public class EntityNPC extends EntityLiving
 		if (direction){
 			//Check all the blocks in a line up to the npc's block height if any are solid, return true
 			for (int i = 0; i <= heightCheck; i++){
-					if (world.getBlockGenerate((int)(x + width) / 6, (int)(y + height) / 6 - 1 - i).getIsSolid()){
+					if (world.getBlock((int)(x + width) / 6, (int)(y + height) / 6 - 1 - i).isSolid()){
 						if (up){
 							return i;
 						}
@@ -173,7 +173,7 @@ public class EntityNPC extends EntityLiving
 		else if (!direction){
 			//Check all the blocks in a line up to the npc's block height if any are solid, return true
 			for (int i = 0; i <= heightCheck; i++){						
-				 if (world.getBlockGenerate((int)(x) / 6 - 1, (int)(y + height) / 6 - 1 - i).getIsSolid()){
+				 if (world.getBlock((int)(x) / 6 - 1, (int)(y + height) / 6 - 1 - i).isSolid()){
 					if (up){
 						return i;
 					}
@@ -202,7 +202,7 @@ public class EntityNPC extends EntityLiving
 				blockSpace = 0;
 				//Check all the blocks in a line up to the maximum jump height + the npc's block height
 				for (int i = start; i < (getUpwardJumpHeight() + height) / 6; i++){
-					 if (!world.getBlockGenerate((int)(x + width) / 6, (int)(y + height) / 6 - 1 - i).getIsSolid()){
+					 if (!world.getBlock((int)(x + width) / 6, (int)(y + height) / 6 - 1 - i).isSolid()){
 						 blockSpace++;
 						 if (blockSpace > maxBlockSpace){
 							 maxBlockSpace = blockSpace;
@@ -222,7 +222,7 @@ public class EntityNPC extends EntityLiving
 				blockSpace = 0;
 				//Check all the blocks in a line up to the maximum jump height + the npc's block height
 				for (int i = start; i < (getUpwardJumpHeight() + height) / 6; i++){
-					 if (!world.getBlockGenerate((int)(x) / 6 - 1, (int)(y + height) / 6 - 1 - i).getIsSolid()){
+					 if (!world.getBlock((int)(x) / 6 - 1, (int)(y + height) / 6 - 1 - i).isSolid()){
 						 blockSpace++;
 						 if (blockSpace > maxBlockSpace){
 							 maxBlockSpace = blockSpace;
@@ -252,7 +252,7 @@ public class EntityNPC extends EntityLiving
 			//Check all the blocks in a line up to the npc's block width if any are solid, return true
 			for (int i = 0; i <= blockWidth; i++){
 				for (int j = 0; j <= (getMaxHeightFallenSafely() / 6); j++)
-				if (world.getBlockGenerate((int)(x + width) / 6 - 1 + i, (int)(y + height) / 6 + j).getIsSolid()){
+				if (world.getBlock((int)(x + width) / 6 - 1 + i, (int)(y + height) / 6 + j).isSolid()){
 					return true;							 
 				}
 			}
@@ -263,7 +263,7 @@ public class EntityNPC extends EntityLiving
 			//Check all the blocks in a line up to the npc's block width if any are solid, return true
 			for (int i = 0; i <= blockWidth; i++){						
 				for (int j = 0; j <= (getMaxHeightFallenSafely() / 6); j++){ 
-					if (world.getBlockGenerate((int)(x) / 6 - i, (int)(y + height) / 6 + j).getIsSolid()){
+					if (world.getBlock((int)(x) / 6 - i, (int)(y + height) / 6 + j).isSolid()){
 						return true;
 					}
 				 }

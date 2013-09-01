@@ -91,8 +91,6 @@ public class UI extends UIBase
 			}
 		}
 	}
-
-	
 	
 	/**
 	 * Renders all constantly visible text that's required for the inventory.
@@ -154,39 +152,8 @@ public class UI extends UIBase
 		{
 		 	return; //There are no recipes
 		}
-		
 		String command = "/player " + player.entityID + " craft " + player.getAllPossibleRecipes()[index].getID();
 		update.addCommand(command);
-//		Recipe whatToCraft = player.getAllPossibleRecipes()[index];
-//		
-//		if(player.getHeldItem() != null && player.getHeldItem().getItemID() != whatToCraft.getResult().getItemID()) //check if it's possible to craft successfully
-//		{
-//			return;
-//		}
-//	
-//		if(player.getHeldItem() != null && player.getHeldItem().getItemID() == whatToCraft.getResult().getItemID()) 
-//		{ //does the mouseItem have the same item being crafted already picked up?
-//			if(whatToCraft.getResult().getStackSize() + player.getHeldItem().getStackSize() < player.getHeldItem().getMaxStackSize()) //if there's room to pick it up
-//			{
-//				for(int i = 0; i < whatToCraft.getRecipe().length; i++) //remove the items from the inventory
-//				{
-//					player.inventory.removeItemsFromInventory(player, whatToCraft.getRecipe()[i]);
-//				}
-//				player.getHeldItem().addToStack(whatToCraft.getResult().getStackSize()); //pick up the item
-//			}
-//		}
-//		else //the mouseitem is null, so pick up a new itemstack
-//		{
-//			for(int i = 0; i < whatToCraft.getRecipe().length; i++) //remove items from inventory
-//			{
-//				player.inventory.removeItemsFromInventory(player, whatToCraft.getRecipe()[i]);
-//			}
-//			
-//			mouseXOffset = xoff;
-//			mouseYOffset = yoff;
-//			mouseItemSize = size;
-//			player.getHeldItem() = new DisplayableItemStack(whatToCraft.getResult()); //THIS IS VERY IMPORTANT
-//		}
 	}
 		
 	/**
@@ -204,5 +171,4 @@ public class UI extends UIBase
 			player.selectedRecipe = player.getAllPossibleRecipes().length - 1;
 		}
 	}
-
 }

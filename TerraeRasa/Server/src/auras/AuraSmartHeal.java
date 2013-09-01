@@ -14,6 +14,10 @@ import entities.EntityPlayer;
  */
 public class AuraSmartHeal extends Aura 
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private boolean percentile;
 	private double healAmount;
 	private double activationThreshold;

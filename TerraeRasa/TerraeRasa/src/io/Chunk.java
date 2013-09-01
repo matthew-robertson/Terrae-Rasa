@@ -201,7 +201,7 @@ public class Chunk
 //		{
 //			addLightSource(x, y);
 //		}
-		blocks[x][y] = new MinimalBlock(block.clone());
+		blocks[x][y] = new MinimalBlock(block);
 	}
 	
 	/**

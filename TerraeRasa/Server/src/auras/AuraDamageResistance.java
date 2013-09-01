@@ -17,6 +17,10 @@ import enums.EnumDamageType;
  */
 public class AuraDamageResistance extends Aura
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private EnumDamageType resistanceType;
 	private double damageModifier;
 	
