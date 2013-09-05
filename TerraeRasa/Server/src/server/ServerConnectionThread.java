@@ -12,6 +12,7 @@ import savable.SaveManager;
 import transmission.ChunkCompressor;
 import transmission.CompressedClientUpdate;
 import transmission.CompressedServerUpdate;
+import transmission.ConnectionFilter;
 import transmission.GZIPHelper;
 import transmission.ServerUpdate;
 import transmission.SuperCompressedChunk;
@@ -31,6 +32,16 @@ public class ServerConnectionThread extends Thread
 	private final int connectionID;
 	private int associatedPlayerID;
 	private volatile boolean sendPlayerAndClose;
+	private ConnectionFilter filter;
+	
+//	TODO ?this?
+	/*
+	TODO: implement this [important]
+	> probably having a shared thread pool of ~32 threads for defered compression is best. 
+	> use callables.
+	  
+	 */
+	
 	
 	public ServerConnectionThread(WorldLock lock, Socket socket, ObjectOutputStream os, ObjectInputStream is)
 	{
@@ -43,6 +54,7 @@ public class ServerConnectionThread extends Thread
 		this.os = os;
 		gzipHelper = new GZIPHelper();
 		connectionID = ServerSettings.getConnectionID();
+		filter = new ConnectionFilter();
 	}
 	
 	public void registerWorldUpdate(ServerUpdate update)
@@ -60,7 +72,7 @@ public class ServerConnectionThread extends Thread
 			while(open)
 			{
 				CompressedClientUpdate[] clientUpdate = (CompressedClientUpdate[])(gzipHelper.expand((byte[])is.readObject()));
-				worldLock.registerPlayerUpdate(clientUpdate);
+				worldLock.registerPlayerUpdate(new ConnectionFilter().filterIn(clientUpdate, associatedPlayerID));
 				//TODO: Maybe? this may or may not be reckless.
 				
 				if(sendPlayerAndClose)
@@ -78,8 +90,23 @@ public class ServerConnectionThread extends Thread
 				}
 				else
 				{
-					CompressedServerUpdate[] updates = worldLock.yieldServerUpdates();
-					os.writeObject(gzipHelper.compress(updates));
+					ServerUpdate[] updates = worldLock.yieldServerUpdates();
+					CompressedServerUpdate[] compressedUpdates = new CompressedServerUpdate[updates.length];
+					for(int i = 0; i < updates.length; i++)
+					{
+						compressedUpdates[i] = filter.filterOutgoing(updates[i], worldLock.getRelevantPlayer());
+					}			
+					long start = System.currentTimeMillis();
+					byte[] result = gzipHelper.compress(compressedUpdates);
+		        	if(System.currentTimeMillis() - start > 50)
+		        	{
+						System.out.println(System.currentTimeMillis() - start);
+		        	}
+		        	if(result.length > 5000)
+		        	{
+		        		System.out.println("LEngth = " + result.length);
+		        	}
+					os.writeObject(result);
 		        	os.flush();
 				}
 			}			

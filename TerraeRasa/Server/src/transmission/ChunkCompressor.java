@@ -16,6 +16,7 @@ public class ChunkCompressor
 
 	public static SuperCompressedChunk compressChunk(Chunk chunk)
 	{
+//		long time = System.currentTimeMillis();
 		SuperCompressedChunk compressedChunk = new SuperCompressedChunk();
 		compressedChunk.biome = new Biome(chunk.getBiome());
 		compressedChunk.backWalls = compress(chunk.backWalls);
@@ -25,6 +26,7 @@ public class ChunkCompressor
 		compressedChunk.height = chunk.getHeight();
 		compressedChunk.lightSources = chunk.getLightSourcesAsArray();
 		compressedChunk.weather = chunk.weather;
+//		System.out.println("Compression time = " + (System.currentTimeMillis() - time));
 		return compressedChunk;
 	}
 

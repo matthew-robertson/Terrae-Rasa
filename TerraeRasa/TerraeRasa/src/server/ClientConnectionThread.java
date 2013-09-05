@@ -9,7 +9,6 @@ import java.net.Socket;
 import java.net.URISyntaxException;
 
 import savable.SaveManager;
-import transmission.ChunkExpander;
 import transmission.CompressedClientUpdate;
 import transmission.CompressedServerUpdate;
 import transmission.GZIPHelper;
@@ -118,17 +117,16 @@ public class ClientConnectionThread extends Thread
 			os.flush();
 			
 			SuperCompressedChunk[] scc = (SuperCompressedChunk[])(gzipHelper.expand((byte[])is.readObject()));
-			Chunk[] chunks = new Chunk[scc.length];
-			for(int i = 0; i < chunks.length; i++)
+			for(int i = 0; i < scc.length; i++)
 			{
-				chunks[i] = ChunkExpander.expandChunk(scc[i]);
+				engineLock.expandChunk(scc[i]);
 			}
 			
 			os.writeUTF("/initialgamedata");
 			os.flush();
 			
 			WorldData data = (WorldData)(gzipHelper.expand((byte[])is.readObject()));
-			World world = new World(data, chunks);
+			World world = new World(data, new Chunk[] { });
 			engineLock.setWorld(world);
 			
 		} catch (IOException e) {

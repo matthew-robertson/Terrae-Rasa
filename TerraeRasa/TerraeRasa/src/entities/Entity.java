@@ -45,7 +45,7 @@ public class Entity
 		textureHeight = 16;
 		blockWidth = 2;
 		blockHeight = 3;		
-		entityID = -1; //TODO: Client-side this is an issue ==> ENTITY_ID
+		entityID = -1;
 	}	
 		
 	/**
@@ -62,7 +62,7 @@ public class Entity
 		this.height = entity.height;
 		this.blockWidth = entity.blockWidth;
 		this.blockHeight = entity.blockHeight;
-		entityID = -1; //TODO: Client-side this is an issue ==> ENTITY_ID
+		entityID = -1; 
 	}
 	
 	public Entity setEntityID(int id)

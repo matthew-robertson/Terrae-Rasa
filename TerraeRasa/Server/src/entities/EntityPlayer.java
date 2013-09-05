@@ -371,9 +371,6 @@ public class EntityPlayer extends EntityLiving
 			possibleRecipesByBlock.put(block.getName(), new Recipe[] { });
 		}
 		allPossibleRecipes = new Recipe[0];
-		
-		//TODO make sure the stats dont exceed maximum allowed values. I dont see any good reason not to cap stuff.
-		//TODO cap out status effects at a given value. Basically, if the power value exceeds 100% then flag it as invalid?
 	}
 	
 	public EntityPlayer(EntityPlayer entity)
@@ -1065,7 +1062,7 @@ public class EntityPlayer extends EntityLiving
 		}
 		//Check If the left-mouse button is pressed && they have the correct tool to mine
 		if (world.getBlock(mx, my).getID() != Block.air.getID()){
-			if (((item instanceof ItemToolPickaxe && block.getBlockType() == 1) //TODO: Magic number fix @ block types
+			if (((item instanceof ItemToolPickaxe && block.getBlockType() == 1) 
 			  || (item instanceof ItemToolAxe && block.getBlockType() == 2)  
 		      || block.getBlockType() == 0))
 			{	

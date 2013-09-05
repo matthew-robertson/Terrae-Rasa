@@ -20,7 +20,6 @@ import render.RenderMenu;
 import render.RenderWorld;
 import statuseffects.DisplayableStatusEffect;
 import transmission.BlockUpdate;
-import transmission.ChunkExpander;
 import transmission.ClientUpdate;
 import transmission.CompressedClientUpdate;
 import transmission.CompressedServerUpdate;
@@ -126,7 +125,8 @@ public class GameEngine
 			final int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
 			final int MAX_FRAMESKIP = 5;
 			long next_game_tick = System.currentTimeMillis();
-			long start, end;
+			long start;
+			long end;
 			long fps = 0;
 			int loops;
 			start = System.currentTimeMillis();
@@ -238,6 +238,12 @@ public class GameEngine
 		        			processUpdates(player, updates);
 		        		}		        		
 		        		update = new ClientUpdate();
+		        		
+		        		if(world != null)
+		        		{
+		        			chunkManager.addAllLoadedChunks(world, world.getChunks());
+		        		}
+		        		
 		        	}
 		        	
 		        	TerraeRasa.terraeRasa.checkWindowSize();		        	 
@@ -432,17 +438,17 @@ public class GameEngine
 					String[] split = update.command.split(" ");
 					world.getChunk(Integer.parseInt(split[1])).weather = null;
 				}
+				else if(update.command.startsWith("/chunk"))
+				{
+					SuperCompressedChunk chunk = (SuperCompressedChunk)(update.object);
+					String command = "/player " + activePlayerID + " chunkrequest " + chunk.x;
+					world.removePendingChunkRequest(command);
+					chunkManager.expandChunk(chunk);
+				}
 			}
 			for(String command : serverupdate.values)
 			{
 				processCommand(clientPlayer, command);
-			}
-			for(SuperCompressedChunk compchunk : serverupdate.chunks)
-			{
-				Chunk chunk = ChunkExpander.expandChunk(compchunk);
-				String command = "/player " + activePlayerID + " chunkrequest " + chunk.getX();
-				world.removePendingChunkRequest(command);
-				world.registerChunk(chunk, chunk.getX());
 			}
 			for(BlockUpdate update : serverupdate.blockUpdates)
 			{
@@ -624,6 +630,11 @@ public class GameEngine
 		}
 	}
 	
+	public void registerChunkExpand(SuperCompressedChunk chunk)
+	{
+		chunkManager.expandChunk(chunk);
+	}
+	
 	public void addColoredText(ColoredText text)
 	{
 		chatbox.addText(text);
@@ -686,7 +697,6 @@ public class GameEngine
 		this.universeName = universeName;
 		this.world = world;
 		this.world.chunkManager = chunkManager;
-		this.world.chunkManager.setUniverseName(universeName);
 		this.activePlayerName = playerName;
 		TerraeRasa.isMainMenuOpen = false;
 		mainMenu = null;

@@ -183,10 +183,10 @@ public class RenderEntities extends Render
         double y = (int)enemy.y;
         double eh = enemy.getHeight();
         double ew = enemy.getWidth();
-		double tx = (double)enemy.iconX * (32.0 / 512);
-		double ty = (double)enemy.iconY * (32.0 / 256); //TODO magic number fix
-		double tw = (double)enemy.textureWidth / 512;
-		double th = (double)enemy.textureHeight / 256;
+		double tx = (double)enemy.iconX * (32.0 / MONSTERS_SHEET_WIDTH);
+		double ty = (double)enemy.iconY * (32.0 / MONSTERS_SHEET_HEIGHT); 
+		double tw = (double)enemy.textureWidth / MONSTERS_SHEET_WIDTH;
+		double th = (double)enemy.textureHeight / MONSTERS_SHEET_HEIGHT;
         
 		monsterSheet.bind(); 
         t.startDrawingQuads();
@@ -209,10 +209,10 @@ public class RenderEntities extends Render
         double y = (int)npc.y;
         double eh = npc.getHeight();
         double ew = npc.getWidth();
-        double tx = (double)npc.iconX * (32.0 / 512);
-		double ty = (double)npc.iconY * (32.0 / 256); //TODO magic number fix
-		double tw = (double)npc.textureWidth / 512;
-		double th = (double)npc.textureHeight / 256;
+        double tx = (double)npc.iconX * (32.0 / MONSTERS_SHEET_WIDTH);
+		double ty = (double)npc.iconY * (32.0 / MONSTERS_SHEET_HEIGHT);  
+		double tw = (double)npc.textureWidth / MONSTERS_SHEET_WIDTH;
+		double th = (double)npc.textureHeight / MONSTERS_SHEET_HEIGHT;
         
 		monsterSheet.bind(); 
         t.startDrawingQuads();

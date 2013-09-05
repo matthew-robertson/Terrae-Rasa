@@ -430,7 +430,6 @@ public class MouseItemHelper {
 
 	public static void socketGem(World world, EntityPlayer player, int inventoryID, int index, int gemSocketIndex)
 	{
-//		TODO fix gemming
 		//Socket a gem, if possible.
 		if(player.getHeldMouseItem() != null)
 		{

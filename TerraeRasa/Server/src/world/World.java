@@ -544,7 +544,6 @@ public class World
 	{		
 		spawnMonsters(update, players);				
 		updateWeather(update);		
-		//TODO: weather		
 		
 		updateChunks(players);
 		
@@ -809,7 +808,11 @@ public class World
 			double x = entityList.get(i).x;
 			double y = entityList.get(i).y;
 			entityList.get(i).invincibilityTicks--;
-			entityList.get(i).applyAI(this); //otherwise apply AI
+			try {
+				entityList.get(i).applyAI(this); //otherwise apply AI
+			} catch (Exception e) {
+				e.printStackTrace();
+			}			
 			if(entityList.get(i).x != x || entityList.get(i).y != y)
 			{
 				update.addPositionUpdate(new PositionUpdate(entityList.get(i).entityID, entityList.get(i).x, entityList.get(i).y));
@@ -823,7 +826,6 @@ public class World
 	 * @param y - location in the world
 	 * @return - updated bitmap
 	 */
-	
 	public int updateBlockBitMap(int x, int y){
 		int bit = getBlock(x,y).getBitMap();
 		//If the block is standard
@@ -905,7 +907,13 @@ public class World
 			if (projectileList.get(i).active){
 				double x = projectileList.get(i).x;
 				double y = projectileList.get(i).y;
-				projectileList.get(i).moveProjectile(this);
+				try {
+					projectileList.get(i).moveProjectile(this);
+				} catch(Exception e) {
+					e.printStackTrace();
+					projectileList.get(i).ticksNonActive += 200;
+				}
+				
 				if(projectileList.get(i).x != x || projectileList.get(i).y != y)
 				{
 					positionUpdateValid = false;
@@ -2205,6 +2213,7 @@ public class World
 	 */
 	private void updateChunks(Vector<EntityPlayer> players)
 	{
+//		long time = System.currentTimeMillis();
 		List<String> requiredChunks = new ArrayList<String>();
 		List<String> removedChunks = new ArrayList<String>();
 		//How far to check for chunks (in blocks)
@@ -2293,7 +2302,8 @@ public class World
 				chunkManager.requestChunk(worldName, this, chunks, Integer.parseInt(str));
 			}			
 		}
-		
+//		System.out.println("Chunk_Check = " + (System.currentTimeMillis() - time));
+
 	}
 	
 	/**

@@ -54,17 +54,20 @@ public class RenderLight extends Render
 				Block block = player.getHandheldLight();
 				if(block != null)
 				{
-	
-					HeldLightMap map = new HeldLightMap(((int)(player.x / 6)) + ((player.isFacingRight) ? 1 : 0), 
-							((int)(player.y / 6)) + 1, 
-							block.lightRadius, 
-							lightUtils.getLightMap(world, 
-									((int)(player.x / 6)) + ((player.isFacingRight) ? 1 : 0), 
-									((int)(player.y / 6)) + 1, 
-									block.lightRadius, 
-									block.lightStrength)
-							);
-					lightMaps.add(map);
+					try {
+						HeldLightMap map = new HeldLightMap(((int)(player.x / 6)) + ((player.isFacingRight) ? 1 : 0), 
+								((int)(player.y / 6)) + 1, 
+								block.lightRadius, 
+								lightUtils.getLightMap(world, 
+										((int)(player.x / 6)) + ((player.isFacingRight) ? 1 : 0), 
+										((int)(player.y / 6)) + 1, 
+										block.lightRadius, 
+										block.lightStrength)
+								);
+						lightMaps.add(map);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 			}
 				

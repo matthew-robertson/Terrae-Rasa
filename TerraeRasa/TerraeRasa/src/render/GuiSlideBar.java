@@ -5,8 +5,6 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
 
-//TODO: The slide-bar part of GuiSlideBar needs a texture.
-
 /**
  * <code> GuiSlideBar extends GuiComponent </code> <br>
  * GuiSlideBar implements a simple slider to measure a % value for a setting, etc. It contains methods to 

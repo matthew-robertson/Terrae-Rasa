@@ -1,6 +1,5 @@
 package enums;
 
-//TODO: Mouse stuff (swings, mining, breaking)
 public enum EnumHardwareInput 
 {
 	MOVE_UP,

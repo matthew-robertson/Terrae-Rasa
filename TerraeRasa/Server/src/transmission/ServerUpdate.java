@@ -1,7 +1,5 @@
 package transmission;
 
-import io.Chunk;
-
 import java.util.Vector;
 
 public class ServerUpdate
@@ -11,15 +9,16 @@ public class ServerUpdate
 	private final Object positionUpdateLock = new Object();
 	private final Object blockUpdateLock = new Object();
 	private final Object statUpdateLock = new Object();
-	private final Object chunkUpdateLock = new Object();
+//	private final Object chunkUpdateLock = new Object();
 	private final Object objectUpdateLock = new Object();
 	private Vector<String> commands; 
 	private Vector<EntityUpdate> entityUpdates;
 	private Vector<PositionUpdate> positionUpdates;
 	private Vector<BlockUpdate> blockUpdates;
 	private Vector<StatUpdate> statUpdates;
-	private Vector<Chunk> chunkUpdates;
+//	private Vector<Chunk> chunkUpdates;
 	private Vector<UpdateWithObject> objectUpdates;
+	public boolean deferCompression;
 	
 	public ServerUpdate()
 	{
@@ -28,8 +27,8 @@ public class ServerUpdate
 		this.positionUpdates = new Vector<PositionUpdate>();
 		this.blockUpdates = new Vector<BlockUpdate>();
 		this.statUpdates = new Vector<StatUpdate>();
-		this.chunkUpdates = new Vector<Chunk>();
-		this.objectUpdates = new Vector<UpdateWithObject>();
+//		this.chunkUpdates = new Vector<Chunk>();
+		this.setObjectUpdates(new Vector<UpdateWithObject>());
 	}
 	
 	public void addValue(String val)
@@ -121,24 +120,24 @@ public class ServerUpdate
 			return updates;
 		}
 	}
-	
-	public void addChunkUpdate(Chunk chunk)
-	{
-		synchronized(chunkUpdateLock)
-		{
-			chunkUpdates.add(chunk);
-		}
-	}
-	
-	public Chunk[] getChunks()
-	{
-		synchronized(chunkUpdateLock)
-		{
-			Chunk[] updates = new Chunk[chunkUpdates.size()];
-			chunkUpdates.copyInto(updates);
-			return updates;
-		}
-	}
+//	
+//	public void addChunkUpdate(Chunk chunk)
+//	{
+//		synchronized(chunkUpdateLock)
+//		{
+//			chunkUpdates.add(chunk);
+//		}
+//	}
+//	
+//	public Chunk[] getChunks()
+//	{
+//		synchronized(chunkUpdateLock)
+//		{
+//			Chunk[] updates = new Chunk[chunkUpdates.size()];
+//			chunkUpdates.copyInto(updates);
+//			return updates;
+//		}
+//	}
 	
 	public void addObjectUpdate(UpdateWithObject update)
 	{
@@ -156,5 +155,39 @@ public class ServerUpdate
 			objectUpdates.copyInto(updates);
 			return updates;
 		}
+	}
+
+	public Vector<String> commands()
+	{
+		return commands;
+	}
+	
+	public Vector<UpdateWithObject> objectUpdates()
+	{
+		return objectUpdates;
+	}
+	
+	private void setObjectUpdates(Vector<UpdateWithObject> objectUpdates) {
+		this.objectUpdates = objectUpdates;
+	}
+
+	public Vector<StatUpdate> statUpdates() {
+		return statUpdates;
+	}
+
+	public int getCommandLength() {
+		return commands.size();
+	}
+
+	public int getUpdateObjectLength() {
+		return objectUpdates.size();
+	}
+
+	public int getStatUpdateLength() {
+		return statUpdates.size();
+	}
+
+	public Vector<String> values() {
+		return commands;
 	}
 }

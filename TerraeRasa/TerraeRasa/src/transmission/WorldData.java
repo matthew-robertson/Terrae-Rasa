@@ -9,10 +9,6 @@ import enums.EnumWorldDifficulty;
 public class WorldData 
 		implements Serializable
 {
-	//TODO: parts of the world dont send. 
-	//public Weather weather;
-	//private boolean weatherFinished;
-	
 	private static final long serialVersionUID = 1L;
 	public List<DisplayableEntity> itemsList;
 	public List<DisplayableEntity> enemyList;

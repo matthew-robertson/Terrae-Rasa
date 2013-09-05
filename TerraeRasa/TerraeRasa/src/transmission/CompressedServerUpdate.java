@@ -7,7 +7,7 @@ public class CompressedServerUpdate
 {
 	private static final long serialVersionUID = 1L;
 	public String[] values;
-	public SuperCompressedChunk[] chunks; 
+//	public SuperCompressedChunk[] chunks; 
 	//public CompressedPlayer player;
 	//public PositionUpdate update;
 	public EntityUpdate[] entityUpdates;

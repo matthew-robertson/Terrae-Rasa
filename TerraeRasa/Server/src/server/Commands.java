@@ -27,6 +27,7 @@ import statuseffects.StatusEffectSteelSkin;
 import statuseffects.StatusEffectStun;
 import statuseffects.StatusEffectSwiftness;
 import transmission.BlockUpdate;
+import transmission.ChunkCompressor;
 import transmission.PositionUpdate;
 import transmission.ServerUpdate;
 import transmission.SuperCompressedBlock;
@@ -776,10 +777,15 @@ public class Commands
 					{
 						if(world.chunksLoaded.get(split[3]))
 						{
-							update.addChunkUpdate(world.getChunk(Integer.parseInt(split[3])));
+							UpdateWithObject objUpdate = new UpdateWithObject();
+		        			objUpdate.command = "/chunk " + split[1]; 
+		        			objUpdate.object = ChunkCompressor.compressChunk(world.getChunk(Integer.parseInt(split[3])));
+							update.addObjectUpdate(objUpdate);
+//							TODO: ?deferCompression here --> create + register new update object?
 						}		
 						else
 						{
+							System.out.println("Deferred : " + split[3]);
 							pendingChunkRequests.add(command);
 						}
 					}
@@ -988,6 +994,7 @@ public class Commands
 				}
 				else if(command.startsWith("/quit"))
 				{
+//					/quit <player_id>
 					String[] split = command.split(" ");
 					TerraeRasa.requestThreadCloseByID(Integer.parseInt(split[1]));
 				}

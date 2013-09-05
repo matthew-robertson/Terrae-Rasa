@@ -271,7 +271,6 @@ public class RecipeManager
 		new DisplayableItemStack(Item.goldIngot, 2)
 	});
 	
-	//TODO: Fix recipes with affixes
 	// Gemcrafting Bench (currently crafting bench)	
 	Recipe frenziedRubyRing = new Recipe(this, new DisplayableItemStack(Item.rubyRing).setRenderedName("Frenzied Ruby Ring"), Block.gemcraftingBench, new DisplayableItemStack[]{
 		new DisplayableItemStack(Item.berserkersEssence), new DisplayableItemStack(Item.rubyRing)

@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
+import transmission.ChunkCompressor;
 import transmission.CompressedClientUpdate;
 import transmission.EntityUpdate;
 import transmission.ServerUpdate;
@@ -135,7 +136,11 @@ public class GameEngine
 		        		
 		        		if(world.chunksLoaded.get(split[3]))
 						{
-							update.addChunkUpdate(world.getChunk(Integer.parseInt(split[3])));
+		        			UpdateWithObject objUpdate = new UpdateWithObject();
+		        			objUpdate.command = "/chunk " + split[1]; 
+		        			objUpdate.object = ChunkCompressor.compressChunk(world.getChunk(Integer.parseInt(split[3])));
+							update.addObjectUpdate(objUpdate);
+//							> TODO: ?Create a new update object and defer the compression of that object?
 							it.remove();
 						}
 		        	}
@@ -404,7 +409,6 @@ public class GameEngine
 //			FileManager manager = new FileManager();
 //			manager.savePlayer(player);
 //		}	
-		//TODO: some sort of player saving
 		//world.saveRemainingWorld();
 	}
 	

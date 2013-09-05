@@ -11,8 +11,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.lwjgl.opengl.Display;
-
 import transmission.ClientUpdate;
 import transmission.TransmittablePlayer;
 import transmission.WorldData;
@@ -279,14 +277,9 @@ public class World
 		
 		player.respawnXPos = getWorldCenterOrtho();
 		
-		//requestRequiredChunks((int)(player.respawnXPos / 6), (int)(player.y / 6));
-		//chunkManager.addAllLoadedChunks_Wait(this, chunks);
-		
-		requestRequiredChunks(getWorldCenterBlock(), averageSkyHeight);
 		chunkManager.addAllLoadedChunks_Wait(this, getChunks());
 		
-		try
-		{
+		try {
 			for(int i = 0; i < height - 1; i++)
 			{
 				if(getBlock((int)(player.respawnXPos / 6), i).id == 0 && getBlock((int)(player.respawnXPos / 6) + 1, i).id == 0) 
@@ -300,45 +293,12 @@ public class World
 					return player;
 				}			
 			}
-		}
-		catch (Exception e) //This is probably a nullpointer 
-		{
+		} catch (Exception e) {//This is probably a nullpointer 
 			e.printStackTrace();
 			throw new RuntimeException("This is likely caused by a chunk that's required being denied due to I/O conflicts");
 			//If this exception is thrown, inspect the addition to chunkmanager - chunkLock from A1.0.23
 		}
 		return player;
-	}
-	
-	/**
-	 * Adds a player to the world. Currently multiplayer placeholder.
-	 * @param player the player to add
-	 */
-	public void addPlayerToWorld(EntityPlayer player)
-	{
-		requestRequiredChunks(getWorldCenterBlock(), averageSkyHeight);
-		chunkManager.addAllLoadedChunks_Wait(this, getChunks());
-		player = spawnPlayer(player);
-	}
-	
-	/**
-	 * Loads all nearby chunks for a location, given the Display's size
-	 * @param x the x value of the point to load near (in blocks)
-	 * @param y the y value of the point to load near (in blocks)
-	 */
-	private void requestRequiredChunks(int x, int y)
-	{
-		final int loadDistanceHorizontally = (((int)(Display.getWidth() / 2.2) + 3) > Chunk.getChunkWidth()) ? 
-				((int)(Display.getWidth() / 2.2) + 3) : Chunk.getChunkWidth();
-		
-		//Where to check, in the chunk map (based off loadDistance variables)
-		int leftOff = (x - loadDistanceHorizontally) / Chunk.getChunkWidth();
-		int rightOff = (x + loadDistanceHorizontally) / Chunk.getChunkWidth();
-		
-		for(int i = leftOff; i <= rightOff; i++) //Check for chunks that need loaded
-		{
-			chunkManager.requestChunk(worldName, this, getChunks(), i);
-		}
 	}
 		
 	/**
@@ -1172,32 +1132,6 @@ public class World
 	}
 	
 	/**
-	 * Saves all chunks loaded in chunks (ConcurrantHashMap) to disk.
-	 * @param dir the sub-directory to save the chunks in (ex. "Earth" for the overworld)
-	 */
-	private void saveAllRemainingChunks()
-	{
-		Enumeration<String> keys = getChunks().keys();
-        while (keys.hasMoreElements()) 
-        {
-            Chunk chunk = getChunks().get((String)(keys.nextElement()));
-            chunkManager.saveChunkAndLockThread(worldName, getChunks(), chunk.getX());		
-        }
-        System.gc();
-	}
-	
-	/**
-	 * Saves all the chunks loaded and the important variables in world to disk. The important variables are saved in the world's
-	 * main directory under the name "worlddata.dat" and the chunks are saved in the "Earth" directory (or the applicable dimension)
-	 * @param dir the sub-directory to save the world data in (Ex. "Earth" for the over-world)
-	 */
-	public void saveRemainingWorld()
-	{
-		saveAllRemainingChunks();
-		chunkManager.saveWorldData(this);
-	}
-	
-	/**
 	 * Returns true if there are one or more chunks left in the world, or false otherwise.
 	 * @return true if chunks are left, otherwise false
 	 */
@@ -1417,12 +1351,16 @@ public class World
             }
             if(chunk.requiresDiffuseApplied())
             {
-            	for(Position position : chunk.getLightSources())
-            	{
-            		Block block = Block.blocksList[getBlock(position.x, position.y).id];
-            		utils.applyLightSource(this, position.x, position.y, block.lightRadius, block.lightStrength);
+            	try {
+	            	for(Position position : chunk.getLightSources())
+	            	{
+	            		Block block = Block.blocksList[getBlock(position.x, position.y).id];
+	            		utils.applyLightSource(this, position.x, position.y, block.lightRadius, block.lightStrength);
+	            	}
+	            	chunk.setRequiresDiffuseApplied(false);
+            	} catch (Exception e) {
+            		e.printStackTrace();
             	}
-            	chunk.setRequiresDiffuseApplied(false);
             }
                     
             //If the light in the chunk has changed, update the light[][] used for rendering

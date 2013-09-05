@@ -4,6 +4,7 @@ import java.util.Vector;
 
 import transmission.CompressedClientUpdate;
 import transmission.CompressedServerUpdate;
+import transmission.SuperCompressedChunk;
 import world.World;
 import entities.EntityPlayer;
 
@@ -80,5 +81,10 @@ public class EngineLock
 
 	public String getActivePlayerName() {
 		return engine.getActivePlayerName();
+	}
+	
+	public void expandChunk(SuperCompressedChunk chunk)
+	{
+		engine.registerChunkExpand(chunk);
 	}
 }

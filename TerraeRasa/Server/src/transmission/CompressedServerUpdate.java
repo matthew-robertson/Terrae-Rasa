@@ -6,7 +6,7 @@ public class CompressedServerUpdate
 {
 	private static final long serialVersionUID = 1L;
 	public String[] values;
-	public SuperCompressedChunk[] chunks; 
+//	public SuperCompressedChunk[] chunks; 
 	public EntityUpdate[] entityUpdates;
 	public PositionUpdate[] positionUpdates;
 	public BlockUpdate[] blockUpdates;
@@ -16,7 +16,7 @@ public class CompressedServerUpdate
 	public CompressedServerUpdate()
 	{
 		this.values = new String[0];
-		this.chunks = new SuperCompressedChunk[0];
+//		this.chunks = new SuperCompressedChunk[0];
 		this.entityUpdates = new EntityUpdate[0];
 		this.positionUpdates = new PositionUpdate[0];
 		this.blockUpdates = new BlockUpdate[0];

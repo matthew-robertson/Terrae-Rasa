@@ -182,7 +182,7 @@ public class Chunk
 	 */
 	public synchronized void setBackWall(Block block, int x, int y)
 	{
-		backWalls[x][y] = new MinimalBlock(block.clone());
+		backWalls[x][y] = new MinimalBlock(block);
 	}
 	
 	/**

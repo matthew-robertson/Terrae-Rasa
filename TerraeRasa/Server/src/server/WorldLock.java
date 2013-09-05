@@ -4,11 +4,8 @@ import io.Chunk;
 
 import java.util.Vector;
 
-import transmission.ChunkCompressor;
 import transmission.CompressedClientUpdate;
-import transmission.CompressedServerUpdate;
 import transmission.ServerUpdate;
-import transmission.SuperCompressedChunk;
 import transmission.TransmittablePlayer;
 import transmission.WorldData;
 import entities.EntityPlayer;
@@ -16,7 +13,7 @@ import entities.EntityPlayer;
 public class WorldLock 
 {
 	private GameEngine engine;
-	private Vector<CompressedServerUpdate> serverUpdates = new Vector<CompressedServerUpdate>();
+	private Vector<ServerUpdate> serverUpdates = new Vector<ServerUpdate>();
 	private EntityPlayer relevantPlayer;
 
 	public WorldLock(GameEngine engine)
@@ -76,31 +73,14 @@ public class WorldLock
 	{
 		if(getRelevantPlayer() != null)
 		{
-			CompressedServerUpdate compressedUpdate = new CompressedServerUpdate();
-			compressedUpdate.values = update.getValues();
-			Chunk[] chunks = update.getChunks();
-			SuperCompressedChunk[] compressedChunks = new SuperCompressedChunk[chunks.length];
-			for(int i = 0; i < chunks.length; i++)
-			{
-				compressedChunks[i] = ChunkCompressor.compressChunk(chunks[i]);
-			}
-			compressedUpdate.chunks = compressedChunks;
-			compressedUpdate.blockUpdates = update.getBlockUpdates();
-			compressedUpdate.entityUpdates = update.getEntityUpdates();
-			compressedUpdate.positionUpdates = update.getPositionUpdates();
-			compressedUpdate.statUpdates = update.getStatUpdates();
-			compressedUpdate.objectUpdates = update.getObjectUpdates();
-			
-//			
-			serverUpdates.add(compressedUpdate);
-			
+			serverUpdates.add(update);
 		}
 	}
 	
 	//Deletes too
-	public synchronized CompressedServerUpdate[] yieldServerUpdates()
+	public synchronized ServerUpdate[] yieldServerUpdates()
 	{
-		CompressedServerUpdate[] updates = new CompressedServerUpdate[serverUpdates.size()];
+		ServerUpdate[] updates = new ServerUpdate[serverUpdates.size()];
 		serverUpdates.copyInto(updates);
 		serverUpdates.clear();
 		return updates;
