@@ -557,7 +557,6 @@ public class World
 			checkForMonsterRemoval(update, players);
 		}
 		updateMonsters(update); 
-		//TODO: NPCs
 		updateNPCs(update);
 		updateProjectiles(update);
 		

@@ -558,9 +558,9 @@ public class Commands
 						int amount = Integer.parseInt(split[3]);
 						if(itemID >= ActionbarItem.blockIndex && itemID <= ActionbarItem.itemIndex)
 						{
-							if(Block.blocksList[itemID] != null)
+							if(Block.blocksList[ActionbarItem.blockIndex + itemID] != null)
 							{
-								ItemStack stack = new ItemStack(Block.blocksList[itemID], amount);
+								ItemStack stack = new ItemStack(Block.blocksList[ActionbarItem.blockIndex + itemID], amount);
 								player.inventory.pickUpItemStack(world, player, stack);
 								String logMessage = "Giving " + player.getName() + " " + stack.toString();
 								Log.log(logMessage);

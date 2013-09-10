@@ -61,7 +61,14 @@ public class MinimalBlock
 		Block block = Block.blocksList[compressedBlock.id];
 		this.id = (short) block.getID();
 		this.metaData = (byte) compressedBlock.metaData;
-		this.mainInventory = compressedBlock.mainInventory; //??????
+		if(compressedBlock.mainInventory == null)
+		{
+			this.mainInventory = new DisplayableItemStack[0];
+		}
+		else
+		{
+			this.mainInventory = compressedBlock.mainInventory; //??????
+		}
 		this.hasMetaData = block.hasMetaData;
 		this.isSolid = block.isSolid;
 		this.iconX = (short) block.iconX;

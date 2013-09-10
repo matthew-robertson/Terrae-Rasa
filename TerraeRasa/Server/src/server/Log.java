@@ -62,7 +62,10 @@ public class Log
 	public static void writeWithTimestamp()
 	{
 		try {
-			String filepath = TerraeRasa.getBasePath() + "/last_server_log.txt";
+			String folderPath = TerraeRasa.getBasePath() + "/logs";
+			new File(folderPath).mkdir();
+			
+			String filepath = folderPath + "/" + "[log]: session-ending-at: "+ getServerTimeStamp() + ".txt";
 			BufferedWriter writer = new BufferedWriter(new FileWriter(new File(filepath)));
 			Iterator<String> it = serverLog.iterator();
 			while(it.hasNext())

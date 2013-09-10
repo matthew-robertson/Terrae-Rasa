@@ -33,9 +33,10 @@ public class SecurityManager
 	{
 		return settings.isAdmin(playerIP);
 	}
+	
 	/**
 	 * Checks if a given socket is allowed to connect and play the game. This will fail if they 
-	 * do not have the password, or are banned.
+	 * are banned.
 	 * @param settings the Server's ServerSetting object
 	 * @param socket the socket for the respective connection check
 	 * @param message a parameter which will be modified to include a message to return to the client
@@ -44,21 +45,9 @@ public class SecurityManager
 	public static boolean verifyConnectionIsAllowed(ServerSettings settings, Socket socket, String[] message)
 	{
 		String ip = (socket.getInetAddress().toString()).substring(1);
-
-		if(settings.usePassword)
-		{
-			//TODO: make passwords and bans work properly
-			return true;
-//			boolean whitelisted = isWhitelisted(settings, ip);
-//			message[0] = (whitelisted) ? "Allowed : whitelisted" : "Not Allowed : no-whitelist";
-//			return whitelisted;
-		}		
-		else
-		{
-			boolean banned = isBanned(settings, ip);
-			message[0] = (!banned) ? "Allowed : no-banned" : "Not Allowed : banned";
-			return !banned;
-		}
+		boolean banned = isBanned(settings, ip);
+		message[0] = (!banned) ? "Allowed : no-banned" : "Not Allowed : banned";
+		return !banned;
 	}
 	
 	/**

@@ -9,7 +9,7 @@ import enums.EnumArmor;
 
 public class ItemArmor extends Item
 {
-	protected boolean isSavingRelic;
+//	protected boolean isSavingRelic;
 	protected DisplayablePassiveBonus[] bonuses;
 	protected DisplayableAura[] auras;
 	protected EnumArmor armorType;
@@ -110,14 +110,6 @@ public class ItemArmor extends Item
 	protected ItemArmor setAuras(DisplayableAura[] auras)
 	{
 		this.auras = auras;
-//TODO fix heaven's reprieve (stay of execution)
-//		for(Aura aura : auras)
-//		{
-//			if(aura instanceof AuraHeavensReprieve)
-//			{
-//				isSavingRelic = true;
-//			}
-//		}
 		return this;
 	}
 	
@@ -141,12 +133,7 @@ public class ItemArmor extends Item
 	{
 		return bonuses;
 	}
-	
-	public boolean getIsSavingRelic()
-	{
-		return isSavingRelic;
-	}	
-	
+
 	public ItemArmor setStamina(int i)
 	{
 		this.stamina = i;

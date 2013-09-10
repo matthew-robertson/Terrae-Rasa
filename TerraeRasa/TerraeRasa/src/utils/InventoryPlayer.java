@@ -780,27 +780,6 @@ public class InventoryPlayer
 	}
 	
 	/**
-	 * Iterates through the armorInventory[], destroying the first item with a saving relic
-	 * attribute (to prevent death).
-	 */
-	public void removeSavingRelic(EntityPlayer player)
-	{
-		//TODO: Fix w/ angel's reprieve
-		for(int i = 0; i < armorInventory.length; i++)
-		{
-			if(armorInventory[i] != null)
-			{
-				if(((ItemArmor)(Item.itemsList[armorInventory[i].getItemID()])).getIsSavingRelic())
-				{
-					player.changedInventorySlots.add("a " + i);
-					setArmorInventoryStack(player, null, armorInventory[i], i, true);
-					return;
-				}
-			}
-		}
-	}
-	
-	/**
 	 * Volatile function to return the quiver[]. Very vulnerable to pointer issues if modification to quiver[]
 	 * is attempted using this method
 	 * @return the quiver[] array

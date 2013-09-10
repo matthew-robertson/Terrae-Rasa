@@ -818,7 +818,6 @@ public class InventoryPlayer
 	 */
 	public void removeSavingRelic(EntityPlayer player)
 	{
-		//TODO: Fix w/ angel's reprieve
 		for(int i = 0; i < armorInventory.length; i++)
 		{
 			if(armorInventory[i] != null)

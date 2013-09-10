@@ -204,8 +204,9 @@ public class TextureLoader
 	        int x = 1;
 	        int y = 1;
 	        
-	        //TODO: Associate specific blocks w/ specific sheets
-	        	
+	        //TODO: Associate specific blocks w/ specific sheets - broadly speaking; fix block texture issues in the inventory
+	        //
+	        
 	        if(list[i].iconOverriden)
 	        {
 		        if(list[i].associatedTextureSheet == Render.TEXTURE_SHEET_ITEMS)

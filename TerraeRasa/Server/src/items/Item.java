@@ -14,9 +14,9 @@ import passivebonuses.PassiveBonusStamina;
 import passivebonuses.PassiveBonusStrength;
 import utils.ActionbarItem;
 import auras.Aura;
-import auras.AuraHeavensReprieve;
 import auras.AuraPeriodicModifier;
 import auras.AuraSmartHeal;
+import auras.AuraStayOfExecution;
 import entities.EntityProjectile;
 import enums.EnumArmor;
 import enums.EnumItemQuality;
@@ -268,12 +268,15 @@ public class Item extends ActionbarItem
 	public static Item goldAxe = new ItemToolAxe(12).setDamageDone(9).setName("Gold Axe").setIconPosition(20, 8).setToolMaterial(EnumToolMaterial.GOLD);	
 	public static Item goldPickaxe = new ItemToolPickaxe(13).setDamageDone(7).setName("Gold Pickaxe").setIconPosition(20, 7).setToolMaterial(EnumToolMaterial.GOLD).setItemQuality(EnumItemQuality.LEGENDARY);	
 	public static Item goldSword = new ItemToolSword(14).setDamageDone(14).setName("Gold Sword").setIconPosition(20, 6).setToolMaterial(EnumToolMaterial.GOLD);	
-	public static Item woodenBow = new ItemRanged(15, 8).setCooldownTicks(10).setName("Wooden Bow").setIconPosition(16, 9);
+	public static Item woodenBow = new ItemRanged(15, 8).setCooldownTicks(10).setName("Wooden Bow").setIconPosition(16, 12);
 	public static Item woodenArrow = new ItemAmmo(16).setProjectile(new EntityProjectile(7, 1, 1, 8f).setSpriteIndex(0, 1).setIsFriendly(true)).setIconPosition(4, 9).setName("Wooden Arrow");
 	public static Item bronzeArrow = new ItemAmmo(17).setProjectile(new EntityProjectile(10, 1, 1, 8f).setSpriteIndex(0, 2).setIsFriendly(true)).setIconPosition(4, 10).setName("Bronze Arrow");
 	public static Item ironArrow = new ItemAmmo(18).setProjectile(new EntityProjectile(13, 1, 1, 8f).setSpriteIndex(0, 3).setIsFriendly(true)).setIconPosition(4, 11).setName("Iron Arrow");
 	public static Item silverArrow = new ItemAmmo(19).setProjectile(new EntityProjectile(16, 1, 1, 8f).setSpriteIndex(0, 4).setIsFriendly(true)).setIconPosition(4, 12).setName("Silver Arrow");
 	public static Item snowball = new ItemThrown(20, 5).setProjectile(new EntityProjectile(5, 1, 1, 11f).setSpriteIndex(0, 0).setIsFriendly(true)).setCooldownTicks(10).setName("Snow Ball").setIconPosition(14, 0);
+	public static Item goldenArrow = new ItemAmmo(21).setProjectile(new EntityProjectile(18, 1, 1, 8f).setSpriteIndex(0, 5).setIsFriendly(true)).setIconPosition(4, 13).setName("Golden Arrow");
+	public static Item nightmareArrow = new ItemAmmo(22).setProjectile(new EntityProjectile(20, 1, 1, 8f).setSpriteIndex(0, 6).setIsFriendly(true)).setIconPosition(4, 14).setName("Nightmare Arrow");
+	
 	
 	public static Item godminiumPickaxe = new ItemToolPickaxe(156).setDamageDone(7).setName("God-Minium Pickaxe").setIconPosition(20, 7).setToolMaterial(EnumToolMaterial.GOD).setItemQuality(EnumItemQuality.LEGENDARY);	
 	
@@ -406,7 +409,7 @@ public class Item extends ActionbarItem
 			new PassiveBonusSpeed(0.1F)
 	}).setIconPosition(15, 3).setName("Talisman of Winds").setExtraTooltipInformation("The winds of fortune are at your back.");	
 	public static Item ankh = new ItemArmorAccessory(403).setAuras(new Aura[]{ 
-			new AuraHeavensReprieve()
+			new AuraStayOfExecution(0.2)
 	}).setIconPosition(14, 1).setName("Ankh").setExtraTooltipInformation("This relic will destroy itself to save the wearer.");	
 	public static Item goddessesTear = new ItemArmorAccessory(404).passiveBonuses(new PassiveBonus[]{ 
 			new PassiveBonusIntellect(8)

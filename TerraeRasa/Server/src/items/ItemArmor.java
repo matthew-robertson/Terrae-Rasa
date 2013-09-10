@@ -5,7 +5,7 @@ import java.util.List;
 
 import passivebonuses.PassiveBonus;
 import auras.Aura;
-import auras.AuraHeavensReprieve;
+import auras.AuraStayOfExecution;
 import enums.EnumArmor;
 
 public class ItemArmor extends Item
@@ -113,7 +113,7 @@ public class ItemArmor extends Item
 		this.auras = auras;
 		for(Aura aura : auras)
 		{
-			if(aura instanceof AuraHeavensReprieve)
+			if(aura instanceof AuraStayOfExecution)
 			{
 				isSavingRelic = true;
 			}
