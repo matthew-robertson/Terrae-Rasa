@@ -32,6 +32,7 @@ import world.World;
  */
 public class TerraeRasa
 {
+	private final static Object connectionThreadLock = new Object();
 	private final static String VERSION = "Alpha 0.1.4";	
 	private final static String WINDOW_TITLE = "Terrae Rasa " + VERSION;
 	private final static String WINDOWS_BASE_PATH = new StringBuilder().append("C:/Users/").append(System.getProperty("user.name")).append("/AppData/Roaming/terraerasa").toString();
@@ -300,14 +301,24 @@ public class TerraeRasa
 		return osName;
 	}
 	
-	public synchronized static void registerClientThread(ClientConnectionThread thread)
+	public static void registerClientThread(ClientConnectionThread thread)
 	{
-		terraeRasa.thread = thread;
+		synchronized(connectionThreadLock)
+		{
+			if(terraeRasa.thread != null)
+			{
+				throw new RuntimeException("Not-null thread was almost replaced by a null thread.");
+			}
+			terraeRasa.thread = thread;
+		}
 	}
 	
-	public synchronized static void terminateClientConnection()
+	public static void terminateClientConnection()
 	{
-		terraeRasa.thread.kill();
+		synchronized(connectionThreadLock)
+		{
+			terraeRasa.thread.kill();
+		}
 	}
 	
 	

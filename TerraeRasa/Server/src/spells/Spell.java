@@ -72,9 +72,9 @@ public class Spell extends ActionbarItem
 	
 	public final static Spell[] spellList = new Spell[spellIndex + 2096];
 	
-	public static Spell rejuvenate = (Spell) new SpellRejuvenate(1).setCost(80).setResourceType(RESOURCE_SPECIAL).setName("Rejuvenate").
+	public final static Spell rejuvenate = (Spell) new SpellRejuvenate(1).setCost(80).setResourceType(RESOURCE_SPECIAL).setName("Rejuvenate").
 			setExtraTooltipInformation("Restores 80% of the player's max health immediately. Costs 80% Special Energy"); 
-	public static Spell bulwark = (Spell) new SpellBulwark(2).setCost(55).setResourceType(RESOURCE_SPECIAL).setName("Bulwark").
+	public final static Spell bulwark = (Spell) new SpellBulwark(2).setCost(55).setResourceType(RESOURCE_SPECIAL).setName("Bulwark").
 			setExtraTooltipInformation("Shields the player for 100% of max health, lasting 8 seconds. Costs 55% Special Energy");
 
 }

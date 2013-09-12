@@ -481,14 +481,14 @@ public class World
 	 * @return - updated bitmap
 	 */	
 	public int updateBlockBitMap(int x, int y){
-		int bit = getBlockGenerate(x,y).getBitMap();
+		int bit = getBlock(x,y).getBitMap();
 		//If the block is standard
-		if (getBlockGenerate(x, y).getTileMap() == 'g'){
+		if (getAssociatedBlock(x, y).getTileMap() == 'g'){
 			return updateGeneralBitMap(x, y);
 		}
 		//if the block requires special actions
 		//If the block is a pillar
-		else if (getBlockGenerate(x, y).getTileMap() == 'p'){
+		else if (getAssociatedBlock(x, y).getTileMap() == 'p'){
 			return updatePillarBitMap(x, y);	
 		}
 		return bit;
@@ -502,20 +502,19 @@ public class World
 	 */
 	private int updateGeneralBitMap(int x, int y){
 		int bit = 0;
-		if (getBlockGenerate(x, y - 1).isSolid){
+		if (getBlock(x, y - 1).isSolid){
 			bit += 1;
 		}
-		if (getBlockGenerate(x, y + 1).isSolid){
+		if (getBlock(x, y + 1).isSolid){
 			bit += 4;
 		}
-		if (getBlockGenerate(x - 1, y).isSolid){
+		if (getBlock(x - 1, y).isSolid){
 			bit += 8;
 		}
-		if (getBlockGenerate(x + 1, y).isSolid){
+		if (getBlock(x + 1, y).isSolid){
 			bit += 2;
 		}
-		if (getBlockGenerate(x, y) instanceof BlockGrass && (bit == 15 || bit == 11 || bit == 27 || bit == 31)){
-			setBlockGenerate(Block.dirt, x,y);
+		if (getAssociatedBlock(x, y) instanceof BlockGrass && (bit == 15 || bit == 11 || bit == 27 || bit == 31)){
 			setBitMap(x, y, bit);
 		}
 		return bit;
@@ -530,7 +529,7 @@ public class World
 	
 	private int updatePillarBitMap(int x, int y){
 		int bit;
-		if (getBlockGenerate(x, y + 1) instanceof BlockPillar){
+		if (getAssociatedBlock(x, y + 1) instanceof BlockPillar){
 			bit = 1;
 		}
 		
@@ -538,11 +537,14 @@ public class World
 			bit = 2;
 		}
 		
-		if (!getBlockGenerate(x, y - 1).isOveridable && !(getBlockGenerate(x, y - 1) instanceof BlockPillar)){
+		if (!getAssociatedBlock(x, y - 1).isOveridable && !(getAssociatedBlock(x, y - 1) instanceof BlockPillar)){
 			bit = 0;					
 		}
 		
-		if (!getBlockGenerate(x, y - 1).isOveridable && !getBlockGenerate(x, y + 1).isOveridable && !(getBlockGenerate(x, y + 1) instanceof BlockPillar) && !(getBlockGenerate(x, y - 1) instanceof BlockPillar)){
+		if (!getAssociatedBlock(x, y - 1).isOveridable &&
+				!getAssociatedBlock(x, y + 1).isOveridable && 
+				!(getAssociatedBlock(x, y + 1) instanceof BlockPillar) && 
+				!(getAssociatedBlock(x, y - 1) instanceof BlockPillar)){
 			bit = 3;
 		}
 		return bit;
@@ -648,15 +650,11 @@ public class World
 	 * @param y the block's y location in the new world map
 	 * @return the block at the location specified (this should never be null)
 	 */
-	public Block getBackBlock(int x, int y)
+	public MinimalBlock getBackBlock(int x, int y)
 	{
-		try
-		{
-			MinimalBlock block = getChunks().get(""+(x / Chunk.getChunkWidth())).getBackWall(x % Chunk.getChunkWidth(), (y));
-			return Block.blocksList[block.id].mergeOnto(block);
-		}
-		catch(Exception e)
-		{
+		try {
+			return getChunks().get(""+(x / Chunk.getChunkWidth())).getBackWall(x % Chunk.getChunkWidth(), (y));
+		} catch(Exception e) {
 			e.printStackTrace();
 			return null;
 		}
@@ -686,15 +684,15 @@ public class World
 	 * Sets the back wall at the specified (x,y). Useful for easily setting a back wall at the specified location; Terrible for mass usage.
 	 * This version of the method does not check if the chunk is actually loaded, therefore it may sometimes fail for bizarre or very, very
 	 * far away requests. It will however, simply catch that Exception, should it occur.
-	 * @param block the block that the specified (x,y) will be set to
+	 * @param minimalBlock the block that the specified (x,y) will be set to
 	 * @param x the block's x location in the new world map
 	 * @param y the block's y location in the new world map
 	 */
-	public void setBackBlock(Block block, int x, int y)
+	public void setBackBlock(MinimalBlock minimalBlock, int x, int y)
 	{
 		try
 		{
-			getChunks().get(""+x / Chunk.getChunkWidth()).setBackWall(block, x % Chunk.getChunkWidth(), y);
+			getChunks().get(""+x / Chunk.getChunkWidth()).setBackWall(minimalBlock, x % Chunk.getChunkWidth(), y);
 		}
 		catch(Exception e)
 		{
@@ -710,7 +708,7 @@ public class World
 	 * @param x the block's x location in the new world map
 	 * @param y the block's y location in the new world map
 	 */
-	public void setBlock(Block block, int x, int y)
+	public void setBlock(MinimalBlock block, int x, int y)
 	{
 		try
 		{
@@ -735,111 +733,57 @@ public class World
 	}
 	
 	/**
-	 * Method designed to grow (or at least attempt to grow) a tree
-	 * @param space - How high/wide the space between trees and terrain must be
-	 * @param x - x location on the world
-	 * @param y - y location on the world
+	 * Get associated block has two different behaviours. If a BlockChest is at the requested position, then a new and 
+	 * reference safe BlockChest will be given. If the Block is not an instanceof BlockChest then a direct reference to 
+	 * that Block.blockList block will be given. This has no metadata and is final. To modify the metadata, use getBlock()
+	 * to request the MinimalBlock for the given (x,y) position. <i> This version of the method getAssociatedBlock accepts 
+	 * integers not doubles.</i>
+	 * @param x the block's x location in the new world map
+	 * @param y the block's y location in the new world map
+	 * @return the block at the location specified, or null if there isnt one.
 	 */
-	public void growTree(int space, int x, int y){
-		boolean isOpen = true;
-		int height = (int)(Math.random() * 5 + 4); //Determine the height of the tree
-		if (y-height-space <= 0 || x <= 2 || x >= getWidth() - 2){ //If the tree would go off the map
-			height = 0; //don't place a tree
-			space = 0; //Don't place a tree
+	public Block getAssociatedBlock(int x, int y)
+	{
+		try {
+			MinimalBlock block = getChunks().get(""+(int)(x / Chunk.getChunkWidth())).getBlock((int)x % Chunk.getChunkWidth(), (int)y);
+			if(Block.blocksList[block.id] instanceof BlockChest)
+			{
+				return new BlockChest((BlockChest)(Block.blocksList[block.id])).mergeOnto(block);
+			}
+			else
+			{
+				return Block.blocksList[block.id];
+			}
+		} catch (Exception e) {
 		}
-		//If there is room for the tree up and to the left/right	
-		for (int j = y; j >= y - height - space; j--){
-			for (int i = x - space; i <= x + space; i++){
-				if (!getBlockGenerate(i, j).getIsOveridable()){
-					isOpen = false;
-					break;
-				}
-			}
-			if (!isOpen) break;			
-		}
-		if (isOpen){
-			setBlockGenerate(Block.dirt, x, y + 1);
-			int count = 1;
-			
-			if ((getBlockGenerate(x-1, y+1).getID() == Block.grass.getID()|| getBlockGenerate(x-1, y+1).getID() == Block.dirt.getID())){
-				setBlockGenerate(Block.treebase, x-1, y);
-				setBitMap(x-1, y, 0);
-				setBlockGenerate(Block.dirt, x-1, y+1);
-			}
-			
-			if ((getBlockGenerate(x+1, y+1).getID() == Block.grass.getID()|| getBlockGenerate(x+1, y+1).getID() == Block.dirt.getID())){
-				setBlockGenerate(Block.treebase, x+1, y);
-				setBitMap(x+1, y, 3);
-				setBlockGenerate(Block.dirt, x+1, y+1);
-			}
-			
-			for (int k = y; k >= y - height; k--){ //Place the tree
-				if (getBlockGenerate(x, k).getID() == Block.air.getID()){ //If the cell is empty
-					if (k == y-height){ //If at the top of the tree
-						setBlockGenerate(Block.treetopr2, x+1, k); //Place the tree top
-						setBlockGenerate(Block.treetopr1, x+1, k-1);
-						setBlockGenerate(Block.treetopc2, x, k);
-						setBlockGenerate(Block.treetopc1, x, k-1);
-						setBlockGenerate(Block.treetopl2, x-1, k);
-						setBlockGenerate(Block.treetop, x-1, k-1);
-					}
-					else{
-						setBlockGenerate(Block.tree, x, k); //Otherwise, place a tree trunk
-						setBitMap(x, k, 1);
-					}
-					if (count > 2 && k > y - height + 1){ //For each slice of tree, if it is more than the third log, determine if there should be a branch
-						int branchl = (int)(Math.random()*60); //Decide if a block should be placed left
-						int branchr = (int)(Math.random()*60); //Decide if a branch should be placed right
-						
-						if (branchl < 5){
-							setBlockGenerate(Block.treebranch, x-1, k);
-							setBitMap(x-1, k, branchl * 2);
-						}
-						if (branchr < 5){
-							setBlockGenerate(Block.treebranch, x+1, k);
-							setBitMap(x+1, k, branchr * 2 + 1);
-						}															
-					}
-					count++; //increment the counter 
-				}
-				else{
-					break;
-				}
-			}
-		}
+		return Block.air;
 	}
-	
+
 	/**
-	 * A method designed to convert all exposed dirt above the minimum height to grass
-	 * Note: We'll probably want to make it work via light value, rather than via y-value.
-	 * @param x - the x-value to start at
-	 * @param w - the width of the area to convert
-	 * @param minHeight - the lowest y value a dirt block can have and still be converted
-	 * @param maxHeight - the highest y value to check
+	 * Get associated block has two different behaviours. If a BlockChest is at the requested position, then a new and 
+	 * reference safe BlockChest will be given. If the Block is not an instanceof BlockChest then a direct reference to 
+	 * that Block.blockList block will be given. This has no metadata and is final. To modify the metadata, use getBlock()
+	 * to request the MinimalBlock for the given (x,y) position. <i> This version of the method getAssociatedBlock accepts 
+	 * doubles not integers.</i>
+	 * @param x the block's x location in the new world map
+	 * @param y the block's y location in the new world map
+	 * @return the block at the location specified, or null if there isnt one.
 	 */
-	public void placeGrass(int x, int w, int minHeight, int maxHeight){
-		for(int j = maxHeight; j > minHeight; j--){ //go through the the y-axis of the world
-			for(int k = 1; k < x + w; k++){ //x-axis	
-				//Search above, left and right of dirt block for air
-				if (getBlockGenerate(k, j).getID() == Block.dirt.getID()){
-					if (k > 0 && k < getWidth() && j > 0){
-						if (getBlockGenerate(k - 1, j).getID() == Block.air.getID()){
-							setBlockGenerate(Block.grass, k, j);
-						}
-					}
-					if (k < getWidth()){
-						if (getBlockGenerate(k + 1, j).getID() == Block.air.getID()){
-							setBlockGenerate(Block.grass, k, j);
-						}
-					}
-					if (j > 0){
-						if (getBlockGenerate(k, j-1).getID() == Block.air.getID()){
-							setBlockGenerate(Block.grass, k, j);
-						}
-					}
-				}
+	public Block getAssociatedBlock(double x, double y)
+	{
+		try {
+			MinimalBlock block = getChunks().get(""+(int)(x / Chunk.getChunkWidth())).getBlock((int)x % Chunk.getChunkWidth(), (int)y);
+			if(Block.blocksList[block.id] instanceof BlockChest)
+			{
+				return new BlockChest((BlockChest)(Block.blocksList[block.id])).mergeOnto(block);
 			}
+			else
+			{
+				return Block.blocksList[block.id];
+			}
+		} catch (Exception e) { 
 		}
+		return Block.air;
 	}
 		
 	/**
@@ -850,7 +794,7 @@ public class World
 	 * @param x the block's x location in the new world map
 	 * @param y the block's y location in the new world map
 	 */
-	public void setBlock(Block block, double x, double y)
+	public void setBlock(MinimalBlock block, double x, double y)
 	{
 		try
 		{
@@ -903,6 +847,35 @@ public class World
 	}
 	
 	/**
+	 * Sets the block at the specified (x,y). This method is safe, as all Exceptions are handled in this method. Additionally,
+	 * the (modular) division is performed automatically. The primary intention is that this method is used to generate the world, 
+	 * so it MUST be safe, otherwise code will become very dangerous. Chunks are generated if there is non chunk present at that
+	 * position.
+	 * @param block the block that the specified (x,y) will be set to
+	 * @param x the block's x location in the new world map
+	 * @param y the block's y location in the new world map
+	 */
+	public void setBackWallGenerate(MinimalBlock block, int x, int y)
+	{
+		//Ensure the chunk exists
+		try { 
+			if(getChunks().get(""+(x / Chunk.getChunkWidth())) == null)
+			{
+				registerChunk(new Chunk(Biome.forest, (int)(x / Chunk.getChunkWidth()), height), (int)(x / Chunk.getChunkWidth()));
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		//Set the block
+		try { 
+			chunks.get(""+(x / Chunk.getChunkWidth())).setBackWall(block, x % Chunk.getChunkWidth(), y);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
 	 * Gets the block at the specified (x,y). This method is safe, as all Exceptions are handled in this method. Additionally, 
 	 * the (modular) division is performed automatically. The primary intention is that this method is used to generate the 
 	 * world, so it MUST be safe, otherwise that code will become dangerous. 
@@ -910,92 +883,13 @@ public class World
 	 * @param y the block's y location in the new world map
 	 * @return the block at the location specified, or null if there isnt one.
 	 */
-	public Block getBlockGenerate(int x, int y)
+	public MinimalBlock getBackWall(int x, int y)
 	{
 		try {
-			MinimalBlock block = getChunks().get(""+(int)(x / Chunk.getChunkWidth())).getBlock((int)x % Chunk.getChunkWidth(), (int)y);
-			if(Block.blocksList[block.id] instanceof BlockChest)
-			{
-				return new BlockChest((BlockChest)(Block.blocksList[block.id])).mergeOnto(block);
-			}
-			else
-			{
-				return Block.blocksList[block.id].mergeOnto(block);
-			}
+			return getChunks().get(""+x / Chunk.getChunkWidth()).getBackWall(x % Chunk.getChunkWidth(), y);
 		} catch (Exception e) {
 		}
-		return Block.air;
-	}
-
-	public Block getBlockGenerate(double x, double y)
-	{
-		try {
-			MinimalBlock block = getChunks().get(""+(int)(x / Chunk.getChunkWidth())).getBlock((int)x % Chunk.getChunkWidth(), (int)y);
-			if(Block.blocksList[block.id] instanceof BlockChest)
-			{
-				return new BlockChest((BlockChest)(Block.blocksList[block.id])).mergeOnto(block);
-			}
-			else
-			{
-				return Block.blocksList[block.id].mergeOnto(block);
-			}
-		} catch (Exception e) { 
-		}
-		return Block.air;
-	}
-	
-	/**
-	 * Sets the block at the specified (x,y). This method is safe, as all Exceptions are handled in this method. Additionally,
-	 * the (modular) division is performed automatically. The primary intention is that this method is used to generate the world, 
-	 * so it MUST be safe, otherwise code will become very dangerous. Chunks are generated if there is non chunk present at that
-	 * position.
-	 * @param block the block that the specified (x,y) will be set to
-	 * @param x the block's x location in the new world map
-	 * @param y the block's y location in the new world map
-	 */
-	public void setBackWallGenerate(Block block, int x, int y)
-	{
-		try
-		{ //Ensure the chunk exists
-			if(getChunks().get(""+(x / Chunk.getChunkWidth())) == null)
-			{
-				registerChunk(new Chunk(Biome.forest, (int)(x / Chunk.getChunkWidth()), height), (int)(x / Chunk.getChunkWidth()));
-			}
-		}
-		catch(Exception e) 
-		{
-			e.printStackTrace();
-		}
-		
-		try 
-		{ //Set the block
-			chunks.get(""+(x / Chunk.getChunkWidth())).setBackWall(block, x % Chunk.getChunkWidth(), y);
-		}
-		catch(Exception e) 
-		{
-			e.printStackTrace();
-		}
-	}
-	
-	/**
-	 * Gets the block at the specified (x,y). This method is safe, as all Exceptions are handled in this method. Additionally, 
-	 * the (modular) division is performed automatically. The primary intention is that this method is used to generate the 
-	 * world, so it MUST be safe, otherwise that code will become dangerous. 
-	 * @param x the block's x location in the new world map
-	 * @param y the block's y location in the new world map
-	 * @return the block at the location specified, or null if there isnt one.
-	 */
-	public Block getBackWallGenerate(int x, int y)
-	{
-		try
-		{
-			MinimalBlock block = getChunks().get(""+x / Chunk.getChunkWidth()).getBackWall(x % Chunk.getChunkWidth(), y);
-			return Block.blocksList[block.id].mergeOnto(block);
-		}
-		catch (Exception e)
-		{
-		}
-		return Block.backAir;
+		return null;
 	}
 		
 	/**
@@ -1007,26 +901,22 @@ public class World
 	 * @param x the block's x location in the new world map
 	 * @param y the block's y location in the new world map
 	 */
-	public void setBlockGenerate(Block block, int x, int y)
+	public void setBlockGenerate(MinimalBlock block, int x, int y)
 	{
-		try
-		{ //Ensure the chunk exists
+		//Ensure the chunk exists
+		try { 
 			if(getChunks().get(""+(x / Chunk.getChunkWidth())) == null)
 			{
 				registerChunk(new Chunk(Biome.forest, (int)(x / Chunk.getChunkWidth()), height), (int)(x / Chunk.getChunkWidth()));
 			}
-		}
-		catch(Exception e) 
-		{
+		} catch(Exception e) {
 			e.printStackTrace();
 		}
 		
-		try 
-		{ //Set the block
+		//Set the block
+		try { 
 			chunks.get(""+(x / Chunk.getChunkWidth())).setBlock(block, x % Chunk.getChunkWidth(), y);
-		}
-		catch(Exception e) 
-		{
+		} catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -1040,12 +930,9 @@ public class World
 	 */
 	public double getLight(int x, int y)
 	{
-		try
-		{
+		try {
 			return getChunks().get(""+(int)(x / Chunk.getChunkWidth())).getLight((int)x % Chunk.getChunkWidth(), (int)y);
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return 1.0f;
@@ -1233,10 +1120,10 @@ public class World
 	 * @param y the block's y location in the new world map
 	 * @return the block at the location specified (this should never be null)
 	 */
-	public Block getBackBlock(double x, double y)
+	public Block getAssociatedBackBlock(double x, double y)
 	{
 		MinimalBlock block = getChunks().get(""+(int)(x / Chunk.getChunkWidth())).getBlock((int)x % Chunk.getChunkWidth(), (int)y);
-		return Block.blocksList[block.id].mergeOnto(block);
+		return Block.blocksList[block.id];
 	}
 	
 	public void setAmbientLight(double x, double y, double strength)
@@ -1311,7 +1198,7 @@ public class World
 	 * @param y the y position where the block will be placed
 	 * @param eventType
 	 */
-	public void setBlock(Block block, int x, int y, EnumEventType eventType)
+	public void setBlock(MinimalBlock block, int x, int y, EnumEventType eventType)
 	{
 		utils.fixDiffuseLightRemove(this, x, y);
 		setBlock(block, x, y);

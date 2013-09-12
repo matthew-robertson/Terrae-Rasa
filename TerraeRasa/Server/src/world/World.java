@@ -21,6 +21,7 @@ import java.util.TreeSet;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
+
 import savable.SavableWorld;
 import savable.SaveManager;
 import server.GameEngine;
@@ -102,6 +103,7 @@ public class World
 	private final Object playerInputLock = new Object();
 	public static final int GAMETICKSPERDAY = 28800; 
 	public static final int GAMETICKSPERHOUR = GameEngine.TICKS_PER_SECOND * 60;
+	/** This corresponds to the physics value g, which indicates acceleration due to gravity for a given planet. */
 	public final double g = 1.8;
 	public Hashtable<String, Boolean> chunksLoaded;
 	
@@ -828,12 +830,12 @@ public class World
 	public int updateBlockBitMap(int x, int y){
 		int bit = getBlock(x,y).getBitMap();
 		//If the block is standard
-		if (getFullBlock(x, y).getTileMap() == 'g'){
+		if (getAssociatedBlock(x, y).getTileMap() == 'g'){
 			return updateGeneralBitMap(x, y);
 		}
 		//if the block requires special actions
 		//If the block is a pillar
-		else if (getFullBlock(x, y).getTileMap() == 'p'){
+		else if (getAssociatedBlock(x, y).getTileMap() == 'p'){
 			return updatePillarBitMap(x, y);	
 		}
 		return bit;
@@ -859,7 +861,7 @@ public class World
 		if (getBlock(x + 1, y).isSolid){
 			bit += 2;
 		}
-		if (getFullBlock(x, y) instanceof BlockGrass && (bit == 15 || bit == 11 || bit == 27 || bit == 31)){
+		if (getAssociatedBlock(x, y) instanceof BlockGrass && (bit == 15 || bit == 11 || bit == 27 || bit == 31)){
 			setBlockGenerate(Block.dirt, x,y);
 			setBitMap(x, y, bit);
 		}
@@ -875,7 +877,7 @@ public class World
 	
 	private int updatePillarBitMap(int x, int y){
 		int bit;
-		if (getFullBlock(x, y + 1) instanceof BlockPillar){
+		if (getAssociatedBlock(x, y + 1) instanceof BlockPillar){
 			bit = 1;
 		}
 		
@@ -883,11 +885,14 @@ public class World
 			bit = 2;
 		}
 		
-		if (!getFullBlock(x, y - 1).isOveridable && !(getFullBlock(x, y - 1) instanceof BlockPillar)){
+		if (!getAssociatedBlock(x, y - 1).isOveridable && !(getAssociatedBlock(x, y - 1) instanceof BlockPillar)){
 			bit = 0;					
 		}
 		
-		if (!getFullBlock(x, y - 1).isOveridable && !getFullBlock(x, y + 1).isOveridable && !(getFullBlock(x, y + 1) instanceof BlockPillar) && !(getFullBlock(x, y - 1) instanceof BlockPillar)){
+		if (!getAssociatedBlock(x, y - 1).isOveridable && 
+				!getAssociatedBlock(x, y + 1).isOveridable && 
+				!(getAssociatedBlock(x, y + 1) instanceof BlockPillar) && 
+				!(getAssociatedBlock(x, y - 1) instanceof BlockPillar)){
 			bit = 3;
 		}
 		return bit;
@@ -1293,7 +1298,7 @@ public class World
 	 */
 	private void handleBlockBreakEvent(ServerUpdate update, EntityPlayer player, int mx, int my)
 	{
-		Block block = getFullBlock(mx, my);
+		Block block = getAssociatedBlock(mx, my);
 		if(block.hasMetaData) //normal block
 		{
 			ItemStack stack = block.getDroppedItem();
@@ -1334,7 +1339,8 @@ public class World
 			if(block instanceof BlockChest)
 			{
 				BlockChest chest = ((BlockChest)(block));
-				if(chest.metaData != 1)
+				MinimalBlock minimalBlock = getBlock(mx, my);
+				if(minimalBlock.metaData != 1)
 				{
 					int[][] metadata = MetaDataHelper.getMetaDataArray((int)(Block.blocksList[getBlock(mx, my).id].blockWidth / 6), 
 							(int)(Block.blocksList[getBlock(mx, my).id].blockHeight / 6)); //metadata used by the block of size (x,y)
@@ -1356,7 +1362,8 @@ public class World
 						}
 					}			
 					
-					chest = (BlockChest)(getFullBlock(mx - x1, my - y1));
+					minimalBlock = getBlock(mx - x1, my - y1);
+					chest = (BlockChest)(getAssociatedBlock(mx - x1, my - y1));
 					mx -= x1;
 					my -= y1;
 				}	
@@ -1485,7 +1492,7 @@ public class World
 			{
 				for(int j = 0; j < blockHeight; j++)
 				{
-					if(getBlock(x + i, y + j).id != Block.air.id && !getFullBlock(x + i, y + j).getIsOveridable())
+					if(getBlock(x + i, y + j).id != Block.air.id && !getAssociatedBlock(x + i, y + j).getIsOveridable())
 					{
 						return;
 					}
@@ -1543,7 +1550,7 @@ public class World
 			{
 				for(int j = 0; j < blockHeight; j++)
 				{
-					if(getBlock(mx + i, my + j).id != Block.air.id && !getFullBlock(mx + i, my + j).getIsOveridable())
+					if(getBlock(mx + i, my + j).id != Block.air.id && !getAssociatedBlock(mx + i, my + j).getIsOveridable())
 					{
 						return false;
 					}
@@ -1612,7 +1619,7 @@ public class World
 					BlockUpdate blockUpdate = new BlockUpdate();
 					blockUpdate.x = mx + i;
 					blockUpdate.y = (short) (my + j);
-					blockUpdate.block = new SuperCompressedBlock(getFullBlock(blockUpdate.x, blockUpdate.y));
+					blockUpdate.block = new SuperCompressedBlock(getBlock(blockUpdate.x, blockUpdate.y));
 					update.addBlockUpdate(blockUpdate);
 				}
 			}
@@ -1628,7 +1635,7 @@ public class World
 		}
 		else
 		{
-			if ((getFullBlock(mx, my).getIsOveridable() == true || getBlock(mx, my).id == Block.air.id) && 
+			if ((getAssociatedBlock(mx, my).getIsOveridable() == true || getBlock(mx, my).id == Block.air.id) && 
 				(getBlock(mx-1, my).isSolid || getBlock(mx, my-1).isSolid || getBlock(mx, my+1).isSolid || getBlock(mx+1, my).isSolid ||
 				getBackBlock(mx, my).getIsSolid())) //can the block be placed
 			{
@@ -1653,7 +1660,7 @@ public class World
 				BlockUpdate blockUpdate = new BlockUpdate();
 				blockUpdate.x = mx;
 				blockUpdate.y = (short) (my);
-				blockUpdate.block = new SuperCompressedBlock(getFullBlock(blockUpdate.x, blockUpdate.y));
+				blockUpdate.block = new SuperCompressedBlock(getBlock(blockUpdate.x, blockUpdate.y));
 				update.addBlockUpdate(blockUpdate);
 				return true;
 			}
@@ -1839,7 +1846,7 @@ public class World
 		try
 		{
 			MinimalBlock block = getChunks().get(""+(x / Chunk.getChunkWidth())).getBackWall(x % Chunk.getChunkWidth(), (y));
-			return Block.blocksList[block.id].mergeOnto(block);
+			return Block.blocksList[block.id];
 		}
 		catch(Exception e)
 		{
@@ -1936,7 +1943,7 @@ public class World
 		//If there is room for the tree up and to the left/right	
 		for (int j = y; j >= y - height - space; j--){
 			for (int i = x - space; i <= x + space; i++){
-				if (!getFullBlock(i, j).getIsOveridable()){
+				if (!getAssociatedBlock(i, j).getIsOveridable()){
 					isOpen = false;
 					break;
 				}
@@ -2084,14 +2091,16 @@ public class World
 	}
 	
 	/**
-	 * Gets the block at the specified (x,y). This method is safe, as all Exceptions are handled in this method. Additionally, 
-	 * the (modular) division is performed automatically. The primary intention is that this method is used to generate the 
-	 * world, so it MUST be safe, otherwise that code will become dangerous. 
+	 * Get associated block has two different behaviours. If a BlockChest is at the requested position, then a new and 
+	 * reference safe BlockChest will be given. If the Block is not an instanceof BlockChest then a direct reference to 
+	 * that Block.blockList block will be given. This has no metadata and is final. To modify the metadata, use getBlock()
+	 * to request the MinimalBlock for the given (x,y) position. <i> This version of the method getAssociatedBlock accepts 
+	 * integers not doubles.</i>
 	 * @param x the block's x location in the new world map
 	 * @param y the block's y location in the new world map
 	 * @return the block at the location specified, or null if there isnt one.
 	 */
-	public Block getFullBlock(int x, int y)
+	public Block getAssociatedBlock(int x, int y)
 	{
 		try {
 			MinimalBlock block = getChunks().get(""+(int)(x / Chunk.getChunkWidth())).getBlock((int)x % Chunk.getChunkWidth(), (int)y);
@@ -2101,14 +2110,24 @@ public class World
 			}
 			else
 			{
-				return Block.blocksList[block.id].mergeOnto(block);
+				return Block.blocksList[block.id];
 			}
 		} catch (Exception e) {
 		}
 		return Block.air;
 	}
 
-	public Block getFullBlock(double x, double y)
+	/**
+	 * Get associated block has two different behaviours. If a BlockChest is at the requested position, then a new and 
+	 * reference safe BlockChest will be given. If the Block is not an instanceof BlockChest then a direct reference to 
+	 * that Block.blockList block will be given. This has no metadata and is final. To modify the metadata, use getBlock()
+	 * to request the MinimalBlock for the given (x,y) position. <i> This version of the method getAssociatedBlock accepts 
+	 * doubles not integers.</i>
+	 * @param x the block's x location in the new world map
+	 * @param y the block's y location in the new world map
+	 * @return the block at the location specified, or null if there isnt one.
+	 */
+	public Block getAssociatedBlock(double x, double y)
 	{
 		try {
 			MinimalBlock block = getChunks().get(""+(int)(x / Chunk.getChunkWidth())).getBlock((int)x % Chunk.getChunkWidth(), (int)y);
@@ -2118,7 +2137,7 @@ public class World
 			}
 			else
 			{
-				return Block.blocksList[block.id].mergeOnto(block);
+				return Block.blocksList[block.id];
 			}
 		} catch (Exception e) { 
 		}
@@ -2165,7 +2184,7 @@ public class World
 		try
 		{
 			MinimalBlock block = getChunks().get(""+x / Chunk.getChunkWidth()).getBackWall(x % Chunk.getChunkWidth(), y);
-			return Block.blocksList[block.id].mergeOnto(block);
+			return Block.blocksList[block.id];
 		}
 		catch (Exception e)
 		{
@@ -2451,7 +2470,7 @@ public class World
 	public Block getBackBlock(double x, double y)
 	{
 		MinimalBlock block = getChunks().get(""+(int)(x / Chunk.getChunkWidth())).getBlock((int)x % Chunk.getChunkWidth(), (int)y);
-		return Block.blocksList[block.id].mergeOnto(block);
+		return Block.blocksList[block.id];
 	}
 			
 	/**

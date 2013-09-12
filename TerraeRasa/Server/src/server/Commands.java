@@ -10,6 +10,7 @@ import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Vector;
 
+
 import statuseffects.StatusEffectAbsorb;
 import statuseffects.StatusEffectAttackSpeedBuff;
 import statuseffects.StatusEffectBleed;
@@ -42,6 +43,7 @@ import world.WeatherSnow;
 import world.World;
 import blocks.Block;
 import blocks.BlockChest;
+import blocks.MinimalBlock;
 import entities.EntityPlayer;
 import enums.EnumColor;
 
@@ -257,7 +259,7 @@ public class Commands
 	}
 		
 	// -- These are server commands
-	public static void processConsoleCommand(ServerSettings settings, ServerUpdate update, World world, GameEngine engine, String command)
+	public static void processConsoleCommand(ServerSettings settings, ServerUpdate update, Vector<EntityPlayer> players, World world, GameEngine engine, String command)
 	{	
 		synchronized(processConsoleCommandLock)
 		{
@@ -287,8 +289,7 @@ public class Commands
 				}
 				if(command.startsWith("/players"))
 				{
-					EntityPlayer[] players = engine.getPlayersArray();
-					String logMessage = "(" + players.length + "/" + settings.maxPlayers + "): ";
+					String logMessage = "(" + players.size() + "/" + settings.maxPlayers + "): ";
 					for(EntityPlayer player : players)
 					{
 						logMessage += player.getName() + " ";
@@ -390,7 +391,7 @@ public class Commands
 					{
 						settings.addMod(split[1]);
 					}
-					engine.addMod(player.getIP());
+					SecurityManager.addMod(players, player.getIP());
 				}
 				if(command.startsWith("/unmod"))
 				{
@@ -406,7 +407,7 @@ public class Commands
 					{
 						settings.removeMod(split[1]);
 					}
-					engine.removeMod(player.getIP());
+					SecurityManager.removeMod(players, player.getIP());
 				}
 				if(command.startsWith("/kick"))
 				{
@@ -480,7 +481,7 @@ public class Commands
 					{
 						settings.addAdmin(split[1]);
 					}				
-					engine.addAdmin(player.getIP());
+					SecurityManager.addAdmin(players, player.getIP());
 				}
 				if(command.startsWith("/unadmin"))
 				{
@@ -496,7 +497,7 @@ public class Commands
 					{
 						settings.removeAdmin(split[1]);
 					}
-					engine.removeAdmin(player.getIP());
+					SecurityManager.removeAdmin(players, player.getIP());
 				}
 				if(command.startsWith("/heal"))
 				{
@@ -682,7 +683,7 @@ public class Commands
 						BlockUpdate blockUpdate = new BlockUpdate();
 						blockUpdate.x = Integer.parseInt(split[1]);
 						blockUpdate.y = Short.parseShort(split[2]);
-						blockUpdate.block = new SuperCompressedBlock(world.getBackWallGenerate(blockUpdate.x, blockUpdate.y));
+						blockUpdate.block = new SuperCompressedBlock(world.getBackBlock(blockUpdate.x, blockUpdate.y));
 						update.addBlockUpdate(blockUpdate);
 						player.inventory.removeItemsFromInventoryStack(player, 1, Integer.parseInt(split[5]));
 					}
@@ -922,8 +923,9 @@ public class Commands
 						int metaHeight = metadata[0].length;	
 						int xOffset = 0;
 						int yOffset = 0;					
-						BlockChest chest = (BlockChest)world.getFullBlock(x, y);
-						if(chest.metaData != 1) //Make sure its metadata is 1 (otherwise it doesnt technically exist)
+						BlockChest chest = (BlockChest)world.getAssociatedBlock(x, y);
+						MinimalBlock minimalBlock = world.getBlock(x, y);
+						if(minimalBlock.metaData != 1) //Make sure its metadata is 1 (otherwise it doesnt technically exist)
 						{
 							//Loop until a the current chest's metadata value is found
 							//This provides the offset to find the 'real' chest, with the actual items in it
@@ -940,7 +942,8 @@ public class Commands
 								}
 							}			
 							//Update the chest
-							chest = (BlockChest)(world.getFullBlock(x - xOffset, y - yOffset));
+							minimalBlock = world.getBlock(x - xOffset, y - yOffset);
+							chest = (BlockChest)(world.getAssociatedBlock(x - xOffset, y - yOffset));
 						}	
 						
 						if(chest.getItemStack(index) != null && player.getHeldMouseItem() == null) //The mouse doesn't have something picked up, so this is straightforward

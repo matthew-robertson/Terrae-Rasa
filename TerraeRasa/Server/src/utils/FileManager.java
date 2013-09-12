@@ -35,7 +35,7 @@ public class FileManager
 		World world = generateNewWorld(name, worldSize.getWidth(), worldSize.getHeight(), difficulty);
 		new File(TerraeRasa.getBasePath() + "/" + name).mkdir();
 		new File(TerraeRasa.getBasePath() + "/" + name + "/Earth").mkdir();
-		world.chunkManager = TerraeRasa.terraeRasa.gameEngine.chunkManager;
+		world.chunkManager = TerraeRasa.terraeRasa.gameEngine.getChunkManager();
 		world.chunkManager.setUniverseName(name);
 		world.saveRemainingWorld();	
 		return world;

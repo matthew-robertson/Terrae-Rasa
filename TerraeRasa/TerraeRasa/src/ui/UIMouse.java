@@ -16,6 +16,7 @@ import utils.MetaDataHelper;
 import world.World;
 import blocks.Block;
 import blocks.BlockChest;
+import blocks.MinimalBlock;
 import entities.EntityPlayer;
 
 /**
@@ -608,16 +609,18 @@ public class UIMouse extends UIBase
 		if(leftClick)
 		{
 			//Get the initial block the player is viewing
-			Block block = world.getBlockGenerate(player.viewedChestX, player.viewedChestY);
+			Block block = world.getAssociatedBlock(player.viewedChestX, player.viewedChestY);
 			if(!(block instanceof BlockChest))
 			{
 				player.clearViewedChest();
 				return;
 			}
 			BlockChest chest = (BlockChest)block;
+			MinimalBlock minimalBlock = world.getBlock(player.viewedChestX, player.viewedChestY);
+			
 			int xOffset = 0;
 			int yOffset = 0;		
-			if(chest.metaData != 1) //Make sure its metadata is 1 (otherwise it doesnt technically exist)
+			if(minimalBlock.metaData != 1) //Make sure its metadata is 1 (otherwise it doesnt technically exist)
 			{
 				//Get the metadata for the block's size
 				int[][] metadata = MetaDataHelper.getMetaDataArray((int)(Block.blocksList[world.getBlock(player.viewedChestX, player.viewedChestY).id].blockWidth / 6), 
@@ -639,7 +642,8 @@ public class UIMouse extends UIBase
 					}
 				}			
 				//Update the chest
-				chest = (BlockChest)(world.getBlockGenerate(player.viewedChestX - xOffset, player.viewedChestY - yOffset));
+				minimalBlock = world.getBlock(player.viewedChestX - xOffset, player.viewedChestY - yOffset);
+				chest = (BlockChest)(world.getAssociatedBlock(player.viewedChestX - xOffset, player.viewedChestY - yOffset));
 			}	
 			
 			int totalRows = chest.getInventorySize() / 4;
@@ -661,16 +665,18 @@ public class UIMouse extends UIBase
 		else
 		{
 			//Get the initial block the player is viewing
-			Block block = world.getBlockGenerate(player.viewedChestX, player.viewedChestY);
+			Block block = world.getAssociatedBlock(player.viewedChestX, player.viewedChestY);
 			if(!(block instanceof BlockChest))
 			{
 				player.clearViewedChest();
 				return;
 			}
 			BlockChest chest = (BlockChest)block;
+			MinimalBlock minimalBlock = world.getBlock(player.viewedChestX, player.viewedChestY);
+			
 			int xOffset = 0;
 			int yOffset = 0;		
-			if(chest.metaData != 1) //Make sure its metadata is 1 (otherwise it doesnt technically exist)
+			if(minimalBlock.metaData != 1) //Make sure its metadata is 1 (otherwise it doesnt technically exist)
 			{
 				//Get the metadata for the block's size
 				int[][] metadata = MetaDataHelper.getMetaDataArray((int)(Block.blocksList[world.getBlock(player.viewedChestX, player.viewedChestY).id].blockWidth / 6), 
@@ -693,7 +699,8 @@ public class UIMouse extends UIBase
 					}
 				}			
 				//Update the chest
-				chest = (BlockChest)(world.getBlockGenerate(player.viewedChestX - xOffset, player.viewedChestY - yOffset));
+				minimalBlock = world.getBlock(player.viewedChestX - xOffset, player.viewedChestY - yOffset);
+				chest = (BlockChest)(world.getAssociatedBlock(player.viewedChestX - xOffset, player.viewedChestY - yOffset));
 			}	
 			
 			//for each DisplayableItemStack in the chest check if there's a mouse command interacting with it
@@ -838,9 +845,10 @@ public class UIMouse extends UIBase
 		if(player.isViewingChest)
 		{
 			//Get the initial block the player is viewing
-			BlockChest chest = (BlockChest)world.getBlockGenerate(player.viewedChestX, player.viewedChestY);
+			BlockChest chest = (BlockChest)world.getAssociatedBlock(player.viewedChestX, player.viewedChestY);
+			MinimalBlock minimalBlock = world.getBlock(player.viewedChestX, player.viewedChestY);
 			
-			if(chest.metaData != 1) //Make sure its metadata is 1 (otherwise it doesnt technically exist)
+			if(minimalBlock.metaData != 1) //Make sure its metadata is 1 (otherwise it doesnt technically exist)
 			{
 				//Get the metadata for the block's size
 				int[][] metadata = MetaDataHelper.getMetaDataArray((int)(Block.blocksList[world.getBlock(player.viewedChestX, player.viewedChestY).id].blockWidth / 6), 
@@ -864,7 +872,8 @@ public class UIMouse extends UIBase
 					}
 				}			
 				//Update the chest
-				chest = (BlockChest)(world.getBlockGenerate(player.viewedChestX - x1, player.viewedChestY - y1));
+				minimalBlock = world.getBlock(player.viewedChestX - x1, player.viewedChestY - y1);
+				chest = (BlockChest)(world.getAssociatedBlock(player.viewedChestX - x1, player.viewedChestY - y1));
 			}	
 			
 			int totalRows = chest.getInventorySize() / 4;

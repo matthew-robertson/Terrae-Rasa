@@ -40,7 +40,7 @@ public class WeatherSnow extends Weather
 	 */
 	private boolean isInBlock(World world, double x, double y)
 	{
-		return (world.getBlockGenerate(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)x / 6), MathHelper.returnIntegerInWorldMapBounds_X(world, (int)y / 6)).getIsSolid());
+		return (world.getAssociatedBlock(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)x / 6), MathHelper.returnIntegerInWorldMapBounds_X(world, (int)y / 6)).getIsSolid());
 	}
 	
 	/**

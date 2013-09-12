@@ -1,6 +1,7 @@
 package blocks;
 
 import savable.SavableBlock;
+import utils.DisplayableItemStack;
 import utils.ItemStack;
 
 /**
@@ -27,9 +28,9 @@ public class MinimalBlock
 	public MinimalBlock(Block block)
 	{
 		this.id = (short) block.getID();
-		this.metaData = (byte) block.metaData;
+		this.metaData = 1;
 		this.mainInventory = (block instanceof BlockChest) ? ((BlockChest)(block)).getMainInventory() : new ItemStack[0];
-		this.setBitMap(block.getBitMap());
+		this.setBitMap(0);
 		this.hasMetaData = block.hasMetaData;
 		this.isSolid = block.isSolid;
 	}
@@ -71,5 +72,18 @@ public class MinimalBlock
 
 	public int getBitMap() {
 		return bitMap;
+	}
+	
+	public DisplayableItemStack[] getDisplayableInventory()
+	{
+		DisplayableItemStack[] displayables = new DisplayableItemStack[mainInventory.length];
+		for(int i = 0; i < mainInventory.length; i++)
+		{
+			if(this.mainInventory[i] != null)
+			{
+				displayables[i] = new DisplayableItemStack(mainInventory[i]);
+			}
+		}
+		return displayables;
 	}
 }

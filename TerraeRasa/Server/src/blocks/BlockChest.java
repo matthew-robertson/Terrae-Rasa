@@ -211,9 +211,7 @@ public class BlockChest extends Block
 	 */
 	public BlockChest mergeOnto(MinimalBlock block)
 	{
-		setBitMap(block.bitMap);
 		this.id = block.id;
-		this.metaData = block.metaData;
 		this.hasMetaData = block.hasMetaData;
 		this.setInventory(block.mainInventory);
  		return this;

@@ -33,6 +33,10 @@ import blocks.MinimalBlock;
  */
 public class Chunk 
 {
+	private static final int CHUNK_WIDTH = 100;
+	private final Object lightLock = new Object();
+	private final Object backWallLock = new Object();
+	private final Object frontBlockLock = new Object();
 	private Biome biome;
 	/** Light is the total of ambient and diffuse light. This value is inverted (0.0F becomes 1.0F, etc) to optimize rendering */
 	public float[][] light;
@@ -43,13 +47,12 @@ public class Chunk
 	public MinimalBlock[][] backWalls;
 	public MinimalBlock[][] blocks;
 	private final int x;
-	private boolean wasChanged;
-	private static final int CHUNK_WIDTH = 100;
+	private volatile boolean wasChanged;
 	private final int height;
-	private boolean lightUpdated;
-	private boolean requiresAmbientLightingUpdate;
+	private volatile boolean lightUpdated;
+	private volatile boolean requiresAmbientLightingUpdate;
 	private Vector<Position> lightSources;
-	private boolean requiresDiffuseApplied;
+	private volatile boolean requiresDiffuseApplied;
 	public Weather weather;
 	
 	/**
@@ -70,8 +73,8 @@ public class Chunk
 		{
 			for(int j = 0; j < height; j++)
 			{
-				blocks[i][j] = new MinimalBlock(Block.air);
-				backWalls[i][j] = new MinimalBlock(Block.backAir);
+				blocks[i][j] = new MinimalBlock(true);
+				backWalls[i][j] = new MinimalBlock(false);
 			}
 		}
 		
@@ -110,15 +113,6 @@ public class Chunk
 	public final Biome getBiome()
 	{
 		return biome;
-	}
-	
-	/**
-	 * Sets the biome of the chunk to the specified new biome type, creating a deep copy of the biome.
-	 * @param biome the new biome type assigned to this chunk
-	 */
-	public synchronized void setBiome(Biome biome)
-	{
-		this.biome = new Biome(biome);
 	}
 	
 	/**
@@ -180,9 +174,12 @@ public class Chunk
 	 * @param x a value from 0 to ChunkWidth	
 	 * @param y a value from 0 to ChunkHeight
 	 */
-	public synchronized void setBackWall(Block block, int x, int y)
+	public void setBackWall(MinimalBlock block, int x, int y)
 	{
-		backWalls[x][y] = new MinimalBlock(block);
+		synchronized(backWallLock)
+		{
+			backWalls[x][y] = block;
+		}
 	}
 	
 	/**
@@ -191,7 +188,7 @@ public class Chunk
 	 * @param x a value from 0 to ChunkWidth	
 	 * @param y a value from 0 to ChunkHeight
 	 */
-	public synchronized void setBlock(Block block, int x, int y)
+	public void setBlock(MinimalBlock block, int x, int y)
 	{
 //		if(Block.blocksList[blocks[x][y].id].lightStrength > 0)
 //		{
@@ -201,7 +198,10 @@ public class Chunk
 //		{
 //			addLightSource(x, y);
 //		}
-		blocks[x][y] = new MinimalBlock(block);
+		synchronized(frontBlockLock)
+		{
+			blocks[x][y] = block;
+		}
 	}
 	
 	/**
@@ -210,9 +210,12 @@ public class Chunk
 	 * @param x a value from 0 to ChunkWidth	
 	 * @param y a value from 0 to ChunkHeight
 	 */
-	public synchronized void setDiffuseLight(double strength, int x, int y)
+	public void setDiffuseLight(double strength, int x, int y)
 	{
-		diffuseLight[x][y] = (float) strength;
+		synchronized(lightLock)
+		{
+			diffuseLight[x][y] = (float) strength;
+		}
 	}
 	
 	/**
@@ -221,16 +224,19 @@ public class Chunk
 	 * @param x a value from 0 to ChunkWidth	 
 	 * @param y a value from 0 to ChunkHeight
 	 */
-	public synchronized void setAmbientLight(double strength, int x, int y)
+	public void setAmbientLight(double strength, int x, int y)
 	{
-		ambientLight[x][y] = (float) strength;
+		synchronized(lightLock)
+		{
+			ambientLight[x][y] = (float) strength;
+		}
 	}
 	
 	/**
 	 * Sets the wasChanged variable of this chunk to the given boolean
 	 * @param flag the new value for this Chunk's wasChanged field
 	 */
-	public synchronized void setChanged(boolean flag)
+	public void setChanged(boolean flag)
 	{
 		wasChanged = flag;
 	}
@@ -253,7 +259,10 @@ public class Chunk
 	 */
 	public final double getDiffuseLight(int x, int y)
 	{
-		return diffuseLight[x][y];
+		synchronized(lightLock)
+		{
+			return diffuseLight[x][y];
+		}
 	}
 
 	/**
@@ -265,36 +274,45 @@ public class Chunk
 	 */
 	public final double getAmbientLight(int x, int y)
 	{
-		return ambientLight[x][y];
+		synchronized(lightLock)
+		{
+			return ambientLight[x][y];
+		}
 	}
 	
 	/**
 	 * Updates the light[][] for rendering. A value of 0.0F is full light, 1.0F is full darkness. This is inverted 
 	 * for optimization reasons.
 	 */
-	public synchronized void updateChunkLight()
+	public void updateChunkLight()
 	{
-		for(int i = 0; i < CHUNK_WIDTH; i++)
+		synchronized(lightLock)
 		{
-			for(int k = 0; k < height; k++)
+			for(int i = 0; i < CHUNK_WIDTH; i++)
 			{
-				light[i][k] = (float) MathHelper.sat(1.0F - ambientLight[i][k] - diffuseLight[i][k]);
+				for(int k = 0; k < height; k++)
+				{
+					light[i][k] = (float) MathHelper.sat(1.0F - ambientLight[i][k] - diffuseLight[i][k]);
+				}
 			}
-		}	
+		}
 	}
 	
 	/**
 	 * Sets all the ambientlight[][] to 0.0F (no light)
 	 */
-	public synchronized void clearAmbientLight()
+	public void clearAmbientLight()
 	{
-		for(int i = 0; i < CHUNK_WIDTH; i++)
+		synchronized(lightLock)
 		{
-			for(int k = 0; k < height; k++)
+			for(int i = 0; i < CHUNK_WIDTH; i++)
 			{
-				ambientLight[i][k] = 0.0F;
+				for(int k = 0; k < height; k++)
+				{
+					ambientLight[i][k] = 0.0F;
+				}
 			}
-		}	
+		}
 	}
 
 	/**
@@ -310,7 +328,7 @@ public class Chunk
 	 * Sets this Chunk's flaggedForLightingUpdate field to the given boolean
 	 * @param flaggedForLightingUpdate the new value for this Chunk's flaggedForLightingUpdate field
 	 */
-	public synchronized void setRequiresAmbientLightingUpdate(boolean requiresAmbientLightingUpdate) 
+	public void setRequiresAmbientLightingUpdate(boolean requiresAmbientLightingUpdate) 
 	{
 		this.requiresAmbientLightingUpdate = requiresAmbientLightingUpdate;
 	}
@@ -328,7 +346,7 @@ public class Chunk
 	 * Sets this Chunk's lightUpdated field to the given boolean
 	 * @param lightUpdated the new value for this Chunk's lightUpdated field
 	 */
-	public synchronized void setLightUpdated(boolean lightUpdated) 
+	public void setLightUpdated(boolean lightUpdated) 
 	{
 		this.lightUpdated = lightUpdated;
 	}	
@@ -377,15 +395,18 @@ public class Chunk
 		}
 	}
 
-	public Vector<Position> getLightSources() {
+	public Vector<Position> getLightSources() 
+	{
 		return lightSources;
 	}
 
-	public boolean requiresDiffuseApplied() {
+	public boolean requiresDiffuseApplied() 
+	{
 		return requiresDiffuseApplied;
 	}
 
-	public void setRequiresDiffuseApplied(boolean requiresDiffuseApplied) {
+	public void setRequiresDiffuseApplied(boolean requiresDiffuseApplied) 
+	{
 		this.requiresDiffuseApplied = requiresDiffuseApplied;
 	}
 }

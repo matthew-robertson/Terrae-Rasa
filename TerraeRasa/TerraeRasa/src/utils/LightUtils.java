@@ -664,9 +664,9 @@ public class LightUtils
 					continue;
 				}
 				
-				if(world.getBlockGenerate(i, k).lightStrength > 0)
+				if(world.getAssociatedBlock(i, k).lightStrength > 0)
 				{
-					Block block = world.getBlockGenerate(i, k);
+					Block block = world.getAssociatedBlock(i, k);
 					removeLightSource(world, i, k, block.lightRadius, block.lightStrength);
 					//applyLightSource(world, i, k, block.lightRadius, block.lightStrength);				
 				}
@@ -685,9 +685,9 @@ public class LightUtils
 					continue;
 				}
 				
-				if(world.getBlockGenerate(i, k).lightStrength > 0)
+				if(world.getAssociatedBlock(i, k).lightStrength > 0)
 				{
-					Block block = world.getBlockGenerate(i, k);
+					Block block = world.getAssociatedBlock(i, k);
 					removeLightSource(world, i, k, block.lightRadius, block.lightStrength);
 					//applyLightSource(world, i, k, block.lightRadius, block.lightStrength);				
 				}
@@ -706,9 +706,9 @@ public class LightUtils
 					continue;
 				}
 				
-				if(world.getBlockGenerate(i, k).lightStrength > 0)
+				if(world.getAssociatedBlock(i, k).lightStrength > 0)
 				{
-					Block block = world.getBlockGenerate(i, k);
+					Block block = world.getAssociatedBlock(i, k);
 					//removeLightSource(world, i, k, block.lightRadius, block.lightStrength);
 					applyLightSource(world, i, k, block.lightRadius, block.lightStrength);				
 				}

@@ -598,7 +598,10 @@ public class InventoryPlayer
 			{
 				player.changedInventorySlots.add("i " + index);
 			}
-			inventoryTotals.put(mainInventory[index].getItemName(), inventoryTotals.get(mainInventory[index].getItemName()) - mainInventory[index].getStackSize());		
+			if(mainInventory[index].getItemID() < ActionbarItem.spellIndex)
+			{
+				inventoryTotals.put(mainInventory[index].getItemName(), inventoryTotals.get(mainInventory[index].getItemName()) - mainInventory[index].getStackSize());		
+			}
 			mainInventory[index] = null;
 			player.inventoryChanged = true;
 		}

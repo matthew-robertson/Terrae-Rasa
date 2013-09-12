@@ -27,7 +27,6 @@ public class CallableLoadChunk implements Callable<Chunk>
 		Chunk chunk = new Chunk(Biome.getBiomeFromBiomeList(savable.biomeID), savable.x, savable.height);
 		chunk.backWalls = convertFromSavable(savable.backWalls);
 		chunk.blocks = convertFromSavable(savable.blocks);
-		chunk.setChanged(savable.wasChanged);
 		chunk.addLightSources(savable.lightPositions);
 		Log.log("Chunk Loaded From File Path : " + basepath + "/" + x + ".trc");
 		manager.unlockChunk(chunk.getX());

@@ -33,11 +33,13 @@ import blocks.MinimalBlock;
  */
 public class Chunk 
 {
+	private final Object biomeLock = new Object();
+	private final Object backWallLock = new Object();
+	private final Object frontBlockLock = new Object();
 	private Biome biome;
 	public MinimalBlock[][] backWalls;
 	public MinimalBlock[][] blocks;
 	private final int x;
-	private boolean wasChanged;
 	private static final int CHUNK_WIDTH = 100;
 	private final int height;
 	private Vector<Position> lightSources;
@@ -102,9 +104,12 @@ public class Chunk
 	 * Sets the biome of the chunk to the specified new biome type, creating a deep copy of the biome.
 	 * @param biome the new biome type assigned to this chunk
 	 */
-	public synchronized void setBiome(Biome biome)
+	public void setBiome(Biome biome)
 	{
-		this.biome = new Biome(biome);
+		synchronized(biomeLock)
+		{
+			this.biome = new Biome(biome);
+		}
 	}
 	
 	/**
@@ -128,16 +133,6 @@ public class Chunk
 	{
 		return backWalls[x][y];
 	}
-		
-	/**
-	 * Gets whether or not this Chunk has been flagged as having been changed, for some reason. This is generally not very descriptive
-	 * and may not even happen at all. 
-	 * @return whether or not this Chunk has been changed
-	 */
-	public final boolean getChanged()
-	{
-		return wasChanged;
-	}
 	
 	/**
 	 * Replaces the current block at backWalls[x][y] with the given Block parameter.
@@ -145,9 +140,12 @@ public class Chunk
 	 * @param x a value from 0 to ChunkWidth	
 	 * @param y a value from 0 to ChunkHeight
 	 */
-	public synchronized void setBackWall(Block block, int x, int y)
+	public void setBackWall(Block block, int x, int y)
 	{
-		backWalls[x][y] = new MinimalBlock(block);
+		synchronized(backWallLock)
+		{
+			backWalls[x][y] = new MinimalBlock(block);
+		}
 	}
 	
 	/**
@@ -156,17 +154,20 @@ public class Chunk
 	 * @param x a value from 0 to ChunkWidth	
 	 * @param y a value from 0 to ChunkHeight
 	 */
-	public synchronized void setBlock(Block block, int x, int y)
+	public void setBlock(Block block, int x, int y)
 	{
-		if(Block.blocksList[blocks[x][y].id].lightStrength > 0)
+		synchronized(frontBlockLock)
 		{
-			removeLightSource(x, y);
+			if(Block.blocksList[blocks[x][y].id].lightStrength > 0)
+			{
+				removeLightSource(x, y);
+			}
+			if(block.lightStrength > 0)
+			{
+				addLightSource(x, y);
+			}
+			blocks[x][y] = new MinimalBlock(block);
 		}
-		if(block.lightStrength > 0)
-		{
-			addLightSource(x, y);
-		}
-		blocks[x][y] = new MinimalBlock(block);
 	}
 		
 	/**
@@ -199,15 +200,6 @@ public class Chunk
 			}
 		}		
 		throw new RuntimeException("Illegal light source removal at (" + (adjustedX) + "," + y + ")");
-	}
-	
-	/**
-	 * Sets the wasChanged variable of this chunk to the given boolean
-	 * @param flag the new value for this Chunk's wasChanged field
-	 */
-	public synchronized void setChanged(boolean flag)
-	{
-		wasChanged = flag;
 	}
 		
 	/**

@@ -38,7 +38,6 @@ import world.Weather;
 import world.World;
 import audio.SoundEngine;
 import blocks.Block;
-import blocks.BlockChest;
 import blocks.MinimalBlock;
 import entities.EntityPlayer;
 import entities.IEntityTransmitBase;
@@ -218,7 +217,7 @@ public class GameEngine
 		        		compUpdate.clientInput = inputsArray;
 		        		hardwareInput.clear();
 		        		//Client Updates (String stuff)
-		        		clientCommands.addAll(update.commands);
+		        		clientCommands.addAll(update.getCommandsVector());
 		        		if(closeRequested) {
 		        			clientCommands.add("/quit " + activePlayerID);
 		        		}
@@ -454,20 +453,21 @@ public class GameEngine
 			{
 				if(update.type == 0)
 				{
-					Block block;
-					if(update.block.mainInventory.length > 0)
-					{
-						BlockChest chest = new BlockChest((BlockChest)Block.blocksList[update.block.id]);
-						chest.mergeOnto(new MinimalBlock(update.block));
-						block = chest;
-					}
-					else
-					{
-						 block = Block.blocksList[update.block.id].clone().mergeOnto(new MinimalBlock(update.block));
-					}
+//					Block block;
+//					if(update.block.mainInventory.length > 0)
+//					{
+//						BlockChest chest = new BlockChest((BlockChest)Block.blocksList[update.block.id]);
+//						chest.mergeOnto(new MinimalBlock(update.block));
+//						block = chest;
+//					}
+//					else
+//					{
+//						 block = Block.blocksList[update.block.id];
+//					}
+//					(new MinimalBlock(update.block)
 					
-					if(block.lightStrength > 0) {
-						world.setBlock(block, update.x, update.y, EnumEventType.EVENT_BLOCK_PLACE_LIGHT);
+					if(Block.blocksList[update.block.id].lightStrength > 0) {
+						world.setBlock(new MinimalBlock(update.block), update.x, update.y, EnumEventType.EVENT_BLOCK_PLACE_LIGHT);
 						world.setBitMap(update.x-1, update.y, world.updateBlockBitMap(update.x-1, update.y));
 						world.setBitMap(update.x, update.y-1, world.updateBlockBitMap(update.x, update.y-1));
 						world.setBitMap(update.x, update.y, world.updateBlockBitMap(update.x, update.y));
@@ -475,7 +475,7 @@ public class GameEngine
 						world.setBitMap(update.x, update.y+1, world.updateBlockBitMap(update.x, update.y+1));
 					}
 					else {
-						world.setBlock(block, update.x, update.y, EnumEventType.EVENT_BLOCK_PLACE);
+						world.setBlock(new MinimalBlock(update.block), update.x, update.y, EnumEventType.EVENT_BLOCK_PLACE);
 						
 						world.setBitMap(update.x-1, update.y, world.updateBlockBitMap(update.x-1, update.y));
 						world.setBitMap(update.x, update.y-1, world.updateBlockBitMap(update.x, update.y-1));
@@ -486,7 +486,7 @@ public class GameEngine
 				}
 				else 
 				{
-					world.setBackBlock(Block.blocksList[update.block.id].clone().mergeOnto(new MinimalBlock(update.block)), update.x, update.y);
+					world.setBackBlock(new MinimalBlock(update.block), update.x, update.y);
 				}
 			}
 			for(EntityUpdate update : serverupdate.entityUpdates)

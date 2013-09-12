@@ -31,7 +31,6 @@ public class CallableSaveChunk implements Callable<Boolean>
 		savable.backWalls = convertToSavable(chunk.backWalls);
 		savable.blocks = convertToSavable(chunk.blocks);
 		savable.x = chunk.getX();
-		savable.wasChanged = chunk.getChanged();
 		savable.height = chunk.getHeight();
 		savable.lightPositions = chunk.getLightPositions();
 		

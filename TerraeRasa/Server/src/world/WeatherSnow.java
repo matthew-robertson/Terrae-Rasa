@@ -4,6 +4,7 @@ import io.Chunk;
 
 import java.util.Random;
 
+
 import transmission.BlockUpdate;
 import transmission.ServerUpdate;
 import transmission.SuperCompressedBlock;
@@ -45,7 +46,7 @@ public class WeatherSnow extends Weather
 	 */
 	private Block getBlockAtPosition(World world, double x, double y)
 	{
-		return world.getFullBlock(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)x / 6), MathHelper.returnIntegerInWorldMapBounds_X(world, (int)y / 6));
+		return world.getAssociatedBlock(MathHelper.returnIntegerInWorldMapBounds_X(world, (int)x / 6), MathHelper.returnIntegerInWorldMapBounds_X(world, (int)y / 6));
 	}
 	
 	/**
@@ -113,7 +114,7 @@ public class WeatherSnow extends Weather
 						BlockUpdate blockUpdate = new BlockUpdate();
 						blockUpdate.x = x;
 						blockUpdate.y = (short) y;
-						blockUpdate.block = new SuperCompressedBlock(world.getFullBlock(blockUpdate.x, blockUpdate.y));
+						blockUpdate.block = new SuperCompressedBlock(world.getBlock(blockUpdate.x, blockUpdate.y));
 						update.addBlockUpdate(blockUpdate);
 					}
 					
@@ -125,13 +126,13 @@ public class WeatherSnow extends Weather
 					{
 						int x = MathHelper.returnIntegerInWorldMapBounds_X(world, (int)(snow[i].x / 6));
 						int y = MathHelper.returnIntegerInWorldMapBounds_Y(world, (int)((snow[i].y - 6) / 6) + 1);
-						Block requestedBlock = world.getFullBlock(x, y);
+						MinimalBlock requestedBlock = world.getBlock(x, y);
 						world.setBitMap(x, y, requestedBlock.getBitMap() + 16);					
 
 						BlockUpdate blockUpdate = new BlockUpdate();
 						blockUpdate.x = x;
 						blockUpdate.y = (short) y;
-						blockUpdate.block = new SuperCompressedBlock(world.getFullBlock(blockUpdate.x, blockUpdate.y));
+						blockUpdate.block = new SuperCompressedBlock(world.getBlock(blockUpdate.x, blockUpdate.y));
 						update.addBlockUpdate(blockUpdate);
 					}					
 				}

@@ -1,6 +1,5 @@
 package blocks;
 
-import savable.SavableBlock;
 import transmission.SuperCompressedBlock;
 import utils.DisplayableItemStack;
 
@@ -24,36 +23,24 @@ public class MinimalBlock
 	public boolean isSolid;
 	
 	/**
-	 * Constructs a new MinimalBlock with the given Block
-	 * @param block the Block to convert to a MinimalBlock
-	 */
-	public MinimalBlock(Block block)
+	 * Constructs a new MinimalBlock MinimumBlock with the properties of air
+	 * @param isFront true if the block is front air, otherwise false (backair)
+	 */ 
+	public MinimalBlock(boolean isFront)
 	{
+		Block block = null;
+		if(isFront)
+			block = Block.air;
+		else
+			block = Block.backAir;
 		this.id = (short) block.getID();
-		this.metaData = (byte) block.metaData;
+		this.metaData = (byte) 1;
 		this.mainInventory = (block instanceof BlockChest) ? ((BlockChest)(block)).getMainInventory() : new DisplayableItemStack[0];
 		this.iconX = (short) block.iconX;
 		this.iconY = (short) block.iconY;
-		this.setBitMap(block.getBitMap());
+		this.setBitMap(0);
 		this.hasMetaData = block.hasMetaData;
 		this.isSolid = block.isSolid;
-	}
-	
-	/**
-	 * Constructs a new MinimalBlock using a SavableBlock
-	 * @param savedBlock the SavableBlock to convert to a MinimalBlock
-	 */
-	public MinimalBlock(SavableBlock savedBlock)
-	{
-		Block block = Block.blocksList[savedBlock.id];
-		this.id = (short) block.getID();
-		this.metaData = (byte) savedBlock.metaData;
-		this.mainInventory = savedBlock.mainInventory; //??????
-		this.hasMetaData = block.hasMetaData;
-		this.isSolid = block.isSolid;
-		this.iconX = (short) block.iconX;
-		this.iconY = (short) block.iconY;
-		this.setBitMap(savedBlock.bitMap);
 	}
 	
 	public MinimalBlock(SuperCompressedBlock compressedBlock)
@@ -129,5 +116,9 @@ public class MinimalBlock
 		iconY = (short)y;
 		iconX = (short)x;
 		return this;
+	}
+
+	public int getBitMap() {
+		return bitMap;
 	}
 }

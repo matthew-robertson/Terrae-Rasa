@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Vector;
 
+
 import passivebonuses.PassiveBonus;
 import passivebonuses.PassiveBonusContainer;
 import passivebonuses.PassiveBonusFactory;
@@ -1055,7 +1056,7 @@ public class EntityPlayer extends EntityLiving
 	 */
 	public void breakBlock (ServerUpdate update, World world, int mx, int my, Item item)
 	{
-		Block block = world.getFullBlock(mx,  my);
+		Block block = world.getAssociatedBlock(mx,  my);
 		if(item == null)
 		{
 			return;
@@ -1102,7 +1103,7 @@ public class EntityPlayer extends EntityLiving
 							world.breakBlock(update, this, mx, my);
 							
 							//Overwrite snow/flowers/etc...
-							if (world.getFullBlock(mx, my-1).getIsOveridable() == true && world.getBlock(mx, my-1).id != Block.air.getID())
+							if (world.getAssociatedBlock(mx, my-1).getIsOveridable() == true && world.getBlock(mx, my-1).id != Block.air.getID())
 							{
 								world.breakBlock(update, this, mx, my-1);
 							}

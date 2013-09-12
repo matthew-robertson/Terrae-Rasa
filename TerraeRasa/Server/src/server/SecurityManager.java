@@ -1,6 +1,10 @@
 package server;
 
 import java.net.Socket;
+import java.util.Iterator;
+import java.util.Vector;
+
+import entities.EntityPlayer;
 
 /**
  * SecurityManager contains several methods which relate to server security. These focus on determining if a player is a mod, determining 
@@ -60,4 +64,77 @@ public class SecurityManager
 	{
 		return settings.isBanned(ip);
 	}
+	
+	/**
+	 * Revokes all mod-status for a given IP
+	 * @param players
+	 * @param IP
+	 */
+	public static void removeMod(Vector<EntityPlayer> players, String IP)
+	{
+		Iterator<EntityPlayer> it = players.iterator();
+		while(it.hasNext())
+		{
+			EntityPlayer player = it.next();
+			if(player.getAssociatedIP().equals(IP))
+			{
+				player.setIsMod(false);
+			}
+		}
+	}
+
+	/**
+	 * Revokes all admin-status for a given IP
+	 * @param players
+	 * @param IP
+	 */
+	public static void removeAdmin(Vector<EntityPlayer> players, String IP)
+	{
+		Iterator<EntityPlayer> it = players.iterator();
+		while(it.hasNext())
+		{
+			EntityPlayer player = it.next();
+			if(player.getAssociatedIP().equals(IP))
+			{
+				player.setIsAdmin(false);
+			}
+		}
+	}
+	
+	/**
+	 * Gives all mod-status for a given IP
+	 * @param players
+	 * @param IP
+	 */
+	public static void addMod(Vector<EntityPlayer> players, String IP)
+	{
+		Iterator<EntityPlayer> it = players.iterator();
+		while(it.hasNext())
+		{
+			EntityPlayer player = it.next();
+			if(player.getAssociatedIP().equals(IP))
+			{
+				player.setIsMod(true);
+			}
+		}
+	}
+
+	/**
+	 * Gives all admin-status for a given IP
+	 * @param players
+	 * @param IP
+	 */
+	public static void addAdmin(Vector<EntityPlayer> players, String IP)
+	{
+		Iterator<EntityPlayer> it = players.iterator();
+		while(it.hasNext())
+		{
+			EntityPlayer player = it.next();
+			if(player.getAssociatedIP().equals(IP))
+			{
+				player.setIsAdmin(true);
+			}
+		}
+	}
+	
 }

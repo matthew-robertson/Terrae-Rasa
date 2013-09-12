@@ -23,7 +23,6 @@ public class ChunkCompressor
 		compressedChunk.backWalls = compress(chunk.backWalls, false);
 		compressedChunk.blocks = compress(chunk.blocks, true);
 		compressedChunk.x = chunk.getX();
-		compressedChunk.wasChanged = chunk.getChanged();
 		compressedChunk.height = chunk.getHeight();
 		compressedChunk.lightSources = chunk.getLightSourcesAsArray();
 		compressedChunk.weather = chunk.weather;

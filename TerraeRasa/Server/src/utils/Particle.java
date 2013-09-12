@@ -2,6 +2,7 @@ package utils;
 
 import java.io.Serializable;
 
+
 import enums.EnumColor;
 
 

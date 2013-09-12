@@ -22,24 +22,24 @@ public class WorldLock
 	}
 	
 	//This can be null. Indicates chunk load failure.
-	public synchronized Chunk requestChunk(int x)
+	public Chunk requestChunk(int x)
 	{
 		return engine.requestChunk(x);
 	}
 	
-	public synchronized WorldData getWorldData()
+	public WorldData getWorldData()
 	{
 		return engine.getWorld().getWorldData();
 	}
 	
-	public synchronized void addPlayerToWorld(EntityPlayer player)
+	public void addPlayerToWorld(EntityPlayer player)
 	{		
 		engine.getWorld().addPlayerToWorld(TerraeRasa.terraeRasa.getSettings(), player);
 		engine.registerPlayer(player);
 		relevantPlayer = player;
 	}
 	
-	public synchronized Chunk[] getChunks(int[] req)
+	public Chunk[] getChunks(int[] req)
 	{
 		Chunk[] chunks = new Chunk[req.length];
 		for(int i = 0; i < chunks.length; i++)
@@ -49,7 +49,7 @@ public class WorldLock
 		return chunks;
 	}
 	
-	public synchronized Chunk[] getInitialChunks()
+	public Chunk[] getInitialChunks()
 	{
 		ServerSettings settings = TerraeRasa.terraeRasa.getSettings();
 		final int loadDistanceHorizontally = (settings.loadDistance * Chunk.getChunkWidth() >= 200) ? settings.loadDistance * Chunk.getChunkWidth() : 200;
@@ -78,7 +78,7 @@ public class WorldLock
 	}
 	
 	//Deletes too
-	public synchronized ServerUpdate[] yieldServerUpdates()
+	public ServerUpdate[] yieldServerUpdates()
 	{
 		ServerUpdate[] updates = new ServerUpdate[serverUpdates.size()];
 		serverUpdates.copyInto(updates);
@@ -86,12 +86,12 @@ public class WorldLock
 		return updates;
 	}
 	
-	public synchronized EntityPlayer getRelevantPlayer()
+	public EntityPlayer getRelevantPlayer()
 	{
 		return relevantPlayer;
 	}
 	
-	public synchronized void registerPlayerUpdate(CompressedClientUpdate[] updates)
+	public void registerPlayerUpdate(CompressedClientUpdate[] updates)
 	{
 		for(CompressedClientUpdate update : updates)
 		{
@@ -101,7 +101,7 @@ public class WorldLock
 		}
 	}
 
-	public synchronized TransmittablePlayer[] requestOtherPlayers()
+	public TransmittablePlayer[] requestOtherPlayers()
 	{
 		EntityPlayer[] players = engine.getPlayersArray();
 		TransmittablePlayer[] compPlayers = new TransmittablePlayer[players.length];

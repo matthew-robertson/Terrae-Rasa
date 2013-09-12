@@ -4,7 +4,6 @@ import io.Chunk;
 
 import java.io.Serializable;
 
-import blocks.Block;
 import blocks.MinimalBlock;
 
 public class ChunkExpander 
@@ -40,7 +39,7 @@ public class ChunkExpander
 				{
 					if(compressed[i][k] == null)
 					{
-						blocks[i][k] = new MinimalBlock(Block.air);	
+						blocks[i][k] = new MinimalBlock(true);	
 					}			
 					else
 					{
@@ -58,7 +57,7 @@ public class ChunkExpander
 				{
 					if(compressed[i][k] == null)
 					{
-						blocks[i][k] = new MinimalBlock(Block.backAir);
+						blocks[i][k] = new MinimalBlock(false);
 					}			
 					else
 					{

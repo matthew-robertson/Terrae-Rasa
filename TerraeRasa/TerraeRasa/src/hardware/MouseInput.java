@@ -69,12 +69,12 @@ public class MouseInput
 			else if (Mouse.isButtonDown(1)) //Right Mouse down
 			{			
 				//If the block is a chest
-				if(world.getBlockGenerate(mouseBX, mouseBY) instanceof BlockChest && player.isInventoryOpen) {
+				if(world.getAssociatedBlock(mouseBX, mouseBY) instanceof BlockChest && player.isInventoryOpen) {
 					player.setViewedChest(mouseBX, mouseBY);
 				}
 				else {
 					if(!((player.viewedChestX != mouseBX || player.viewedChestY != mouseBY) && 
-						world.getBlockGenerate(mouseBX, mouseBY) instanceof BlockChest && 
+						world.getAssociatedBlock(mouseBX, mouseBY) instanceof BlockChest && 
 						player.isInventoryOpen)) {
 						player.isViewingChest = false;
 					}

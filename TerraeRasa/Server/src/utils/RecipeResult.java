@@ -86,7 +86,7 @@ public class RecipeResult
 	{
 		Random random = new Random();
 		double chanceRoll = random.nextDouble();
-		if(chanceRoll <= affixChance)
+		if(chanceRoll <= affixChance && possibleAffixIDs.size() > 0)
 		{
 			int affixIndex = random.nextInt(possibleAffixIDs.size());
 			result.rollAffixBonuses(possibleAffixIDs.get(affixIndex));

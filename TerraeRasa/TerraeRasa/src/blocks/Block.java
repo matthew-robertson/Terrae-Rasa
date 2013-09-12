@@ -60,7 +60,6 @@ import enums.EnumBlockMaterial;
  * @since 1.0
  */
 public class Block extends ActionbarItem 
-		implements Cloneable
 {
 	public final static short BLOCK_TYPE_PICKAXE = 1,
 			BLOCK_TYPE_AXE = 2;
@@ -72,11 +71,9 @@ public class Block extends ActionbarItem
 	protected DisplayableItemStack droppedItem;
 	protected int maximumDropAmount;
 	protected int minimumDropAmount;
-	public int metaData;
 	public boolean isOveridable;
 	public boolean hasMetaData;
 	protected char tileMap;
-	protected int bitMap;
 	/** The render width of a texture (in the world) */
 	public double blockWidth; 
 	/** The render height of a texture (in the world) */
@@ -152,7 +149,6 @@ public class Block extends ActionbarItem
 		textureHeight = 16;
 		passable = false;
 		tileMap = ' ';
-		bitMap = 0;
 		maxStackSize = 250;
 		gradeOfToolRequired = 0;
 		blockTier = 0;
@@ -177,21 +173,6 @@ public class Block extends ActionbarItem
 	}
 
 	/**
-	 * Overrides Object.clone() to provide better and public cloning
-	 *             functionality for Block. Cloned objects, using Block.clone()
-	 *             should return a deep copy, at a new reference.
-	 * @return a deep copy of the current Block
-	 */
-	public Block clone() {
-		try {
-			return (Block) super.clone();
-		} catch (CloneNotSupportedException e) {
-			System.out.println("Cloning not allowed.");
-			return this;
-		}
-	}
-
-	/**
 	 * Creates a deep copy of a Block. Objects are copied, but will not have the same reference, though, Enums references are directly
 	 * copied to the new Block.
 	 * @param block the Block to be copied
@@ -203,11 +184,9 @@ public class Block extends ActionbarItem
 		this.droppedItem = new DisplayableItemStack(block.droppedItem);
 		this.maximumDropAmount = block.maximumDropAmount;
 		this.minimumDropAmount = block.minimumDropAmount;
-		this.metaData = block.metaData;
 		this.isOveridable = block.isOveridable;
 		this.hasMetaData = block.hasMetaData;
 		this.tileMap = block.tileMap;
-		this.bitMap = block.bitMap;
 		this.blockWidth = block.blockWidth;
 		this.blockHeight = block.blockHeight;
 		this.textureWidth = block.textureWidth;
@@ -381,43 +360,6 @@ public class Block extends ActionbarItem
 		return this;
 	}
 		
-	public Block setBitMap(int i) 
-	{
-		bitMap = i;
-		// If the block is a general case
-		if (this.getTileMap() == 'g') {
-			if (i <= 15) {
-				this.setIconIndex(i, this.iconY);
-			} else {
-				this.setIconIndex(i - 16, this.iconY + 1);
-			}
-		}
-		// If the block is a pillar
-		else if (this.getTileMap() == 'p') {
-			this.setIconIndex(i, this.iconY);
-		}
-		// If the block is a tree
-		else if (this.getTileMap() == 't') {
-			this.setIconIndex(i, this.iconY);
-		}
-		// If the block is a branch
-		else if (this.getTileMap() == 'b') {
-			// If the branch is a regular branch
-			if (i <= 11) {
-				this.setIconIndex(4 + i, this.iconY);
-			}
-			// If the branch is covered in snow
-			else {
-				this.setIconIndex(4 + (i - 12), this.iconY + 1);
-			}
-		}
-		// If the block is a treetop
-		else if (this.getTileMap() == 'T') {
-			this.setIconIndex(this.iconX + 3 * i, this.iconY);
-		}
-		return this;
-	}
-
 	protected Block setIconIndex(double x, double y) 
 	{
 		iconY = y;
@@ -509,10 +451,6 @@ public class Block extends ActionbarItem
 		return lRange;
 	}
 
-	public int getBitMap() {
-		return bitMap;
-	}
-
 	public char getTileMap() {
 		return tileMap;
 	}
@@ -538,20 +476,6 @@ public class Block extends ActionbarItem
 		this.associatedTextureSheet = associatedSheet;
 		iconOverriden = true;
 		return this;
-	}
-
-	/**
-	 * Creates a full block based on a given MinimalBlock
-	 * @param block the MinimalBlock to fully expand to a Block
-	 * @return a Block, expanded from the MinimalBlock
-	 */
-	public Block mergeOnto(MinimalBlock block)
-	{
-		setBitMap(block.bitMap);
-		this.id = block.id;
-		this.metaData = block.metaData;
-		this.hasMetaData = block.hasMetaData;
- 		return this;
 	}
 	
 	public static final Block[] blocksList = new Block[2048];

@@ -9,6 +9,7 @@ import utils.MetaDataHelper;
 import world.World;
 import blocks.Block;
 import blocks.BlockChest;
+import blocks.MinimalBlock;
 import entities.EntityPlayer;
 
 /**
@@ -128,14 +129,14 @@ public class UIInventory extends UIBase
 		if(player.isViewingChest)
 		{
 			//Get the initial block the player is viewing
-			Block block = world.getBlockGenerate(player.viewedChestX, player.viewedChestY);
+			Block block = world.getAssociatedBlock(player.viewedChestX, player.viewedChestY);
 			if(!(block instanceof BlockChest))
 			{
 				return null;
 			}
 			BlockChest chest = (BlockChest)block;
-			
-			if(chest.metaData != 1) //Make sure its metadata is 1 (otherwise it doesnt technically exist)
+			MinimalBlock minimalBlock = world.getBlock(player.viewedChestX, player.viewedChestY);
+			if(minimalBlock.metaData != 1) //Make sure its metadata is 1 (otherwise it doesnt technically exist)
 			{
 				//Get the metadata for the block's size
 				int[][] metadata = MetaDataHelper.getMetaDataArray((int)(Block.blocksList[world.getBlock(player.viewedChestX, player.viewedChestY).id].blockWidth / 6), 
@@ -161,7 +162,8 @@ public class UIInventory extends UIBase
 				}			
 				
 				//Update the chest
-				chest = (BlockChest)(world.getBlockGenerate(player.viewedChestX - x, player.viewedChestY - y));
+				minimalBlock = world.getBlock(player.viewedChestX - x, player.viewedChestY - y);
+				chest = (BlockChest)(world.getAssociatedBlock(player.viewedChestX - x, player.viewedChestY - y));
 			}	
 			
 			int totalRows = chest.getInventorySize() / 4;
@@ -187,14 +189,15 @@ public class UIInventory extends UIBase
 	protected static void renderChest(World world, EntityPlayer player)
 	{
 		//Get the initial block the player is viewing
-		Block block = world.getBlockGenerate(player.viewedChestX, player.viewedChestY);
+		Block block = world.getAssociatedBlock(player.viewedChestX, player.viewedChestY);
 		if(!(block instanceof BlockChest))
 		{
 			return;
 		}
 		BlockChest chest = (BlockChest)block;
+		MinimalBlock minimalBlock = world.getBlock(player.viewedChestX, player.viewedChestY);
 		
-		if(chest.metaData != 1)
+		if(minimalBlock.metaData != 1)
 		{
 			//Get the metadata for the block's size
 			int[][] metadata = MetaDataHelper.getMetaDataArray((int)(Block.blocksList[world.getBlock(player.viewedChestX, player.viewedChestY).id].blockWidth / 6), 
@@ -220,7 +223,8 @@ public class UIInventory extends UIBase
 			}
 			
 			//Update the chest
-			chest = (BlockChest)(world.getBlockGenerate(player.viewedChestX - x, player.viewedChestY - y));
+			minimalBlock = world.getBlock(player.viewedChestX - x, player.viewedChestY - y);
+			chest = (BlockChest)(world.getAssociatedBlock(player.viewedChestX - x, player.viewedChestY - y));
 			player.viewedChestX -= x;
 			player.viewedChestY -= y;
 		}	

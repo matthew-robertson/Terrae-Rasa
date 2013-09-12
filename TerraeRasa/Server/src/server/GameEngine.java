@@ -4,7 +4,6 @@ import io.Chunk;
 import io.ChunkManager;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -43,14 +42,19 @@ import entities.EntityPlayer;
  */
 public class GameEngine 
 {
+	private final Object serverCommandLock = new Object();
+	private final Object clientUpdateLock = new Object();
+	private final Object extraObjectUpdateLock = new Object();
+	private final Object playersLock = new Object();
+	private final Object chunkLock = new Object();
+	private final Object extraTextUpdateLock = new Object();
 	/** The number of game ticks per second - this will always be 20 */
 	public static final int TICKS_PER_SECOND = 20;
 	private World world;
 	private Vector<EntityPlayer> players = new Vector<EntityPlayer>(10);
-	public ChunkManager chunkManager;
+	private ChunkManager chunkManager;
 	private String universeName;
 	private List<String> pendingChunkRequests = new ArrayList<String>();
-	
 	private Vector<UpdateWithObject> extraObjectUpdates = new Vector<UpdateWithObject>();
 	private Vector<EntityUpdate> extraEntityUpdates = new Vector<EntityUpdate>();
 	/**Updates provided by a client that are not yet processed.*/
@@ -68,7 +72,7 @@ public class GameEngine
 	{
 		this.universeName = universeName;
 		this.chunkManager = new ChunkManager();
-		this.chunkManager.setUniverseName(universeName);
+		this.getChunkManager().setUniverseName(universeName);
 	}
 	
 	public void run()
@@ -101,7 +105,7 @@ public class GameEngine
 		        	ServerUpdate update = new ServerUpdate();
 		        	TerraeRasa.processCloseRequests();
 		        	CompressedClientUpdate[] updates = yieldClientUpdates();
-		        	handleClientUpdates(update, updates);
+		        	processClientUpdates(update, updates);
 		        	
 		        	world.onWorldTick(update, players);
 		        	for(EntityUpdate up : extraEntityUpdates)
@@ -125,7 +129,7 @@ public class GameEngine
 		        	String[] serverCommands = yieldServerCommands();
 		        	for(String val : serverCommands)
 		        	{
-		        		Commands.processConsoleCommand(TerraeRasa.terraeRasa.getSettings(), update, world, this, val);
+		        		Commands.processConsoleCommand(TerraeRasa.terraeRasa.getSettings(), update, players, world, this, val);
 		        	}
 		        	
 		        	Iterator<String> it = pendingChunkRequests.iterator();
@@ -177,7 +181,7 @@ public class GameEngine
 		}
 	}	
 	
-	private void handleClientUpdates(ServerUpdate serverUpdate, CompressedClientUpdate[] updates)
+	private void processClientUpdates(ServerUpdate serverUpdate, CompressedClientUpdate[] updates)
 	{
 		for(CompressedClientUpdate update : updates)
 		{
@@ -200,167 +204,193 @@ public class GameEngine
 		}
 	}
 	
-	
-	
-	public synchronized void registerServerCommand(EntityPlayer player, String command, boolean consoleGenerated)
+	/**
+	 * Server commands are the various slash commands that the player or the console can issue. 
+	 * @param player
+	 * @param command
+	 * @param consoleGenerated
+	 */
+	public  void registerServerCommand(EntityPlayer player, String command, boolean consoleGenerated)
 	{
-		//If a player issues a command with "console" level permission it fails. Likewise they need the
-		//required mod/admin permission to issue one of those commands.
-		if(player != null)
+		synchronized(serverCommandLock)
 		{
-			int commandTier = Commands.getCommandTier(command);
-			if(commandTier == Commands.PERMISSION_CONSOLE)
+			//If a player issues a command with "console" level permission it fails. Likewise they need the
+			//required mod/admin permission to issue one of those commands.
+			if(player != null)
 			{
-				serverCommands.add("/say YELLOW You do not have the required permissions to issue that command");
-				return;
-			}
-			else if(commandTier == Commands.PERMISSION_ADMIN)
-			{
-				if(!player.isAdmin())
+				int commandTier = Commands.getCommandTier(command);
+				if(commandTier == Commands.PERMISSION_CONSOLE)
 				{
 					serverCommands.add("/say YELLOW You do not have the required permissions to issue that command");
 					return;
 				}
-			}
-			else if(commandTier == Commands.PERMISSION_MOD)
-			{
-				if(!player.isMod() && !player.isAdmin())
+				else if(commandTier == Commands.PERMISSION_ADMIN)
 				{
-					serverCommands.add("/say YELLOW You do not have the required permissions to issue that command");
-					return;
+					if(!player.isAdmin())
+					{
+						serverCommands.add("/say YELLOW You do not have the required permissions to issue that command");
+						return;
+					}
 				}
-			}			
-			serverCommands.add(command);
-		}		
-		else if(consoleGenerated)
-		{
-			serverCommands.add(command);
+				else if(commandTier == Commands.PERMISSION_MOD)
+				{
+					if(!player.isMod() && !player.isAdmin())
+					{
+						serverCommands.add("/say YELLOW You do not have the required permissions to issue that command");
+						return;
+					}
+				}			
+				serverCommands.add(command);
+			}		
+			else if(consoleGenerated)
+			{
+				serverCommands.add(command);
+			}
 		}
 	}
 
-	public synchronized String[] yieldServerCommands()
+	public String[] yieldServerCommands()
 	{
-		String[] updates = new String[serverCommands.size()];
-		serverCommands.copyInto(updates);
-		serverCommands.clear();
-		return updates;
+		synchronized(serverCommandLock)
+		{
+			String[] updates = new String[serverCommands.size()];
+			serverCommands.copyInto(updates);
+			serverCommands.clear();
+			return updates;
+		}
 	}
 	
-	public synchronized CompressedClientUpdate[] yieldClientUpdates()
+	public CompressedClientUpdate[] yieldClientUpdates()
 	{
-		CompressedClientUpdate[] updates = new CompressedClientUpdate[clientUpdates.size()];
-		clientUpdates.copyInto(updates);
-		clientUpdates.clear();
-		return updates;
+		synchronized(clientUpdateLock)
+		{
+			CompressedClientUpdate[] updates = new CompressedClientUpdate[clientUpdates.size()];
+			clientUpdates.copyInto(updates);
+			clientUpdates.clear();
+			return updates;
+		}
 	}
 	
-	public synchronized void registerClientUpdate(CompressedClientUpdate update)
+	public void registerClientUpdate(CompressedClientUpdate update)
 	{
-		clientUpdates.add(update);
+		synchronized(clientUpdateLock)
+		{
+			clientUpdates.add(update);
+		}
 	}
 	
 	public World getWorld() {
 		return world;
 	}
 		
-	public synchronized String[] yieldCommandUpdates()
+	public String[] yieldCommandUpdates()
 	{
-		String[] updates = new String[extraTextUpdates.size()];
-		extraTextUpdates.copyInto(updates);
-		extraTextUpdates.clear();
-		return updates;
-	}
-	
-	public synchronized void addCommandUpdate(String command)
-	{
-		extraTextUpdates.add(command);
-	}
-	
-	public synchronized UpdateWithObject[] yieldExtraObjectUpdates()
-	{
-		UpdateWithObject[] updates = new UpdateWithObject[extraObjectUpdates.size()];
-		extraObjectUpdates.copyInto(updates);
-		extraObjectUpdates.clear();
-		return updates;
-	}
-	
-	public synchronized void addExtraObjectUpdate(UpdateWithObject update)
-	{
-		extraObjectUpdates.add(update);
-	}
-	
-	public synchronized EntityPlayer[] getPlayersArray()
-	{
-		//TODO: make references safer, I think? IE same-tick leaving of the server may be problematic.
-		EntityPlayer[] players = new EntityPlayer[this.players.size()];
-		this.players.copyInto(players);
-		return players;
-	}
-	
-	public synchronized void registerPlayer(EntityPlayer player)
-	{
-		players.add(player);
-		EntityUpdate update = new EntityUpdate();
-		update.entityID = player.entityID;
-		update.updatedEntity = player.getTransmittable();
-		update.action = 'a';
-		update.type = 5;
-		extraEntityUpdates.add(update);
-		
-		ServerSettings settings = TerraeRasa.terraeRasa.getSettings();
-		
-		if(settings.isAdmin(player.getAssociatedIP()))
+		synchronized(extraTextUpdateLock)
 		{
-			player.setIsAdmin(true);
+			String[] updates = new String[extraTextUpdates.size()];
+			extraTextUpdates.copyInto(updates);
+			extraTextUpdates.clear();
+			return updates;
 		}
-		else if(settings.isMod(player.getAssociatedIP()))
-		{
-			player.setIsMod(true);
-		}
-		
-		world.addPlayer(player);
 	}
 	
-	public synchronized void removePlayer(EntityPlayer player)
+	public void addCommandUpdate(String command)
 	{
-		players.remove(player);
-		EntityUpdate update = new EntityUpdate();
-		update.entityID = player.entityID;
-		update.updatedEntity = null;
-		update.action = 'r';
-		update.type = 5;
-		extraEntityUpdates.add(update);
-		world.entitiesByID.remove(""+player.entityID);
-		player = null;
+		synchronized(extraTextUpdateLock)
+		{
+			extraTextUpdates.add(command);
+		}
+	}
+	
+	public UpdateWithObject[] yieldExtraObjectUpdates()
+	{
+		synchronized(extraObjectUpdateLock)
+		{
+			UpdateWithObject[] updates = new UpdateWithObject[extraObjectUpdates.size()];
+			extraObjectUpdates.copyInto(updates);
+			extraObjectUpdates.clear();
+			return updates;
+		}
+	}
+	
+	public void addExtraObjectUpdate(UpdateWithObject update)
+	{
+		synchronized(extraObjectUpdateLock)
+		{
+			extraObjectUpdates.add(update);
+		}
+	}
+	
+	public EntityPlayer[] getPlayersArray()
+	{
+		synchronized(playersLock)
+		{
+			EntityPlayer[] players = new EntityPlayer[this.players.size()];
+			this.players.copyInto(players);
+			return players;
+		}
+	}
+	
+	public void registerPlayer(EntityPlayer player)
+	{
+		synchronized(playersLock)
+		{
+			players.add(player);
+			EntityUpdate update = new EntityUpdate();
+			update.entityID = player.entityID;
+			update.updatedEntity = player.getTransmittable();
+			update.action = 'a';
+			update.type = 5;
+			extraEntityUpdates.add(update);
+			
+			ServerSettings settings = TerraeRasa.terraeRasa.getSettings();
+			
+			if(settings.isAdmin(player.getAssociatedIP()))
+			{
+				player.setIsAdmin(true);
+			}
+			else if(settings.isMod(player.getAssociatedIP()))
+			{
+				player.setIsMod(true);
+			}
+			
+			world.addPlayer(player);
+		}
+	}
+	
+	public void removePlayer(EntityPlayer player)
+	{
+		synchronized(playersLock)
+		{
+			players.remove(player);
+			EntityUpdate update = new EntityUpdate();
+			update.entityID = player.entityID;
+			update.updatedEntity = null;
+			update.action = 'r';
+			update.type = 5;
+			extraEntityUpdates.add(update);
+			world.entitiesByID.remove(""+player.entityID);
+			player = null;
+		}
 	}
 
-	public synchronized Chunk requestChunk(int x)
+	public Chunk requestChunk(int x)
 	{
-		Chunk chunk = world.getChunk(x);
-		if(chunk == null)
+		synchronized(chunkLock)
 		{
-			world.forceloadChunk(x);
+			Chunk chunk = world.getChunk(x);
+			if(chunk == null)
+			{
+				world.forceloadChunk(x);
+			}
+			return chunk;
 		}
-		return chunk;
 	}
-
-//	public synchronized void registerPlayerIssuedCommands(PlayerIssuedCommand command)
-//	{
-//		playerIssuedCommands.add(command);
-//	}
-//	
-//	public synchronized PlayerIssuedCommand[] emptyPlayerIssuedCommands()
-//	{
-//		PlayerIssuedCommand[] commands = new PlayerIssuedCommand[playerIssuedCommands.size()];
-//		playerIssuedCommands.copyInto(commands);
-//		playerIssuedCommands.clear();
-//		return commands;
-//	}
 			
 	/**
 	 * Initiates a hardcore death - which deletes the player and exits to the main menu. For now.
 	 */
-	public synchronized void hardcoreDeath()
+	public void hardcoreDeath()
 	{
 		//Delete the player
 //		FileManager manager = new FileManager();
@@ -374,10 +404,7 @@ public class GameEngine
 	}
 	
 	/**
-	 * Changes the loaded world to something else. For example, changing from Earth to Hell would use this. Calling
-	 * this method forces a save of the remaining World and then loads what's required for the new World. The value 
-	 * of the param newMode should correspond to the class variables in GameEngine such as RENDER_MODE_WORLD_EARTH or
-	 * RENDER_MODE_WORLD_HELL. Supplying an incorrect value will not load a new World.
+	 * @depreciated - this doesnt do anything and wouldnt work anyway.
 	 * @param newMode the final integer value for the new world (indicating what object to manipulate)
 	 * @throws IOException indicates a general failure to load the file, not relating to a version error
 	 * @throws ClassNotFoundException indicates the saved world version is incompatible
@@ -385,31 +412,11 @@ public class GameEngine
 	public void changeWorld(int newMode)
 			throws IOException, ClassNotFoundException
 	{
-		String worldName = "";
-		
-		world.saveRemainingWorld();
-		world = null;
-		
-		FileManager manager = new FileManager();
-		manager.loadWorld("Earth", worldName);
-		
-	}
-	
-	/**
-	 * Saves the remaining world that's loaded and the player to their respective save locations before
-	 * exiting to the main menu.
-	 * @throws FileNotFoundException indicates a failure to find the save location of the player or world
-	 * @throws IOException indicates a general failure to save, not relating to the file
-	 */
-	public void closeGame() 
-			throws FileNotFoundException, IOException
-	{
-//		if(!player.defeated)
-//		{
-//			FileManager manager = new FileManager();
-//			manager.savePlayer(player);
-//		}	
-		//world.saveRemainingWorld();
+//		String worldName = "";
+//		world.saveRemainingWorld();
+//		world = null;
+//		FileManager manager = new FileManager();
+//		manager.loadWorld("Earth", worldName);
 	}
 	
 	private void loadWorld()
@@ -420,7 +427,7 @@ public class GameEngine
 		{
 			try {
 				this.world = manager.loadWorld("/Earth", universeName);
-				this.world.chunkManager = this.chunkManager;
+				this.world.chunkManager = this.getChunkManager();
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (ClassNotFoundException e) {
@@ -435,97 +442,34 @@ public class GameEngine
 		}
 		
 		Log.log("Loaded Universe: " + universeName);
-		
 	}
 	
 	public EntityPlayer getPlayer(String playerName)
 	{
-		Iterator<EntityPlayer> it = players.iterator();
-		while(it.hasNext())
+		synchronized(playersLock)
 		{
-			EntityPlayer player = it.next();
-			if(player.getName().equalsIgnoreCase(playerName))
+			Iterator<EntityPlayer> it = players.iterator();
+			while(it.hasNext())
 			{
-				return player;
+				EntityPlayer player = it.next();
+				if(player.getName().equalsIgnoreCase(playerName))
+				{
+					return player;
+				}
 			}
 		}
 		return null;
 	}
 	
-	/**
-	 * Revokes all mod-status for a given IP
-	 * @param players
-	 * @param IP
-	 */
-	public void removeMod(String IP)
-	{
-		Iterator<EntityPlayer> it = players.iterator();
-		while(it.hasNext())
-		{
-			EntityPlayer player = it.next();
-			if(player.getAssociatedIP().equals(IP))
-			{
-				player.setIsMod(false);
-			}
-		}
-	}
-
-	/**
-	 * Revokes all admin-status for a given IP
-	 * @param players
-	 * @param IP
-	 */
-	public void removeAdmin(String IP)
-	{
-		Iterator<EntityPlayer> it = players.iterator();
-		while(it.hasNext())
-		{
-			EntityPlayer player = it.next();
-			if(player.getAssociatedIP().equals(IP))
-			{
-				player.setIsAdmin(false);
-			}
-		}
-	}
-	
-	/**
-	 * Gives all mod-status for a given IP
-	 * @param players
-	 * @param IP
-	 */
-	public void addMod(String IP)
-	{
-		Iterator<EntityPlayer> it = players.iterator();
-		while(it.hasNext())
-		{
-			EntityPlayer player = it.next();
-			if(player.getAssociatedIP().equals(IP))
-			{
-				player.setIsMod(true);
-			}
-		}
-	}
-
-	/**
-	 * Gives all admin-status for a given IP
-	 * @param players
-	 * @param IP
-	 */
-	public void addAdmin(String IP)
-	{
-		Iterator<EntityPlayer> it = players.iterator();
-		while(it.hasNext())
-		{
-			EntityPlayer player = it.next();
-			if(player.getAssociatedIP().equals(IP))
-			{
-				player.setIsAdmin(true);
-			}
-		}
-	}
-	
 	public void saveChunks()
 	{
-		chunkManager.saveAllChunksWithoutUnload(universeName, world.getChunks());
+		synchronized(chunkLock)
+		{
+			getChunkManager().saveAllChunksWithoutUnload(universeName, world.getChunks());
+		}
+	}
+
+	public ChunkManager getChunkManager() {
+		return chunkManager;
 	}
 }
