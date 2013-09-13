@@ -566,8 +566,10 @@ public class World
 		
 		
 		//update the player
-		for(EntityPlayer player : players)
+		Iterator<EntityPlayer> it = players.iterator();
+		while(it.hasNext())
 		{
+			EntityPlayer player = it.next();
 			double h = player.getHealth();
 			double m = player.mana;
 			double s = player.specialEnergy;

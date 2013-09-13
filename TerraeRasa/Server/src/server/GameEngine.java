@@ -140,11 +140,14 @@ public class GameEngine
 		        		
 		        		if(world.chunksLoaded.get(split[3]))
 						{
+		        			ServerUpdate chunkServerUpdate = new ServerUpdate();
+		        			chunkServerUpdate.deferCompression = true;
 		        			UpdateWithObject objUpdate = new UpdateWithObject();
 		        			objUpdate.command = "/chunk " + split[1]; 
 		        			objUpdate.object = ChunkCompressor.compressChunk(world.getChunk(Integer.parseInt(split[3])));
-							update.addObjectUpdate(objUpdate);
-//							> TODO: ?Create a new update object and defer the compression of that object?
+							chunkServerUpdate.addObjectUpdate(objUpdate);
+		        			TerraeRasa.addWorldUpdate(chunkServerUpdate);
+//		        			> TODO: ?Create a new update object and defer the compression of that object?
 							it.remove();
 						}
 		        	}

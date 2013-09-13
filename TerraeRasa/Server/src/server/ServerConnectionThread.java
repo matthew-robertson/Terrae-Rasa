@@ -6,6 +6,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
+import java.util.concurrent.Future;
 
 import savable.SavablePlayer;
 import savable.SaveManager;
@@ -33,15 +37,8 @@ public class ServerConnectionThread extends Thread
 	private int associatedPlayerID;
 	private volatile boolean sendPlayerAndClose;
 	private ConnectionFilter filter;
-	
-//	TODO ?this?
-	/*
-	TODO: implement this [important]
-	> probably having a shared thread pool of ~32 threads for defered compression is best. 
-	> use callables.
-	  
-	 */
-	
+	private List<Future<byte[]>> deferredCompressions = new ArrayList<Future<byte[]>>();
+	private long sentData;
 	
 	public ServerConnectionThread(WorldLock lock, Socket socket, ObjectOutputStream os, ObjectInputStream is)
 	{
@@ -55,16 +52,29 @@ public class ServerConnectionThread extends Thread
 		gzipHelper = new GZIPHelper();
 		connectionID = ServerSettings.getConnectionID();
 		filter = new ConnectionFilter();
+		sentData = 0;
 	}
 	
 	public void registerWorldUpdate(ServerUpdate update)
 	{
 		if(open)
 		{
-			worldLock.addUpdate(update);
+			if(update.deferCompression)
+			{
+//				long start = System.currentTimeMillis();
+//				System.out.println(start);
+//				System.out.println("Deferred update");
+				deferCompression(new CompressedServerUpdate[]{ filter.filterOutgoing(update, worldLock.getRelevantPlayer()) });
+//				System.out.println("That took : " + (System.currentTimeMillis() - start));
+			}
+			else
+			{
+				worldLock.addUpdate(update);
+			}
 		}
 	}
 	
+
 	public void run()
 	{	
 		try {
@@ -84,30 +94,44 @@ public class ServerConnectionThread extends Thread
 					closingUpdate.objectUpdates = new UpdateWithObject[1];
 					closingUpdate.objectUpdates[0] = playerUpdate;
 					CompressedServerUpdate[] updates = { closingUpdate };
-					os.writeObject(gzipHelper.compress(updates));
+					os.writeByte(1);
+					byte[] result = gzipHelper.compress(updates);
+					sentData += result.length;
+					os.writeObject(result);
 		        	os.flush();
 		        	open = false;
 				}
 				else
 				{
+					Vector<Future<byte[]>> doneOperations = finishedCompressionOperations();
+					int totalUpdates = 1 + doneOperations.size();
+
+					os.writeByte(totalUpdates);
+					
+					//"i = 0" version of this might be another way to state it -- it's for the 100% chance of server updates.
 					ServerUpdate[] updates = worldLock.yieldServerUpdates();
 					CompressedServerUpdate[] compressedUpdates = new CompressedServerUpdate[updates.length];
 					for(int i = 0; i < updates.length; i++)
 					{
 						compressedUpdates[i] = filter.filterOutgoing(updates[i], worldLock.getRelevantPlayer());
 					}			
-					long start = System.currentTimeMillis();
 					byte[] result = gzipHelper.compress(compressedUpdates);
-		        	if(System.currentTimeMillis() - start > 50)
-		        	{
-						System.out.println(System.currentTimeMillis() - start);
-		        	}
-		        	if(result.length > 5000)
-		        	{
-		        		System.out.println("LEngth = " + result.length);
-		        	}
-					os.writeObject(result);
+					sentData += result.length + 1;
+		        	os.writeObject(result);
 		        	os.flush();
+					
+					for(int i = 1; i < totalUpdates; i++)
+					{
+//						long start = System.currentTimeMillis();
+//						System.out.println(start);
+						//TODO this is not quite done. Or is it?
+						byte[] compressed = doneOperations.get(i - 1).get();
+						sentData += compressed.length;
+						System.out.println("Added defered update. Size=" + compressed.length);
+						os.writeObject(compressed);
+			        	os.flush();
+//			        	System.out.println("That took : " + (System.currentTimeMillis() - start));
+					}
 				}
 			}			
 		} catch (IOException e) {
@@ -124,6 +148,27 @@ public class ServerConnectionThread extends Thread
 			
 			
 		}
+	}
+	
+	
+	public void deferCompression(Object object)
+	{
+		Future<byte[]> future = HeavyLoadCompressor.scheduleRequest(object);
+		deferredCompressions.add(future);
+	}
+	
+	public Vector<Future<byte[]>> finishedCompressionOperations()
+	{
+		Vector<Future<byte[]>> done = new Vector<Future<byte[]>>();
+		for(int i = 0; i < deferredCompressions.size(); i++)
+		{
+			if(deferredCompressions.get(i).isDone()) 
+			{
+				done.add(deferredCompressions.get(i));
+				deferredCompressions.remove(i);
+			}
+		}
+		return done;
 	}
 	
 	private void handleInitialData()
@@ -196,6 +241,7 @@ public class ServerConnectionThread extends Thread
 			e.printStackTrace();
 		}
 	}
+	
 	
 	/**
 	 * Gets whether or not this connection thread to a client is open. If it is open then server/client update cycle is allowed.

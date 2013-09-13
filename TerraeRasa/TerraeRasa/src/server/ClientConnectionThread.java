@@ -59,15 +59,19 @@ public class ClientConnectionThread extends Thread
 		        while(System.currentTimeMillis() > next_game_tick && loops < MAX_FRAMESKIP) //Update the game 20 times/second 
 		        {
 		        	//The update cycle things
-		        	CompressedClientUpdate[] input = engineLock.yieldClientUpdates();        		
+		        	CompressedClientUpdate[] input = engineLock.yieldClientUpdates();
 					os.writeObject(gzipHelper.compress(input));
 		        	os.flush();
-		        	
-		        	CompressedServerUpdate[] updates = (CompressedServerUpdate[])(gzipHelper.expand((byte[])is.readObject()));
-		        	for(CompressedServerUpdate update : updates)
+
+		        	byte loopTotal = is.readByte();
+		        	for(int i = 0; i < loopTotal; i++)
 		        	{
-		        		engineLock.addUpdate(update);
-		        	}	        	
+			        	CompressedServerUpdate[] updates = (CompressedServerUpdate[])(gzipHelper.expand((byte[])is.readObject()));
+			        	for(CompressedServerUpdate update : updates)
+			        	{
+			        		engineLock.addUpdate(update);
+			        	}
+		        	}
 		        		        	
 			        next_game_tick += SKIP_TICKS;
 				    loops++;

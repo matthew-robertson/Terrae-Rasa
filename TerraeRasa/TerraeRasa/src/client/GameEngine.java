@@ -451,44 +451,35 @@ public class GameEngine
 			}
 			for(BlockUpdate update : serverupdate.blockUpdates)
 			{
-				if(update.type == 0)
-				{
-//					Block block;
-//					if(update.block.mainInventory.length > 0)
-//					{
-//						BlockChest chest = new BlockChest((BlockChest)Block.blocksList[update.block.id]);
-//						chest.mergeOnto(new MinimalBlock(update.block));
-//						block = chest;
-//					}
-//					else
-//					{
-//						 block = Block.blocksList[update.block.id];
-//					}
-//					(new MinimalBlock(update.block)
-					
-					if(Block.blocksList[update.block.id].lightStrength > 0) {
-						world.setBlock(new MinimalBlock(update.block), update.x, update.y, EnumEventType.EVENT_BLOCK_PLACE_LIGHT);
-						world.setBitMap(update.x-1, update.y, world.updateBlockBitMap(update.x-1, update.y));
-						world.setBitMap(update.x, update.y-1, world.updateBlockBitMap(update.x, update.y-1));
-						world.setBitMap(update.x, update.y, world.updateBlockBitMap(update.x, update.y));
-						world.setBitMap(update.x+1, update.y, world.updateBlockBitMap(update.x+1, update.y));
-						world.setBitMap(update.x, update.y+1, world.updateBlockBitMap(update.x, update.y+1));
-					}
-					else {
-						world.setBlock(new MinimalBlock(update.block), update.x, update.y, EnumEventType.EVENT_BLOCK_PLACE);
+				try {
+					if(update.type == 0)
+					{
 						
-						world.setBitMap(update.x-1, update.y, world.updateBlockBitMap(update.x-1, update.y));
-						world.setBitMap(update.x, update.y-1, world.updateBlockBitMap(update.x, update.y-1));
-						world.setBitMap(update.x, update.y, world.updateBlockBitMap(update.x, update.y));
-						world.setBitMap(update.x+1, update.y, world.updateBlockBitMap(update.x+1, update.y));
-						world.setBitMap(update.x, update.y+1, world.updateBlockBitMap(update.x, update.y+1));
+						if(Block.blocksList[update.block.id].lightStrength > 0) {
+							world.setBlock(new MinimalBlock(update.block), update.x, update.y, EnumEventType.EVENT_BLOCK_PLACE_LIGHT);
+							world.setBitMap(update.x-1, update.y, world.updateBlockBitMap(update.x-1, update.y));
+							world.setBitMap(update.x, update.y-1, world.updateBlockBitMap(update.x, update.y-1));
+							world.setBitMap(update.x, update.y, world.updateBlockBitMap(update.x, update.y));
+							world.setBitMap(update.x+1, update.y, world.updateBlockBitMap(update.x+1, update.y));
+							world.setBitMap(update.x, update.y+1, world.updateBlockBitMap(update.x, update.y+1));
+						}
+						else {
+							world.setBlock(new MinimalBlock(update.block), update.x, update.y, EnumEventType.EVENT_BLOCK_PLACE);
+							
+							world.setBitMap(update.x-1, update.y, world.updateBlockBitMap(update.x-1, update.y));
+							world.setBitMap(update.x, update.y-1, world.updateBlockBitMap(update.x, update.y-1));
+							world.setBitMap(update.x, update.y, world.updateBlockBitMap(update.x, update.y));
+							world.setBitMap(update.x+1, update.y, world.updateBlockBitMap(update.x+1, update.y));
+							world.setBitMap(update.x, update.y+1, world.updateBlockBitMap(update.x, update.y+1));
+						}
 					}
+					else 
+					{
+						world.setBackBlock(new MinimalBlock(update.block), update.x, update.y);
+					}
+				} catch (NullPointerException e) {
 				}
-				else 
-				{
-					world.setBackBlock(new MinimalBlock(update.block), update.x, update.y);
-				}
-			}
+           	}
 			for(EntityUpdate update : serverupdate.entityUpdates)
 			{
 				if(update.type == 5) { //Player
