@@ -1,6 +1,5 @@
 package utils;
 
-import enums.EnumBlockSize;
 
 /**
  * MetaDataHelper is a utility class to help deal with blocks of sizes greater than 1x1. Currently supporting blocks upto size 3x3.
@@ -27,69 +26,27 @@ import enums.EnumBlockSize;
 public class MetaDataHelper 
 {	
 	/**
-	 * Returns a constant metadata array of size w by h.
+	 * Returns a constant metadata array of size w by h. This can be of any size from 0x0 to 100x100.
+	 * Any value beyond 100 is denied based on the fact it is ridiculous.
 	 * @param w the width of the metadata (block width)
 	 * @param h the height of the metadata (block height)
 	 * @return a metadata array of specified width and height
 	 */
 	public static int[][] getMetaDataArray(int w, int h)
 	{
-		return getMetaDataByType(getTypeBySize(w, h));
-	}
-	
-	private static EnumBlockSize getTypeBySize(int w, int h)
-	{
-		return (w == 2 && h == 1) ? EnumBlockSize.TWOBYONE : (w == 3 && h == 1) ? EnumBlockSize.THREEBYONE : (w == 1 && h == 2) ? EnumBlockSize.ONEBYTWO : (w == 2 && h == 2) ? EnumBlockSize.TWOBYTWO : (w == 3 && h == 2) ? EnumBlockSize.THREEBYTWO : (w == 1 && h == 3) ? EnumBlockSize.ONEBYTHREE : (w == 2 && h == 3) ? EnumBlockSize.TWOBYTHREE : (w == 3 && h == 3) ? EnumBlockSize.THREEBYTHREE : EnumBlockSize.ONEBYONE;
-	}
+		if(w > 100) 
+			w = 100;
+		if(h > 100) 
+			h = 100;
 		
-	private static int[][] getMetaDataByType(EnumBlockSize size)
-	{
-		return (size == EnumBlockSize.TWOBYONE) ? twoByOne : (size == EnumBlockSize.THREEBYONE) ? threeByOne : (size == EnumBlockSize.ONEBYTWO) ? oneByTwo : (size == EnumBlockSize.TWOBYTWO) ? twoByTwo : (size == EnumBlockSize.THREEBYTWO) ? threeByTwo : (size == EnumBlockSize.ONEBYTHREE) ? oneByThree : (size == EnumBlockSize.TWOBYTHREE) ? twoByThree : (size == EnumBlockSize.THREEBYTHREE) ? threeByThree : oneByOne;		
-	}
-	
-	private static final int[][] oneByOne = 
-	{ 
-		{ 1 }
-	};
-	private static final int[][] twoByOne = 
-	{
-		{ 1 },
-		{ 2 }
-	};
-	private static final int[][] threeByOne = 
-	{
-		{ 1 },
-		{ 2 },
-		{ 3 }
-	};
-	private static final int[][] oneByTwo = 
-	{
-		{ 1, 2 }
-	};
-	private static final int[][] twoByTwo = 		
-	{ 
-		{ 1, 2 },
-		{ 3, 4 } 
-	};
-	private static final int[][] threeByTwo = 	
-	{ 
-		{ 1, 2 },
-		{ 3, 4 },
-		{ 5, 6 } 
-	};
-	private static final int[][] oneByThree = 	
-	{ 
-		{ 1, 2, 3 }
-	};
-	private static final int[][] twoByThree = 	
-	{
-		{ 1, 2, 3 },
-		{ 4, 5, 6 }
-	};
-	private static final int[][] threeByThree = 
-	{ 
-		{ 1, 2, 3 },
-		{ 4, 5, 6 },
-		{ 7, 8, 9 } 
-	};		     
+		int[][] metadata = new int[w][h];
+		for(int i = 0; i < w; i++)
+		{
+			for(int j = 0; j < h; j++)
+			{
+				metadata[i][j] = 1 + (i * w) + j;
+			}
+		}
+		return metadata;
+	}	
 }

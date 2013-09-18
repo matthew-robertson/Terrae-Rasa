@@ -15,12 +15,12 @@ import entities.EntityPlayer;
  */
 public class AuraSmartMana extends Aura 
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
+	/** Indicates whether or not the mana regenerated is based on maximum mana percent, or a flat value (true indicates a percent). */
 	private boolean percentile;
+	/** The amount of mana restored. */
 	private double manaAmount;
+	/** The activation threshold, a percentage based from 0.0D to 1.0D. */
 	private double activationThreshold;
 	
 	/**

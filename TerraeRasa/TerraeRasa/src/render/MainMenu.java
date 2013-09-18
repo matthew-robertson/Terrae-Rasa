@@ -907,12 +907,19 @@ public class MainMenu extends Render
 			int port = Integer.parseInt(selectedServer.getPort());
 
 			ServerConnect connect = new ServerConnect();
-//			String[] stuff = connect.getServerInformation(ip, port);
+			String[] serverInfo = connect.getServerInformation(ip, port);
 //			for(String str : stuff)
 //			{
 //				System.out.println("[Server Info]: " + str);
 //			}
 			 
+			if(serverInfo.length == 0 || !TerraeRasa.getVersion().equals(serverInfo[0]))
+			{
+				//TODO better error message for outdated client
+				System.out.println("OUTDATED CLIENT");
+				return;
+			}
+			
 			String[] message = { "" };
 			Socket socket = new Socket(ip, port);
 			ObjectOutputStream os = null;

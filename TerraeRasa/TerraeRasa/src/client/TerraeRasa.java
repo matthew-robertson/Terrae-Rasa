@@ -38,6 +38,8 @@ public class TerraeRasa
 	private final static String WINDOWS_BASE_PATH = new StringBuilder().append("C:/Users/").append(System.getProperty("user.name")).append("/AppData/Roaming/terraerasa").toString();
 	private final static String MAC_BASE_PATH = new StringBuilder().append("/Users/").append(System.getProperty("user.name")).append("/Library/Application").append(" Support/terraerasa").toString();
 	private final static String LINUX_BASE_PATH = new StringBuilder().append("/home/").append(System.getProperty("user.name")).append("/terraerasa").toString();
+	private final static int DEFAULT_RESOLUTION_WIDTH = 900;
+	private final static int DEFAULT_RESOLUTION_HEIGHT = 520;
 	private Frame terraeRasaFrame;
 	private Canvas terraeRasaCanvas;
 	private int width;
@@ -109,8 +111,7 @@ public class TerraeRasa
 			throw new RuntimeException("OS not supported");
 		}
 						
-		//Default resolution is 900x500
-		terraeRasa = new TerraeRasa(900, 520);
+		terraeRasa = new TerraeRasa(DEFAULT_RESOLUTION_WIDTH, DEFAULT_RESOLUTION_HEIGHT);
 		terraeRasa.run(); 
 	}	
 	
@@ -119,8 +120,7 @@ public class TerraeRasa
 	 */
 	private void createWindow()
 	{
-		try
-		{
+		try {
 			//Frame and canvas			
 			terraeRasaCanvas = new Canvas();
 			terraeRasaCanvas.setPreferredSize(new Dimension(width, height));
@@ -134,17 +134,6 @@ public class TerraeRasa
 			terraeRasaFrame.pack();
 			terraeRasaFrame.setLocationRelativeTo(null);
 			terraeRasaFrame.setVisible(true);
-
-//			GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-//			if (gd.isFullScreenSupported()) {
-//	    		try {
-//	    			gd.setFullScreenWindow(terraeRasaFrame);
-//	    		}
-//	    		catch (Exception e) {
-//	    			e.printStackTrace();
-//	    			gd.setFullScreenWindow(null);
-//	    		}
-//	    	}			
 			
 			//Opengl display
 			Display.setParent(terraeRasaCanvas); //The display is inside an awtCanvas to allow for resizing
@@ -160,15 +149,12 @@ public class TerraeRasa
 	    	Component myComponent = terraeRasaFrame;
 			myComponent.addComponentListener(new ComponentAdapter() //JFrame listener for a window resize event
 			{
-			    @Override
 			    public void componentResized(ComponentEvent e)
 			    {
 		    		needsResized = true; //Flags the window for recalculations on the next game update
 			    }
 			});
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 			System.exit(1);
 		}
@@ -232,7 +218,6 @@ public class TerraeRasa
 	{		
 		int width_fix = (int)(width / Render.BLOCK_SIZE) * Render.BLOCK_SIZE + Render.BLOCK_SIZE;
 		int height_fix = (int)(height / Render.BLOCK_SIZE) * Render.BLOCK_SIZE + Render.BLOCK_SIZE;
-		
 		GL11.glClear(16640); //Clear the screendad
         GL11.glMatrixMode(GL11.GL_PROJECTION); 
         GL11.glLoadIdentity(); //Reset to the origin
@@ -256,11 +241,9 @@ public class TerraeRasa
 	public void run()
 	{
 		createWindow(); //Create the display and embed it in an awtcanvas	
-		
 		isMainMenuOpen = true;       
 		gameEngine.init();
 		gameEngine.run();
-	    
 	    Display.destroy(); //Cleans up  
         System.exit(1); //remember to exit the system and release resources
 	} 		
@@ -291,16 +274,28 @@ public class TerraeRasa
 		terraeRasa.gameEngine.startGame(universeName, world, playerName);
 	}
 	
+	/**
+	 * Flags a game join as being a MP game session. Things will behave a bit differently in MP.
+	 */
 	public static void startMPGame()
 	{
 		terraeRasa.gameEngine.startMPGame();
 	}
 	
+	/**
+	 * Gets the name of the user's operating system.
+	 * @return the name of the user's operating system
+	 */
 	public static final String getOSName()
 	{
 		return osName;
 	}
 	
+	/**
+	 * Registers a new connection to a server. This will forcibly throw a runtime exception if one such 
+	 * connection already exists.
+	 * @param thread the new ClientConnectionThread to register.
+	 */
 	public static void registerClientThread(ClientConnectionThread thread)
 	{
 		synchronized(connectionThreadLock)
@@ -313,14 +308,17 @@ public class TerraeRasa
 		}
 	}
 	
+	/**
+	 * Kills the active clientConnectionThread if it is not null and is still alive.
+	 */
 	public static void terminateClientConnection()
 	{
 		synchronized(connectionThreadLock)
 		{
-			terraeRasa.thread.kill();
+			if(terraeRasa.thread != null && terraeRasa.thread.isAlive())
+			{
+				terraeRasa.thread.kill();
+			}
 		}
 	}
-	
-	
 }
-

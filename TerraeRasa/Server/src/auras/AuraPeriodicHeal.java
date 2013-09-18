@@ -18,13 +18,15 @@ import entities.EntityPlayer;
  */
 public class AuraPeriodicHeal extends Aura 
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
+	/** True if the amount healed should be based on damage taken or maximum health. It will be based on damage taken if baseOnDamageTaken
+	 * is true and maximum health otherwise. */
 	private boolean percentile;
+	/** The amount healed, depending this can be a double value indicating percent or a flat amount. */
 	private double healAmount;
+	/** The duration of the heal StatusEffect given. */ 
 	private int durationSeconds;
+	/** True if the heal amount should be based on damage taken (IE a percentage of damage taken). */
 	private boolean baseOnDamageTaken;
 	
 	/**

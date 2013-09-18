@@ -17,6 +17,7 @@ public class AuraContainer
 		 implements Serializable
 {
 	private static final long serialVersionUID = 1L;
+	/** A collection of auras to be used at some point later on. There's a good chance this belong to some piece of armour. */
 	private Aura[] auras;
 	
 	/**

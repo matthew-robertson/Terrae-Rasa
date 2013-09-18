@@ -4,28 +4,49 @@ import passivebonuses.PassiveBonus;
 import passivebonuses.PassiveBonusDamageAll;
 import auras.Aura;
 
-public class AffixDestruction extends Affix{
-
-	/**
-	 * 
-	 */
+/**
+ * AffixDestruction extends Affix to give a damage bonus ranging from +2% to +6% to a piece of armour.
+ * The power[] is as follows: [damage_bonus_value{passive_bonus}]
+ * @author      Alec Sobeck
+ * @author      Matthew Robertson
+ * @version     1.0
+ * @since       1.0 
+ */
+public class AffixDestruction extends Affix
+{
 	private static final long serialVersionUID = 1L;
-	private double max = 0.06;
-	private double min = 0.02;
+	/** The maximum damage bonus percent */
+	private final double max = 0.06;
+	/** The minimum damage bonus percent */
+	private final double min = 0.02;
 	
-	public AffixDestruction(){
+	/**
+	 * Constructs a new AffixDestruction (this does not roll new power values).
+	 */
+	public AffixDestruction()
+	{
 		super("of destruction", getAffixID(), false);
-		
 	}
 
+	/**
+	 * Gets a unique ID for this affix.
+	 * @return this affix's unique ID
+	 */
 	public static int getAffixID()
 	{
 		return 3;
 	}
 	
-	//param powers [damage_bonus_value{passive}]
+	/**
+	 * The power[] for this method should be in the form: [damage_bonus_value{passive_bonus}]
+	 */
 	public void verifyPowers(double[] powers)
 	{
+		if(powers == null || powers.length == 0)
+		{
+			powers = new double[] { this.min };
+			return;
+		}
 		if(powers[0] > max)
 		{
 			powers[0] = max;
@@ -36,18 +57,27 @@ public class AffixDestruction extends Affix{
 		}
 	}
 	
-	//param powers [damage_bonus_value{passive}]
-	public double[] rollPowers() {		
+	/**
+	 * The power[] for this method should be in the form: [damage_bonus_value{passive_bonus}]
+	 */
+	public double[] rollPowers() 
+	{		
 		return new double[] {  rng.nextDouble() * (max - min) + min };
 	}
 
-	//param powers [damage_bonus_value{passive}]
-	public PassiveBonus[] getPassives(double[] powers) {
+	/**
+	 * The power[] for this method should be in the form: [damage_bonus_value{passive_bonus}]
+	 */
+	public PassiveBonus[] getPassives(double[] powers) 
+	{
 		return new PassiveBonus[] { new PassiveBonusDamageAll(powers[0]) };
 	}
 
-	//param powers [damage_bonus_value{passive}]
-	public Aura[] getAuras(double[] powers) {
+	/**
+	 * The power[] for this method should be in the form: [damage_bonus_value{passive_bonus}]
+	 */
+	public Aura[] getAuras(double[] powers) 
+	{
 		return new Aura[] { };
 	}
 }

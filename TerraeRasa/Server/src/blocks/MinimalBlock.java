@@ -30,7 +30,7 @@ public class MinimalBlock
 		this.id = (short) block.getID();
 		this.metaData = 1;
 		this.mainInventory = (block instanceof BlockChest) ? ((BlockChest)(block)).getMainInventory() : new ItemStack[0];
-		this.setBitMap(0);
+		this.setBitMap((byte)0);
 		this.hasMetaData = block.hasMetaData;
 		this.isSolid = block.isSolid;
 	}
@@ -44,36 +44,54 @@ public class MinimalBlock
 		Block block = Block.blocksList[savedBlock.id];
 		this.id = (short) block.getID();
 		this.metaData = (byte) savedBlock.metaData;
-		this.mainInventory = savedBlock.mainInventory; //??????
+		this.mainInventory = savedBlock.mainInventory; 
 		this.hasMetaData = block.hasMetaData;
 		this.isSolid = block.isSolid;
 		this.setBitMap(savedBlock.bitMap);
 	}
 		
+	/**
+	 * Gets the Block ID associated with this minimum block.
+	 * @return the Block ID associated with this minimum block
+	 */
 	public int getID()
 	{
 		return id;
 	}
 	
 	/**
-	 * Sets the bitmap of this minimal block, using the same procedure as Block.setBitMap(int)
-	 * @param i the new bitmap value
+	 * Sets the bitmap of this minimal block
+	 * @param bit the new bitmap value
 	 * @return a reference to this MinimalBlock
 	 */
-	public MinimalBlock setBitMap(int i) 
+	public MinimalBlock setBitMap(byte bit) 
 	{
-		bitMap = (byte)i;		
+		bitMap = bit;		
 		return this;
 	}
 
-	public boolean isSolid() {
+	/**
+	 * Gets whether or not this block is solid - if it's solid it cant be walked through.
+	 * @return true if this block cannot be passed, otherwise false
+	 */
+	public boolean isSolid() 
+	{
 		return isSolid;
 	}
 
-	public int getBitMap() {
+	/**
+	 * Gets this block's bitmap.
+	 * @return this block's bitmap
+	 */
+	public int getBitMap() 
+	{
 		return bitMap;
 	}
 	
+	/**
+	 * Converts the mainInventory[] from a ItemStack[] to a DisplayableItemStack[] and then returns the newly created DisplayableItemStack[].
+	 * @return a reference safe, conversion of mainInventory[] from ItemStack[] to DisplayableItemStack[]
+	 */
 	public DisplayableItemStack[] getDisplayableInventory()
 	{
 		DisplayableItemStack[] displayables = new DisplayableItemStack[mainInventory.length];

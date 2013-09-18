@@ -65,7 +65,7 @@ public class RecipeResult
 	
 	public RecipeResult addAffix(AffixData affix)
 	{
-		possibleAffixIDs.add(affix.affixID);
+		possibleAffixIDs.add(affix.getAffixID());
 		return this;
 	}
 	

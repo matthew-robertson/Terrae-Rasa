@@ -6,11 +6,9 @@ import utils.ItemStack;
 /**
  * BlockChest is an extension of Block that allows items to be stored in it. Items can be placed in 
  * the chest with {@link #placeItemStack(ItemStack, int)} and removed using {@link #takeItemStack(int)}. 
- * Most methods which request an ItemStack make a deep copy to prevent reference errors, but this is not the 
- * case with {@link #getMainInventory()}, therefore caution should be used to prevent corrupting the chest's 
- * contents. 
+ * Most methods which request an ItemStack make a deep copy to prevent reference errors. 
  * <br><br>
- * A new Chest can be created using the only constructor, {@link #BlockChest(int, int)}.
+ * A new BlockChest copy can be created using the only publicly exposed constructor, {@link #BlockChest(BlockChest)}.
  * @author      Alec Sobeck
  * @author      Matthew Robertson
  * @version     1.0
@@ -35,8 +33,7 @@ public class BlockChest extends Block
 	}	
 	
 	/**
-	 * Implements a further version of Block(Block). In addition to Block(Block) a deep copy of all variables
-	 * is performed and a new mainInventory[] is created.
+	 * Implements a further version of Block(Block). In addition to Block(Block) a fresh mainInventory[] is created.
 	 * @param block the block to create a deep copy of
 	 */
 	public BlockChest(BlockChest block)
@@ -47,8 +44,8 @@ public class BlockChest extends Block
 	
 	/**
 	 * Attempts to place the itemstack in the chest.
-	 * @param stack
-	 * @param index
+	 * @param stack the stack to place into a slot
+	 * @param index the index of the slot in the mainInventory[] to place the new stack
 	 * @return
 	 */
 	public ItemStack placeItemStack(ItemStack stack, int index)
@@ -137,6 +134,10 @@ public class BlockChest extends Block
 		return stacks;
 	}
 	
+	/**
+	 * Converts the mainInventory[] to a DisplayableItemStack[] then returns this array.
+	 * @return the mainInventory[] converted to DisplayableItemStack[]
+	 */
 	public DisplayableItemStack[] getDisplayableInventory()
 	{
 		DisplayableItemStack[] displayables = new DisplayableItemStack[mainInventory.length];
@@ -151,9 +152,8 @@ public class BlockChest extends Block
 	}
 	
 	/**
-	 * Returns the size of the chest's inventory. This should be equal to the mainInventory's length, but is a separate value
-	 * stored within the chest.
-	 * @return
+	 * Returns the size (length) of the chest's inventory. 
+	 * @return the length of the chest's inventory
 	 */
 	public int getInventorySize()
 	{
@@ -161,7 +161,7 @@ public class BlockChest extends Block
 	}
 	
 	/**
-	 * Sets the mainInventory[] to the given ItemStacks
+	 * Sets the mainInventory[] to the given ItemStacks. This is bounds safe, and reference safe. Excess items will simply be ignored.
 	 * @param stacks the new contains of the mainInventory[]
 	 */
 	public void setInventory(ItemStack[] stacks)
@@ -188,8 +188,19 @@ public class BlockChest extends Block
 		mainInventory = new ItemStack[newsize];
 	}
 	
+	/**
+	 * Removes a specified number of items from a stack in the inventory.
+	 * @param howMany the number of items to remove
+	 * @param index the index in the mainInvenotry by which to remove items.
+	 * @return
+	 */
 	public boolean removeItemsFromInventoryStack(int howMany, int index)
 	{
+		if(mainInventory[index] == null)
+		{
+			return false;
+		}
+		
 		if(howMany < mainInventory[index].getStackSize())
 		{
 			mainInventory[index].removeFromStack(howMany);
@@ -216,6 +227,4 @@ public class BlockChest extends Block
 		this.setInventory(block.mainInventory);
  		return this;
 	}
-	
-	
 }

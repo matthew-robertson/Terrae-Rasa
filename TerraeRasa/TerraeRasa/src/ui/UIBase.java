@@ -62,4 +62,9 @@ public class UIBase extends Render
 	{
 		return inventoryIndex;
 	}
+	
+	public static void forceHeldItemSize(int size)
+	{
+		mouseItemSize = size;
+	}
 }

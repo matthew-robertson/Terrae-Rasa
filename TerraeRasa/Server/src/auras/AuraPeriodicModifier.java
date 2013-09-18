@@ -16,9 +16,6 @@ import entities.EntityPlayer;
  */
 public class AuraPeriodicModifier extends Aura 
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	/** A double value indicating how much to modify the damage. 1 is normal; 0.5 is 50% reduced; 1.5 is 50% increased (et cetera) */
 	private double damageModifier;

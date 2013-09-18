@@ -17,13 +17,15 @@ import entities.EntityPlayer;
  */
 public class AuraReflectiveAbsorb extends Aura 
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
+	/** True if the amount absorbed should be based on damage taken or maximum health. It will be based on damage taken if baseOnDamageTaken
+	 * is true and maximum health otherwise. */
 	private boolean percentile;
+	/** The amount absorbed, depending this can be a double value indicating percent or a flat amount. */
 	private double absorbAmount;
+	/** The duration of the absorb StatusEffect given. */ 
 	private int durationSeconds;
+	/** True if the absorb amount should be based on damage taken (IE a percentage of damage taken). */
 	private boolean baseOnDamageTaken;
 	
 	/**
@@ -50,21 +52,24 @@ public class AuraReflectiveAbsorb extends Aura
 	public void onDamageTaken(World world, EntityPlayer player, Damage damage)
 	{
 		double absorbValue = 0;
-		if(baseOnDamageTaken) {
+		if(baseOnDamageTaken) 
+		{
 			//A percent of damage done
 			absorbValue = damage.amount() * absorbAmount;
 		}
-		else {
-			if(percentile) {
+		else 
+		{
+			if(percentile) 
+			{
 				//A percent of maximum health
 				absorbValue = player.maxHealth * absorbAmount;
 			}
-			else {
+			else 
+			{
 				//A static amount
 				absorbValue = absorbAmount;
 			}
-		}
-		
+		}		
 		StatusEffectAbsorb effect = new StatusEffectAbsorb(durationSeconds, 1, (int)absorbValue);
 		player.registerStatusEffect(world, effect);
 	}

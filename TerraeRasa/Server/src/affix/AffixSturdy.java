@@ -4,28 +4,49 @@ import auras.Aura;
 import passivebonuses.PassiveBonus;
 import passivebonuses.PassiveBonusDefense;
 
-public class AffixSturdy extends Affix{
+/**
+ * AffixSturdy extends Affix to give a defense bonus ranging from +2 to +10 defense.
+ * The power[] is as follows: [defense_value{passive_bonus}]
+ * @author      Alec Sobeck
+ * @author      Matthew Robertson
+ * @version     1.0
+ * @since       1.0 
+ */
+public class AffixSturdy extends Affix
+{
+	private static final long serialVersionUID = 1L;
+	/** The maximum allowed defense. */
+	private final int max = 10;
+	/** The minimum allowed defense. */
+	private final int min = 2;
 	
 	/**
-	 * 
+	 * Constructs a new Sturdy Affix (this will not roll new powers)
 	 */
-	private static final long serialVersionUID = 1L;
-	private int max = 10;
-	private int min = 2;
-	
-	public AffixSturdy() {
+	public AffixSturdy() 
+	{
 		super("Sturdy", getAffixID(), true);
-		
 	}
 	
+	/**
+	 * Gets a unique ID for this affix.
+	 * @return this affix's unique ID
+	 */
 	public final static int getAffixID()
 	{
 		return 1;
 	}
 
-	//[defense_value{passive}]
+	/**
+	 * The power[] for this method should be in the form: [defense_value{passive_bonus}]
+	 */
 	public void verifyPowers(double[] powers)
 	{
+		if(powers == null || powers.length == 0)
+		{
+			powers = new double[] { this.min };
+			return;
+		}
 		if(powers[0] > max)
 		{
 			powers[0] = max;
@@ -36,19 +57,27 @@ public class AffixSturdy extends Affix{
 		}
 	}
 	
-	//[defense_value{passive}]
-	public double[] rollPowers() {
+	/**
+	 * The power[] for this method should be in the form: [defense_value{passive_bonus}]
+	 */
+	public double[] rollPowers() 
+	{
 		return new double[] { rng.nextInt(max - min) + min };
 	}
 
-	//param powers - [defense_value{passive}]
-	public PassiveBonus[] getPassives(double[] powers) {
+	/**
+	 * The power[] for this method should be in the form: [defense_value{passive_bonus}]
+	 */
+	public PassiveBonus[] getPassives(double[] powers) 
+	{
 		return new PassiveBonus[] { new PassiveBonusDefense(powers[0]) };
 	}
 
-	//param powers [defense_value{passive}]
-	public Aura[] getAuras(double[] powers) {
+	/**
+	 * The power[] for this method should be in the form: [defense_value{passive_bonus}]
+	 */
+	public Aura[] getAuras(double[] powers) 
+	{
 		return new Aura[] { };
 	}
-	
 }

@@ -830,17 +830,22 @@ public class World
 	 * @return - updated bitmap
 	 */
 	public int updateBlockBitMap(int x, int y){
-		int bit = getBlock(x,y).getBitMap();
-		//If the block is standard
-		if (getAssociatedBlock(x, y).getTileMap() == 'g'){
-			return updateGeneralBitMap(x, y);
+		try {
+			int bit = getBlock(x,y).getBitMap();
+			//If the block is standard
+			if (getAssociatedBlock(x, y).getTileMap() == Block.TILEMAP_GENERAL){
+				return updateGeneralBitMap(x, y);
+			}
+			//if the block requires special actions
+			//If the block is a pillar
+			else if (getAssociatedBlock(x, y).getTileMap() == Block.TILEMAP_PILLAR){
+				return updatePillarBitMap(x, y);	
+			}
+			return bit;
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+			return 0;
 		}
-		//if the block requires special actions
-		//If the block is a pillar
-		else if (getAssociatedBlock(x, y).getTileMap() == 'p'){
-			return updatePillarBitMap(x, y);	
-		}
-		return bit;
 	}
 	
 	/**
@@ -1301,7 +1306,7 @@ public class World
 	private void handleBlockBreakEvent(ServerUpdate update, EntityPlayer player, int mx, int my)
 	{
 		Block block = getAssociatedBlock(mx, my);
-		if(block.hasMetaData) //normal block
+		if(!block.hasMetaData) //normal block
 		{
 			ItemStack stack = block.getDroppedItem();
 			if(stack != null) //if there's an item to drop, add it to the list of dropped items
@@ -2502,7 +2507,7 @@ public class World
 	public void setBitMap(int x, int y, int bitMap)
 	{
 		MinimalBlock block = getChunks().get(""+(x / Chunk.getChunkWidth())).getBlock(x % Chunk.getChunkWidth(), (y));
-		block.setBitMap(bitMap);
+		block.setBitMap((byte)bitMap);
 	}
 	
 	/**

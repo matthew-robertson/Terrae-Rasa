@@ -300,12 +300,12 @@ public class ItemStack
 		
 	public void rollAffixBonuses(Affix affix){
 		AffixData data = new AffixData();
-		data.affixID = affix.getID();
-		data.power = AffixGenerator.getPowers(affix.getID());
+		data.setAffixID(affix.getID());
+		data.setPower(AffixGenerator.getPowers(affix.getID()));
 		this.affix = data;
 
-		PassiveBonus[] passives = AffixGenerator.getPassiveBonuses(this.affix.affixID, this.affix.power);
-		Aura[] auras = AffixGenerator.getAuras(this.affix.affixID, this.affix.power);
+		PassiveBonus[] passives = AffixGenerator.getPassiveBonuses(this.affix.getAffixID(), this.affix.getPower());
+		Aura[] auras = AffixGenerator.getAuras(this.affix.getAffixID(), this.affix.getPower());
 		this.bonuses = passives;
 		this.auras = auras;
 		
@@ -319,12 +319,12 @@ public class ItemStack
 	
 	public void rollAffixBonuses(int affixID){
 		AffixData data = new AffixData();
-		data.affixID = affixID;
-		data.power = AffixGenerator.getPowers(affixID);
+		data.setAffixID(affixID);
+		data.setPower(AffixGenerator.getPowers(affixID));
 		this.affix = data;
 
-		PassiveBonus[] passives = AffixGenerator.getPassiveBonuses(this.affix.affixID, this.affix.power);
-		Aura[] auras = AffixGenerator.getAuras(this.affix.affixID, this.affix.power);
+		PassiveBonus[] passives = AffixGenerator.getPassiveBonuses(this.affix.getAffixID(), this.affix.getPower());
+		Aura[] auras = AffixGenerator.getAuras(this.affix.getAffixID(), this.affix.getPower());
 		this.bonuses = passives;
 		this.auras = auras;
 
@@ -345,9 +345,9 @@ public class ItemStack
 	{
 		if(this.affix != null)
 		{
-			AffixGenerator.verifyPowers(this.affix.affixID, this.affix.power);
-			PassiveBonus[] passives = AffixGenerator.getPassiveBonuses(this.affix.affixID, this.affix.power);
-			Aura[] auras = AffixGenerator.getAuras(this.affix.affixID, this.affix.power);
+			AffixGenerator.verifyPowers(this.affix.getAffixID(), this.affix.getPower());
+			PassiveBonus[] passives = AffixGenerator.getPassiveBonuses(this.affix.getAffixID(), this.affix.getPower());
+			Aura[] auras = AffixGenerator.getAuras(this.affix.getAffixID(), this.affix.getPower());
 			this.bonuses = passives;
 			this.auras = auras;
 		}

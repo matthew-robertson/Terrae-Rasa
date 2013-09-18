@@ -199,11 +199,12 @@ public class ActionbarItem
 	 * @param info any extra tooltip information useful to the user
 	 * @return a reference to this object
 	 */
-	public ActionbarItem setExtraTooltipInformation(String info)
+	protected ActionbarItem setExtraTooltipInformation(String info)
 	{
 		this.extraTooltipInformation = info;
 		return this;
 	}
+	
 	/**
 	 * Overrides the icon used when rendering this item in the inventory to one on any terrain or item.png sprite sheet.
 	 * @param x the x position of the sprite on the item.png sheet to render

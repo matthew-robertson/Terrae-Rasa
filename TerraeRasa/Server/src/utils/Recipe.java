@@ -13,7 +13,6 @@ import blocks.Block;
  */
 public class Recipe 
 {
-	public static int RECIPE_ID_GEN = 0;
 	/** What the recipe yields */
 	private RecipeResult result; 
 	/** What the recipe requires. */
@@ -33,7 +32,7 @@ public class Recipe
 	{
 		this.recipe = stacks;
 		this.result = result;
-		this.id = RECIPE_ID_GEN++;
+		this.id = manager.getNextID();
 		this.requiredBlock = requiredBlock;
 		manager.registerRecipe(this);
 	}

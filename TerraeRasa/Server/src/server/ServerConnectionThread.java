@@ -61,11 +61,7 @@ public class ServerConnectionThread extends Thread
 		{
 			if(update.deferCompression)
 			{
-//				long start = System.currentTimeMillis();
-//				System.out.println(start);
-//				System.out.println("Deferred update");
 				deferCompression(new CompressedServerUpdate[]{ filter.filterOutgoing(update, worldLock.getRelevantPlayer()) });
-//				System.out.println("That took : " + (System.currentTimeMillis() - start));
 			}
 			else
 			{
@@ -122,15 +118,10 @@ public class ServerConnectionThread extends Thread
 					
 					for(int i = 1; i < totalUpdates; i++)
 					{
-//						long start = System.currentTimeMillis();
-//						System.out.println(start);
-						//TODO this is not quite done. Or is it?
 						byte[] compressed = doneOperations.get(i - 1).get();
 						sentData += compressed.length;
-						System.out.println("Added defered update. Size=" + compressed.length);
 						os.writeObject(compressed);
 			        	os.flush();
-//			        	System.out.println("That took : " + (System.currentTimeMillis() - start));
 					}
 				}
 			}			
@@ -145,19 +136,17 @@ public class ServerConnectionThread extends Thread
 			e.printStackTrace();
 		} finally {
 			TerraeRasa.requestClientConnectionClosed(this, worldLock.getRelevantPlayer());
-			
-			
+			System.out.println("This thread " + connectionID + " sent a total of " + sentData + " bytes of data.");
 		}
 	}
 	
-	
-	public void deferCompression(Object object)
+	private void deferCompression(Object object)
 	{
 		Future<byte[]> future = HeavyLoadCompressor.scheduleRequest(object);
 		deferredCompressions.add(future);
 	}
 	
-	public Vector<Future<byte[]>> finishedCompressionOperations()
+	private Vector<Future<byte[]>> finishedCompressionOperations()
 	{
 		Vector<Future<byte[]>> done = new Vector<Future<byte[]>>();
 		for(int i = 0; i < deferredCompressions.size(); i++)
@@ -264,7 +253,7 @@ public class ServerConnectionThread extends Thread
 	 * Gives the ID of the player associated to this connection.
 	 * @return the ID of the player associated with this connection.
 	 */
-	public final int getAssociatedPlayerID()
+	public int getAssociatedPlayerID()
 	{
 		return associatedPlayerID;
 	}

@@ -146,13 +146,13 @@ public class Item extends ActionbarItem
 	/**
 	 * Overrides ActionbarItem.setExtraTooltipInformation(String) to make Item declarations cleaner
 	 */
-	public Item setExtraTooltipInformation(String info)
+	protected Item setExtraTooltipInformation(String info)
 	{
 		this.extraTooltipInformation = info;
 		return this;
 	}
 	
-	public Item setOnUseSound(String s){
+	protected Item setOnUseSound(String s){
 		onUseSound = s;
 		return this;
 	}
@@ -277,7 +277,6 @@ public class Item extends ActionbarItem
 	public static final Item goldenArrow = new ItemAmmo(21).setProjectile(new EntityProjectile(18, 1, 1, 8f).setProjectileSpriteIndex(0, 5).setIsFriendly(true)).setIconPosition(4, 13).setName("Golden Arrow");
 	public static final Item nightmareArrow = new ItemAmmo(22).setProjectile(new EntityProjectile(20, 1, 1, 8f).setProjectileSpriteIndex(0, 6).setIsFriendly(true)).setIconPosition(4, 14).setName("Nightmare Arrow");
 	
-	
 	public static final Item godminiumPickaxe = new ItemToolPickaxe(156).setDamageDone(7).setName("God-Minium Pickaxe").setIconPosition(20, 7).setToolMaterial(EnumToolMaterial.GOD).setItemQuality(EnumItemQuality.LEGENDARY);	
 	
 	public static final Item copperHelmet = new ItemArmorHelmet(200).setArmorType(EnumArmor.COPPER).setIconPosition(16, 0).setName("Copper Helmet");
@@ -394,12 +393,6 @@ public class Item extends ActionbarItem
 	//275
 	//276
 	//277
-	
-	
-	
-	
-	
-	
 	
 	public static final Item rocketBoots = new ItemArmorAccessory(400).setIconPosition(0, 0).setName("Rocket Boots");	
 	public static final Item ringOfVigor = new ItemArmorAccessory(401).passiveBonuses(new PassiveBonus[]{ 

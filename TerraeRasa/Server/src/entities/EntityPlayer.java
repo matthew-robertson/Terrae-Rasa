@@ -1999,4 +1999,8 @@ public class EntityPlayer extends EntityLiving
 	public String getAssociatedIP() {
 		return associatedIP;
 	}
+
+	public double getMana() {
+		return mana;
+	}
 }

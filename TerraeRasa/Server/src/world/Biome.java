@@ -7,7 +7,7 @@ import java.util.List;
 import entities.EntityNPCEnemy;
 
 public class Biome 
-		 implements Cloneable, Serializable
+		 implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	protected int biomeID;
@@ -110,7 +110,7 @@ public class Biome
 		return new Biome(biomeList[index]);
 	}
 	
-	private final static Biome biomeList[] = new Biome[3];
+	private final static Biome biomeList[] = new Biome[12];
 	
 	/** Biome Declarations **/
 	

@@ -12,12 +12,15 @@ import entities.EntityPlayer;
  * all the methods required by IAura but they do not do anything. To provide customized event functionality, the different 
  * event methods should be overriden. Version 1.0 of Aura includes the following event methods:
  * <ul>
- * <li>{@link #onDamageDone(EntityPlayer)}</li>
- * <li>{@link #onDamageTaken(EntityPlayer)}</li>
- * <li>{@link #onDeath(EntityPlayer)}</li>
- * <li>{@link #onHeal(EntityPlayer)}</li>
- * <li>{@link #onPercentageHealth(EntityPlayer)}</li>
- * <li>{@link #onStatusEffectGained(EntityPlayer)}</li>
+ *  <li>{@link #onDamageDone(World, EntityPlayer)}</li>
+ *  <li>{@link #onDamageTaken(World, EntityPlayer)}</li>
+ *  <li>{@link #onHeal(World, EntityPlayer)}</li>
+ *  <li>{@link #onPercentageHealth(World, EntityPlayer)} </li>
+ *  <li>{@link #onDeath(World, EntityPlayer)}</li>
+ *  <li>{@link #onTick(World, EntityPlayer)} </li>
+ *  <li>{@link #onManaRestored(World, EntityPlayer)} </li>
+ *  <li>{@link #onManaSpend(World, EntityPlayer)} </li>
+ *  <li>{@link #onPercentageMana(World, EntityPlayer)} </li>
  * </ul>
  * @author      Alec Sobeck
  * @author      Matthew Robertson
@@ -38,6 +41,9 @@ public class Aura
 	/** A number unique to this aura, used to distinguish it from other auras it. */
 	private final long id;
 	
+	/**
+	 * Constructs a new Aura with default values. Assigns an id of System.nanoTime().
+	 */
 	protected Aura()
 	{
 		this.random = new Random();
@@ -47,6 +53,12 @@ public class Aura
 		this.id = System.nanoTime();
 	}
 
+	/**
+	 * Constructs a new Aura with default values, a maximum cooldown, and percent activation chance. 
+	 * Assigns an id of System.nanoTime().
+	 * @param maxCooldown the maximum cooldown of this aura in game ticks
+	 * @param activationChance the chance, from 0.0D to 1.0D, for this aura to activate
+	 */
 	protected Aura(int maxCooldown, double activationChance)
 	{
 		this.random = new Random();
@@ -56,6 +68,11 @@ public class Aura
 		this.id = System.nanoTime();
 	}
 	
+	/**
+	 * Updates this aura, reducing its cooldown time and anything else applicable.
+	 * @param world the world the player is currently in
+	 * @param player the player to whom this aura belongs
+	 */
 	public void update(World world, EntityPlayer player)
 	{
 		remainingCooldown--;

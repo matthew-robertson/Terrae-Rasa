@@ -14,12 +14,12 @@ import entities.EntityPlayer;
  */
 public class AuraSmartHeal extends Aura 
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
+	/** Indicates whether or not the health regenerated is based on maximum health percent, or a flat value (true indicates a percent). */
 	private boolean percentile;
+	/** The amount healed by this aura. */
 	private double healAmount;
+	/** The activation threshold, a percentage based from 0.0D to 1.0D. */
 	private double activationThreshold;
 	
 	/**

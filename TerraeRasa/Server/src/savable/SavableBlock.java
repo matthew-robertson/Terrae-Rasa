@@ -9,8 +9,7 @@ public class SavableBlock
 {
 	private static final long serialVersionUID = 1L;
 	public ItemStack[] mainInventory;
-	public int id;
-	public int metaData;
-	public int bitMap;
-	
+	public short id;
+	public byte metaData;
+	public byte bitMap;
 }

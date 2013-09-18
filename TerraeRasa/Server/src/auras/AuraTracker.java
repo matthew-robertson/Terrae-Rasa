@@ -29,6 +29,7 @@ import entities.EntityPlayer;
 public class AuraTracker 
 		implements IAura
 {
+	/** Holds the different auras, allocating one slot for each piece of armour the player has. */
 	private AuraContainer[] aurasByPiece;	
 	
 	/**
@@ -200,21 +201,4 @@ public class AuraTracker
 		}
 		
 	}
-	
-	/*
-
-	public void onStatusEffectGained(EntityPlayer player)
-	{
-		for(int i = 0; i < aurasByPiece.length; i++)
-		{
-			if(aurasByPiece[i] != null)
-			{
-				for(Aura aura : aurasByPiece[i].getAll())
-				{
-					aura.onStatusEffectGained(player);
-				}
-			}
-		}
-	}	
-	*/
 }

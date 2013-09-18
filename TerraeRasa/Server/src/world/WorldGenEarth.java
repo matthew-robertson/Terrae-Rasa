@@ -94,8 +94,8 @@ public class WorldGenEarth extends WorldGen
 		for(int j = (yLoc + depth) - 1; j > yLoc; j--){ //go through the the y-axis of the world
 			for(int k = xLoc + 1; k < (xLoc + width) - 1; k++){ //x-axis
 				if (world.getAssociatedBlock(k,j).isSolid 
-					&& world.getAssociatedBlock(k,j).getTileMap() != 'T'
-					&& world.getAssociatedBlock(k,j).getTileMap() != 'b'){
+					&& world.getAssociatedBlock(k,j).getTileMap() != Block.TILEMAP_TREETOP
+					&& world.getAssociatedBlock(k,j).getTileMap() != Block.TILEMAP_TREE_BRANCH){
 					world.setBitMap(k, j, world.updateBlockBitMap(k, j)); //set the appropriate texture
 				}				
 			}

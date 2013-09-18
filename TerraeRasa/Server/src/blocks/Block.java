@@ -11,8 +11,6 @@ import enums.EnumBlockMaterial;
 
 
 /**
- * <code>Block extends ActionbarItem and implements , Cloneable</code>
- * <br>
  * <code>Block</code> defines the class for placable ItemStacks in the player's
  * inventory, and the Objects used to render the world and determine where
  * <code>Entities</code> are able to move. All possible <code>Blocks</code> must
@@ -61,8 +59,15 @@ import enums.EnumBlockMaterial;
  */
 public class Block extends ActionbarItem 
 {
-	public static final short BLOCK_TYPE_PICKAXE = 1,
-			BLOCK_TYPE_AXE = 2;
+	public static final short BLOCK_TYPE_UNBREAKABLE = -1,
+								 BLOCK_TYPE_HAND = 0,
+								 BLOCK_TYPE_PICKAXE = 1,
+								 BLOCK_TYPE_AXE = 2;
+	public static final byte TILEMAP_GENERAL = 0,
+								TILEMAP_PILLAR = 1,
+								TILEMAP_TREE_BRANCH = 2,
+								TILEMAP_TREE = 3,
+								TILEMAP_TREETOP = 4;
 	/** (constant) Block width in pixels, currently this value is 6. Corresponds to the value of Render.BLOCK_SIZE. */
 	public static final int BLOCK_WIDTH = 6;
 	/** (constant) Block height in pixels, currently this is 6. Corresponds to the value of Render.BLOCK_SIZE. */
@@ -73,7 +78,7 @@ public class Block extends ActionbarItem
 	protected int minimumDropAmount;
 	public boolean isOveridable;
 	public boolean hasMetaData;
-	protected char tileMap;
+	protected byte tileMap;
 	/** The render width of a texture (in the world) */
 	public double blockWidth; 
 	/** The render height of a texture (in the world) */
@@ -113,6 +118,8 @@ public class Block extends ActionbarItem
 		lightStrength = 0;
 		lightRadius = 0;
 		textureHeight = 16;
+		tileMap = TILEMAP_GENERAL;
+		blockType = BLOCK_TYPE_HAND;
 		iconX = 0;
 		iconY = 0;
 		if (blocksList[id] != null) {
@@ -163,7 +170,8 @@ public class Block extends ActionbarItem
 		lightRadius = 0;
 		iconX = 0;
 		iconY = 0;
-
+		blockType = BLOCK_TYPE_HAND;
+		tileMap = TILEMAP_GENERAL;
 		if (blocksList[id] != null) {
 			Log.log("Conflict@ BlockID " + id);
 			throw new RuntimeException(new StringBuilder().append("Conflict@ BlockID ").append(id).toString());
@@ -229,8 +237,7 @@ public class Block extends ActionbarItem
 	}
 
 	/**
-	 * Overrides ActionbarItem.setName(String) to make Block creation more
-	 * friendly
+	 * Overrides ActionbarItem.setName(String) to make Block creation more friendly
 	 */
 	protected Block setName(String name)
 	{
@@ -257,7 +264,7 @@ public class Block extends ActionbarItem
 		return this;
 	}
 
-	public Block setExtraTooltipInformation(String info) 
+	protected Block setExtraTooltipInformation(String info) 
 	{
 		this.extraTooltipInformation = info;
 		return this;
@@ -354,7 +361,7 @@ public class Block extends ActionbarItem
 		return this;
 	}
 
-	public Block setIsMineable(boolean b){
+	protected Block setIsMineable(boolean b){
 		isMineable = b;
 		return this;
 	}
@@ -366,12 +373,14 @@ public class Block extends ActionbarItem
 		return this;
 	}
 
-	protected Block setTileMap(char c) {
-		tileMap = c;
+	protected Block setTileMap(byte b)
+	{
+		tileMap = b;
 		return this;
 	}
 
-	protected Block setIsOveridable(boolean flag) {
+	protected Block setIsOveridable(boolean flag) 
+	{
 		isOveridable = flag;
 		return this;
 	}
@@ -450,10 +459,15 @@ public class Block extends ActionbarItem
 		return lRange;
 	}
 
-	public char getTileMap() {
+	public byte getTileMap()
+	{
 		return tileMap;
 	}
 
+	/**
+	 * Rolls for a blocks's dropped items, which can either be based on chance or a 100% drop.
+	 * @return whatever destroying this block would yield as an ItemStack
+	 */
 	public ItemStack getDroppedItem() 
 	{
 		return (droppedItem != null) ? new ItemStack(droppedItem.getItemID(), (minimumDropAmount + (((maximumDropAmount - minimumDropAmount) > 0) ? random.nextInt(maximumDropAmount - minimumDropAmount) : 0))) : null;
@@ -465,8 +479,7 @@ public class Block extends ActionbarItem
 	}
 
 	/**
-	 * Overrides ActionbarItem.overrideItemIcon(int, int, int) to make block
-	 * creation easier.
+	 * Overrides ActionbarItem.overrideItemIcon(int, int, int) to make block creation easier.
 	 */
 	public Block overrideItemIcon(int x, int y)
 	{
@@ -481,205 +494,68 @@ public class Block extends ActionbarItem
 
 	public static final Block none = new Block(2047).setName("None");
 	public static final Block air = new Block();
-	public static final Block dirt = new Block(1).setName("Dirt").setTileMap('g')
-			.setBlockHardness(40.0f).setIconIndex(0, 3).setBlockType(BLOCK_TYPE_PICKAXE);
-	public static final Block stone = new Block(2).setName("Stone").setTileMap('g')
-			.setBlockHardness(70.0f).setIconIndex(0, 0).setBlockType(BLOCK_TYPE_PICKAXE);
-	public static final Block grass = new BlockGrass(3).setName("Grass")
-			.setTileMap('g').setBlockHardness(40.0f).setIconIndex(0, 4)
-			.setBlockType(BLOCK_TYPE_PICKAXE);
-	public static final Block sand = new Block(6).setName("Sand").setTileMap('g')
-			.setBlockHardness(30.0f).setIconIndex(0, 2).setBlockType(BLOCK_TYPE_PICKAXE);
-	public static final Block sandstone = new Block(7).setName("Sandstone")
-			.setTileMap('g').setIconIndex(0, 1).setBlockHardness(70.0f)
-			.setBlockType(BLOCK_TYPE_PICKAXE);
-	public static final Block cactus = new Block(8).setName("Cactus")
-			.setBlockHardness(1.0f).setIconIndex(2, 3).setPassable(true)
-			.setBlockType(BLOCK_TYPE_AXE).setIsSolid(false);
-	public static final Block tree = new BlockWood(9).setName("Tree").setTileMap('t')
-			.setBlockHardness(60.0f).setIconIndex(1, 27).setPassable(true)
-			.setBlockType(BLOCK_TYPE_AXE).setIsSolid(false);
-	public static final Block treebase = new BlockWood(10).setName("tree base")
-			.setTileMap('t').setBlockHardness(60.0f).setIconIndex(0, 27)
-			.setPassable(true).setBlockType(BLOCK_TYPE_AXE).setIsSolid(false);
-	public static final Block treebranch = new BlockWood(12).setName("tree branch")
-			.setTileMap('b').setBlockHardness(5.0f).setIconIndex(4, 25)
-			.setPassable(true).setIsSolid(false);
-	public static final Block treetop = new BlockLeaves(20)
-			.setName("tree top left top").setTileMap('T')
-			.setBlockHardness(5.0f).setIconIndex(4, 27).setPassable(true)
-			.setIsSolid(false);
-	public static final Block treetopl2 = new BlockLeaves(21)
-			.setName("tree top left bottom").setTileMap('T')
-			.setBlockHardness(5.0f).setIconIndex(4, 28).setPassable(true)
-			.setIsSolid(false);
-	public static final Block treetopc1 = new BlockLeaves(22)
-			.setName("tree top center top").setTileMap('T')
-			.setBlockHardness(5.0f).setIconIndex(5, 27).setPassable(true)
-			.setIsSolid(false);
-	public static final Block treetopc2 = new BlockLeaves(23)
-			.setName("tree top center bottom").setTileMap('T')
-			.setBlockHardness(5.0f).setIconIndex(5, 28).setPassable(true)
-			.setIsSolid(false);
-	public static final Block treetopr1 = new BlockLeaves(24)
-			.setName("tree top right top").setTileMap('T')
-			.setBlockHardness(5.0f).setIconIndex(6, 27).setPassable(true)
-			.setIsSolid(false);
-	public static final Block treetopr2 = new BlockLeaves(25)
-			.setName("tree top right bottom").setTileMap('T')
-			.setBlockHardness(5.0f).setIconIndex(6, 28).setPassable(true)
-			.setIsSolid(false);
-	public static final Block gold = new BlockOre(26).setName("Gold Ore Block")
-			.setBlockHardness(10.0f).setHRange(0).setLRange(3)
-			.setIconIndex(15, 11).setBlockType(BLOCK_TYPE_PICKAXE)
-			.setDroppedItem(new ItemStack(Item.goldOre), 1, 1);
-	public static final Block iron = new BlockOre(27).setName("Iron Ore Block")
-			.setBlockHardness(10.0f).setHRange(5).setLRange(10)
-			.setIconIndex(15, 8).setBlockType(BLOCK_TYPE_PICKAXE)
-			.setDroppedItem(new ItemStack(Item.ironOre), 1, 1);
-	public static final Block coal = new BlockOre(28).setName("Coal Ore Block")
-			.setTileMap('g').setHRange(40).setLRange(10)
-			.setBlockHardness(10.0f).setIconIndex(15, 6).setBlockType(BLOCK_TYPE_PICKAXE)
-			.setDroppedItem(new ItemStack(Item.coal), 1, 1);
-	public static final Block diamond = new BlockOre(29).setName("Diamond Ore Block")
-			.setBlockHardness(10.0f).setLRange(10)
-			.setIconIndex(15, 14).setBlockType(BLOCK_TYPE_PICKAXE)
-			.setDroppedItem(new ItemStack(Item.diamond), 1, 1);
-	public static final Block ruby = new BlockOre(30).setName("Ruby Ore Block")
-			.setBlockHardness(10.0f).setLRange(5)
-			.setIconIndex(15, 13).setBlockType(BLOCK_TYPE_PICKAXE)
-			.setDroppedItem(new ItemStack(Item.ruby), 1, 1);
-	public static final Block sapphire = new BlockOre(31).setName("Sapphire Ore Block")
-			.setBlockHardness(10.0f).setLRange(5)
-			.setIconIndex(15, 12).setBlockType(BLOCK_TYPE_PICKAXE)
-			.setDroppedItem(new ItemStack(Item.sapphire), 1, 1);
-	public static final Block emerald = new BlockOre(32).setName("Emerald Ore Block")
-			.setBlockHardness(10.0f).setLRange(5)
-			.setIconIndex(15, 15).setBlockType(BLOCK_TYPE_PICKAXE)
-			.setDroppedItem(new ItemStack(Item.emerald), 1, 1);
-	public static final Block opal = new BlockOre(33).setName("Opal Ore Block")
-			.setBlockHardness(10.0f).setLRange(5)
-			.setIconIndex(15, 16).setBlockType(BLOCK_TYPE_PICKAXE)
-			.setDroppedItem(new ItemStack(Item.opal), 1, 1);
-	public static final Block jasper = new BlockOre(34).setName("Jasper Ore Block")
-			.setBlockHardness(10.0f).setLRange(5)
-			.setIconIndex(15, 17).setBlockType(BLOCK_TYPE_PICKAXE)
-			.setDroppedItem(new ItemStack(Item.jasper), 1, 1);
-	public static final Block copper = new BlockOre(35).setName("Copper Ore Block")
-			.setBlockHardness(55.0f).setHRange(25).setLRange(0)
-			.setIconIndex(15, 9).setBlockType(BLOCK_TYPE_PICKAXE)
-			.setDroppedItem(new ItemStack(Item.copperOre), 1, 1);
-	public static final Block silver = new BlockOre(36).setName("Silver Ore Block")
-			.setBlockHardness(80.0f).setHRange(0).setLRange(10)
-			.setIconIndex(15, 10).setBlockType(BLOCK_TYPE_PICKAXE)
-			.setDroppedItem(new ItemStack(Item.silverOre), 1, 1);
-	public static final Block tin = new BlockOre(37).setName("Tin Ore Block")
-			.setBlockHardness(55.0f).setHRange(20).setLRange(0)
-			.setIconIndex(15, 8).setBlockType(BLOCK_TYPE_PICKAXE)
-			.setDroppedItem(new ItemStack(Item.tinOre), 1, 1);
-	public static final Block redflower = new Block(38).setName("Red Flower")
-			.setBlockHardness(10.0f).setIconIndex(0, 1).setPassable(true)
-			.setIsOveridable(true).setIsSolid(false);
-	public static final Block yellowflower = new Block(39).setName("Yellow Flower")
-			.setBlockHardness(10.0f).setIconIndex(0, 1).setPassable(true)
-			.setIsOveridable(true).setIsSolid(false);
-	public static final Block tallgrass = new Block(40).setName("Tall Grass")
-			.setBlockHardness(10.0f).setIconIndex(0, 1).setPassable(true)
-			.setIsOveridable(true).setIsSolid(false);
-	public static final Block snowCover = new Block(44).setName("Snow Cover")
-			.setBlockHardness(10.0f).setIconIndex(9, 10).setPassable(true)
-			.setIsOveridable(true)
-			.setDroppedItem(new ItemStack(Item.snowball), 1, 1)
-			.setIsSolid(false);
-	public static final Block torch = new Block(48)
-			.setLightStrengthAndRadius(1.0F, 10).setName("Torch")
-			.setBlockHardness(0.0f)
-			.overrideItemIcon(5, 0).setOnlyBlockTextureWidthAndHeight(32, 32)
-			.setPassable(true).setIsSolid(false);
-	public static final Block adminium = new Block(49).setName("Adminium").setIsMineable(false)
-			.setBlockHardness(8000.0f).setIconIndex(0, 1);
-	public static final Block plank = new Block(50).setName("Plank").setTileMap('g')
-			.setBlockHardness(30.0f).setIconIndex(0, 20).setBlockType(BLOCK_TYPE_AXE);
-	public static final Block sapling = new Block(51).setName("Sapling")
-			.setBlockHardness(5.0f).setIconIndex(10, 4).setBlockType(BLOCK_TYPE_AXE)
-			.setIsOveridable(true).setIsSolid(false);
-	public static final Block furnace = new Block(52).setName("Furnace")
-			.setBlockHardness(50.0f).setIconIndex(10, 23).setBlockType(BLOCK_TYPE_PICKAXE)
-			.setBothBlockWidthAndHeight(2, 2);
-	public static final Block craftingTable = new Block(53).setName("Crafting table")
-			.setBlockHardness(50.0f).setIconIndex(14, 23).setBlockType(BLOCK_TYPE_AXE)
-			.setBothBlockWidthAndHeight(2, 2);
-	public static final Block snow = new Block(54).setName("Snow Block")
-			.setBlockHardness(10.0f).setIconIndex(4, 1).setBlockType(BLOCK_TYPE_PICKAXE)
-			.setIsOveridable(true);
-	public static final Block heartCrystal = new Block(55)
-			.setName("Heart Crystal Block").setBlockHardness(50.0f)
-			.setIconIndex(1, 1).setBlockType(BLOCK_TYPE_PICKAXE)
-			.setBothBlockWidthAndHeight(2, 2)
-			.setDroppedItem(new ItemStack(Item.heartCrystal), 1, 1);
-	public static final Block chest = new BlockChest(56, 20).setName("Chest")
-			.setBothBlockWidthAndHeight(2, 2).setBlockHardness(40.0f)
-			.setIconIndex(11, 1).setBlockType(BLOCK_TYPE_AXE).setIsOveridable(false)
-			.setIsSolid(true);
+	public static final Block dirt = new Block(1).setName("Dirt").setBlockHardness(40.0f).setIconIndex(0, 3).setBlockType(BLOCK_TYPE_PICKAXE);
+	public static final Block stone = new Block(2).setName("Stone").setBlockHardness(70.0f).setIconIndex(0, 0).setBlockType(BLOCK_TYPE_PICKAXE);
+	public static final Block grass = new BlockGrass(3).setName("Grass").setBlockHardness(40.0f).setIconIndex(0, 4).setBlockType(BLOCK_TYPE_PICKAXE);
+	public static final Block sand = new Block(6).setName("Sand").setBlockHardness(30.0f).setIconIndex(0, 2).setBlockType(BLOCK_TYPE_PICKAXE);
+	public static final Block sandstone = new Block(7).setName("Sandstone").setIconIndex(0, 1).setBlockHardness(70.0f).setBlockType(BLOCK_TYPE_PICKAXE);
+	public static final Block cactus = new Block(8).setName("Cactus").setBlockHardness(1.0f).setIconIndex(2, 3).setPassable(true).setBlockType(BLOCK_TYPE_AXE).setIsSolid(false);
+	public static final Block tree = new BlockWood(9).setName("Tree").setTileMap(TILEMAP_TREE).setBlockHardness(60.0f).setIconIndex(1, 27).setPassable(true).setBlockType(BLOCK_TYPE_AXE).setIsSolid(false);
+	public static final Block treebase = new BlockWood(10).setName("tree base").setTileMap(TILEMAP_TREE).setBlockHardness(60.0f).setIconIndex(0, 27).setPassable(true).setBlockType(BLOCK_TYPE_AXE).setIsSolid(false);
+	public static final Block treebranch = new BlockWood(12).setName("tree branch").setTileMap(TILEMAP_TREE_BRANCH).setBlockHardness(5.0f).setIconIndex(4, 25).setPassable(true).setIsSolid(false);
+	public static final Block treetop = new BlockLeaves(20).setName("tree top left top").setTileMap(TILEMAP_TREETOP).setBlockHardness(5.0f).setIconIndex(4, 27).setPassable(true).setIsSolid(false);
+	public static final Block treetopl2 = new BlockLeaves(21).setName("tree top left bottom").setTileMap(TILEMAP_TREETOP).setBlockHardness(5.0f).setIconIndex(4, 28).setPassable(true).setIsSolid(false);
+	public static final Block treetopc1 = new BlockLeaves(22).setName("tree top center top").setTileMap(TILEMAP_TREETOP).setBlockHardness(5.0f).setIconIndex(5, 27).setPassable(true).setIsSolid(false);
+	public static final Block treetopc2 = new BlockLeaves(23).setName("tree top center bottom").setTileMap(TILEMAP_TREETOP).setBlockHardness(5.0f).setIconIndex(5, 28).setPassable(true).setIsSolid(false);
+	public static final Block treetopr1 = new BlockLeaves(24).setName("tree top right top").setTileMap(TILEMAP_TREETOP).setBlockHardness(5.0f).setIconIndex(6, 27).setPassable(true).setIsSolid(false);
+	public static final Block treetopr2 = new BlockLeaves(25).setName("tree top right bottom").setTileMap(TILEMAP_TREETOP).setBlockHardness(5.0f).setIconIndex(6, 28).setPassable(true).setIsSolid(false);
+	public static final Block gold = new BlockOre(26).setName("Gold Ore Block").setBlockHardness(10.0f).setHRange(0).setLRange(3).setIconIndex(15, 11).setBlockType(BLOCK_TYPE_PICKAXE).setDroppedItem(new ItemStack(Item.goldOre), 1, 1);
+	public static final Block iron = new BlockOre(27).setName("Iron Ore Block").setBlockHardness(10.0f).setHRange(5).setLRange(10).setIconIndex(15, 8).setBlockType(BLOCK_TYPE_PICKAXE).setDroppedItem(new ItemStack(Item.ironOre), 1, 1);
+	public static final Block coal = new BlockOre(28).setName("Coal Ore Block").setHRange(40).setLRange(10).setBlockHardness(10.0f).setIconIndex(15, 6).setBlockType(BLOCK_TYPE_PICKAXE).setDroppedItem(new ItemStack(Item.coal), 1, 1);
+	public static final Block diamond = new BlockOre(29).setName("Diamond Ore Block").setBlockHardness(10.0f).setLRange(10).setIconIndex(15, 14).setBlockType(BLOCK_TYPE_PICKAXE).setDroppedItem(new ItemStack(Item.diamond), 1, 1);
+	public static final Block ruby = new BlockOre(30).setName("Ruby Ore Block").setBlockHardness(10.0f).setLRange(5).setIconIndex(15, 13).setBlockType(BLOCK_TYPE_PICKAXE).setDroppedItem(new ItemStack(Item.ruby), 1, 1);
+	public static final Block sapphire = new BlockOre(31).setName("Sapphire Ore Block").setBlockHardness(10.0f).setLRange(5).setIconIndex(15, 12).setBlockType(BLOCK_TYPE_PICKAXE).setDroppedItem(new ItemStack(Item.sapphire), 1, 1);
+	public static final Block emerald = new BlockOre(32).setName("Emerald Ore Block").setBlockHardness(10.0f).setLRange(5).setIconIndex(15, 15).setBlockType(BLOCK_TYPE_PICKAXE).setDroppedItem(new ItemStack(Item.emerald), 1, 1);
+	public static final Block opal = new BlockOre(33).setName("Opal Ore Block").setBlockHardness(10.0f).setLRange(5).setIconIndex(15, 16).setBlockType(BLOCK_TYPE_PICKAXE).setDroppedItem(new ItemStack(Item.opal), 1, 1);
+	public static final Block jasper = new BlockOre(34).setName("Jasper Ore Block").setBlockHardness(10.0f).setLRange(5).setIconIndex(15, 17).setBlockType(BLOCK_TYPE_PICKAXE).setDroppedItem(new ItemStack(Item.jasper), 1, 1);
+	public static final Block copper = new BlockOre(35).setName("Copper Ore Block").setBlockHardness(55.0f).setHRange(25).setLRange(0).setIconIndex(15, 9).setBlockType(BLOCK_TYPE_PICKAXE).setDroppedItem(new ItemStack(Item.copperOre), 1, 1);
+	public static final Block silver = new BlockOre(36).setName("Silver Ore Block").setBlockHardness(80.0f).setHRange(0).setLRange(10).setIconIndex(15, 10).setBlockType(BLOCK_TYPE_PICKAXE).setDroppedItem(new ItemStack(Item.silverOre), 1, 1);
+	public static final Block tin = new BlockOre(37).setName("Tin Ore Block").setBlockHardness(55.0f).setHRange(20).setLRange(0).setIconIndex(15, 8).setBlockType(BLOCK_TYPE_PICKAXE).setDroppedItem(new ItemStack(Item.tinOre), 1, 1);
+	public static final Block redflower = new Block(38).setName("Red Flower").setBlockHardness(10.0f).setIconIndex(0, 1).setPassable(true).setIsOveridable(true).setIsSolid(false);
+	public static final Block yellowflower = new Block(39).setName("Yellow Flower").setBlockHardness(10.0f).setIconIndex(0, 1).setPassable(true).setIsOveridable(true).setIsSolid(false);
+	public static final Block tallgrass = new Block(40).setName("Tall Grass").setBlockHardness(10.0f).setIconIndex(0, 1).setPassable(true).setIsOveridable(true).setIsSolid(false);
+	public static final Block snowCover = new Block(44).setName("Snow Cover").setBlockHardness(10.0f).setIconIndex(9, 10).setPassable(true).setIsOveridable(true).setDroppedItem(new ItemStack(Item.snowball), 1, 1).setIsSolid(false);
+	public static final Block torch = new Block(48).setLightStrengthAndRadius(1.0F, 10).setName("Torch").setBlockHardness(0.0f).overrideItemIcon(5, 0).setOnlyBlockTextureWidthAndHeight(32, 32).setPassable(true).setIsSolid(false);
+	public static final Block adminium = new Block(49).setName("Adminium").setIsMineable(false).setBlockHardness(8000.0f).setIconIndex(0, 1);
+	public static final Block plank = new Block(50).setName("Plank").setBlockHardness(30.0f).setIconIndex(0, 20).setBlockType(BLOCK_TYPE_AXE);
+	public static final Block sapling = new Block(51).setName("Sapling").setBlockHardness(5.0f).setIconIndex(10, 4).setBlockType(BLOCK_TYPE_AXE).setIsOveridable(true).setIsSolid(false);
+	public static final Block furnace = new Block(52).setName("Furnace").setBlockHardness(50.0f).setIconIndex(10, 23).setBlockType(BLOCK_TYPE_PICKAXE).setBothBlockWidthAndHeight(2, 2);
+	public static final Block craftingTable = new Block(53).setName("Crafting table").setBlockHardness(50.0f).setIconIndex(14, 23).setBlockType(BLOCK_TYPE_AXE).setBothBlockWidthAndHeight(2, 2);
+	public static final Block snow = new Block(54).setName("Snow Block").setBlockHardness(10.0f).setIconIndex(4, 1).setBlockType(BLOCK_TYPE_PICKAXE).setIsOveridable(true);
+	public static final Block heartCrystal = new Block(55).setName("Heart Crystal Block").setBlockHardness(50.0f).setIconIndex(1, 1).setBlockType(BLOCK_TYPE_PICKAXE).setBothBlockWidthAndHeight(2, 2).setDroppedItem(new ItemStack(Item.heartCrystal), 1, 1);
+	public static final Block chest = new BlockChest(56, 20).setName("Chest").setBothBlockWidthAndHeight(2, 2).setBlockHardness(40.0f).setIconIndex(11, 1).setBlockType(BLOCK_TYPE_AXE).setIsOveridable(false).setIsSolid(true);
 	
 	// Needs recipe
-	public static final Block bookshelf = new Block(57).setName("Bookshelf")
-			.setIconIndex(4, 3).setBlockHardness(20.0f).setBlockType(BLOCK_TYPE_AXE);
-	public static final Block woodTable = new Block(58).setName("Wooden Table")
-			.setPassable(true).setBlockHardness(50.0f).setIconIndex(5, 24)
-			.setBlockType(BLOCK_TYPE_AXE).setBothBlockWidthAndHeight(2, 1);
-	public static final Block stoneTable = new Block(59).setName("Stone Table")
-			.setPassable(true).setBlockHardness(50.0f).setIconIndex(5, 23)
-			.setBlockType(BLOCK_TYPE_PICKAXE).setBothBlockWidthAndHeight(2, 1);
-	public static final Block fence = new Block(61).setName("Fence")
-			.setPassable(true).setBlockHardness(50.0f).setIconIndex(3, 4)
-			.setBlockType(BLOCK_TYPE_AXE);
-	public static final Block woodChairRight = new Block(63)
-			.setName("Right facing wood chair").setPassable(true)
-			.setBlockHardness(50.0f).setIconIndex(5, 24).setBlockType(BLOCK_TYPE_AXE);
-	public static final Block woodChairLeft = new Block(64)
-			.setName("Left facing wood chair").setPassable(true)
-			.setBlockHardness(50.0f).setIconIndex(4, 24).setBlockType(BLOCK_TYPE_AXE);
-	public static final Block stoneChairRight = new Block(65)
-			.setName("Right facing stone chair").setPassable(true)
-			.setBlockHardness(50.0f).setIconIndex(5, 23).setBlockType(BLOCK_TYPE_PICKAXE);
-	public static final Block stoneChairLeft = new Block(66)
-			.setName("Left facing stone chair").setPassable(true)
-			.setBlockHardness(50.0f).setIconIndex(4, 23).setBlockType(BLOCK_TYPE_PICKAXE);
+	public static final Block bookshelf = new Block(57).setName("Bookshelf").setIconIndex(4, 3).setBlockHardness(20.0f).setBlockType(BLOCK_TYPE_AXE);
+	public static final Block woodTable = new Block(58).setName("Wooden Table").setPassable(true).setBlockHardness(50.0f).setIconIndex(5, 24).setBlockType(BLOCK_TYPE_AXE).setBothBlockWidthAndHeight(2, 1);
+	public static final Block stoneTable = new Block(59).setName("Stone Table").setPassable(true).setBlockHardness(50.0f).setIconIndex(5, 23).setBlockType(BLOCK_TYPE_PICKAXE).setBothBlockWidthAndHeight(2, 1);
+	public static final Block fence = new Block(61).setName("Fence").setPassable(true).setBlockHardness(50.0f).setIconIndex(3, 4).setBlockType(BLOCK_TYPE_AXE);
+	public static final Block woodChairRight = new Block(63).setName("Right facing wood chair").setPassable(true).setBlockHardness(50.0f).setIconIndex(5, 24).setBlockType(BLOCK_TYPE_AXE);
+	public static final Block woodChairLeft = new Block(64).setName("Left facing wood chair").setPassable(true).setBlockHardness(50.0f).setIconIndex(4, 24).setBlockType(BLOCK_TYPE_AXE);
+	public static final Block stoneChairRight = new Block(65).setName("Right facing stone chair").setPassable(true).setBlockHardness(50.0f).setIconIndex(5, 23).setBlockType(BLOCK_TYPE_PICKAXE);
+	public static final Block stoneChairLeft = new Block(66).setName("Left facing stone chair").setPassable(true).setBlockHardness(50.0f).setIconIndex(4, 23).setBlockType(BLOCK_TYPE_PICKAXE);
 
-	public static final Block stonePillar = new BlockPillar(68)
-			.setName("Stone Pillar Block").setTileMap('p').setPassable(true)
-			.setBlockHardness(75.0f).setIconIndex(0, 23).setBlockType(BLOCK_TYPE_PICKAXE);
-	public static final Block marblePillar = new BlockPillar(71)
-			.setName("Marble Pillar Block").setTileMap('p').setPassable(true)
-			.setBlockHardness(75.0f).setIconIndex(0, 24).setBlockType(BLOCK_TYPE_PICKAXE);
-	public static final Block goldPillar = new BlockPillar(74)
-			.setName("Gold Pillar Block").setTileMap('p').setPassable(true)
-			.setBlockHardness(75.0f).setIconIndex(0, 25).setBlockType(BLOCK_TYPE_PICKAXE);
-	public static final Block diamondPillar = new BlockPillar(77)
-			.setName("Diamond Pillar Block").setTileMap('p').setPassable(true)
-			.setBlockHardness(75.0f).setIconIndex(0, 26).setBlockType(BLOCK_TYPE_PICKAXE);
-
-	public static final Block glass = new Block(79).setName("Glass Block")
-			.setBlockHardness(10.0f).setIconIndex(1, 3).setBlockType(BLOCK_TYPE_PICKAXE);
-	public static final Block ironChest = new BlockChest(80, 40)
-			.setName("Iron Chest").setBothBlockWidthAndHeight(2, 2)
-			.setBlockHardness(40.0f).setIconIndex(11, 1).setBlockType(BLOCK_TYPE_AXE)
-			.setIsOveridable(false).setIsSolid(true);
-	
-	public static final Block gemcraftingBench = new Block(81).setName("Gemcrafting table")
-			.setBlockHardness(50.0f).setIconIndex(0, 0).setBlockType(BLOCK_TYPE_PICKAXE)
-			.setBothBlockWidthAndHeight(2, 2);
-	public static final Block alchemyStation = new Block(82).setName("Alchemy station")
-			.setBlockHardness(50.0f).setIconIndex(12, 23).setBlockType(BLOCK_TYPE_AXE)
-			.setBothBlockWidthAndHeight(2, 2);
+	public static final Block stonePillar = new BlockPillar(68).setName("Stone Pillar Block").setTileMap(TILEMAP_PILLAR).setPassable(true).setBlockHardness(75.0f).setIconIndex(0, 23).setBlockType(BLOCK_TYPE_PICKAXE);
+	public static final Block marblePillar = new BlockPillar(71).setName("Marble Pillar Block").setTileMap(TILEMAP_PILLAR).setPassable(true).setBlockHardness(75.0f).setIconIndex(0, 24).setBlockType(BLOCK_TYPE_PICKAXE);
+	public static final Block goldPillar = new BlockPillar(74).setName("Gold Pillar Block").setTileMap(TILEMAP_PILLAR).setPassable(true).setBlockHardness(75.0f).setIconIndex(0, 25).setBlockType(BLOCK_TYPE_PICKAXE);
+	public static final Block diamondPillar = new BlockPillar(77).setName("Diamond Pillar Block").setTileMap(TILEMAP_PILLAR).setPassable(true).setBlockHardness(75.0f).setIconIndex(0, 26).setBlockType(BLOCK_TYPE_PICKAXE);
+	public static final Block glass = new Block(79).setName("Glass Block").setBlockHardness(10.0f).setIconIndex(1, 3).setBlockType(BLOCK_TYPE_PICKAXE);
+	public static final Block ironChest = new BlockChest(80, 40).setName("Iron Chest").setBothBlockWidthAndHeight(2, 2).setBlockHardness(40.0f).setIconIndex(11, 1).setBlockType(BLOCK_TYPE_AXE).setIsOveridable(false).setIsSolid(true);
+	public static final Block gemcraftingBench = new Block(81).setName("Gemcrafting table").setBlockHardness(50.0f).setIconIndex(0, 0).setBlockType(BLOCK_TYPE_PICKAXE).setBothBlockWidthAndHeight(2, 2);
+	public static final Block alchemyStation = new Block(82).setName("Alchemy station").setBlockHardness(50.0f).setIconIndex(12, 23).setBlockType(BLOCK_TYPE_AXE).setBothBlockWidthAndHeight(2, 2);
 	
 	// Backwalls
-	public static final Block backAir = new BlockBackWall(128).setIsSolid(false)
-			.setName("backwall air");
-	public static final Block backDirt = new BlockBackWall(129).setIconIndex(0, 21)
-			.setName("backwall dirt").setBlockHardness(40.0f).setBlockType(BLOCK_TYPE_PICKAXE);
-	public static final Block backStone = new BlockBackWall(130).setIconIndex(0, 22)
-			.setName("backwall stone").setBlockHardness(70.0f).setBlockType(BLOCK_TYPE_PICKAXE);
-	
+	public static final Block backAir = new BlockBackWall(128).setIsSolid(false).setName("backwall air");
+	public static final Block backDirt = new BlockBackWall(129).setIconIndex(0, 21).setName("backwall dirt").setBlockHardness(40.0f).setBlockType(BLOCK_TYPE_PICKAXE);
+	public static final Block backStone = new BlockBackWall(130).setIconIndex(0, 22).setName("backwall stone").setBlockHardness(70.0f).setBlockType(BLOCK_TYPE_PICKAXE);
 }

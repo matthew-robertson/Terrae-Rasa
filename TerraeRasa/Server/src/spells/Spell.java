@@ -26,7 +26,7 @@ public class Spell extends ActionbarItem
 	 * all new spells cost 1 resource, and use mana as their resource. maxstacksize is also initialized to 1.
 	 * @param i the ID of the new spell, a unique value
 	 */
-	public Spell(int i)
+	protected Spell(int i)
 	{
 		super(i);
 		this.id = i + spellIndex;
@@ -40,12 +40,6 @@ public class Spell extends ActionbarItem
 			throw new RuntimeException(new StringBuilder().append("Conflict@ spellList").append(id).toString());
 		}
 		spellList[id] = this;				
-	}
-	
-	public Spell(Spell spell)
-	{
-		super(spell);
-		this.cost = spell.cost;
 	}
 	
 	protected Spell setResourceType(int type)
@@ -68,6 +62,18 @@ public class Spell extends ActionbarItem
 	public int getManaCost()
 	{
 		return cost;
+	}
+	
+	protected Spell setExtraTooltipInformation(String info) 
+	{
+		this.extraTooltipInformation = info;
+		return this;
+	}
+	
+	protected Spell setName(String name)
+	{
+		this.name = name;
+		return this;
 	}
 	
 	public final static Spell[] spellList = new Spell[spellIndex + 2096];

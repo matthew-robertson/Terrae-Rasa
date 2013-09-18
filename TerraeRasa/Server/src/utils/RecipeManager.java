@@ -23,7 +23,8 @@ import blocks.Block;
 public class RecipeManager 
 {
 	private final Vector<Recipe> unorganizedRecipes = new Vector<Recipe>(128);
-	
+	public int nextRecipeID = 0;
+
 	public RecipeManager()
 	{
 	}
@@ -57,6 +58,11 @@ public class RecipeManager
 	public void registerRecipe(Recipe recipe)
 	{
 		unorganizedRecipes.add(recipe);
+	}
+	
+	public int getNextID()
+	{
+		return nextRecipeID++;
 	}
 	
 	/** Recipe Declarations **/

@@ -15,6 +15,7 @@ import entities.EntityPlayer;
 public class AuraStayOfExecution extends Aura
 {
 	private static final long serialVersionUID = 1L;
+	/** The strength of this aura, ranging from 0.0D to 1.0D (a 100% heal). */
 	private double power;
 	
 	/**

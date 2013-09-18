@@ -29,6 +29,7 @@ import transmission.StatUpdate;
 import transmission.SuperCompressedChunk;
 import transmission.TransmittablePlayer;
 import transmission.UpdateWithObject;
+import ui.UIBase;
 import utils.ColoredText;
 import utils.Cooldown;
 import utils.DisplayableItemStack;
@@ -361,6 +362,7 @@ public class GameEngine
 					{
 						///player <id> mouseitemset ---> Includes DisplayableItemStack Object
 						((EntityPlayer)(world.getEntityByID(Integer.parseInt(split[1])))).heldMouseItem = (DisplayableItemStack)(update.object);
+						UIBase.forceHeldItemSize(16);
 					}
 					else if(split[2].equals("inventoryset"))
 					{
