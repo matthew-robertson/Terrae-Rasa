@@ -61,7 +61,7 @@ public class TransmittablePlayer
 	{
 		for(StatusEffect effect : statusEffects)
 		{
-			this.statusEffects.add(new DisplayableStatusEffect(effect));
+			this.statusEffects.add(effect.getAsDisplayable());
 		}
 	}
 

@@ -1078,7 +1078,7 @@ public class EntityPlayer extends EntityLiving
 				}
 				
 				double distance = MathHelper.distanceBetweenTwoPoints(mx * 6, my * 6, (this.x + ((isFacingRight) ? 9 : 3)), (this.y + 9));
-				if(distance <= material.getDistance())
+				if(distance <= material.getReachOrtho())
 				{
 					if(material.getToolTier() >= block.getBlockTier()) //If the block is within range
 					{ 	
@@ -1148,7 +1148,7 @@ public class EntityPlayer extends EntityLiving
 				}
 
 				double distance = MathHelper.distanceBetweenTwoPoints(mx * 6, my * 6, (this.x + ((isFacingRight) ? 9 : 3)), (this.y + 9));
-				if(distance <= material.getDistance() && 
+				if(distance <= material.getReachOrtho() && 
 						(!world.getBackBlock(mx, my-1).isSolid ||
 						!world.getBackBlock(mx, my+1).isSolid || 
 						!world.getBackBlock(mx - 1, my).isSolid ||
@@ -1652,7 +1652,7 @@ public class EntityPlayer extends EntityLiving
 		List<DisplayableStatusEffect> display = new ArrayList<DisplayableStatusEffect>();
 		for(StatusEffect effect : effects)
 		{
-			DisplayableStatusEffect displayable = new DisplayableStatusEffect(effect);
+			DisplayableStatusEffect displayable = effect.getAsDisplayable();
 			display.add(displayable);
 		}
 		return display;
@@ -1738,7 +1738,7 @@ public class EntityPlayer extends EntityLiving
 						effect.applyInitialEffect(world, this);
 						
 						UpdateWithObject update = new UpdateWithObject();
-						update.object = new DisplayableStatusEffect(effect);
+						update.object = effect.getAsDisplayable();
 						update.command = "/player " + entityID + " statuseffectadd";
 						TerraeRasa.terraeRasa.gameEngine.addExtraObjectUpdate(update);
 						
@@ -1756,7 +1756,7 @@ public class EntityPlayer extends EntityLiving
 		effect.applyInitialEffect(world, this);
 		
 		UpdateWithObject update = new UpdateWithObject();
-		update.object = new DisplayableStatusEffect(effect);
+		update.object = effect.getAsDisplayable();
 		update.command = "/player " + entityID + " statuseffectadd";
 		TerraeRasa.terraeRasa.gameEngine.addExtraObjectUpdate(update);
 		

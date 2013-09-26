@@ -14,9 +14,8 @@ import entities.EntityLiving;
  */
 public class StatusEffectSwiftness extends StatusEffect
 {
-
 	/**
-	 * Creates a new damage speed effect. A speed effect's strength is based on it's power, indicating the overall % of increase. 
+	 * Creates a new speed effect. A speed effect's strength is based on it's power, indicating the overall % of increase. 
 	 * A power of 1 indicates a 100% increase, 0.5 a 50% increase, et cetera.
 	 * @param durationSeconds the duration of the effect in seconds
 	 * @param tier the tier of the effect, which may serve as a tie-breaker if effects cannot stack

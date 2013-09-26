@@ -9,7 +9,7 @@ import entities.EntityPlayer;
  * A set bonus container holds an array of set bonuses for further use. This is useful when 
  * reversing a set bonus, for example. Set Bonuses cannot be added or removed after being 
  * added, but can be copied to a new set bonus container. This restriction is to prevent
- * corruption or wierd side effects.
+ * corruption or weird side effects.
  * @author      Alec Sobeck
  * @author      Matthew Robertson
  * @version     1.0
@@ -19,6 +19,7 @@ public class PassiveBonusContainer
 		implements Serializable
 {
 	private static final long serialVersionUID = 1L;
+	/** The PassiveBonuses in this PassiveBonusContainer. */
 	private PassiveBonus[] bonuses;
 	
 	/**

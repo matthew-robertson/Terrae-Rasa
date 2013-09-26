@@ -4,7 +4,6 @@ import entities.EntityLiving;
 import world.World;
 
 /**
- * <code>StatusEffectAbsorb extends StatusEffect</code> 
  * A StatusEffectAbsorb is a beneficial effect that can be applied to an EntityLiving that will absorb
  * damage, upto the point where it "breaks" (can absorb no more damage). 
  * @author Alec Sobeck
@@ -14,12 +13,14 @@ import world.World;
  */
 public class StatusEffectAbsorb extends StatusEffect
 {
+	/** The initial absorb amount of the effect. */
 	private int startAbsorbAmount;
+	/** The remaining absorb amount of this effect. */
 	private int remainingAbsorb;
 	
 	/**
 	 * Creates a new StatusEffectAbsorb. 
-	 * @param durationSeconds
+	 * @param durationSeconds the duration of the effect in seconds. This can be a fraction. 
 	 * @param tier the tier of the absorb 
 	 * @param absorb the amount this StatusEffect will absorb, in total damage
 	 */
@@ -65,7 +66,7 @@ public class StatusEffectAbsorb extends StatusEffect
 	/**
 	 * Gets whether or not the absorb has been broken. A broken absorb shield is one that has been 
 	 * fully used, having 0 or less remaining absorbable damage.
-	 * @return
+	 * @return true if this absorb has been fully depleted, otherwise false
 	 */
 	public boolean isBroken()
 	{

@@ -12,12 +12,12 @@ import entities.EntityPlayer;
  */
 public class PassiveBonusKnockback extends PassiveBonus 
 {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Constructs a new PassiveBonusKnockback with given power.
+	 * @param power the strength of this PassiveBonus
+	 */
 	public PassiveBonusKnockback(double power)
 	{
 		super(power);

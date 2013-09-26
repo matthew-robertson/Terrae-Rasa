@@ -15,7 +15,7 @@ public class BlockGrass extends Block
 	 * Constructs a new BlockGrass
 	 * @param i the unique ID of this BlockGrass
 	 */
-	public BlockGrass(int i)
+	protected BlockGrass(int i)
 	{
 		super(i);
 	}

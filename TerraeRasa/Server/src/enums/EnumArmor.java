@@ -33,23 +33,23 @@ import entities.EntityPlayer;
 public enum EnumArmor 
 {
 	NOTHING("None", 0, 0, 0, 0, 0, 0, new PassiveBonus[]{ }),
-	COPPER("Copper", 1, 2, 1, 1, 1, 1, new PassiveBonus[]{
+	COPPER("Copper Fortification", 1, 2, 1, 1, 1, 1, new PassiveBonus[]{
 			new PassiveBonusDefense(1).setPiecesRequiredToActivate(3),
 			new PassiveBonusDefense(1).setPiecesRequiredToActivate(6)
 		}),
-	BRONZE("Bronze", 2, 3, 2, 1, 1, 1, new PassiveBonus[]{ 
+	BRONZE("Bronze Fortification", 2, 3, 2, 1, 1, 1, new PassiveBonus[]{ 
 			new PassiveBonusDefense(1).setPiecesRequiredToActivate(3), 
 			new PassiveBonusDefense(2).setPiecesRequiredToActivate(6)
 		}),
-	IRON("Iron", 2, 4, 3, 1, 2, 1, new PassiveBonus[]{ 
+	IRON("Iron Fortification", 2, 4, 3, 1, 2, 1, new PassiveBonus[]{ 
 			new PassiveBonusDefense(2).setPiecesRequiredToActivate(3),
 			new PassiveBonusDefense(2).setPiecesRequiredToActivate(6)
 		}),
-	SILVER("Silver", 3, 4, 3, 2, 2, 2, new PassiveBonus[]{ 
+	SILVER("Silver Fortification", 3, 4, 3, 2, 2, 2, new PassiveBonus[]{ 
 			new PassiveBonusDefense(2).setPiecesRequiredToActivate(3),
 			new PassiveBonusDefense(3).setPiecesRequiredToActivate(6),
 		}),
-	GOLD("Gold", 4, 5, 4, 2, 3, 2, new PassiveBonus[]{ 
+	GOLD("Gold Fortification", 4, 5, 4, 2, 3, 2, new PassiveBonus[]{ 
 			new PassiveBonusDefense(2).setPiecesRequiredToActivate(2),
 			new PassiveBonusDefense(3).setPiecesRequiredToActivate(4),
 			new PassiveBonusSpeed(0.1).setPiecesRequiredToActivate(6)
@@ -93,24 +93,29 @@ public enum EnumArmor
 		//(3):+2% HP / sec
 		//(3):+10% Special Energy / minute (40% more)
 	}),	
-	
-	
-	
-	
 	OP_TEST_SET("OP-Ness", 7, 9, 7, 5, 5, 5, new PassiveBonus[]{ 
 			new PassiveBonusSpeed(.4).setPiecesRequiredToActivate(2),
 			new PassiveBonusDefense(200).setPiecesRequiredToActivate(4),
 			new PassiveBonusIntellect(100).setPiecesRequiredToActivate(6)
 		});
 
+	/** The defense provided by equipping the helm of this set. */
 	private final int helmDefense;
+	/** The defense provided by equipping the body of this set. */
 	private final int bodyDefense;
+	/** The defense provided by equipping the pants of this set. */
 	private final int pantsDefense;
+	/** The defense provided by equipping the boots of this set. */
 	private final int bootsDefense;
+	/** The defense provided by equipping the gloves of this set. */
 	private final int glovesDefense;
+	/** The defense provided by equipping the belt of this set. */
 	private final int beltDefense;
+	/** The set's name in plain text. */
 	private final String setname;
+	/** Any PassiveBonuses assigned to this EnumArmor. */
 	private PassiveBonus[] bonuses;
+	/** A Vector which contains all the different tiers of armour. */
 	private static Vector<EnumArmor> armorTiers;
 	static
 	{
@@ -123,6 +128,17 @@ public enum EnumArmor
         }
 	}
 	
+	/**
+	 * Constructs a new EnumArmour with the provided parameters.
+	 * @param setname a displayable name for the overall set bonus
+	 * @param helmDef the defense provided by the helm of the set
+	 * @param bodyDef the defense provided by the body of the set
+	 * @param pantsDef the defense provided by the pants of the set
+	 * @param bootsDefense the defense provided by the boots of the set
+	 * @param glovesDefense the defense provided by the gloves of the set
+	 * @param beltDefense the defense provided by the belt of the set 
+	 * @param bonuses the PassiveBonus[] assigned to this set 
+	 */
 	EnumArmor(String setname, int helmDef, int bodyDef, int pantsDef, int bootsDefense, int glovesDefense, int beltDefense, PassiveBonus[] bonuses)
 	{
 		this.setname = setname;
@@ -136,7 +152,7 @@ public enum EnumArmor
 	}
 	
 	/**
-	 * Gets all the different tiers of armor from EnumArmor
+	 * Gets all the different tiers of armor from EnumArmor as an array.
 	 * @return all the tiers of EnumArmor
 	 */
 	public static EnumArmor[] getTiers()
@@ -146,41 +162,73 @@ public enum EnumArmor
 		return tiers;
 	}
 	
+	/**
+	 * Gets the defense value of the helmet for this tier of armour.
+	 * @return the defense of the helm for this armour tier
+	 */
 	public int getHelmetDefense()
 	{
 		return helmDefense;
 	}
 	
+	/**
+	 * Gets the defense value of the body for this tier of armour.
+	 * @return the defense of the body for this armour tier
+	 */
 	public int getBodyDefense()
 	{
 		return bodyDefense;
 	}
 	
+	/**
+	 * Gets the defense value of the legs for this tier of armour.
+	 * @return the defense of the legs for this armour tier
+	 */ 
 	public int getGreavesDefense()
 	{
 		return pantsDefense;
 	}
-	
+
+	/**
+	 * Gets the defense value of the boots for this tier of armour.
+	 * @return the defense of the boots for this armour tier
+	 */
 	public int getBootsDefense()
 	{
 		return bootsDefense;
 	}
-	
+
+	/**
+	 * Gets the defense value of the gloves for this tier of armour.
+	 * @return the defense of the gloves for this armour tier
+	 */
 	public int getGlovesDefense()
 	{
 		return glovesDefense;
 	}
 	
+	/**
+	 * Gets the defense value of the belt for this tier of armour.
+	 * @return the defense of the belt for this armour tier
+	 */
 	public int getBeltDefense()
 	{
 		return beltDefense;
 	}
 	
+	/**
+	 * Gets the name of this set as a plain text string. 
+	 * @return the name of this set in plaintext
+	 */
 	public String getSetName()
 	{
 		return setname;
 	}
 	
+	/**
+	 * Gets any relevant PassiveBonuses provided by this armour set (does not consider pieces equipped)
+	 * @return any relevant PassiveBonuses for this armour set
+	 */
 	public PassiveBonus[] getBonuses()
 	{
 		return bonuses;
@@ -211,8 +259,8 @@ public enum EnumArmor
 	/**
 	 * Gets all the PassiveBonuses for this armour tier in a nicely formatted array of the following general
 	 * form: <br>
-	 * (2): BONUS_NAME
-	 * @return the PassiveBonuses for this armour tier in a well formatted way
+	 * { (2): BONUS_NAME, .... , (6): BONUS_NAME }
+	 * @return the PassiveBonuses for this armour tier in a well formatted array
 	 */
 	public String[] getPassiveBonusesAsStringArray()
 	{

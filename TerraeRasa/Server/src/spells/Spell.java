@@ -3,12 +3,8 @@ package spells;
 import utils.ActionbarItem;
 
 /**
- * <code>Spell extends ActionbarItem</code>
- * <br><br>
- * 
- * Spell is the base class for all Spells. A new spell can be constructed using {@link #Spell(int)} and 
- * should be created in this class similarly to Items or Blocks. 
- * 
+ * Spell is the base class for all Spells. A Spell is something that can be put in the inventory and does
+ * something when interacted with. A new spell can be constructed using {@link #Spell(int)}.
  * @author Alec Sobeck
  * @author Matthew Robertson
  * @version 1.0
@@ -16,9 +12,12 @@ import utils.ActionbarItem;
  */
 public class Spell extends ActionbarItem
 {
-	public static final int RESOURCE_MANA = 1, 
+	/** A resource type constant for a Spell cost - mana or special energy. */
+	protected static final int RESOURCE_MANA = 1, 
 							   RESOURCE_SPECIAL = 2;
+	/** The cost of the spell, in mana or special energy points. */
 	protected int cost;
+	/** The resource type of this spell, either mana or special. */
 	protected int resourceType;
 	
 	/**
@@ -42,34 +41,67 @@ public class Spell extends ActionbarItem
 		spellList[id] = this;				
 	}
 	
+	/**
+	 * Overrides ActionbarItem.setMaxStackSize(int) to prevent spells from having a stack size greater than 1.
+	 */
+	protected Spell setMaxStackSize(int size)
+	{
+		this.maxStackSize = 1;
+		return this;		
+	}
+	
+	/**
+	 * Sets the resource type required to cast this spell.
+	 * @param type the new resource type for this Spell
+	 * @return a reference to this Spell
+	 */
 	protected Spell setResourceType(int type)
 	{
 		this.resourceType = type;
 		return this;
 	}
 
+	/**
+	 * Sets the cost of this Spell.
+	 * @param cost the new cost of this Spell
+	 * @return a reference to this Spell
+	 */
 	protected Spell setCost(int cost)
 	{
 		this.cost = cost;
 		return this;
 	}
 	
+	/**
+	 * Gets the resource type required to cast this spell.
+	 * @return the resource type required to cast this spell
+	 */
 	public int getResourceType()
 	{
 		return resourceType;
 	}
 	
-	public int getManaCost()
+	/**
+	 * Gets the cost of this spell.
+	 * @return the cost of this spell
+	 */
+	public int getCost()
 	{
 		return cost;
 	}
 	
+	/**
+	 * Overrides ActionbarItem.setExtraTooltipInformation(String) to make tooltip information easier to set.
+	 */
 	protected Spell setExtraTooltipInformation(String info) 
 	{
 		this.extraTooltipInformation = info;
 		return this;
 	}
 	
+	/**
+	 * Overrides ActionbarItem.setName(String) to make setting the name easier.
+	 */
 	protected Spell setName(String name)
 	{
 		this.name = name;
@@ -78,9 +110,7 @@ public class Spell extends ActionbarItem
 	
 	public final static Spell[] spellList = new Spell[spellIndex + 2096];
 	
-	public final static Spell rejuvenate = (Spell) new SpellRejuvenate(1).setCost(80).setResourceType(RESOURCE_SPECIAL).setName("Rejuvenate").
-			setExtraTooltipInformation("Restores 80% of the player's max health immediately. Costs 80% Special Energy"); 
-	public final static Spell bulwark = (Spell) new SpellBulwark(2).setCost(55).setResourceType(RESOURCE_SPECIAL).setName("Bulwark").
-			setExtraTooltipInformation("Shields the player for 100% of max health, lasting 8 seconds. Costs 55% Special Energy");
-
+	public final static Spell rejuvenate = (Spell) new SpellRejuvenate(1);
+	public final static Spell bulwark = (Spell) new SpellBulwark(2);
+	
 }

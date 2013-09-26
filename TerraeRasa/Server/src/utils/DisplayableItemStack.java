@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 import passivebonuses.DisplayablePassiveBonus;
 import passivebonuses.PassiveBonus;
-import affix.DisplayableAffix;
 import auras.Aura;
 import auras.DisplayableAura;
 
@@ -58,13 +57,13 @@ public class DisplayableItemStack
 		for(int i = 0; i < stack.getBonuses().length; i++)
 		{
 			PassiveBonus bonus = stack.getBonuses()[i];
-			this.bonuses[i] = new DisplayablePassiveBonus(bonus);
+			this.bonuses[i] = bonus.getAsDisplayable();
 		}
 		this.auras = new DisplayableAura[stack.getAuras().length];
 		for(int i = 0; i < stack.getAuras().length; i++)
 		{
 			Aura aura = stack.getAuras()[i];
-			this.auras[i] = new DisplayableAura(aura);
+			this.auras[i] = aura.getAsDisplayable();
 		}
 		this.craftingID = stack.getCraftingID();
 	}
@@ -174,11 +173,6 @@ public class DisplayableItemStack
 	public void PassiveBonuses(DisplayablePassiveBonus[] bonuses)
 	{
 		this.bonuses = bonuses;
-	}
-	
-	public DisplayableItemStack setAffix(DisplayableAffix affix){
-		System.err.println("Affix-Set failure with affix=" + affix.toString());
-		return this;
 	}
 	
 	/**

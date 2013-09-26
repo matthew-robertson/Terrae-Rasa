@@ -14,7 +14,7 @@ public class BlockOre extends Block
 	 * Constructs a new BlockOre.
 	 * @param i the unique ID of this BlockOre
 	 */
-	public BlockOre(int i)
+	protected BlockOre(int i)
 	{
 		super(i);
 	}

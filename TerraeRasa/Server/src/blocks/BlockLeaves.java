@@ -15,7 +15,7 @@ public class BlockLeaves extends Block
 	 * Constructs a new BlockLeaf
 	 * @param i the unique ID of this BlockLeaf
 	 */
-	public BlockLeaves(int i)
+	protected BlockLeaves(int i)
 	{
 		super(i);
 	}

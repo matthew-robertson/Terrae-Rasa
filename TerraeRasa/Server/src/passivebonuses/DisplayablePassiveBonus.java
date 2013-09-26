@@ -2,13 +2,8 @@ package passivebonuses;
 
 import java.io.Serializable;
 
-import entities.EntityPlayer;
-
 /**
- * PassiveBonus is a fairly lightweight abstract base class for all PassiveBonus needs. A PassiveBonus is a static benefit to a stat
- * or something else in the player class that can be reversed. It does not respond to events. All subclasses of PassiveBonus
- * must implement {@link #apply(EntityPlayer)} and {@link #remove(EntityPlayer)} which will apply the set
- * bonus and then later remove it. These should directly counter each other and comply with stat-stacking rules.
+ * DisplayablePassiveBonus is a data structure used to display a PassiveBonus client side. 
  * @author      Alec Sobeck
  * @author      Matthew Robertson
  * @version     1.0
@@ -20,15 +15,24 @@ public class DisplayablePassiveBonus
 	private static final long serialVersionUID = 1L;
 	/** The number of pieces required to activate this set bonus. */
 	protected int piecesRequiredToActivate;
+	/** A description of this DisplayablePassiveBonus. */
 	protected String description;
 	
-	public DisplayablePassiveBonus(String description)
+	/**
+	 * Constructs a new DisplayablePassiveBonus given a description. This will set the pieces required to 1.
+	 * @param description the description of this DisplayablePassiveBonus
+	 */
+	protected DisplayablePassiveBonus(String description)
 	{
 		this.piecesRequiredToActivate = 1;
 		this.description = description;
 	}
 	
-	public DisplayablePassiveBonus(PassiveBonus bonus)
+	/**
+	 * Constructs a new DisplayablePassiveBonus given a PassiveBonus. This will copy both the number of pieces required and a description.
+	 * @param bonus the PassiveBonus by which to create a DisplayablePassiveBonus
+	 */
+	protected DisplayablePassiveBonus(PassiveBonus bonus)
 	{
 		this.piecesRequiredToActivate = bonus.getPiecesRequiredToActivate();
 		this.description = bonus.toString();
@@ -38,22 +42,27 @@ public class DisplayablePassiveBonus
 		}
 	}
 	
+	/**
+	 * Gets the number of pieces in a set required to activate this DisplayablePassiveBonus.
+	 * @return the number of pieces required to activate this DisplayablePassiveBonus
+	 */
 	public int getPiecesRequiredToActivate()
 	{
 		return piecesRequiredToActivate;
 	}
 	
-	public DisplayablePassiveBonus setPiecesRequiredToActivate(int pieces)
-	{
-		this.piecesRequiredToActivate = pieces;
-		return this;
-	}
-	
+	/**
+	 * Provides a description of this DisplayablePassiveBonus that is in plaintext.
+	 */
 	public String toString()
 	{
 		return description;
 	}
 	
+	/**
+	 * Gets the description of this DisplayablePassiveBonus.
+	 * @return the description of this DisplayablePassiveBonus
+	 */
 	public String getDescription()
 	{
 		return description;

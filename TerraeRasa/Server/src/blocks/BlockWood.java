@@ -15,7 +15,7 @@ public class BlockWood extends Block
 	 * Constructs a new BlockWood
 	 * @param i the unique ID of this BlockWood
 	 */
-	public BlockWood(int i)
+	protected BlockWood(int i)
 	{
 		super(i);
 	}

@@ -13,12 +13,12 @@ import entities.EntityPlayer;
  */
 public class PassiveBonusManaBoost extends PassiveBonus
 {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Constructs a new PassiveBonusManaBoost with given power.
+	 * @param power the strength of this PassiveBonus
+	 */
 	public PassiveBonusManaBoost(double power) 
 	{
 		super(power);

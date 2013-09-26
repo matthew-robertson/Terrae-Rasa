@@ -134,4 +134,13 @@ public class Aura
 	{
 		return "Aura Base Class";
 	}
+	
+	/**
+	 * Gets this Aura as a DisplayableAura, which can be transmitted to the client.
+	 * @return a DisplayableAura corresponding to this Aura 
+	 */
+	public DisplayableAura getAsDisplayable()
+	{
+		return new DisplayableAura(this);
+	}
 }

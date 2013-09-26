@@ -126,7 +126,7 @@ public class WorldGenEarth extends WorldGen
 						world.getAssociatedBlock(k, j+1).getID() == Block.treetopr1.getID() || world.getAssociatedBlock(k, j+1).getID() == Block.treetopr2.getID()) world.setBitMap(k, j+1, 1);
 				
 				if (world.getAssociatedBlock(k, j+1).isSolid){ //If there is a solid block with air above
-					if (world.getAssociatedBlock(k, j).isOveridable){
+					if (world.getAssociatedBlock(k, j).getIsOveridable()){
 						world.setBlockGenerate(Block.snowCover, k, j); // If the current block is air or a unneeded plant, replace the block with snow
 					}
 				}

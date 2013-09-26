@@ -7,50 +7,20 @@ import java.util.Random;
 import server.Log;
 import utils.ActionbarItem;
 import utils.ItemStack;
-import enums.EnumBlockMaterial;
 
 
 /**
- * <code>Block</code> defines the class for placable ItemStacks in the player's
- * inventory, and the Objects used to render the world and determine where
- * <code>Entities</code> are able to move. All possible <code>Blocks</code> must
- * extend <code>Block</code>, to ensure general consistancy and storage of all
- * Blocks. All <code>Blocks</code> are stored in <code>Block.blocksList[]</code>
- * upon creation, at the index of their <code>blockID</code>, so that they may
- * easily be accessed later. <br>
- * <br>
- * <code>Blocks</code> are generally initialized using
- * <code>protected Block(int)</code>, but <code>Block.air</code> is uniquely
- * created using <code>protected Block()</code> due to there being irregular
- * settings and no need for it to be stored in <code>blocksList[]</code>.
- * <code>Block(int)</code> provides a large amount of standard
- * <code>Block</code> settings that can be changed with the use of setters. An
- * example block declaration (in this case for <code>Block.chest</code>): <br>
- * <code>public static final Block chest = new BlockChest(56).setName("chest").setBothBlockWidthAndHeight(2, 2)
- * .setBlockHardness(40.0f).setIconIndex(11, 1).setBlockType(BLOCK_TYPE_AXE);</code>
- * <br>
- * To explain this example, a <code>Block</code> is created as an
- * <code>instanceof BlockChest</code> with: <li>A blockID of 56 <li>A blockName
- * of "chest" <li>A render width and texture width of 2x2 blocks (so it renders
- * 12x12 ortho units, and has a texture of 32x32 pixels) <li>A blockHardness of
- * 40.0f (about 20% weaker than stone) <li>An icon position on terrain.png of
- * (11,1) <li>A blockType of 2 (breakable with an axe) <br>
- * In addition to the default settings that otherwise are unmodified. This
- * allows for <code>Block</code>, like <code>Item</code>, to be a very versitile
- * class with the simple use of several different setters. <br>
- * <br>
- * The constructor of <code>Block</code> is protected for the same reason as
- * <code>Item</code>'s, to prevent random redeclaration of a <code>Block</code>.
- * This could cause corruption of the world save file, or cause the game to
- * crash. With a protected constructor, a <code>Block</code> can only be
- * declared here; hopefully preventing corrupt except due to extreme stupid. <br>
- * <br>
- * There is a point of interest regarding rendering of <code>Block</code>. The
- * "universal block constant" width and height is 12 pixels (6 'ortho'(render)
- * units), per block in the 'world map'. This does not change, and likely never
- * will. This size does not even change when the screen is resized, instead more
- * <code>Blocks</code> are displayed. <b>NOTE: this is a 'magic number' not a
- * constant.</b>
+ * Block defines methods and variables for the tiles that make up the world. Blocks can
+ * be stored in the player's inventory as ItemStacks. Custom functionality can be added to 
+ * a Block by extending Block, which will allow this more complicated Block to share a common
+ * base and be a part of the blockList[], which contains all legal blocks.
+ * <br> <br>
+ * All Blocks except Block.air should be created in Block.java using {@link #Block(int)}. Air
+ * can be created using {@link #Block()}, which will assign that block an ID of 0 and the unique 
+ * properties of air.
+ * <br> <br>
+ * Block's contructors are protected to prevent random block redeclaration in the program, which will
+ * cause an ID conflict and RuntimeException. 
  * 
  * @author Alec Sobeck
  * @author Matthew Robertson
@@ -59,26 +29,38 @@ import enums.EnumBlockMaterial;
  */
 public class Block extends ActionbarItem 
 {
+	/** Defines one of the different tools that can be used to break a Block. */
 	public static final short BLOCK_TYPE_UNBREAKABLE = -1,
 								 BLOCK_TYPE_HAND = 0,
 								 BLOCK_TYPE_PICKAXE = 1,
 								 BLOCK_TYPE_AXE = 2;
+	/** Defines one of the different tilemaps a Block can use when calculating its bitmap. */
 	public static final byte TILEMAP_GENERAL = 0,
 								TILEMAP_PILLAR = 1,
 								TILEMAP_TREE_BRANCH = 2,
 								TILEMAP_TREE = 3,
 								TILEMAP_TREETOP = 4;
-	/** (constant) Block width in pixels, currently this value is 6. Corresponds to the value of Render.BLOCK_SIZE. */
+	/** Corresponds to the value of Render.BLOCK_SIZE. This is the width of a 1x1 Block in the world. */
 	public static final int BLOCK_WIDTH = 6;
-	/** (constant) Block height in pixels, currently this is 6. Corresponds to the value of Render.BLOCK_SIZE. */
+	/** Corresponds to the value of Render.BLOCK_SIZE. This is the height of a 1x1 Block in the world. */
 	public static final int BLOCK_HEIGHT = 6;
 	protected static final Random random = new Random();
+	/** The ItemStack this Block drops when destroyed. This may be null, or inaccurate should {@link #getDroppedItem()} be overriden. */
 	protected ItemStack droppedItem;
+	/** The maximum possible quantity of {@link #droppedItem} that can be obtained. */
 	protected int maximumDropAmount;
+	/** The minimum possible quantity of {@link #droppedItem} that can be obtained. */
 	protected int minimumDropAmount;
-	public boolean isOveridable;
-	public boolean hasMetaData;
+	/** Indicated whether or not another Block can be placed over this one. */
+	protected boolean isOveridable;
+    /** Indicated whether or not this block has metadata - if something has metadata it is greater than size 1x1. */
+	protected boolean hasMetaData;
+	/** This is a variable used to help calculate bitmaps. Different constants like {@link #TILEMAP_GENERAL} will change 
+	 * the behaviour of bitmaps. */
 	protected byte tileMap;
+	
+	
+	
 	/** The render width of a texture (in the world) */
 	public double blockWidth; 
 	/** The render height of a texture (in the world) */
@@ -90,7 +72,6 @@ public class Block extends ActionbarItem
 	protected int gradeOfToolRequired;
 	protected short blockType;
 	protected int blockTier;
-	protected EnumBlockMaterial material;
 	protected boolean breakable;
 	protected double hardness;
 	protected boolean passable;
@@ -102,8 +83,7 @@ public class Block extends ActionbarItem
 	public int lightRadius;
 	
 	/**
-	 * Constructs a special Block- air. This constructor should only ever be
-	 * used for the initial declaration of Block.air.
+	 * Constructs a special Block - air. This constructor should only ever be used for the initial declaration of Block.air.
 	 */
 	private Block() 
 	{
@@ -130,20 +110,10 @@ public class Block extends ActionbarItem
 	}
 
 	/**
-	 * Constructs a new <code>Block</code> that will be stored in
-	 * <code>blocksList[]</code> at the index of the blockID, allowing for easy
-	 * access to the <code>Block</code> created later. <code>Block</code> has a
-	 * protected constructor, so that a <code>Block</code> can't be randomly
-	 * declared outside of <code>Block.java</code>. This should prevent random
-	 * <code>Blocks</code> from overwriting random parts of the
-	 * <code>blocksList[]</code>, possibly crashing the game or corrupting the
-	 * save file for the world. <br>
-	 * <br>
-	 * Additional customization can be performed after creation of a
-	 * <code>Block</code> through the use of setters (see the class comment for
-	 * an example).
-	 * 
-	 * @param i the unique blockID of the <code>Block</code> being created
+	 * Constructs a new Block that will be stored in the blocksList[] at the index of the blockID. This allows for 
+	 * easy access to the Block created later. Block has a protected constructor, so that a Block can't redeclared 
+	 * at a whim. Additional customization can be performed after creation of a Block through the use of setters. 
+	 * @param id the unique blockID of the Block being created
 	 */
 	protected Block(int id)
 	{
@@ -183,7 +153,7 @@ public class Block extends ActionbarItem
 	 * Creates a deep copy of a Block. Objects are copied, but will not have the same reference, though, Enums references are directly
 	 * copied to the new Block.
 	 * @param block the Block to be copied
-	 * @return a new Block with the same properties as the cloned one
+	 * @return a new Block with the same properties as the copied one
 	 */
 	public Block(Block block) 
 	{
@@ -201,7 +171,6 @@ public class Block extends ActionbarItem
 		this.gradeOfToolRequired = block.gradeOfToolRequired;
 		this.blockType = block.blockType;
 		this.blockTier = block.blockTier;
-		this.material = block.material;
 		this.breakable = block.breakable;
 		this.hardness = block.hardness;
 		this.passable = block.passable;
@@ -214,16 +183,272 @@ public class Block extends ActionbarItem
 	}
 	
 	/**
-	 * Set the light strength and radius
+	 * Set the light strength and radius.
 	 * @param strength the max strength of the light. 1.0F is 100%, 0.0F is 0%
 	 * @param radius the max distance of the light in blocks
 	 * @return the updated block
 	 */
-	public Block setLightStrengthAndRadius(double strength, int radius)
+	protected Block setLightStrengthAndRadius(double strength, int radius)
 	{
 		this.lightStrength = strength;
 		this.lightRadius = radius;
 		return this;
+	}
+	
+	/**
+	 * Overrides ActionbarItem.setName(String) to make Block creation more friendly.
+	 */
+	protected Block setName(String name)
+	{
+		this.name = name;
+		return this;
+	}
+	
+	/**
+	 * Sets this Blocks' hardness
+	 * @param f the new Block hardness
+	 * @return a reference to this Block
+	 */
+	protected Block setBlockHardness(double f)
+	{
+		hardness = f;
+		return this;
+	}
+
+	/**
+	 * Sets this blocks breakability
+	 * @param flag the new Block breakability
+	 * @return a reference to this Block
+	 */
+	protected Block setBreakable(boolean flag) 
+	{
+		breakable = flag;
+		return this;
+	}
+
+	/**
+	 * Sets this Blocks's icon position in form (x,y)
+	 * @param x the new IconX value
+	 * @param y the new IconY value
+	 * @return a reference to this Block
+	 */
+	protected Block setIconIndex(int x, int y) 
+	{
+		iconY = y;
+		iconX = x;
+		return this;
+	}
+
+	/**
+	 *  * Overrides ActionbarItem.setExtraTooltipInformation(String) to make Block creation more friendly.
+	 */
+	protected Block setExtraTooltipInformation(String info) 
+	{
+		this.extraTooltipInformation = info;
+		return this;
+	}
+
+	/**
+	 * Sets this Block's passability.
+	 * @param flag the new Block passability
+	 * @return a reference to this Block
+	 */
+	protected Block setPassable(boolean flag) 
+	{
+		passable = flag;
+		return this;
+	}
+
+	/**
+	 *  * Overrides ActionbarItem.setMaxStackSize(int) to make Block creation more friendly.
+	 */
+	protected Block setMaxStackSize(int i)
+	{
+		maxStackSize = i;
+		return this;
+	}
+
+	/**
+	 * Sets the grade of tool required to break this block.
+	 * @param i the new grade of tool required to break this block
+	 * @return a reference to this Block
+	 */
+	protected Block setGradeOfToolRequired(int i) 
+	{
+		gradeOfToolRequired = i;
+		return this;
+	}
+
+	/**
+	 * Sets both the world and texture width of a block.
+	 * @param x the new width of this block, for the texture and world
+	 * @param y the new height of this block, for the texture and world
+	 * @return a reference to this Block
+	 */
+	protected Block setBothBlockWidthAndHeight(int x, int y)
+	{
+		setOnlyBlockWorldWidthAndHeight(x * 6, y * 6);
+		setOnlyBlockTextureWidthAndHeight(x * 16, y * 16);
+		return this;
+	}
+
+	/**
+	 * Sets only the world width of a block. Note: this must be the actual size in ortho units.
+	 * @param w the new width of this Block, for the world only
+	 * @param h the new height of this Block, for the world only
+	 * @return a reference to this Block
+	 */
+	protected Block setOnlyBlockWorldWidthAndHeight(int w, int h) 
+	{
+		blockWidth = w;
+		blockHeight = h;
+		hasMetaData = true;
+		return this;
+	}
+
+	/**
+	 * Sets the texture size of this block. Note: this must be the full texture size (ex. 16x16)
+	 * @param w the new texture width of this Block
+	 * @param h the new texture height of this Block
+	 * @return a reference to this Block
+	 */
+	protected Block setOnlyBlockTextureWidthAndHeight(int w, int h) 
+	{
+		textureWidth = w;
+		textureHeight = h;
+		return this;
+	}
+
+	/**
+	 * Sets this block's tier. 
+	 * @param i the new Block tier
+	 * @return a reference to this Block
+	 */
+	protected Block setBlockTier(int i)
+	{
+		blockTier = i;
+		return this;
+	}
+
+	/**
+	 * Sets this block's type, which can be a constant like {@link #BLOCK_TYPE_UNBREAKABLE}, to determine what tool breaks it.
+	 * @param s the new Block type 
+	 * @return a reference to this Block
+	 */
+	protected Block setBlockType(short s)
+	{
+		blockType = s;
+		return this;
+	}
+
+	/**
+	 * Sets whether or not the block allows blocks to be placed by it in the world.
+	 * @param flag whether or not blocks can be placed next to this Block
+	 * @return a reference to this Block
+	 */
+	protected Block setIsSolid(boolean flag)
+	{
+		isSolid = flag;
+		return this;
+	}
+
+	/**
+	 * Sets this block's hRange.
+	 * @param i this block's new hRange
+	 * @return a reference to this Block
+	 */
+	protected Block setHRange(int i) 
+	{
+		hRange = i;
+		return this;
+	}
+
+	/**
+	 * Sets this block's lRange.
+	 * @param i this Block's new lRange
+	 * @return a reference to this Block
+	 */
+	protected Block setLRange(int i) 
+	{
+		lRange = i;
+		return this;
+	}
+
+	/**
+	 * Sets the ItemStack, min, and max sizes of what's dropped by this Block when destroyed.
+	 * @param stack the ItemStack dropped by this Block when destroyed (can be null)
+	 * @param min the minimum quantity of said stack obtained
+	 * @param max the maximum quantity of said stack obtained
+	 * @return a reference to this Block
+	 */
+	protected Block setDroppedItem(ItemStack stack, int min, int max) 
+	{
+		droppedItem = stack;
+		minimumDropAmount = min;
+		maximumDropAmount = max;
+		return this;
+	}
+
+	/**
+	 * Sets this block's mineability - whether or not it is able to be mined.
+	 * @param b this Block's new mineability
+	 * @return a reference to this Block
+	 */
+	protected Block setIsMineable(boolean b)
+	{
+		isMineable = b;
+		return this;
+	}
+
+	/**
+	 * Sets this Block's icon position (x,y).
+	 * @param x this Block's new IconX
+	 * @param y this Block's new IconY
+	 * @return a reference to this Block
+	 */
+	protected Block setIconIndex(double x, double y) 
+	{
+		iconY = y;
+		iconX = x;
+		return this;
+	}
+
+	/**
+	 * Sets this Blokc's tilemap type to a constant.
+	 * @param b this block's new tilemap constant
+	 * @return a reference to this Block
+	 */
+	protected Block setTileMap(byte b)
+	{
+		tileMap = b;
+		return this;
+	}
+
+	/**
+	 * Sets whether or not a Block is Overidable. If a block is overidable it can have another block placed on it.
+	 * @param flag this Block's new ability to be overwritten
+	 * @return a reference to this Block
+	 */
+	protected Block setIsOveridable(boolean flag) 
+	{
+		isOveridable = flag;
+		return this;
+	}
+	
+	/**
+	 * Overrides ActionbarItem.overrideItemIcon(int, int, int) to make block creation easier.
+	 */
+	protected Block overrideItemIcon(int x, int y)
+	{
+		iconOverrideX = x;
+		iconOverrideY = y;
+		iconOverriden = true;
+		return this;
+	}
+	
+	public boolean getHasMetaData()
+	{
+		return hasMetaData;
 	}
 	
 	public double getLightStrength()
@@ -235,156 +460,7 @@ public class Block extends ActionbarItem
 	{
 		return lightRadius;
 	}
-
-	/**
-	 * Overrides ActionbarItem.setName(String) to make Block creation more friendly
-	 */
-	protected Block setName(String name)
-	{
-		this.name = name;
-		return this;
-	}
-
-	protected Block setBlockHardness(double f)
-	{
-		hardness = f;
-		return this;
-	}
-
-	protected Block setBreakable(boolean flag) 
-	{
-		breakable = flag;
-		return this;
-	}
-
-	protected Block setIconIndex(int x, int y) 
-	{
-		iconY = y;
-		iconX = x;
-		return this;
-	}
-
-	protected Block setExtraTooltipInformation(String info) 
-	{
-		this.extraTooltipInformation = info;
-		return this;
-	}
-
-	protected Block setBlockMaterial(EnumBlockMaterial mat) 
-	{
-		material = mat;
-		// gradeOfToolRequired....
-		return this;
-	}
-
-	protected Block setPassable(boolean flag) 
-	{
-		passable = flag;
-		return this;
-	}
-
-	protected Block setMaxStackSize(int i)
-	{
-		maxStackSize = i;
-		return this;
-	}
-
-	protected Block setGradeOfToolRequired(int i) 
-	{
-		gradeOfToolRequired = i;
-		return this;
-	}
-
-	protected Block setBothBlockWidthAndHeight(int x, int y)
-	{
-		setOnlyBlockWorldWidthAndHeight(x * 6, y * 6);
-		setOnlyBlockTextureWidthAndHeight(x * 16, y * 16);
-		return this;
-	}
-
-	protected Block setOnlyBlockWorldWidthAndHeight(int w, int h) 
-	{
-		blockWidth = w;
-		blockHeight = h;
-		hasMetaData = true;
-		// metaData = MetaDataHelper.getBlockMetaDataId(w, h);
-		return this;
-	}
-
-	protected Block setOnlyBlockTextureWidthAndHeight(int w, int h) 
-	{
-		textureWidth = w;
-		textureHeight = h;
-		return this;
-	}
-
-	protected Block setBlockTier(int i)
-	{
-		blockTier = i;
-		return this;
-	}
-
-	protected Block setBlockType(short s)
-	{
-		blockType = s;
-		return this;
-	}
-
-	/**
-	 * Sets if the block allows blocks to be placed by it in the world.
-	 * @param flag whether or not blocks can be placed next to this Block
-	 * @return a reference to this Block
-	 */
-	protected Block setIsSolid(boolean flag)
-	{
-		isSolid = flag;
-		return this;
-	}
-
-	protected Block setHRange(int i) 
-	{
-		hRange = i;
-		return this;
-	}
-
-	protected Block setLRange(int i) 
-	{
-		lRange = i;
-		return this;
-	}
-
-	protected Block setDroppedItem(ItemStack stack, int min, int max) 
-	{
-		droppedItem = stack;
-		minimumDropAmount = min;
-		maximumDropAmount = max;
-		return this;
-	}
-
-	protected Block setIsMineable(boolean b){
-		isMineable = b;
-		return this;
-	}
-
-	protected Block setIconIndex(double x, double y) 
-	{
-		iconY = y;
-		iconX = x;
-		return this;
-	}
-
-	protected Block setTileMap(byte b)
-	{
-		tileMap = b;
-		return this;
-	}
-
-	protected Block setIsOveridable(boolean flag) 
-	{
-		isOveridable = flag;
-		return this;
-	}
-
+	
 	public double getBlockHardness()
 	{
 		return hardness;
@@ -395,11 +471,6 @@ public class Block extends ActionbarItem
 		return breakable;
 	}
 
-	public EnumBlockMaterial getMaterial()
-	{
-		return material;
-	}
-	
 	public boolean getIsMineable(){
 		return isMineable;
 	}
@@ -478,19 +549,8 @@ public class Block extends ActionbarItem
 		return isSolid;
 	}
 
-	/**
-	 * Overrides ActionbarItem.overrideItemIcon(int, int, int) to make block creation easier.
-	 */
-	public Block overrideItemIcon(int x, int y)
-	{
-		iconOverrideX = x;
-		iconOverrideY = y;
-		iconOverriden = true;
-		return this;
-	}
-	
+	/** Contains all the Blocks legally available in the game. */
 	public static final Block[] blocksList = new Block[2048];
-	/** Block Declarations **/
 
 	public static final Block none = new Block(2047).setName("None");
 	public static final Block air = new Block();

@@ -12,11 +12,12 @@ import entities.EntityPlayer;
  */
 public class PassiveBonusHealthRegeneration extends PassiveBonus
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Constructs a new PassiveBonusHealthRegeneration with given power.
+	 * @param power the strength of this PassiveBonus
+	 */
 	public PassiveBonusHealthRegeneration(double power) 
 	{
 		super(power);

@@ -44,24 +44,49 @@ public abstract class PassiveBonus
 		this.piecesRequiredToActivate = piecesRequiredToActivate;
 	}
 	
+	/**
+	 * Gets the pieces of armour required to activate this PassiveBonus. This is generally one and has little effect unless this is a set bonus.
+	 * @return the number of armour pieces required to activate this PassiveBonus
+	 */
 	public int getPiecesRequiredToActivate()
 	{
 		return piecesRequiredToActivate;
 	}
 	
+	/**
+	 * Sets the number of pieces required to activate this PassiveBonus. This may or may not have a substancial effect.
+	 * @param pieces the number of pieces required to activate this PassiveBonus
+	 * @return a reference to this PassiveBonus
+	 */
 	public PassiveBonus setPiecesRequiredToActivate(int pieces)
 	{
 		this.piecesRequiredToActivate = pieces;
 		return this;
 	}
 
+	/**
+	 * Converts the PassiveBonus or extension thereof into a readable plaintext form.
+	 */
 	public String toString()
 	{
 		return "PassiveBonus: Effect=None";
 	}
 	
+	/**
+	 * Gets the power of this PassiveBonus.
+	 * @return the power of this PassiveBonus
+	 */
 	public double getPower()
 	{
 		return power;
+	}
+	
+	/**
+	 * Gets this PassiveBonus as a DisplayablePassiveBonus.
+	 * @return a DisplayablePassiveBonus corresponding to this PassiveBonus instance
+	 */
+	public DisplayablePassiveBonus getAsDisplayable()
+	{
+		return new DisplayablePassiveBonus(this);
 	}
 }

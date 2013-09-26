@@ -10,7 +10,7 @@ import utils.ItemStack;
 import enums.EnumArmor;
 
 /**
- * PassiveBonusFactory determines the PassiveBonuses for a given set of armor equipped on a player. PassiveBonusFactory 
+ * PassiveBonusFactory determines the PassiveBonuses for a given set of armour equipped on a player. PassiveBonusFactory 
  * exposes only the {@link #getPassiveBonuses(InventoryPlayer)} method which will return the PassiveBonuses for 
  * that given player inventory. PassiveBonuses found using PassiveBonusFactory are returned as a PassiveBonusContainer.
  * @author      Alec Sobeck

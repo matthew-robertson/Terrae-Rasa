@@ -14,11 +14,17 @@ import utils.ItemStack;
  */
 public class MinimalBlock 
 {
+	/** An items this Block may be holding (this does not have to exceed length 0). */
 	public ItemStack[] mainInventory;
+	/** An id, which corresponds to some entry of the Block.blockList[]*/
 	public short id;
+	/** A metadata value for this block. Defaults to 1 but may change beyond size 1x1. This is used to identify parts of a large block. */
 	public byte metaData;
+	/** The bitmap value for this block, used in rendering to make things look better. */
 	public byte bitMap;
+	/** Whether or not this block has metadata (IE is of size greater than 1x1). */
 	public boolean hasMetaData;
+	/** Whether or not this block can be walked through. */
 	public boolean isSolid;
 	
 	/**

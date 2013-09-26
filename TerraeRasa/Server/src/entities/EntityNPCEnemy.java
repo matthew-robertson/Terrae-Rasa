@@ -8,7 +8,6 @@ import utils.ItemStack;
 import utils.MonsterDrop;
 import world.World;
 import enums.EnumDamageSource;
-import enums.EnumMonsterType;
 
 /**
  * <code>EntityNPCEnemy</code> implements many of the features and fields needed for a monster.
@@ -43,7 +42,6 @@ public class EntityNPCEnemy extends EntityNPC
 	protected int monsterId;
 	public int damageDone;
 	protected EnumDamageSource damageType;
-	protected EnumMonsterType monsterType;
 	public boolean isBoss;
 	
 	/**
@@ -61,7 +59,6 @@ public class EntityNPCEnemy extends EntityNPC
 		damageDone = 0;
 		monsterId = i;
 		damageType = EnumDamageSource.MELEE;
-		monsterType = EnumMonsterType.GROUNDED;
 		blockWidth = 2;
 		blockHeight = 3;
 		textureWidth = 16;
@@ -94,7 +91,6 @@ public class EntityNPCEnemy extends EntityNPC
 		this.monsterId = entity.monsterId;
 		this.damageDone = entity.damageDone;
 		this.damageType = entity.damageType;
-		this.monsterType = entity.monsterType;
 		this.isBoss = entity.isBoss;
 		
 	}

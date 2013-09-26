@@ -12,12 +12,12 @@ import entities.EntityPlayer;
  */
 public class PassiveBonusDexterity extends PassiveBonus
 {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Constructs a new PassiveBonusDexterity with given power.
+	 * @param power the strength of this PassiveBonus
+	 */
 	public PassiveBonusDexterity(double power) 
 	{
 		super(power);

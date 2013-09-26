@@ -892,12 +892,12 @@ public class World
 			bit = 2;
 		}
 		
-		if (!getAssociatedBlock(x, y - 1).isOveridable && !(getAssociatedBlock(x, y - 1) instanceof BlockPillar)){
+		if (!getAssociatedBlock(x, y - 1).getIsOveridable() && !(getAssociatedBlock(x, y - 1) instanceof BlockPillar)){
 			bit = 0;					
 		}
 		
-		if (!getAssociatedBlock(x, y - 1).isOveridable && 
-				!getAssociatedBlock(x, y + 1).isOveridable && 
+		if (!getAssociatedBlock(x, y - 1).getIsOveridable() && 
+				!getAssociatedBlock(x, y + 1).getIsOveridable() && 
 				!(getAssociatedBlock(x, y + 1) instanceof BlockPillar) && 
 				!(getAssociatedBlock(x, y - 1) instanceof BlockPillar)){
 			bit = 3;
@@ -1306,7 +1306,7 @@ public class World
 	private void handleBlockBreakEvent(ServerUpdate update, EntityPlayer player, int mx, int my)
 	{
 		Block block = getAssociatedBlock(mx, my);
-		if(!block.hasMetaData) //normal block
+		if(!block.getHasMetaData()) //normal block
 		{
 			ItemStack stack = block.getDroppedItem();
 			if(stack != null) //if there's an item to drop, add it to the list of dropped items
@@ -1489,7 +1489,7 @@ public class World
 	 */
 	public void generateLargeBlock(int x, int y, Block block)
 	{
-		if(block.hasMetaData) //if the block is large
+		if(block.getHasMetaData()) //if the block is large
 		{
 			double blockWidth = block.getBlockWidth() / 6;
 			double blockHeight = block.getBlockHeight() / 6;
@@ -1547,7 +1547,7 @@ public class World
 	 */
 	public boolean placeBlock(ServerUpdate update, EntityPlayer player, int mx, int my, Block block)
 	{
-		if(block.hasMetaData) //if the block is large
+		if(block.getHasMetaData()) //if the block is large
 		{
 			double blockWidth = block.getBlockWidth() / 6;
 			double blockHeight = block.getBlockHeight() / 6;

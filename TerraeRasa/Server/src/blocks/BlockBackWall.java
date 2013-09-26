@@ -14,7 +14,7 @@ public class BlockBackWall extends Block
 	 * Constructs a new BlockBackWall
 	 * @param i the unique ID of this BlockBackWall
 	 */
-	public BlockBackWall(int i)
+	protected BlockBackWall(int i)
 	{
 		super(i);
 	}

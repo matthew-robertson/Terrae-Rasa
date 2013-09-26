@@ -12,12 +12,12 @@ import entities.EntityPlayer;
  */
 public class PassiveBonusSpeed extends PassiveBonus
 {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Constructs a new PassiveBonusSpeed with given power.
+	 * @param power the strength of this PassiveBonus
+	 */
 	public PassiveBonusSpeed(double power) 
 	{
 		super(power);

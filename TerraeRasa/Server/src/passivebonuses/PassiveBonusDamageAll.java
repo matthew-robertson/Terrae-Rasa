@@ -12,11 +12,12 @@ import entities.EntityPlayer;
  */
 public class PassiveBonusDamageAll extends PassiveBonus
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Constructs a new PassiveBonusDamageAll with given power.
+	 * @param power the strength of this PassiveBonus
+	 */
 	public PassiveBonusDamageAll(double power) 
 	{
 		super(power);

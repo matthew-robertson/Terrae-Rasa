@@ -2,20 +2,9 @@ package statuseffects;
 
 import java.io.Serializable;
 
-import world.World;
-import entities.EntityLiving;
-
 /**
- * A StatusEffect is any short term beneficial or negative effect. They can be applied to an EntityLiving or any subclass
- * thereof. A StatusEffect will persist until the remaining time expires. 
- * <br><br>
- * When applied a StatusEffect will call {@link #applyInitialEffect(EntityLiving)}, and when removed
- * {@link #removeInitialEffect(EntityLiving)} will be called. Each game tick the effect is active 
- * {@link #applyPeriodicBonus(World, EntityLiving)} will be called. None of these methods must do anything
- * and don't in StatusEffect, but any subclass may override them to implement custom functionality.
- * The apply and remove methods should directly counter each other to ensure that residual effects are
- * not remaining.
- *
+ * A DisplayableStatusEffect contains the data to display a StatusEffect in the client. It is a conversion of 
+ * a status effect to a data structure that is simpler to transmit over a socket.
  * @author      Alec Sobeck
  * @author      Matthew Robertson
  * @version     1.0
@@ -25,14 +14,23 @@ public class DisplayableStatusEffect
 		implements Serializable
 {
 	private static final long serialVersionUID = 1L;
+	/** The remaining time of this effect in game ticks. */
 	public int ticksLeft;
 	/** If this effect benefits the entity, then this is true. */
 	public boolean isBeneficialEffect;
-	public short iconX; //->Squares of size 16. IE 2 is at pixel x-positions 32 to 48
-	public short iconY; //->Squares of size 16. IE 1 is at pixel y-positions 16 to 32
-	public short iconWidth; //->Squares of size 16. Size 1 is 16 pixels in the x direction 
-	public short iconHeight; //->Squares of size 16. Size 1 is 16 pixels in the y direction
+	/** The X position of the StatusEffect icon, measured in squares of pixel size 16 on the sprite sheet. IE 
+	 * position 1 is from pixels 16 to 32 on the X-axis of the spritesheet. */
+	public short iconX; 
+	/** The y position of the StatusEffect icon, measured in squares of pixel size 16 on the sprite sheet. IE 
+	 * position 3 is from pixels 48 to 64 on the Y-axis of the spritesheet. */
+	public short iconY;
+	/** The width of this StatusEffect icon in squares of size 16. Size 1 for example is 16 pixels in the x direction. */
+	public short iconWidth; 
+	/** The height of this StatusEffect icon in squares of size 16. Size 2 for example is 32 pixels in the y direction. */
+	public short iconHeight; 
+	/** The unique ID number for this StatusEffect, allowing it to be distinguished from other effects. */
 	public long id;
+	/** A description of this DisplayableStatusEffect which can be rendered or output. */
 	public String description;
 	
 	/**
@@ -42,7 +40,7 @@ public class DisplayableStatusEffect
 	 * @param power the strength of the effect
 	 * @param ticksBetweenEffect the number of game ticks between the periodic effect being applied, if applicable
 	 */
-	public DisplayableStatusEffect(double durationSeconds, int tier, double power, int ticksBetweenEffect, String description)
+	protected DisplayableStatusEffect(double durationSeconds, int tier, double power, int ticksBetweenEffect, String description)
 	{
 		ticksLeft = (int) (durationSeconds * 20);
 		this.isBeneficialEffect = true;
@@ -54,7 +52,7 @@ public class DisplayableStatusEffect
 		this.description = description;
 	}
 	
-	public DisplayableStatusEffect(StatusEffect effect)
+	protected DisplayableStatusEffect(StatusEffect effect)
 	{
 		this.ticksLeft = effect.ticksLeft;
 		this.isBeneficialEffect = effect.isBeneficialEffect;

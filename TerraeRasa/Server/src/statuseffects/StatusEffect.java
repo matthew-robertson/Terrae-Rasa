@@ -23,17 +23,26 @@ public class StatusEffect
 		 implements IStatusEffect
 {
 	public boolean reapplicationSkipsRemovalEffect;
-	public int ticksLeft;
 	public int tier;
-	/** If this effect benefits the entity, then this is true. */
-	public boolean isBeneficialEffect;
-	public short iconX;
-	public short iconY;
-	public short iconWidth;
-	public short iconHeight;
 	public boolean stacksIndependantly;
 	public double power;
 	public int ticksBetweenEffect;
+
+	/** The remaining time of this effect in game ticks. */
+	public int ticksLeft;
+	/** If this effect benefits the entity somehow, then this is true. */
+	public boolean isBeneficialEffect;
+	/** The X position of the StatusEffect icon, measured in squares of pixel size 16 on the sprite sheet. IE 
+	 * position 1 is from pixels 16 to 32 on the X-axis of the spritesheet. */
+	public short iconX; 
+	/** The y position of the StatusEffect icon, measured in squares of pixel size 16 on the sprite sheet. IE 
+	 * position 3 is from pixels 48 to 64 on the Y-axis of the spritesheet. */
+	public short iconY;
+	/** The width of this StatusEffect icon in squares of size 16. Size 1 for example is 16 pixels in the x direction. */
+	public short iconWidth; 
+	/** The height of this StatusEffect icon in squares of size 16. Size 2 for example is 32 pixels in the y direction. */
+	public short iconHeight; 
+	/** The unique ID number for this StatusEffect, allowing it to be distinguished from other effects. */
 	public long id;
 	
 	/**
@@ -43,7 +52,7 @@ public class StatusEffect
 	 * @param power the strength of the effect
 	 * @param ticksBetweenEffect the number of game ticks between the periodic effect being applied, if applicable
 	 */
-	public StatusEffect(double durationSeconds, int tier, double power, int ticksBetweenEffect)
+	protected StatusEffect(double durationSeconds, int tier, double power, int ticksBetweenEffect)
 	{
 		reapplicationSkipsRemovalEffect = false;
 		ticksLeft = (int) (durationSeconds * 20);
@@ -59,6 +68,10 @@ public class StatusEffect
 		this.id = System.nanoTime();
 	}
 	
+	/**
+	 * Provides a deep copy of all the values in this StatusEffect base class using a manually implemented copy constructor.
+	 * @param effect the StatusEffect to copy
+	 */
 	public StatusEffect(StatusEffect effect)
 	{
 		this.reapplicationSkipsRemovalEffect =  effect.reapplicationSkipsRemovalEffect;
@@ -93,6 +106,13 @@ public class StatusEffect
 		return ticksLeft <= 0;
 	}
 	
+	/**
+	 * Sets the (x,y) icon positions of this StatusEffect. Each unit in the x or y directions here will correspond
+	 * to a 16 pixel movement on the sprite sheet. Ex. (5,7) as an icon position means this StatusEffect's icon
+	 * will start at (5 * 16, 7 * 16) = (80, 112) on the spritesheet. 
+	 * @param x the new x position for this StatusEffect's icon
+	 * @param y the new y position for this StatusEffect's icons
+	 */
 	public void setIconPosition(short x, short y)
 	{
 		this.iconX = x;
@@ -104,8 +124,20 @@ public class StatusEffect
 		return id;
 	}
 	
+	/**
+	 * Provides a description of this StatusEffect that will update alongside the StatusEffect is applicable.
+	 */
 	public String toString()
 	{
 		return "Status_Effect_Base(None)";
+	}
+	
+	/**
+	 * Gets this StatusEffect as a DisplayableStatusEffect which can be transmitted to the client.
+	 * @return a DisplayablestatusEffect which corresponds to this StatusEffect
+	 */
+	public DisplayableStatusEffect getAsDisplayable()
+	{
+		return new DisplayableStatusEffect(this);
 	}
 }
