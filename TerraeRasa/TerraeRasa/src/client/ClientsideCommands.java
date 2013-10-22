@@ -1,6 +1,6 @@
 package client;
 
-import entities.EntityPlayer;
+import client.entities.EntityPlayer;
 
 public class ClientsideCommands 
 {

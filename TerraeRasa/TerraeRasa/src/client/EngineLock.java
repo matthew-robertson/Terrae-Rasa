@@ -5,17 +5,18 @@ import java.util.Vector;
 import transmission.CompressedClientUpdate;
 import transmission.CompressedServerUpdate;
 import transmission.SuperCompressedChunk;
-import world.World;
-import entities.EntityPlayer;
+import client.entities.EntityPlayer;
+import client.world.WorldClientEarth;
+import entry.SPGameLoop;
 
 public class EngineLock 
 {
 	private Vector<CompressedClientUpdate> clientUpdates = new Vector<CompressedClientUpdate>();
-	private GameEngine engine;
+	private SPGameLoop engine;
 	private Vector<CompressedServerUpdate> serverUpdates = new Vector<CompressedServerUpdate>();
 //	private EntityPlayer relevantPlayer;
 	
-	public EngineLock(GameEngine engine)
+	public EngineLock(SPGameLoop engine)
 	{
 		this.engine = engine;
 	}
@@ -68,10 +69,10 @@ public class EngineLock
 		return engine.getActivePlayer();
 	}
 	
-	public synchronized void setWorld(World world)
+	public synchronized void setWorld(WorldClientEarth world)
 	{
 		engine.setWorld(world);
-		GameEngine.flagAsMPPlayable();
+		SPGameLoop.flagAsMPPlayable();
 	}
 	
 	public synchronized void setActivePlayerID(int id)

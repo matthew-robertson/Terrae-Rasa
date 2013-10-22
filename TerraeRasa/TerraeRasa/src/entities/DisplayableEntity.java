@@ -2,6 +2,11 @@ package entities;
 
 import java.io.Serializable;
 
+import server.entities.EntityItemStack;
+import server.entities.EntityNPC;
+import server.entities.EntityNPCEnemy;
+import server.entities.EntityProjectile;
+
 
 public class DisplayableEntity 
 		implements Serializable, IEntityTransmitBase
@@ -22,14 +27,87 @@ public class DisplayableEntity
 	public String deathSound;
 	public String hitSound;
 	public int entityID;	
-	/** The x position of the entity in pixels. */
 	public double x;
-	/** The y position of the entity in pixels. */
 	public double y;
 	public int textureWidth;
 	public int textureHeight;
 	public double width;
 	public double height;	
+	
+	public DisplayableEntity(EntityProjectile entity)
+	{
+		type = TYPE_PROJECTILE;
+		iconX = entity.iconX;
+		iconY = entity.iconY;
+		name = entity.toString();
+		jumpSound = "";
+		deathSound = "";
+		hitSound = "";
+		entityID = entity.entityID;
+		x = entity.x;
+		y = entity.y;	
+		textureWidth = (int) entity.getTextureWidth();
+		textureHeight = (int) entity.getTextureHeight();
+		width = entity.width;
+		height = entity.height;
+	}
+	
+	public DisplayableEntity(EntityNPCEnemy entity)
+	{
+		type = TYPE_ENEMY;
+		
+		iconX = entity.getIconX();
+		iconY = entity.getIconY();
+		name = entity.getName();
+		jumpSound = entity.jumpSound;
+		deathSound = entity.deathSound;
+		hitSound = entity.hitSound;
+		entityID = entity.entityID;
+		x = entity.x;
+		y = entity.y;
+		textureWidth = (int) entity.getTextureWidth();
+		textureHeight = (int) entity.getTextureHeight();
+		width = entity.width;
+		height = entity.height;
+	}
+	
+	public DisplayableEntity(EntityNPC entity)
+	{
+		type = TYPE_FRIENDLY;
+		
+		iconX = entity.getIconX();
+		iconY = entity.getIconY();
+		name = entity.getName();
+		jumpSound = entity.jumpSound;
+		deathSound = entity.deathSound;
+		hitSound = entity.hitSound;
+		entityID = entity.entityID;
+		x = entity.x;
+		y = entity.y;
+		textureWidth = (int) entity.getTextureWidth();
+		textureHeight = (int) entity.getTextureHeight();
+		width = entity.width;
+		height = entity.height;
+	}
+	
+	public DisplayableEntity(EntityItemStack entity)
+	{
+		type = TYPE_ITEMSTACK;
+		
+		iconX = entity.getStack().getItemID();
+		iconY = 0;
+		name = entity.getStack().getItemName();
+		jumpSound = entity.jumpSound;
+		deathSound = entity.deathSound;
+		hitSound = entity.hitSound;
+		entityID = entity.entityID;
+		x = entity.x;
+		y = entity.y;
+		textureWidth = (int) entity.getTextureWidth();
+		textureHeight = (int) entity.getTextureHeight();
+		width = entity.width;
+		height = entity.height;
+	}
 	
 	public double getX()
 	{

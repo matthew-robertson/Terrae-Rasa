@@ -1,9 +1,14 @@
 package world;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import server.entities.EntityNPCEnemy;
+
 
 public class Biome 
-		 implements Cloneable, Serializable
+		 implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	protected int biomeID;
@@ -11,10 +16,12 @@ public class Biome
 	protected double y;
 	protected double width;
 	protected double height;
+	protected List<EntityNPCEnemy> spawnableEntites;
 	protected String biomeName;
 	
 	protected Biome(int i, String name)
 	{
+		spawnableEntites = new ArrayList<EntityNPCEnemy>();
 		biomeName = name;
 		x = 0;
 		y = 0;
@@ -39,6 +46,7 @@ public class Biome
 		this.y = biome.y;
 		this.width = biome.width;
 		this.height = biome.height;
+		this.spawnableEntites = biome.spawnableEntites;
 		this.biomeName = biome.biomeName;
 	}
 	
@@ -103,7 +111,7 @@ public class Biome
 		return new Biome(biomeList[index]);
 	}
 	
-	private final static Biome biomeList[] = new Biome[3];
+	private final static Biome biomeList[] = new Biome[12];
 	
 	/** Biome Declarations **/
 	

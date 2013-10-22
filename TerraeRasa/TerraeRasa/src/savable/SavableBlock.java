@@ -2,15 +2,14 @@ package savable;
 
 import java.io.Serializable;
 
-import utils.DisplayableItemStack;
+import utils.ItemStack;
 
 public class SavableBlock 
 		implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	public DisplayableItemStack[] mainInventory;
-	public int id;
-	public int metaData;
-	public int bitMap;
-	
+	public ItemStack[] mainInventory;
+	public short id;
+	public byte metaData;
+	public byte bitMap;
 }

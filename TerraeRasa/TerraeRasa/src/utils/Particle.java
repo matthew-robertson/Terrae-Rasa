@@ -2,6 +2,7 @@ package utils;
 
 import java.io.Serializable;
 
+import math.Vector2;
 import enums.EnumColor;
 
 
@@ -20,16 +21,16 @@ public class Particle
     public double x;                      // X Position
     public double y;                      // Y Position
     public double zrot;					 // Rotation on the Z axis
-    public Texture texture;
-    public Vector2F velocity;
-    public Vector2F acceleration;
+    public Vector2 velocity;
+    public Vector2 acceleration;
     public EnumColor[] colors;
     public boolean rotateRight;
+    public Texture texture;
     
     public Particle()
     {
-    	 velocity = new Vector2F(0, 0);
-    	 acceleration = new Vector2F(0, 0);
+    	 velocity = new Vector2(0, 0);
+    	 acceleration = new Vector2(0, 0);
     	 colors = new EnumColor[0];
     }
     
@@ -39,7 +40,7 @@ public class Particle
 	 */
 	public void integrate()
 	{
-		velocity = velocity.addF(acceleration);
+		velocity.addVector(acceleration);
 		this.x += velocity.getX();
 		this.y += velocity.getY();
 		life -= fade;

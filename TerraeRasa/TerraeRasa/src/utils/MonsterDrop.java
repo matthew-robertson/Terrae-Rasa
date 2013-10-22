@@ -3,10 +3,11 @@ package utils;
 import java.io.Serializable;
 
 
+
 /**
  * MonsterDrop implements a simple way to store a drop for a monster. 
  * <br><br>
- * Data for the DisplayableItemStack, chance of it dropping (1/rollMaximum), minimum drop amount, and maximum drop amount are stored. The drop is determined by the following
+ * Data for the ItemStack, chance of it dropping (1/rollMaximum), minimum drop amount, and maximum drop amount are stored. The drop is determined by the following
  * process (this is done outside of MonsterDrop.java, in EntityEnemy.getDrops()):
  * <ol>
  * 	<li>See if the drop will actually occur
@@ -16,13 +17,13 @@ import java.io.Serializable;
  * </ol>
  * Generally a declaration of this class is final, and will not change so there are only getters for the values, no setters. Values are assigned at creation through a constructor:
 <pre>
-	{@link #MonsterDrop(DisplayableItemStack)}
+	{@link #MonsterDrop(ItemStack)}
 	
-	{@link #MonsterDrop(DisplayableItemStack, int, int, int)}
+	{@link #MonsterDrop(ItemStack, int, int, int)}
 </pre>
- * MonsterDrop(DisplayableItemStack) creates a guarenteed drop, of stack size 1. 
+ * MonsterDrop(ItemStack) creates a guarenteed drop, of stack size 1. 
  * <br><br>
- * MonsterDrop(DisplayableItemStack, int, int, int) provides more customization. A minimum, maximum, and rollMax
+ * MonsterDrop(ItemStack, int, int, int) provides more customization. A minimum, maximum, and rollMax
  * are set, respectively. (Note: (1/rollMax) dictates the probability of an Item dropping). 
  * <br><br>
  * For varied chances of obtaining the same drop, but with a different quantity, use 2 separate MonsterDrops. For example, a 33% to drop 5 coal and 
@@ -39,14 +40,14 @@ public class MonsterDrop
 	private int rollMaximum;
 	private int minimum;
 	private int maximum;
-	private DisplayableItemStack drop;
+	private ItemStack drop;
 
 	/**
-	 * Constructs a new monster drop, with only the DisplayableItemStack. The chance of the drop is assumed to be 100% and maximum/minimum drop amount is 1. In other words, a 
+	 * Constructs a new monster drop, with only the ItemStack. The chance of the drop is assumed to be 100% and maximum/minimum drop amount is 1. In other words, a 
 	 * Guaranteed drop can be registered using this constructor.
 	 * @param stack the stack to be dropped on death
 	 */
-	public MonsterDrop(DisplayableItemStack stack)
+	public MonsterDrop(ItemStack stack)
 	{
 		this.drop = stack;
 		this.minimum = 1;
@@ -56,13 +57,13 @@ public class MonsterDrop
 	
 	/**
 	 * Constructs a new monster drop, with more custom settings. Drop minimums, maximums, and maximum rolls can be registered using this constructor, 
-	 * in addition to the DisplayableItemStack used to store the drop. 
+	 * in addition to the ItemStack used to store the drop. 
 	 * @param stack the stack to be dropped on death
 	 * @param min minimum amount that has to be dropped
 	 * @param max maximum amount that has to be dropped
 	 * @param rollMax 1/rollMax is the chance the item drops
 	 */
-	public MonsterDrop(DisplayableItemStack stack, int min, int max, int rollMax)
+	public MonsterDrop(ItemStack stack, int min, int max, int rollMax)
 	{
 		this.drop = stack;
 		this.minimum = min;
@@ -85,8 +86,8 @@ public class MonsterDrop
 		return minimum;
 	}
 	
-	public DisplayableItemStack getDrop()
+	public ItemStack getDrop()
 	{
-		return new DisplayableItemStack(drop);
+		return new ItemStack(drop);
 	}
 }

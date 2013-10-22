@@ -1,15 +1,13 @@
 package blocks;
 
-import utils.DisplayableItemStack;
+import utils.ItemStack;
 
 /**
- * BlockChest is an extension of Block that allows items to be stored in it. Items can be placed in 
- * the chest with {@link #placeDisplayableItemStack(DisplayableItemStack, int)} and removed using {@link #takeDisplayableItemStack(int)}. 
- * Most methods which request an DisplayableItemStack make a deep copy to prevent reference errors, but this is not the 
- * case with {@link #getMainInventory()}, therefore caution should be used to prevent corrupting the chest's 
- * contents. 
+ * BlockChestServer is an extension of Block that allows items to be stored in it. Items can be placed in 
+ * the chest with {@link #placeItemStack(ItemStack, int)} and removed using {@link #takeItemStack(int)}. 
+ * Most methods which request an ItemStack make a deep copy to prevent reference errors. 
  * <br><br>
- * A new Chest can be created using the only constructor, {@link #BlockChest(int, int)}.
+ * A new BlockChestServer copy can be created using the only publicly exposed constructor, {@link #BlockChestServer(BlockChestServer)}.
  * @author      Alec Sobeck
  * @author      Matthew Robertson
  * @version     1.0
@@ -18,7 +16,7 @@ import utils.DisplayableItemStack;
 public class BlockChest extends Block
 {
 	/** The contents of the chest. */
-	private DisplayableItemStack[] mainInventory;
+	private ItemStack[] mainInventory;
 	
 	/**
 	 * Creates a chest of the specified size and ID. Block(int) is called, and handed the ID of the 
@@ -30,31 +28,30 @@ public class BlockChest extends Block
 	protected BlockChest(int i, int inventorySize)
 	{
 		super(i);
-		mainInventory = new DisplayableItemStack[inventorySize];
+		mainInventory = new ItemStack[inventorySize];
 	}	
 	
 	/**
-	 * Implements a further version of Block(Block). In addition to Block(Block) a deep copy of all variables
-	 * is performed and a new mainInventory[] is created.
+	 * Implements a further version of Block(Block). In addition to Block(Block) a fresh mainInventory[] is created.
 	 * @param block the block to create a deep copy of
 	 */
 	public BlockChest(BlockChest block)
 	{
 		super(block);
-		this.mainInventory = new DisplayableItemStack[block.getInventorySize()];
+		this.mainInventory = new ItemStack[block.getInventorySize()];
 	}
 	
 	/**
 	 * Attempts to place the itemstack in the chest.
-	 * @param stack
-	 * @param index
+	 * @param stack the stack to place into a slot
+	 * @param index the index of the slot in the mainInventory[] to place the new stack
 	 * @return
 	 */
-	public DisplayableItemStack placeDisplayableItemStack(DisplayableItemStack stack, int index)
+	public ItemStack placeItemStack(ItemStack stack, int index)
 	{
 		if(mainInventory[index] == null)
 		{
-			mainInventory[index] = new DisplayableItemStack(stack);
+			mainInventory[index] = new ItemStack(stack);
 			return null;
 		}
 		else if(stack.getItemID() == mainInventory[index].getItemID())
@@ -74,14 +71,14 @@ public class BlockChest extends Block
 	}
 	
 	/**
-	 * Gets the DisplayableItemStack at the specified index and then removes that DisplayableItemStack from the chest. This will return null if 
-	 * there is no item at the given DisplayableItemStack. Additionally, the DisplayableItemStack returned will be a deep copy.
-	 * @param index the DisplayableItemStack to remove from the chest
-	 * @return the DisplayableItemStack at given index from the chest
+	 * Gets the ItemStack at the specified index and then removes that ItemStack from the chest. This will return null if 
+	 * there is no item at the given ItemStack. Additionally, the ItemStack returned will be a deep copy.
+	 * @param index the ItemStack to remove from the chest
+	 * @return the ItemStack at given index from the chest
 	 */
-	public DisplayableItemStack takeDisplayableItemStack(int index)
+	public ItemStack takeItemStack(int index)
 	{
-		DisplayableItemStack stack = (mainInventory[index] != null) ? new DisplayableItemStack(mainInventory[index]) : null;
+		ItemStack stack = (mainInventory[index] != null) ? new ItemStack(mainInventory[index]) : null;
 		mainInventory[index] = null;
 		return stack;
 	}
@@ -99,47 +96,46 @@ public class BlockChest extends Block
 	}
 	
 	/**
-	 * Returns a deep copy of the DisplayableItemStack at the given index. This will instead be null if there is no 
-	 * DisplayableItemStack at the given index. An out of bounds exception is thrown if the given index is not within the 
+	 * Returns a deep copy of the ItemStack at the given index. This will instead be null if there is no 
+	 * ItemStack at the given index. An out of bounds exception is thrown if the given index is not within the 
 	 * Chest's mainInventory[] size.
 	 * @param index the slot of the chest to copy
-	 * @return a deep copy of the DisplayableItemStack at the given index, or null if it's empty
+	 * @return a deep copy of the ItemStack at the given index, or null if it's empty
 	 */
-	public DisplayableItemStack getDisplayableItemStack(int index)
+	public ItemStack getItemStack(int index)
 	{
-		return (mainInventory[index] != null) ? new DisplayableItemStack(mainInventory[index]) : null;
+		return (mainInventory[index] != null) ? new ItemStack(mainInventory[index]) : null;
 	}
 	
 	/**
-	 * Removes the DisplayableItemStack at the given index from the chest's inventory.
+	 * Removes the ItemStack at the given index from the chest's inventory.
 	 * @param index the slot of the chest to empty.
 	 */
-	public void removeDisplayableItemStack(int index)
+	public void removeItemStack(int index)
 	{
 		mainInventory[index] = null;
 	}
 		
 	/**
-	 * Returns a reference to the chest's mainInventory[].
-	 * @return a reference to the chest's mainInventory[]
+	 * Returns a deep copy of the chest's mainInventory[].
+	 * @return a deep copy to the chest's mainInventory[]
 	 */
-	public DisplayableItemStack[] getMainInventory()
+	public ItemStack[] getMainInventory()
 	{
-		DisplayableItemStack[] stacks = new DisplayableItemStack[mainInventory.length];
+		ItemStack[] stacks = new ItemStack[mainInventory.length];
 		for(int i = 0; i < stacks.length; i++)
 		{
 			if(this.mainInventory[i] != null)
 			{
-				stacks[i] = new DisplayableItemStack(this.mainInventory[i]);
+				stacks[i] = new ItemStack(this.mainInventory[i]);
 			}
 		}		
 		return stacks;
 	}
 	
 	/**
-	 * Returns the size of the chest's inventory. This should be equal to the mainInventory's length, but is a separate value
-	 * stored within the chest.
-	 * @return
+	 * Returns the size (length) of the chest's inventory. 
+	 * @return the length of the chest's inventory
 	 */
 	public int getInventorySize()
 	{
@@ -147,16 +143,19 @@ public class BlockChest extends Block
 	}
 	
 	/**
-	 * Sets the mainInventory[] to the given DisplayableItemStacks
+	 * Sets the mainInventory[] to the given ItemStacks. This is bounds safe, and reference safe. Excess items will simply be ignored.
 	 * @param stacks the new contains of the mainInventory[]
 	 */
-	public void setInventory(DisplayableItemStack[] stacks)
+	public void setInventory(ItemStack[] stacks)
 	{
 		for(int i = 0; i < mainInventory.length; i++)
 		{
-			if(i < stacks.length && stacks[i] != null)
+			if(i < stacks.length)
 			{
-				mainInventory[i] = new DisplayableItemStack(stacks[i]);
+				if(stacks[i] != null)
+				{
+					mainInventory[i] = new ItemStack(stacks[i]);
+				}
 			}
 		}
 	}
@@ -168,11 +167,22 @@ public class BlockChest extends Block
 	 */
 	public void setInventorySize(int newsize)
 	{
-		mainInventory = new DisplayableItemStack[newsize];
+		mainInventory = new ItemStack[newsize];
 	}
 	
+	/**
+	 * Removes a specified number of items from a stack in the inventory.
+	 * @param howMany the number of items to remove
+	 * @param index the index in the mainInvenotry by which to remove items.
+	 * @return
+	 */
 	public boolean removeItemsFromInventoryStack(int howMany, int index)
 	{
+		if(mainInventory[index] == null)
+		{
+			return false;
+		}
+		
 		if(howMany < mainInventory[index].getStackSize())
 		{
 			mainInventory[index].removeFromStack(howMany);
@@ -188,9 +198,9 @@ public class BlockChest extends Block
 	}
 	
 	/**
-	 * Creates a full BlockChest based on a given MinimalBlock
-	 * @param block the MinimalBlock to fully expand to a BlockChest
-	 * @return a BlockChest, expanded from the MinimalBlock
+	 * Creates a full BlockChestServer based on a given MinimalBlock
+	 * @param block the MinimalBlock to fully expand to a BlockChestServer
+	 * @return a BlockChestServer, expanded from the MinimalBlock
 	 */
 	public BlockChest mergeOnto(MinimalBlock block)
 	{
@@ -198,5 +208,13 @@ public class BlockChest extends Block
 		this.hasMetaData = block.hasMetaData;
 		this.setInventory(block.mainInventory);
  		return this;
+	}
+	
+	public BlockChest mergeOnto(ClientMinimalBlock block)
+	{
+		this.id = block.id;
+		this.hasMetaData = block.hasMetaData;
+		this.setInventory(block.mainInventory);
+		return this;
 	}
 }

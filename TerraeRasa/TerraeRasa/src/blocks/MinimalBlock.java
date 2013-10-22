@@ -1,7 +1,7 @@
 package blocks;
 
-import transmission.SuperCompressedBlock;
-import utils.DisplayableItemStack;
+import savable.SavableBlock;
+import utils.ItemStack;
 
 /**
  * A MinimalBlock is a highly cropped version of Block, which holds minimal amounts of data required for rendering and operations. Other information can
@@ -13,112 +13,87 @@ import utils.DisplayableItemStack;
  */
 public class MinimalBlock 
 {
-	public DisplayableItemStack[] mainInventory;
+	/** An items this Block may be holding (this does not have to exceed length 0). */
+	public ItemStack[] mainInventory;
+	/** An id, which corresponds to some entry of the Block.blockList[]*/
 	public short id;
+	/** A metadata value for this block. Defaults to 1 but may change beyond size 1x1. This is used to identify parts of a large block. */
 	public byte metaData;
+	/** The bitmap value for this block, used in rendering to make things look better. */
 	public byte bitMap;
-	public short iconX;
-	public short iconY;
+	/** Whether or not this block has metadata (IE is of size greater than 1x1). */
 	public boolean hasMetaData;
+	/** Whether or not this block can be walked through. */
 	public boolean isSolid;
 	
+	protected MinimalBlock()
+	{
+		
+	}
+	
 	/**
-	 * Constructs a new MinimalBlock MinimumBlock with the properties of air
-	 * @param isFront true if the block is front air, otherwise false (backair)
-	 */ 
-	public MinimalBlock(boolean isFront)
+	 * Constructs a new MinimalBlock with the given Block
+	 * @param block the Block to convert to a MinimalBlock
+	 */
+	public MinimalBlock(Block block)
 	{
-		Block block = null;
-		if(isFront)
-			block = Block.air;
-		else
-			block = Block.backAir;
 		this.id = (short) block.getID();
-		this.metaData = (byte) 1;
-		this.mainInventory = (block instanceof BlockChest) ? ((BlockChest)(block)).getMainInventory() : new DisplayableItemStack[0];
-		this.iconX = (short) block.iconX;
-		this.iconY = (short) block.iconY;
-		this.setBitMap(0);
+		this.metaData = 1;
+		this.mainInventory = (block instanceof BlockChest) ? ((BlockChest)(block)).getMainInventory() : new ItemStack[0];
+		this.setBitMap((byte)0);
 		this.hasMetaData = block.hasMetaData;
 		this.isSolid = block.isSolid;
 	}
 	
-	public MinimalBlock(SuperCompressedBlock compressedBlock)
+	/**
+	 * Constructs a new MinimalBlock using a SavableBlock
+	 * @param savedBlock the SavableBlock to convert to a MinimalBlock
+	 */
+	public MinimalBlock(SavableBlock savedBlock)
 	{
-		Block block = Block.blocksList[compressedBlock.id];
+		Block block = Block.blocksList[savedBlock.id];
 		this.id = (short) block.getID();
-		this.metaData = (byte) compressedBlock.metaData;
-		if(compressedBlock.mainInventory == null)
-		{
-			this.mainInventory = new DisplayableItemStack[0];
-		}
-		else
-		{
-			this.mainInventory = compressedBlock.mainInventory; //??????
-		}
+		this.metaData = (byte) savedBlock.metaData;
+		this.mainInventory = savedBlock.mainInventory; 
 		this.hasMetaData = block.hasMetaData;
 		this.isSolid = block.isSolid;
-		this.iconX = (short) block.iconX;
-		this.iconY = (short) block.iconY;
-		this.setBitMap(compressedBlock.bitMap);
+		this.setBitMap(savedBlock.bitMap);
 	}
-	
+		
+	/**
+	 * Gets the Block ID associated with this minimum block.
+	 * @return the Block ID associated with this minimum block
+	 */
 	public int getID()
 	{
 		return id;
 	}
 	
 	/**
-	 * Sets the bitmap of this minimal block, using the same procedure as Block.setBitMap(int)
-	 * @param i the new bitmap value
+	 * Sets the bitmap of this minimal block
+	 * @param bit the new bitmap value
 	 * @return a reference to this MinimalBlock
 	 */
-	public MinimalBlock setBitMap(int i) 
+	public void setBitMap(byte bit) 
 	{
-		char tilemap = Block.blocksList[id].getTileMap(); 
-		bitMap = (byte)i;
-		// If the block is a general case
-		if (tilemap == 'g') {
-			if (i <= 15) {
-				this.setIconIndex(i, this.iconY);
-			} else {
-				this.setIconIndex(i - 16, this.iconY + 1);
-			}
-		}
-		// If the block is a pillar
-		else if (tilemap == 'p') {
-			this.setIconIndex(i, this.iconY);
-		}
-		// If the block is a tree
-		else if (tilemap == 't') {
-			this.setIconIndex(i, this.iconY);
-		}
-		// If the block is a branch
-		else if (tilemap == 'b') {
-			// If the branch is a regular branch
-			if (i <= 11) {
-				this.setIconIndex(4 + i, this.iconY);
-			}
-			// If the branch is covered in snow
-			else {
-				this.setIconIndex(4 + (i - 12), this.iconY + 1);
-			}
-		}
-		// If the block is a treetop
-		else if (tilemap == 'T') {
-			this.setIconIndex(this.iconX + 3 * i, this.iconY);
-		}
-		return this;
-	}
-	
-	protected MinimalBlock setIconIndex(int x, int y) 
-	{
-		iconY = (short)y;
-		iconX = (short)x;
-		return this;
+		bitMap = bit;		
 	}
 
-	public int getBitMap() {
+	/**
+	 * Gets whether or not this block is solid - if it's solid it cant be walked through.
+	 * @return true if this block cannot be passed, otherwise false
+	 */
+	public boolean isSolid() 
+	{
+		return isSolid;
+	}
+
+	/**
+	 * Gets this block's bitmap.
+	 * @return this block's bitmap
+	 */
+	public int getBitMap() 
+	{
 		return bitMap;
 	}
 }

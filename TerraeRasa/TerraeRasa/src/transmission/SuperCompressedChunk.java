@@ -3,8 +3,8 @@ package transmission;
 import java.io.Serializable;
 
 import utils.Position;
+import utils.WeatherData;
 import world.Biome;
-import world.Weather;
 
 
 public class SuperCompressedChunk 
@@ -19,5 +19,5 @@ public class SuperCompressedChunk
 	public static final int CHUNK_WIDTH = 100;
 	public int height;		
 	public Position[] lightSources;
-	public Weather weather;
+	public WeatherData weatherData;
 }

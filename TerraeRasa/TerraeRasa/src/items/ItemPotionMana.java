@@ -1,8 +1,8 @@
 package items;
 
+import server.entities.EntityPlayer;
 import world.World;
-import audio.SoundEngine;
-import entities.EntityPlayer;
+import entry.MPGameEngine;
 
 public class ItemPotionMana extends Item
 {
@@ -16,7 +16,13 @@ public class ItemPotionMana extends Item
 	
 	public void onRightClick(World world, EntityPlayer player)
 	{
-		SoundEngine.playSoundEffect(onUseSound);
+		boolean success = player.restoreMana(world, manaRestored, true);
+
+		if(success)
+		{
+			player.inventory.removeItemsFromInventoryStack(player, 1, player.selectedSlot);
+			MPGameEngine.terraeRasa.gameEngine.addCommandUpdate("/soundeffect " + onUseSound);
+		}
 	}
 	
 	public int getManaRestored()

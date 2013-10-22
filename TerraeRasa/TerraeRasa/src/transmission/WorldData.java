@@ -1,7 +1,13 @@
 package transmission;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+
+import server.entities.EntityItemStack;
+import server.entities.EntityNPC;
+import server.entities.EntityNPCEnemy;
+import server.entities.EntityProjectile;
 
 import entities.DisplayableEntity;
 import enums.EnumWorldDifficulty;
@@ -27,4 +33,28 @@ public class WorldData
 	public double previousLightLevel;
 	public boolean lightingUpdateRequired;
 	public TransmittablePlayer[] otherplayers;
+	
+	public void setLists(List<EntityItemStack> itemstacks, List<EntityNPCEnemy> enemies, List<EntityNPC> npcs, List<EntityProjectile> projectiles)
+	{
+		itemsList = new ArrayList<DisplayableEntity>();
+		enemyList = new ArrayList<DisplayableEntity>();
+		npcList = new ArrayList<DisplayableEntity>();
+		projectileList = new ArrayList<DisplayableEntity>();
+		for(EntityItemStack stack : itemstacks)
+		{
+			itemsList.add(new DisplayableEntity(stack));
+		}
+		for(EntityNPCEnemy enemy : enemies)
+		{
+			enemyList.add(new DisplayableEntity(enemy));
+		}
+		for(EntityNPC npc : npcs)
+		{
+			npcList.add(new DisplayableEntity(npc));
+		}
+		for(EntityProjectile projectile : projectiles)
+		{
+			projectileList.add(new DisplayableEntity(projectile));
+		}
+	}
 }

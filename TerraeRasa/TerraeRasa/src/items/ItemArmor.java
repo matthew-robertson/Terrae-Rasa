@@ -3,15 +3,16 @@ package items;
 import java.util.ArrayList;
 import java.util.List;
 
-import passivebonuses.DisplayablePassiveBonus;
-import auras.DisplayableAura;
+import passivebonuses.PassiveBonus;
+import auras.Aura;
+import auras.AuraStayOfExecution;
 import enums.EnumArmor;
 
 public class ItemArmor extends Item
 {
-//	protected boolean isSavingRelic;
-	protected DisplayablePassiveBonus[] bonuses;
-	protected DisplayableAura[] auras;
+	protected boolean isSavingRelic;
+	protected PassiveBonus[] bonuses;
+	protected Aura[] auras;
 	protected EnumArmor armorType;
 	protected int defense;
 	protected int dexterity;
@@ -28,8 +29,8 @@ public class ItemArmor extends Item
 		dexterity = 0;
 		strength = 0;
 		armorType = EnumArmor.NOTHING;
-		bonuses = new DisplayablePassiveBonus[0];
-		auras = new DisplayableAura[0];
+		bonuses = new PassiveBonus[0];
+		auras = new Aura[0];
 		totalSockets = 0;
 	}
 	
@@ -101,19 +102,26 @@ public class ItemArmor extends Item
 		return armorType;
 	}
 	
-	protected ItemArmor passiveBonuses(DisplayablePassiveBonus[] bonuses)
+	protected ItemArmor passiveBonuses(PassiveBonus[] bonuses)
 	{
 		this.bonuses = bonuses;
 		return this;
 	}
 	
-	protected ItemArmor setAuras(DisplayableAura[] auras)
+	protected ItemArmor setAuras(Aura[] auras)
 	{
 		this.auras = auras;
+		for(Aura aura : auras)
+		{
+			if(aura instanceof AuraStayOfExecution)
+			{
+				isSavingRelic = true;
+			}
+		}
 		return this;
 	}
 	
-	public DisplayableAura[] getAuras()
+	public Aura[] getAuras()
 	{
 		return auras;
 	}
@@ -129,11 +137,16 @@ public class ItemArmor extends Item
 		return this;
 	}
 	
-	public DisplayablePassiveBonus[] getBonuses()
+	public PassiveBonus[] getBonuses()
 	{
 		return bonuses;
 	}
-
+	
+	public boolean getIsSavingRelic()
+	{
+		return isSavingRelic;
+	}	
+	
 	public ItemArmor setStamina(int i)
 	{
 		this.stamina = i;
@@ -208,7 +221,7 @@ public class ItemArmor extends Item
 		return strings;
 	}
 	
-	public DisplayablePassiveBonus[] getTierBonuses()
+	public PassiveBonus[] getTierBonuses()
 	{
 		return armorType.getBonuses();
 	}

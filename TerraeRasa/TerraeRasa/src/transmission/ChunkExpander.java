@@ -1,19 +1,22 @@
 package transmission;
 
-import io.Chunk;
+
 
 import java.io.Serializable;
 
-import blocks.MinimalBlock;
+import world.Weather;
+import blocks.Chunk;
+import blocks.ChunkClient;
+import blocks.ClientMinimalBlock;
 
 public class ChunkExpander 
 		implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 
-	public static Chunk expandChunk(SuperCompressedChunk compressedChunk)
+	public static ChunkClient expandChunk(SuperCompressedChunk compressedChunk)
 	{
-		Chunk chunk = new Chunk(compressedChunk.biome, compressedChunk.x, compressedChunk.height);
+		ChunkClient chunk = new ChunkClient(compressedChunk.biome, compressedChunk.x, compressedChunk.height);
 		chunk.light = new float[Chunk.getChunkWidth()][compressedChunk.height];
 		chunk.diffuseLight = new float[Chunk.getChunkWidth()][compressedChunk.height];
 		chunk.ambientLight = new float[Chunk.getChunkWidth()][compressedChunk.height];
@@ -24,13 +27,16 @@ public class ChunkExpander
 		chunk.setRequiresAmbientLightingUpdate(true);
 		chunk.addLightSources(compressedChunk.lightSources);
 		chunk.setRequiresDiffuseApplied(true);
-		chunk.weather = compressedChunk.weather;
+		if(compressedChunk.weatherData != null)
+		{
+			chunk.weather = Weather.generateWeatherByID(compressedChunk.weatherData);
+		}
 		return chunk;
 	}
 	
-	private static MinimalBlock[][] expand(SuperCompressedBlock[][] compressed, boolean front)
+	private static ClientMinimalBlock[][] expand(SuperCompressedBlock[][] compressed, boolean front)
 	{
-		MinimalBlock[][] blocks = new MinimalBlock[compressed.length][compressed[0].length];
+		ClientMinimalBlock[][] blocks = new ClientMinimalBlock[compressed.length][compressed[0].length];
 		if(front)
 		{
 			for(int i = 0; i < compressed.length; i++)
@@ -39,11 +45,11 @@ public class ChunkExpander
 				{
 					if(compressed[i][k] == null)
 					{
-						blocks[i][k] = new MinimalBlock(true);	
+						blocks[i][k] = new ClientMinimalBlock(true);	
 					}			
 					else
 					{
-						MinimalBlock block = new MinimalBlock(compressed[i][k]);
+						ClientMinimalBlock block = new ClientMinimalBlock(compressed[i][k]);
 						blocks[i][k] = block;	
 					}
 				}
@@ -57,11 +63,11 @@ public class ChunkExpander
 				{
 					if(compressed[i][k] == null)
 					{
-						blocks[i][k] = new MinimalBlock(false);
+						blocks[i][k] = new ClientMinimalBlock(false);
 					}			
 					else
 					{
-						MinimalBlock block = new MinimalBlock(compressed[i][k]);
+						ClientMinimalBlock block = new ClientMinimalBlock(compressed[i][k]);
 						blocks[i][k] = block;	
 					}
 				}

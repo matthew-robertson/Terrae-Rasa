@@ -1,7 +1,6 @@
 package utils;
 
-import entities.EntityPlayer;
-import render.Render;
+import server.entities.EntityPlayer;
 import world.World;
 
 /**
@@ -24,7 +23,6 @@ public class ActionbarItem
 	public double iconOverrideY;
 	public boolean iconOverriden;
 	/**Corresponds to values from Render like TEXTURE_SHEET_TERRAIN_EARTH, to determine the inventory icon for a specific block.*/
-	public int associatedTextureSheet;
 	protected int totalSockets;
 	
 	/**
@@ -43,7 +41,6 @@ public class ActionbarItem
 		iconOverrideY = 0;
 		iconOverriden = false;
 		totalSockets = 0;
-		associatedTextureSheet = Render.TEXTURE_SHEET_ITEMS;
 	}
 	
 	/**
@@ -64,7 +61,6 @@ public class ActionbarItem
 		iconOverrideX = 0;
 		iconOverrideY = 0;
 		totalSockets = 0;
-		associatedTextureSheet = Render.TEXTURE_SHEET_ITEMS;
 	}
 	
 	/**
@@ -83,7 +79,6 @@ public class ActionbarItem
 		this.iconOverrideX = item.iconOverrideX;
 		this.iconOverrideY = item.iconOverrideY;
 		this.iconOverriden = item.iconOverriden;
-		this.associatedTextureSheet = item.associatedTextureSheet;
 		this.totalSockets = item.totalSockets;
 	}	
 	
@@ -204,11 +199,12 @@ public class ActionbarItem
 	 * @param info any extra tooltip information useful to the user
 	 * @return a reference to this object
 	 */
-	public ActionbarItem setExtraTooltipInformation(String info)
+	protected ActionbarItem setExtraTooltipInformation(String info)
 	{
 		this.extraTooltipInformation = info;
 		return this;
 	}
+	
 	/**
 	 * Overrides the icon used when rendering this item in the inventory to one on any terrain or item.png sprite sheet.
 	 * @param x the x position of the sprite on the item.png sheet to render
@@ -220,7 +216,6 @@ public class ActionbarItem
 	{
 		iconOverrideX = x;
 		iconOverrideY = y;
-		this.associatedTextureSheet = associatedSheet;
 		iconOverriden = true;
 		return this;
 	}

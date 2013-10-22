@@ -1,628 +1,58 @@
 package world;
 
-import io.Chunk;
-import io.ChunkManager;
-import items.Item;
 
 import java.util.ArrayList;
 import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Vector;
 
-import transmission.ClientUpdate;
-import transmission.TransmittablePlayer;
+import server.entities.Entity;
+import server.entities.EntityPlayer;
+import transmission.ServerUpdate;
 import transmission.WorldData;
-import utils.DisplayableItemStack;
-import utils.LightUtils;
-import utils.MathHelper;
-import utils.Position;
 import utils.WorldText;
 import blocks.Block;
-import blocks.BlockChest;
-import blocks.BlockGrass;
-import blocks.BlockPillar;
+import blocks.Chunk;
 import blocks.MinimalBlock;
-import entities.DisplayableEntity;
-import entities.EntityPlayer;
-import entities.IEntityTransmitBase;
+import entry.MPGameLoop;
 import enums.EnumColor;
 import enums.EnumEventType;
 import enums.EnumWorldDifficulty;
 
-/**
- * <code>World</code> implements many of the key features for TerraeRasa to actually run properly and update. 
- * <br><br>
- * All players, chunks, Biomes, EntityEnemies, EntityLivingItemStacks, TemporaryText, Weather are stored in the 
- * World class. 
- * <br><br>
- * Methods exist to perform hittests between anything requiring it (monster and player, etc); as well as
- * methods to update entities, and everything else in the world. These methods are private and called 
- * though {@link #onWorldTick()}, as such no external source can modify the update rate, or otherwise
- * interfere with it. 
- * <br><br>
- * Other methods of interest, aside from onWorldTick(), relate to block breaking or Block requests.
- * {@link #getBlock(int, int)} and {@link #setBlock(Block, int, int)} implement most of the features 
- * required to "grandfather in" the old world.worldMap[][] style which has since been rendered obsolete 
- * by chunks. These methods are generally considered safe to use, with the same co-ordinates as the
- * previous world.worldMap[][] style. They should perform the division and modular division required 
- * automatically. <b>NOTE: These methods are relatively slow, and unsuitable for large-scale modifications.</b>
- * These large scale operations should be done directly through chunk data, with exact values not requiring
- * division/modular division every single request. 
- * <br><br>
- * The main methods relating to Block breaking and placement are {@link #breakBlock(int, int)} for breaking,
- * and {@link #placeBlock(int, int, Block)} for placing a Block. These methods differ from getBlock(int, int)
- * and setBlock(Block, int, int) significantly. These methods are for block placement and destruction while
- * the game is running (generally the player would do this). As a result, they must obey the rules of 
- * the game. These methods are relatively simple in what they do, instantly breaking and dropping or placing
- * a block upon call, but with regard to the rules of the game. They do not actually decrease inventory 
- * totals, add to them, or interact with the player in any way. As a result, anything in the project
- * can actually request a block placement/destroy using these methods, however it's advised that only the 
- * player actually do this.
- * 
- * @author      Alec Sobeck
- * @author      Matthew Robertson
- * @version     1.0
- * @since       1.0
- */
-public class World
+public abstract class World 
 {
-	private static final int GAMETICKSPERDAY = 28800; 
-	private static final int GAMETICKSPERHOUR = 1200;
-	public final double g = 1.8;
-	public Hashtable<String, Boolean> chunksLoaded;
-	
-	public List<DisplayableEntity> itemsList;
-	public List<WorldText> temporaryText; 
-	public List<DisplayableEntity> enemyList;
-	public List<DisplayableEntity> npcList;
-	public List<DisplayableEntity> projectileList;
-	
-	private int[] generatedHeightMap;
-	private int averageSkyHeight;
-	private int totalBiomes;
-	private int chunkWidth;
-	public ChunkManager chunkManager;
-	private EnumWorldDifficulty difficulty;
+	public static final int GAMETICKSPERDAY = 24 * MPGameLoop.TICKS_PER_SECOND * 60; 
+	public static final int GAMETICKSPERHOUR = MPGameLoop.TICKS_PER_SECOND * 60;
 	protected String worldName;
-	private long worldTime;
-	private ConcurrentHashMap<String, Chunk> chunks;
-	private int width; //Width in blocks, not pixels
-	private int height; //Height in blocks, not pixels
-	private double previousLightLevel;
-	private LightUtils utils;
-	private boolean lightingUpdateRequired;
-	
-	private List<String> pendingChunkRequests = new ArrayList<String>();
-	public List<EntityPlayer> otherPlayers = new ArrayList<EntityPlayer>();
-	
-	public Dictionary<String, Object> entitiesByID = new Hashtable<String, Object>();
-	
-	/**
-	 * Reconstructs a world from a save file. This is the first step.
-	 */
-	public World()
-	{
-		setChunks(new ConcurrentHashMap<String, Chunk>(10));
-		enemyList = new ArrayList<DisplayableEntity>(255);
-		projectileList = new ArrayList<DisplayableEntity>(255);
-		npcList = new ArrayList<DisplayableEntity>(255);
-		temporaryText = new ArrayList<WorldText>(100);
-		itemsList = new ArrayList<DisplayableEntity>(250);
-		chunksLoaded= new Hashtable<String, Boolean>(25);
-		utils = new LightUtils();
-//		checkChunks();
-		lightingUpdateRequired = true;
-	}
-	
-	public Object getEntityByID(int id)
-	{
-		try {
-			return entitiesByID.get(""+id);
-		} catch(NullPointerException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-		
-	public void overwriteEntityByID(int id, Object newEntity)
-	{
-		IEntityTransmitBase entity = (IEntityTransmitBase) entitiesByID.get(""+id);
-		if(entity.getEntityType() == DisplayableEntity.TYPE_ITEMSTACK)
-		{
-			itemsList.remove(entity);
-			itemsList.add((DisplayableEntity) newEntity);
-		}
-		else if(entity.getEntityType() == DisplayableEntity.TYPE_PROJECTILE)
-		{
-			projectileList.remove(entity);
-			projectileList.add((DisplayableEntity) newEntity);
-		}
-		else if(entity.getEntityType() == DisplayableEntity.TYPE_ENEMY)
-		{
-			enemyList.remove(entity);
-			enemyList.add((DisplayableEntity) newEntity);
-		}
-		else if(entity.getEntityType() == DisplayableEntity.TYPE_FRIENDLY) //Friendly?
-		{
-			npcList.remove(entity);
-			npcList.add((DisplayableEntity) newEntity);
-		}
-		else if(entity.getEntityType() == DisplayableEntity.TYPE_PLAYER)
-		{
-			otherPlayers.remove(entity);
-			otherPlayers.add((EntityPlayer) newEntity);
-		}
-		entitiesByID.put(""+id, newEntity);		
-	}
-	
-	public void removeEntityByID(int id)
-	{
-		IEntityTransmitBase entity = (IEntityTransmitBase) entitiesByID.get(""+id);
-		if(entity.getEntityType() == DisplayableEntity.TYPE_ITEMSTACK)
-		{
-			itemsList.remove(entity);
-		}
-		else if(entity.getEntityType() == DisplayableEntity.TYPE_PROJECTILE)
-		{
-			projectileList.remove(entity);
-		}
-		else if(entity.getEntityType() == DisplayableEntity.TYPE_ENEMY)
-		{
-			enemyList.remove(entity);
-		}
-		else if(entity.getEntityType() == DisplayableEntity.TYPE_FRIENDLY) //Friendly?
-		{
-			npcList.remove(entity);
-		}
-		else if(entity.getEntityType() == DisplayableEntity.TYPE_PLAYER)
-		{
-			otherPlayers.remove(entity);
-		}
-		entitiesByID.remove(""+id);
-	}
-	
-	/**
-	 * Constructs a new instance of World. This involves creation of the EntityLists, and some miscellaneous
-	 * fields being initialized, but largely initialization doesnt happen here. Instead things like WorldGen_
-	 * initialize most of the important things, such as the 'world map', and ground-level map/averages, 
-	 * @param universeName the world's name, assigned on creation
-	 * @param width the width of the world, in blocks
-	 * @param height the height of the world, in blocks
-	 * @param difficulty the difficulty (EnumDifficulty) of the world
-	 */
-	public World(String universeName, int width, int height, EnumWorldDifficulty difficulty)
-	{
-		setChunks(new ConcurrentHashMap<String, Chunk>(10));
-		this.width = width;
-		this.height = height; 
-		enemyList = new ArrayList<DisplayableEntity>(255);
-		projectileList = new ArrayList<DisplayableEntity>(255);
-		npcList = new ArrayList<DisplayableEntity>(255);
-		temporaryText = new ArrayList<WorldText>(100);
-		itemsList = new ArrayList<DisplayableEntity>(250);
-		chunksLoaded= new Hashtable<String, Boolean>(25);
-		setWorldTime((long) (6.5 * GAMETICKSPERHOUR));
-		worldName = "Earth";
-		totalBiomes = 0;
-		previousLightLevel = getLightLevel();
-		this.difficulty = difficulty;
-		chunkWidth = width / Chunk.getChunkWidth();
-		utils = new LightUtils();
-		lightingUpdateRequired = true;
-//		checkChunks();
-	}
-	
-	public World(WorldData data, Chunk[] chunks)
-	{
-		setChunks(new ConcurrentHashMap<String, Chunk>(10));
-		chunksLoaded = new Hashtable<String, Boolean>(25);	
-		for(Chunk chunk : chunks)
-		{
-			this.chunks.put(""+chunk.getX(), chunk);
-			this.chunksLoaded.put(""+chunk.getX(), true);
-		}
-		
-		this.width = data.width;
-		this.height = data.height; 
-		this.difficulty = data.difficulty;
-		
-		
-		this.enemyList = new ArrayList<DisplayableEntity>();
-		for(DisplayableEntity enemy : data.enemyList)
-		{
-//			enemy.setTexture(EntityNPCEnemy.enemyList[enemy.getNPCID()].getTexture());
-			addEntityToEnemyList(enemy);
-		}
-		this.npcList = new ArrayList<DisplayableEntity>();
-		for(DisplayableEntity friendly : data.npcList)
-		{
-//			friendly.setTexture(EntityNPCFriendly.npcList[friendly.getNPCID()].getTexture());
-			addEntityToNPCList(friendly);
-		}		
-		this.itemsList = data.itemsList;
-		this.projectileList = data.projectileList;
-		this.temporaryText = new ArrayList<WorldText>();
-		
-		this.worldName = data.worldName;
-		this.setWorldTime(data.worldTime);
-		this.previousLightLevel = data.previousLightLevel;
-		this.chunkWidth = data.chunkWidth;
-		this.lightingUpdateRequired = data.lightingUpdateRequired;
-		this.generatedHeightMap = data.generatedHeightMap;
-		this.averageSkyHeight = data.averageSkyHeight;
-		
-		for(TransmittablePlayer player : data.otherplayers)
-		{
-			addPlayer(player);
-		}		
-		utils = new LightUtils();		
-	}
-			
-	/**
-	 * Puts the player at the highest YPosition for the spawn XPosition 
-	 * @param player the player to be added
-	 * @return the player with updated position (x, y)
-	 */
-	public EntityPlayer spawnPlayer(EntityPlayer player) 
-	{
-		if(player.inventory.isEmpty())
-		{
-			player.inventory.pickUpItemStack(this, player, new DisplayableItemStack(Item.copperSword));
-			player.inventory.pickUpItemStack(this, player, new DisplayableItemStack(Item.copperPickaxe));
-			player.inventory.pickUpItemStack(this, player, new DisplayableItemStack(Item.copperAxe));
-			player.inventory.pickUpItemStack(this, player, new DisplayableItemStack(Block.craftingTable));
-		}
-		
-		player.respawnXPos = getWorldCenterOrtho();
-		
-		chunkManager.addAllLoadedChunks_Wait(this, getChunks());
-		
-		try {
-			for(int i = 0; i < height - 1; i++)
-			{
-				if(getBlock((int)(player.respawnXPos / 6), i).id == 0 && getBlock((int)(player.respawnXPos / 6) + 1, i).id == 0) 
-				{
-					continue;
-				}
-				if(getBlock((int)player.respawnXPos / 6, i).id != 0 || getBlock((int) (player.respawnXPos / 6) + 1, i).id != 0)
-				{	
-					player.x = player.respawnXPos;
-					player.y = (i * 6) - 18;				
-					return player;
-				}			
-			}
-		} catch (Exception e) {//This is probably a nullpointer 
-			e.printStackTrace();
-			throw new RuntimeException("This is likely caused by a chunk that's required being denied due to I/O conflicts");
-			//If this exception is thrown, inspect the addition to chunkmanager - chunkLock from A1.0.23
-		}
-		return player;
-	}
-		
-	/**
-	 * Keeps track of the worldtime and updates the light if needed
-	 */
-	public void updateWorldTime(EntityPlayer player)
-	{		
-		setWorldTime(getWorldTime() + 1);
-		if(getWorldTime() >= GAMETICKSPERDAY)//If the time exceeds 24:00, reset it to 0:00
-		{
-			setWorldTime(0);
-		}
-		
-		if(getLightLevel() != previousLightLevel) //if the sunlight has changed, update it
-		{
-			previousLightLevel = getLightLevel();
-			lightingUpdateRequired = true;
-		}		
-	}
-	
-	/**
-	 * Gets the light value of the sun. Full light is a value of 1.0f, minimal (night) light is .2f
-	 */
-	public double getLightLevel()
-	{
-		//LightLevel of 1.0f is full darkness (it's reverse due to blending mechanics)
-		//Light Levels By Time: 20:00-4:00->20%; 4:00-8:00->20% to 100%; 8:00-16:00->100%; 16:00-20:00->20% to 100%;  
-		
-		double time = (double)(getWorldTime()) / GAMETICKSPERHOUR; 
-		
-		return (time > 8 && time < 16) ? 1.0f : (time >= 4 && time <= 8) ? MathHelper.roundDowndouble20th(((((time - 4) / 4.0F) * 0.8F) + 0.2F)) : (time >= 16 && time <= 20) ? MathHelper.roundDowndouble20th(1.0F - ((((time - 16) / 4.0F) * 0.8F) + 0.2F)) : 0.2f;
-	}
-		
-	/**
-	 * Gets the center of the world, with a block value. This is xsize / 2 
-	 * @return xsize / 2 (giving the center block of the world)
-	 */
-	public final int getWorldCenterBlock()
-	{
-		return width / 2;
-	}
-	
-	/**
-	 * Gets the 'ortho' unit value for the world's center. 1 block = 6 ortho units, so this is xsize * 3
-	 * @return xsize * 3 (the world's center in ortho)
-	 */
-	public final int getWorldCenterOrtho()
-	{
-		return width * 3;
-	}
-	
-	public void addUnspecifiedEntity(IEntityTransmitBase entity)
-	{
-		if(getEntityByID(entity.getEntityID()) != null)
-		{
-			return;
-		}
-		if(entity.getEntityType() == DisplayableEntity.TYPE_ENEMY)
-		{
-			enemyList.add((DisplayableEntity) entity);
-			entitiesByID.put(""+entity.getEntityID(), entity);
-		}
-		else if(entity.getEntityType() == DisplayableEntity.TYPE_FRIENDLY)
-		{
-			npcList.add((DisplayableEntity) entity);
-			entitiesByID.put(""+entity.getEntityID(), entity);
-		}
-		else if(entity.getEntityType() == DisplayableEntity.TYPE_ITEMSTACK)
-		{
-			itemsList.add((DisplayableEntity) entity);
-			entitiesByID.put(""+entity.getEntityID(), entity);
-		}
-		else if(entity.getEntityType() == DisplayableEntity.TYPE_PROJECTILE)
-		{
-			projectileList.add((DisplayableEntity) entity);
-			entitiesByID.put(""+entity.getEntityID(), entity);
-		}
-		
-	}
-	
-	/**
-	 * Adds an EntityNPCEnemy to the enemyList in this instance of World
-	 * @param enemy the enemy to add to enemyList
-	 */
-	public void addEntityToEnemyList(DisplayableEntity enemy)
-	{
-		enemyList.add(enemy);
-		entitiesByID.put(""+enemy.entityID, enemy);
-	}
-	
-	/**
-	 * Adds an EntityNPC to the npcList in this instance of World
-	 * @param npc the npc to add to enemyList
-	 */
-	public void addEntityToNPCList(DisplayableEntity npc)
-	{
-		npcList.add(npc);
-		entitiesByID.put(""+npc.entityID, npc);
-	}
-	
-	/**
-	 * Adds an entityProjectile to the projectileList in this instance of World
-	 * @param projectile the projectile to add to projectileList
-	 */
-	public void addEntityToProjectileList(DisplayableEntity projectile)
-	{
-		projectileList.add(projectile);
-		entitiesByID.put(""+projectile.entityID, projectile);
-	}
+	protected int chunkWidth;
+	protected int chunkHeight;
+	protected long worldTime;
+	protected int width; //Width in blocks, not pixels
+	protected int height; //Height in blocks, not pixels
+	public Dictionary<String, Object> entitiesByID;
+	public List<WorldText> temporaryText; 
+	protected int[] generatedHeightMap;
+	protected int averageSkyHeight;
+	public Hashtable<String, Boolean> chunksLoaded;
+	protected EnumWorldDifficulty difficulty;
 
-	/**
-	 * Adds an EntityLivingItemStack to the itemsList in this instance of World
-	 * @param stack the EntityLivingItemStack to add to itemsList
-	 */
-	public void addItemStackToItemList(DisplayableEntity stack)
+	
+	public World(String name)
 	{
-		itemsList.add(stack);
-		entitiesByID.put(""+stack.entityID, stack);
+		this.worldName = name;
+		entitiesByID = new Hashtable<String, Object>();
+		temporaryText = new ArrayList<WorldText>();
 	}
 	
-	public void addPlayer(TransmittablePlayer transmittablePlayer)
+	public final void setWorldTime(long worldTime) 
 	{
-		for(EntityPlayer p : otherPlayers)
-		{
-			if(transmittablePlayer.entityID == p.entityID)
-			{
-				return;
-			}
-		}
-		EntityPlayer player = new EntityPlayer(transmittablePlayer);
-		otherPlayers.add(player);
-		entitiesByID.put(""+player.entityID, player);
+		this.worldTime = worldTime;
 	}
 	
-	/**
-	 * Adds a piece of temporary text to the temporaryText ArrayList. This text is rendered until its time left runs out.
-	 * This text is generally from healing, damage, (combat)
-	 * @param message the text to display
-	 * @param x the x position in ortho units
-	 * @param y the y position in ortho units
-	 * @param ticksLeft the time (in game ticks) before the text despawns
-	 * @param type the type of combat text (affects the colour). For example 'g' makes the text render green
-	 */
-	public void addTemporaryText(String message, int x, int y, int ticksLeft, EnumColor color)
+	public final long getWorldTime()
 	{
-		temporaryText.add(new WorldText(message, x, y, ticksLeft, color, true));
-	}
-	
-	/**
-	 * Calls all the methods to update the world and its inhabitants
-	 */
-	public void onClientWorldTick(ClientUpdate update, EntityPlayer player)
-	{		
-		updateTemporaryText();
-		updateWeather();
-		//Update the time
-		updateWorldTime(player);
-		if(getWorldTime() % 20 == 0) {
-			updateChunks(update, player);
-		}
-
-		player.onClientTick(update, this); 
-		
-		applyLightingUpdates(player);
-	}
-		
-	/**
-	 * Gets how many horizontal chunks the world has. This is equal to (width / Chunk.getChunkWidth())
-	 * @return the number of horizontal chunks the world has
-	 */
-	public int getChunkWidth()
-	{
-		return chunkWidth;
-	}
-		
-	/**
-	 * Method designed to handle the updating of all blocks
-	 * @param x - x location in the world
-	 * @param y - location in the world
-	 * @return - updated bitmap
-	 */	
-	public int updateBlockBitMap(int x, int y){
-		int bit = getBlock(x,y).getBitMap();
-		//If the block is standard
-		if (getAssociatedBlock(x, y).getTileMap() == 'g'){
-			return updateGeneralBitMap(x, y);
-		}
-		//if the block requires special actions
-		//If the block is a pillar
-		else if (getAssociatedBlock(x, y).getTileMap() == 'p'){
-			return updatePillarBitMap(x, y);	
-		}
-		return bit;
-	}
-	
-	/**
-	 * Method to determine the bitmap
-	 * @param x - location of the block on the x axis
-	 * @param y - location of the block on the y axis
-	 * @return bit - the int to be used for calculating which texture to use
-	 */
-	private int updateGeneralBitMap(int x, int y){
-		int bit = 0;
-		if (getBlock(x, y - 1).isSolid){
-			bit += 1;
-		}
-		if (getBlock(x, y + 1).isSolid){
-			bit += 4;
-		}
-		if (getBlock(x - 1, y).isSolid){
-			bit += 8;
-		}
-		if (getBlock(x + 1, y).isSolid){
-			bit += 2;
-		}
-		if (getAssociatedBlock(x, y) instanceof BlockGrass && (bit == 15 || bit == 11 || bit == 27 || bit == 31)){
-			setBitMap(x, y, bit);
-		}
-		return bit;
-	}
-	
-	/**
-	 * Subroutine for updateBlockBitMap, specific for pillars.
-	 * @param x - location of the block on the x axis
-	 * @param y - location of the block on the y axis
-	 * @return bit - the int to be used to calculate which texture to use
-	 */
-	
-	private int updatePillarBitMap(int x, int y){
-		int bit;
-		if (getAssociatedBlock(x, y + 1) instanceof BlockPillar){
-			bit = 1;
-		}
-		
-		else {
-			bit = 2;
-		}
-		
-		if (!getAssociatedBlock(x, y - 1).isOveridable && !(getAssociatedBlock(x, y - 1) instanceof BlockPillar)){
-			bit = 0;					
-		}
-		
-		if (!getAssociatedBlock(x, y - 1).isOveridable &&
-				!getAssociatedBlock(x, y + 1).isOveridable && 
-				!(getAssociatedBlock(x, y + 1) instanceof BlockPillar) && 
-				!(getAssociatedBlock(x, y - 1) instanceof BlockPillar)){
-			bit = 3;
-		}
-		return bit;
-	}	
-		
-	/**
-	 * Displays all temporary text in the world, or remove it if it's past its life time
-	 */
-	private void updateTemporaryText()
-	{
-		for(int i = 0; i < temporaryText.size(); i++)
-		{
-			temporaryText.get(i).ticksLeft--; //reduce time remaining
-			if(temporaryText.get(i).ticksLeft <= 0)
-			{ //remove obsolete text
-				temporaryText.remove(i);
-			}
-		}
-	}
-		
-	/**
-	 * Gets the world object's name. worldName is a final field of world and is always the same. It 
-	 * describes whether the world is 'Earth', 'Sky', etc.
-	 * @return the world's name
-	 */
-	public final String getWorldName()
-	{
-		return worldName;
-	}
-
-	/**
-	 * Gets the average level of the terrain. After the world object is generated, this should be invoked to map out the top of the terrain.
-	 * This allows for simpler application of a background to the world, sunlight, and weather... in theory.
-	 */
-	public void assessForAverageSky()
-	{
-		List<Integer> values = new ArrayList<Integer>(width);
-		long average = 0;
-		
-		for(int i = 0; i < width; i++) //Loop though each column
-		{
-			for(int j = 0; j < height; j++) //and each row
-			{
-				if(getBlock(i, j).id != Block.air.id) //when something not air is hit, assume it's just the ground
-				{
-					values.add(j);
-					average += j;
-					break;
-				}				
-			}
-		}
-		
-		average /= width; //get Average height
-		generatedHeightMap = new int[values.size()];
-		averageSkyHeight = (int) average; //save value to the averageSkyHeight field 
-		
-		for(int i = 0; i < generatedHeightMap.length; i++) //save over the individual data as well
-		{
-			generatedHeightMap[i] = (Integer)(values.get(i));
-		}
-		
-		System.out.println("Average World Height: " + average);
-	}
-
-	/**
-	 * Tries to make weather happen on each game tick
-	 */
-	private void updateWeather()
-	{
-		Enumeration<String> keys = chunks.keys();
-        while (keys.hasMoreElements()) 
-        {
-            Chunk chunk = (Chunk)chunks.get((String)(keys.nextElement()));
-            if(chunk.weather != null)
-            {
-	            chunk.weather.update(this);
-            }
-        }
+		return worldTime;
 	}
 	
 	/**
@@ -644,474 +74,41 @@ public class World
 	}
 	
 	/**
-	 * Gets the back wall at the specified (x,y). Useful for easily getting a back wall at the specified location; Terrible for mass usage,
-	 * such as in rendering.
-	 * @param x the block's x location in the new world map
-	 * @param y the block's y location in the new world map
-	 * @return the block at the location specified (this should never be null)
+	 * Gets the world object's name. worldName is a final field of world and is always the same. It 
+	 * describes whether the world is 'Earth', 'Sky', etc.
+	 * @return the world's name
 	 */
-	public MinimalBlock getBackBlock(int x, int y)
+	public final String getWorldName()
 	{
-		try {
-			return getChunks().get(""+(x / Chunk.getChunkWidth())).getBackWall(x % Chunk.getChunkWidth(), (y));
-		} catch(Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-
-	/**
-	 * Gets the block at the specified (x,y). Useful for easily getting a block at the specified location; Terrible for mass usage,
-	 * such as in rendering.
-	 * @param x the block's x location in the new world map
-	 * @param y the block's y location in the new world map
-	 * @return the block at the location specified (this should never be null)
-	 */
-	public MinimalBlock getBlock(int x, int y)
-	{
-		try
-		{
-			return getChunks().get(""+(x / Chunk.getChunkWidth())).getBlock(x % Chunk.getChunkWidth(), (y));
-		}
-		catch(Exception e)
-		{
-	//		e.printStackTrace();
-			return null;
-		}
+		return worldName;
 	}
 	
 	/**
-	 * Sets the back wall at the specified (x,y). Useful for easily setting a back wall at the specified location; Terrible for mass usage.
-	 * This version of the method does not check if the chunk is actually loaded, therefore it may sometimes fail for bizarre or very, very
-	 * far away requests. It will however, simply catch that Exception, should it occur.
-	 * @param minimalBlock the block that the specified (x,y) will be set to
-	 * @param x the block's x location in the new world map
-	 * @param y the block's y location in the new world map
+	 * Gets how many vertical chunks the world has. This is equal to (height / height)
+	 * @return the number of vertical chunks the world has
 	 */
-	public void setBackBlock(MinimalBlock minimalBlock, int x, int y)
+	public final int getChunkHeight()
 	{
-		try
-		{
-			getChunks().get(""+x / Chunk.getChunkWidth()).setBackWall(minimalBlock, x % Chunk.getChunkWidth(), y);
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
-		
-	/**
-	 * Sets the block at the specified (x,y). Useful for easily setting a block at the specified location; Terrible for mass usage.
-	 * This version of the method does not check if the chunk is actually loaded, therefore it may sometimes fail for bizarre or very, very
-	 * far away requests. It will however, simply catch that Exception, should it occur.
-	 * @param block the block that the specified (x,y) will be set to
-	 * @param x the block's x location in the new world map
-	 * @param y the block's y location in the new world map
-	 */
-	public void setBlock(MinimalBlock block, int x, int y)
-	{
-		try
-		{
-			getChunks().get(""+x / Chunk.getChunkWidth()).setBlock(block, x % Chunk.getChunkWidth(), y);
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
-		
-	/**
-	 * Gets the block at the specified (x,y). Useful for easily getting a block at the specified location; Terrible for mass usage, such as in rendering.
-	 * This version of the method accepts doubles, and casts them to Integers.
-	 * @param x the block's x location in the new world map
-	 * @param y the block's y location in the new world map
-	 * @return the block at the location specified (this should never be null)
-	 */
-	public MinimalBlock getBlock(double x, double y)
-	{
-		return getChunks().get(""+(int)(x / Chunk.getChunkWidth())).getBlock((int)x % Chunk.getChunkWidth(), (int)y);
+		return chunkHeight;
 	}
 	
 	/**
-	 * Get associated block has two different behaviours. If a BlockChest is at the requested position, then a new and 
-	 * reference safe BlockChest will be given. If the Block is not an instanceof BlockChest then a direct reference to 
-	 * that Block.blockList block will be given. This has no metadata and is final. To modify the metadata, use getBlock()
-	 * to request the MinimalBlock for the given (x,y) position. <i> This version of the method getAssociatedBlock accepts 
-	 * integers not doubles.</i>
-	 * @param x the block's x location in the new world map
-	 * @param y the block's y location in the new world map
-	 * @return the block at the location specified, or null if there isnt one.
+	 * Gets how many horizontal chunks the world has. This is equal to (width / Chunk.getChunkWidth())
+	 * @return the number of horizontal chunks the world has
 	 */
-	public Block getAssociatedBlock(int x, int y)
+	public final int getChunkWidth()
 	{
-		try {
-			MinimalBlock block = getChunks().get(""+(int)(x / Chunk.getChunkWidth())).getBlock((int)x % Chunk.getChunkWidth(), (int)y);
-			if(Block.blocksList[block.id] instanceof BlockChest)
-			{
-				return new BlockChest((BlockChest)(Block.blocksList[block.id])).mergeOnto(block);
-			}
-			else
-			{
-				return Block.blocksList[block.id];
-			}
-		} catch (Exception e) {
-		}
-		return Block.air;
-	}
-
-	/**
-	 * Get associated block has two different behaviours. If a BlockChest is at the requested position, then a new and 
-	 * reference safe BlockChest will be given. If the Block is not an instanceof BlockChest then a direct reference to 
-	 * that Block.blockList block will be given. This has no metadata and is final. To modify the metadata, use getBlock()
-	 * to request the MinimalBlock for the given (x,y) position. <i> This version of the method getAssociatedBlock accepts 
-	 * doubles not integers.</i>
-	 * @param x the block's x location in the new world map
-	 * @param y the block's y location in the new world map
-	 * @return the block at the location specified, or null if there isnt one.
-	 */
-	public Block getAssociatedBlock(double x, double y)
-	{
-		try {
-			MinimalBlock block = getChunks().get(""+(int)(x / Chunk.getChunkWidth())).getBlock((int)x % Chunk.getChunkWidth(), (int)y);
-			if(Block.blocksList[block.id] instanceof BlockChest)
-			{
-				return new BlockChest((BlockChest)(Block.blocksList[block.id])).mergeOnto(block);
-			}
-			else
-			{
-				return Block.blocksList[block.id];
-			}
-		} catch (Exception e) { 
-		}
-		return Block.air;
-	}
-		
-	/**
-	 * Sets the block at the specified (x,y). Useful for easily setting a block at the specified location; Terrible for mass usage.
-	 * This version of the method does not check if the chunk is actually loaded, therefore it may sometimes fail for bizarre or very, very
-	 * far away requests. It will however, simply catch that Exception, should it occur. This version of the method uses doubles.
-	 * @param block the block that the specified (x,y) will be set to
-	 * @param x the block's x location in the new world map
-	 * @param y the block's y location in the new world map
-	 */
-	public void setBlock(MinimalBlock block, double x, double y)
-	{
-		try
-		{
-			getChunks().get(""+x).setBlock(block, (int)x, (int)y);
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
+		return chunkWidth;
 	}
 	
-	/**
-	 * Gets the chunk based off the block position, so division must occur.
-	 * @param x the x position of the chunk (in Blocks)
-	 * @param y the y position of the chunk (in Blocks)
-	 * @return the chunk at the specified position in the world's chunk map, or null if it doesn't exist or isn't loaded
-	 */
-	public Chunk getChunk_Division(int x)
+	public double getG()
 	{
-		return getChunks().get(""+(int)(x / Chunk.getChunkWidth()));
+		return 0;
 	}
 	
-	/**
-	 * Gets the chunk based off the chunk-map coordinates. Division is not performed.
-	 * @param x the x position of the chunk 
-	 * @param y the y position of the chunk 
-	 * @return the chunk at the specified position in the world's chunk map, or null if it doesn't exist or isn't loaded
-	 */
-	public Chunk getChunk(int x)
-	{
-		return (getChunks().get(""+x) != null) ? getChunks().get(""+x) : new Chunk(Biome.forest, x, height);
-	}
+	public abstract Biome getBiome(String pos);
 	
-	/**
-	 * Add a new Chunk to the World's Chunk map. Usage of this method is advisable so that the game actually knows the chunk 
-	 * exists in memory.
-	 * @param chunk the chunk to add to the chunk map of the world
-	 * @param x the x position of the chunk
-	 * @param y the y position of the chunk
-	 */
-	public void registerChunk(Chunk chunk, int x)
-	{
-		chunksLoaded.put(""+x, true);
-		chunks.put(""+x, chunk);
-	}
-	
-	public void removePendingChunkRequest(String command)
-	{
-		pendingChunkRequests.remove(command);
-	}
-	
-	/**
-	 * Sets the block at the specified (x,y). This method is safe, as all Exceptions are handled in this method. Additionally,
-	 * the (modular) division is performed automatically. The primary intention is that this method is used to generate the world, 
-	 * so it MUST be safe, otherwise code will become very dangerous. Chunks are generated if there is non chunk present at that
-	 * position.
-	 * @param block the block that the specified (x,y) will be set to
-	 * @param x the block's x location in the new world map
-	 * @param y the block's y location in the new world map
-	 */
-	public void setBackWallGenerate(MinimalBlock block, int x, int y)
-	{
-		//Ensure the chunk exists
-		try { 
-			if(getChunks().get(""+(x / Chunk.getChunkWidth())) == null)
-			{
-				registerChunk(new Chunk(Biome.forest, (int)(x / Chunk.getChunkWidth()), height), (int)(x / Chunk.getChunkWidth()));
-			}
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-		
-		//Set the block
-		try { 
-			chunks.get(""+(x / Chunk.getChunkWidth())).setBackWall(block, x % Chunk.getChunkWidth(), y);
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	/**
-	 * Gets the block at the specified (x,y). This method is safe, as all Exceptions are handled in this method. Additionally, 
-	 * the (modular) division is performed automatically. The primary intention is that this method is used to generate the 
-	 * world, so it MUST be safe, otherwise that code will become dangerous. 
-	 * @param x the block's x location in the new world map
-	 * @param y the block's y location in the new world map
-	 * @return the block at the location specified, or null if there isnt one.
-	 */
-	public MinimalBlock getBackWall(int x, int y)
-	{
-		try {
-			return getChunks().get(""+x / Chunk.getChunkWidth()).getBackWall(x % Chunk.getChunkWidth(), y);
-		} catch (Exception e) {
-		}
-		return null;
-	}
-		
-	/**
-	 * Sets the block at the specified (x,y). This method is safe, as all Exceptions are handled in this method. Additionally,
-	 * the (modular) division is performed automatically. The primary intention is that this method is used to generate the world, 
-	 * so it MUST be safe, otherwise code will become very dangerous. Chunks are generated if there is non chunk present at that
-	 * position.
-	 * @param block the block that the specified (x,y) will be set to
-	 * @param x the block's x location in the new world map
-	 * @param y the block's y location in the new world map
-	 */
-	public void setBlockGenerate(MinimalBlock block, int x, int y)
-	{
-		//Ensure the chunk exists
-		try { 
-			if(getChunks().get(""+(x / Chunk.getChunkWidth())) == null)
-			{
-				registerChunk(new Chunk(Biome.forest, (int)(x / Chunk.getChunkWidth()), height), (int)(x / Chunk.getChunkWidth()));
-			}
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-		
-		//Set the block
-		try { 
-			chunks.get(""+(x / Chunk.getChunkWidth())).setBlock(block, x % Chunk.getChunkWidth(), y);
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-	}
-		
-	/**
-	 * Gets the lighting value of the indicated Block. This may fail if the chunk requested isn't loaded into memory or doesnt exist.
-	 * In this case, a lighting value of 1.0f will be returned. All Exceptions are handled in this method.
-	 * @param x the x position of the Block to check for light in the world map
-	 * @param y the y position of the Block to check for light in the world map
-	 * @return the light value of that square, or 1.0f if that square is null or doesnt exist.
-	 */
-	public double getLight(int x, int y)
-	{
-		try {
-			return getChunks().get(""+(int)(x / Chunk.getChunkWidth())).getLight((int)x % Chunk.getChunkWidth(), (int)y);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return 1.0f;
-	}
-	
-	/**
-	 * Checks for chunks that need to be loaded or unloaded, based on the player's screen size. The range in which chunks stay loaded increases if the player's 
-	 * screen size is larger. (It's about ((width/2.2), (height/2.2))). 
-	 */
-	private void updateChunks(ClientUpdate update, EntityPlayer player)
-	{
-		//How far to check for chunks (in blocks)
-		int loadDistance = 2 * Chunk.getChunkWidth();//(((int)(Display.getWidth() / 2.2) + 3) > Chunk.getChunkWidth()) ? ((int)(Display.getWidth() / 2.2) + 3) : Chunk.getChunkWidth();
-		int unloadDistance = 3 * Chunk.getChunkWidth();
-		
-		//Position to check from
-		final int x = (int) (player.x / 6);
-		//Where to check, in the chunk map (based off loadDistance variables)
-		int leftLoad = (x - loadDistance) / Chunk.getChunkWidth();
-		int rightLoad = (x + loadDistance) / Chunk.getChunkWidth();
-		//Bounds checking
-		if(leftLoad < 0) leftLoad = 0;
-		if(rightLoad > (width / Chunk.getChunkWidth())) rightLoad = width / Chunk.getChunkWidth();
-		
-		int leftUnload = (x - unloadDistance) / Chunk.getChunkWidth();
-		int rightUnload= (x + unloadDistance) / Chunk.getChunkWidth();
-		//Bounds checking
-		if(leftUnload < 0) leftUnload = 0;
-		if(rightUnload > (width / Chunk.getChunkWidth())) rightUnload = width / Chunk.getChunkWidth();
-				
-		Enumeration<String> keys = chunksLoaded.keys();
-        while (keys.hasMoreElements()) 
-        {
-            String strKey = (String) keys.nextElement();
-            boolean loaded = chunksLoaded.get(strKey);
-          
-            int cx = Integer.parseInt(strKey);
-            
-            if(loaded && (cx < leftUnload || cx > rightUnload) && x != leftUnload && x != rightUnload)
-			{
-//            	System.out.println("Unload: " + cx);
-            	chunksLoaded.put(""+cx, false);
-            	Chunk chunk = chunks.get(""+cx);
-            	chunk = null;
-            	chunks.remove(""+cx);
-			}
-		}
-		for(int i = leftLoad; i <= rightLoad; i++) //Check for chunks that need loaded
-		{
-			if(i >= 0 && chunksLoaded.get(""+i) == null)
-			{
-				chunksLoaded.put(""+i, false);
-			}
-			if(chunksLoaded.get(""+i) != null && !chunksLoaded.get(""+i)) //If a needed chunk isnt loaded, request it.
-			{
-				String command = "/player " + player.entityID + " chunkrequest " + i;
-				if(!pendingChunkRequests.contains(command))
-				{
-//					System.out.println("Request: " + i);
-					pendingChunkRequests.add(command);
-					update.addCommand(command);
-				}
-				//chunkManager.requestChunk(worldName, this, chunks, i);
-			}
-		}
-	}
-	
-	/**
-	 * Sets the total number of biomes the world has. Generally this is advisable only during world generation.
-	 * @param total the value to set totalBiomes to
-	 */
-	public void setTotalBiomes(int total)
-	{
-		totalBiomes = total;
-	}
-	
-	/**
-	 * Gets how many biomes the world has. Merged biomes count as a single biome.
-	 * @return the total biomes in the world
-	 */
-	public int getTotalBiomes()
-	{
-		return totalBiomes;
-	}
-	
-	/**
-	 * Returns true if there are one or more chunks left in the world, or false otherwise.
-	 * @return true if chunks are left, otherwise false
-	 */
-	public boolean hasChunksLeft()
-	{
-		return chunks.size() > 0;
-	}
-	
-	/**
-	 * Gets the average sky height. This is actually the average Block at which the ground begins. This is measured from the 
-	 * top of the screen and should vary based on the world's height.
-	 * @return the average block at which the ground begins
-	 */
-	public int getAverageSkyHeight()
-	{
-		return averageSkyHeight;
-	}
-	
-	/**
-	 * A detailed Integer array of where the ground begins, based on how the world was generated. This is measured from the top of
-	 * the screen (sky). The average of these values should equal the value of {@link #getAverageSkyHeight()}.
-	 * @return a detailed Integer array of where the ground begins
-	 */
-	public int[] getGeneratedHeightMap()
-	{
-		return generatedHeightMap;
-	}
-	
-	public long getWorldTime()
-	{
-		return worldTime;
-	}
-	
-	public EnumWorldDifficulty getDifficulty()
-	{
-		return difficulty;
-	}
-	
-	public ConcurrentHashMap<String, Chunk> getChunks() 
-	{
-		return chunks;
-	}
-
-	public void setChunks(ConcurrentHashMap<String, Chunk> chunks) 
-	{
-		this.chunks = chunks;
-	}
-	
-	public void setChunk(Chunk chunk, int x, int y)
-	{
-		getChunks().put(""+x, chunk);
-	}
-	
-//	private void checkChunks()
-//	{
-//		for(int i = 0; i < width / Chunk.getChunkWidth(); i++)
-//		{
-//			if(getChunks().get(""+i) == null)
-//			{
-//				registerChunk(new Chunk(Biome.forest, i, height), i);
-//			}
-//		}
-//	}
-	
-	/**
-	 * Gets the biome for the specified chunk value, NOT block value
-	 * @param pos a string in the form of "x", indicating which chunk to check for a biome
-	 * @return the chunk's biome if it's loaded, otherwise null if it isnt
-	 */
-	public Biome getBiome(String pos)
-	{
-		int x = (Integer.parseInt(pos)) / Chunk.getChunkWidth();
-	
-		Chunk chunk = getChunks().get(""+x);
-		if(chunk != null)
-		{
-			return chunk.getBiome();
-		}
-			
-		return null;
-	}
-	
-	public String getBiomeColumn(String pos)
-	{
-		Biome biome = getBiome(pos);
-		
-		if(biome != null)
-		{
-			return biome.getBiomeName();
-		}
-		
-		return null;
-	}
+	public abstract String getBiomeColumn(String pos);
 		
 	/**
 	 * Gets the background block at the specified (x,y). Useful for easily getting a backgroundblock at the specified location; 
@@ -1120,76 +117,8 @@ public class World
 	 * @param y the block's y location in the new world map
 	 * @return the block at the location specified (this should never be null)
 	 */
-	public Block getAssociatedBackBlock(double x, double y)
-	{
-		MinimalBlock block = getChunks().get(""+(int)(x / Chunk.getChunkWidth())).getBlock((int)x % Chunk.getChunkWidth(), (int)y);
-		return Block.blocksList[block.id];
-	}
-	
-	public void setAmbientLight(double x, double y, double strength)
-	{
-		try
-		{
-			getChunks().get(""+(int)(x / Chunk.getChunkWidth())).setAmbientLight(strength, (int)x % Chunk.getChunkWidth(), (int)y);
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
-		
-	public void setDiffuseLight(double x, double y, double strength)
-	{
-		try
-		{
-			getChunks().get(""+(int)(x / Chunk.getChunkWidth())).setDiffuseLight(strength, (int)x % Chunk.getChunkWidth(), (int)y);
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
-
-	public double getAmbientLight(int x, int y)
-	{
-		try
-		{
-			return getChunks().get(""+(int)(x / Chunk.getChunkWidth())).getAmbientLight((int)x % Chunk.getChunkWidth(), (int)y);
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-		return 1.0f;
-	}
-	
-	public double getDiffuseLight(int x, int y)
-	{
-		try
-		{
-			return getChunks().get(""+(int)(x / Chunk.getChunkWidth())).getDiffuseLight((int)x % Chunk.getChunkWidth(), (int)y);
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-		return 1.0f;
-	}
-	
-	/**
-	 * Updates the ambient lighting based on the world time and light level (from getLightLevel())
-	 */
-	public void updateAmbientLighting()
-	{
-		Enumeration<String> keys = chunks.keys();
-		//Update the lighting in all the chunks (this is now efficient enough to work)
-		while (keys.hasMoreElements()) 
-        {
-            Chunk chunk = chunks.get((String)keys.nextElement());
-        	utils.applyAmbientChunk(this, chunk);
-    	}
-	}
-	
+	public abstract Block getBackBlock(double x, double y);
+			
 	/**
 	 * Sets the block and applies relevant lighting to the area nearby. Includes an EnumEventType to describe the event, although
 	 * it is currently not used for anything.
@@ -1198,79 +127,166 @@ public class World
 	 * @param y the y position where the block will be placed
 	 * @param eventType
 	 */
-	public void setBlock(MinimalBlock block, int x, int y, EnumEventType eventType)
+	public abstract void setBlock(Block block, int x, int y, EnumEventType eventType);
+
+	
+	/**
+	 * Sets the game time based on an hour in game ticks.
+	 * @param timeInTicks the time in game ticks
+	 */
+	public final void setTime(int timeInTicks)
 	{
-		utils.fixDiffuseLightRemove(this, x, y);
-		setBlock(block, x, y);
-		if(block != null);
-		{
-			utils.blockUpdateAmbient(this, x, y, eventType);		
-			utils.fixDiffuseLightApply(this, x, y);
-		}
+		this.worldTime = timeInTicks;
 	}
 	
 	/**
-	 * Called on world tick. Updates the lighting if it's appropriate to do so. It is considered appropriate if the light level of
-	 * the world has changed, or if the chunk (for whatever reason) has been flagged for a lighting update by a source.
-	 * @param player
+	 * Gets the world time in hours, between 0 and 24
+	 * @return gets the world time in hours, between 0 and 24
 	 */
-	public void applyLightingUpdates(EntityPlayer player)
+	public double getWorldTimeInHours()
 	{
-		//If the light level has changed, update the ambient lighting.
-		if(lightingUpdateRequired)
-		{
-			updateAmbientLighting();
-			lightingUpdateRequired = false;
-		}
-		
-		Enumeration<String> keys = chunks.keys();
-        while (keys.hasMoreElements()) 
-        {
-            Object key = keys.nextElement();
-            String str = (String) key;
-            Chunk chunk = chunks.get(str);
-                        
-            //If the chunk has been flagged for an ambient lighting update, update the lighting
-            if(chunk.requiresAmbientLightingUpdate())
-            {
-            	utils.applyAmbientChunk(this, chunk);
-            	chunk.setRequiresAmbientLightingUpdate(false);
-            }
-            if(chunk.requiresDiffuseApplied())
-            {
-            	try {
-	            	for(Position position : chunk.getLightSources())
-	            	{
-	            		Block block = Block.blocksList[getBlock(position.x, position.y).id];
-	            		utils.applyLightSource(this, position.x, position.y, block.lightRadius, block.lightStrength);
-	            	}
-	            	chunk.setRequiresDiffuseApplied(false);
-            	} catch (Exception e) {
-            		e.printStackTrace();
-            	}
-            }
-                    
-            //If the light in the chunk has changed, update the light[][] used for rendering
-            if(!chunk.isLightUpdated())
-            {
-            	chunk.updateChunkLight();
-            	chunk.setLightUpdated(true);
-            }
-        }
+		return (double)(worldTime) / GAMETICKSPERHOUR;
 	}
 	
-	public void setBitMap(int x, int y, int bitMap)
+	/**
+	 * Adds a piece of temporary text to the temporaryText ArrayList. This text is rendered until its time left runs out.
+	 * This text is generally from healing, damage, (combat)
+	 * @param message the text to display
+	 * @param x the x position in ortho units
+	 * @param y the y position in ortho units
+	 * @param ticksLeft the time (in game ticks) before the text despawns
+	 * @param type the type of combat text (affects the colour). For example 'g' makes the text render green
+	 */
+	public final void addTemporaryText(String message, int x, int y, int ticksLeft, EnumColor color)
 	{
-		try {
-			MinimalBlock block = getChunks().get(""+(x / Chunk.getChunkWidth())).getBlock(x % Chunk.getChunkWidth(), (y));
-			block.setBitMap(bitMap);
-		} catch (Exception e) {
-			
-		}
+		temporaryText.add(new WorldText(message, x, y, ticksLeft, color, true));
+	}
+	
+	public abstract Object getEntityByID(int id);
 		
-	}
+	public abstract void overwriteEntityByID(Vector<EntityPlayer> players, int id, Entity newEntity);
+	
+	public abstract void removeEntityByID(Vector<EntityPlayer> players, int id);
+	
+	public abstract Block getAssociatedBlock(double x, double y);
+	
+	/**
+	 * Gets the back wall at the specified (x,y). Useful for easily getting a back wall at the specified location; Terrible for mass usage,
+	 * such as in rendering.
+	 * @param x the block's x location in the new world map
+	 * @param y the block's y location in the new world map
+	 * @return the block at the location specified (this should never be null)
+	 */
+	public abstract Block getBackBlock(int x, int y);
 
-	public void setWorldTime(long worldTime) {
-		this.worldTime = worldTime;
-	}
+	/**
+	 * Gets the block at the specified (x,y). Useful for easily getting a block at the specified location; Terrible for mass usage,
+	 * such as in rendering.
+	 * @param x the block's x location in the new world map
+	 * @param y the block's y location in the new world map
+	 * @return the block at the location specified (this should never be null)
+	 */
+	public abstract MinimalBlock getBlock(int x, int y);
+	
+	/**
+	 * Sets the back wall at the specified (x,y). Useful for easily setting a back wall at the specified location; Terrible for mass usage.
+	 * This version of the method does not check if the chunk is actually loaded, therefore it may sometimes fail for bizarre or very, very
+	 * far away requests. It will however, simply catch that Exception, should it occur.
+	 * @param block the block that the specified (x,y) will be set to
+	 * @param x the block's x location in the new world map
+	 * @param y the block's y location in the new world map
+	 */
+	public abstract void setBackBlock(Block block, int x, int y);
+
+	/**
+	 * Gets the block at the specified (x,y). Useful for easily getting a block at the specified location; Terrible for mass usage, such as in rendering.
+	 * This version of the method accepts doubles, and casts them to Integers.
+	 * @param x the block's x location in the new world map
+	 * @param y the block's y location in the new world map
+	 * @return the block at the location specified (this should never be null)
+	 */
+	public abstract MinimalBlock getBlock(double x, double y);
+	
+	/**
+	 * Gets the chunk based off the chunk-map coordinates. Division is not performed.
+	 * @param x the x position of the chunk 
+	 * @param y the y position of the chunk 
+	 * @return the chunk at the specified position in the world's chunk map, or null if it doesn't exist or isn't loaded
+	 */
+	public abstract Chunk getChunk(int x);
+	
+	/**
+	 * Add a new Chunk to the World's Chunk map. Usage of this method is advisable so that the game actually knows the chunk 
+	 * exists in memory.
+	 * @param chunk the chunk to add to the chunk map of the world
+	 * @param x the x position of the chunk
+	 * @param y the y position of the chunk
+	 */
+	public abstract void registerChunk(Chunk chunk, int x);
+	
+	public abstract Object getChunks();
+	
+	/**
+	 * Adds an EntityNPCEnemy to the enemyList in this instance of World
+	 * @param enemy the enemy to add to enemyList
+	 */
+	public abstract void addEntityToEnemyList(Object enemy);
+	
+	/**
+	 * Adds an EntityNPC to the npcList in this instance of World
+	 * @param npc the npc to add to enemyList
+	 */
+	public abstract void addEntityToNPCList(Object npc);
+	
+	/**
+	 * Adds an entityProjectile to the projectileList in this instance of World
+	 * @param projectile the projectile to add to projectileList
+	 */
+	public abstract void addEntityToProjectileList(Object projectile);
+
+	/**
+	 * Adds an EntityLivingItemStack to the itemsList in this instance of World
+	 * @param stack the EntityLivingItemStack to add to itemsList
+	 */
+	public abstract void addItemStackToItemList(Object stack);
+
+
+	/**
+	 * Provides access to handlBackBlockBreakEvent() because that method is private and has a bizzare name, that's hard to both find and
+	 * remember
+	 * @param x the x position of the block to break (in the 'world map')
+	 * @param y the y position of the block to break (in the 'world map')
+	 */
+	public abstract void breakBackBlock(ServerUpdate update, EntityPlayer player, int x, int y);
+	
+	/**
+	 * Provides access to handlBlockBreakEvent() because that method is private and has a bizzare name, that's hard to both find and
+	 * remember
+	 * @param x the x position of the block to break (in the 'world map')
+	 * @param y the y position of the block to break (in the 'world map')
+	 */
+	public abstract void breakBlock(ServerUpdate update, EntityPlayer player, int x, int y);
+
+	/**
+	 * Breaks a cactus, from bottom to top.
+	 * @param mx the x position of the first block in worldMap
+	 * @param my the y position of the first block in worldMap
+	 */
+	public abstract void breakCactus(ServerUpdate update, EntityPlayer player, int mx, int my);
+
+	/**
+	 * Cuts down a tree, if a log was broken
+	 * @param mx x position in worldmap array, of the BlockWood
+	 * @param my y position in the worldmap array, of the BlockWood
+	 */
+	public abstract void breakTree(ServerUpdate update, EntityPlayer player, int mx, int my);
+
+	public abstract void setBlockGenerate(Block block, int x, int y);
+
+	public abstract void setBitMap(int x, int y, int i);
+
+	public abstract WorldData getWorldData();
+
+	public abstract int getWorldCenterBlock();
+
 }

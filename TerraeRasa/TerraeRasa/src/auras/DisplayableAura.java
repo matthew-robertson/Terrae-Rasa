@@ -2,46 +2,43 @@ package auras;
 
 import java.io.Serializable;
 
-import entities.EntityPlayer;
-
 /**
- * Auras are event listeners for the player. They react to certain events and will do something if appropriate. Aura.java implements 
- * all the methods required by IAura but they do not do anything. To provide customized event functionality, the different 
- * event methods should be overriden. Version 1.0 of Aura includes the following event methods:
- * <ul>
- * <li>{@link #onDamageDone(EntityPlayer)}</li>
- * <li>{@link #onDamageTaken(EntityPlayer)}</li>
- * <li>{@link #onDeath(EntityPlayer)}</li>
- * <li>{@link #onHeal(EntityPlayer)}</li>
- * <li>{@link #onPercentageHealth(EntityPlayer)}</li>
- * <li>{@link #onStatusEffectGained(EntityPlayer)}</li>
- * </ul>
+ * DisplayableAura is a data structure used to display an Aura client side.
  * @author      Alec Sobeck
  * @author      Matthew Robertson
  * @version     1.0
  * @since       1.0
  */
-public class DisplayableAura  
+public class DisplayableAura
 		implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	/** A number unique to this aura, used to distinguish it from other auras it. */
+	/** A number unique to this DisplayableAura, used to distinguish it from other DisplayableAura. */
 	private final long id;
+	/** The description of this DisplayableAura. */
 	protected String description;
-
-	protected DisplayableAura(int maxCooldown, double activationChance, String description)
+	
+	/**
+	 * Constructs a new DisplayableAura from an Aura
+	 * @param aura the Aura to use in the construction of this DisplayableAura
+	 */
+	protected DisplayableAura(Aura aura)
 	{
-		this.id = System.nanoTime();
-		this.description = description;
+		this.id = aura.getID();
+		this.description = aura.toString();
 	}
 
+	/**
+	 * Gets the description of this DisplayableAura.
+	 * @return the description of this DisplayableAura
+	 */
 	public String getDescription()
 	{
 		return description;
 	}
 	
 	/**
-	 * Returns the id of this Aura - a unique value to this Aura.
+	 * Returns the id of this DisplayableAura - a unique value to this DisplayableAura.
 	 * @return a value unique to this Aura
 	 */
 	public final long getID()
@@ -50,7 +47,7 @@ public class DisplayableAura
 	}
 	
 	/**
-	 * Overrides Object.toString() to accurately describe this aura in text form.
+	 * Overrides Object.toString() to accurately describe this DisplayableAura in text form.
 	 */
 	public String toString()
 	{

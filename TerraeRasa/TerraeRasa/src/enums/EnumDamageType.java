@@ -2,14 +2,14 @@ package enums;
 
 /**
  * EnumDamageType defines the different damage types. These can be used for individual resistances 
- * among other things. Version 1.0 includes the vollowing damage types:
+ * among other things. Version 1.0 includes the following damage types:
  * <ul>
- * <li> FIRE </li>
- * <li> DROWNING </li>
- * <li> NONE </li>
- * <li> POISON </li>
- * <li> FALL </li>
- * <li> BLEED </li>
+ *  <li> FIRE </li>
+ *  <li> DROWNING </li>
+ *  <li> NONE </li>
+ *  <li> POISON </li>
+ *  <li> FALL </li>
+ *  <li> BLEED </li>
  * </ul>
  * @author      Alec Sobeck
  * @author      Matthew Robertson

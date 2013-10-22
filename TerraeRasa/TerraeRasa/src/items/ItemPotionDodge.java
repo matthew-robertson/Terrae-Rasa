@@ -1,8 +1,9 @@
 package items;
 
+import server.entities.EntityPlayer;
+import statuseffects.StatusEffectDodgeBuff;
 import world.World;
-import audio.SoundEngine;
-import entities.EntityPlayer;
+import entry.MPGameEngine;
 
 public class ItemPotionDodge extends ItemPotion
 {
@@ -13,6 +14,8 @@ public class ItemPotionDodge extends ItemPotion
 	
 	public void onRightClick(World world, EntityPlayer player)
 	{
-		SoundEngine.playSoundEffect(onUseSound);
+		player.registerStatusEffect(world, new StatusEffectDodgeBuff(durationSeconds, tier, power, ticksBetweenEffect));
+		player.inventory.removeItemsFromInventoryStack(player, 1, player.selectedSlot);
+		MPGameEngine.terraeRasa.gameEngine.addCommandUpdate("/soundeffect " + onUseSound);
 	}
 }

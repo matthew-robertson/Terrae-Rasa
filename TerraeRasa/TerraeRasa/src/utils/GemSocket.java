@@ -2,6 +2,7 @@ package utils;
 
 import java.io.Serializable;
 
+
 /**
  * A GemSocket is a small helper class to hold an ItemGem. Socketting a new gem will remove
  * the old one.
@@ -14,13 +15,13 @@ public class GemSocket
 		implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	private DisplayableItemStack gem;
+	private ItemStack gem;
 	
 	/**
 	 * Sockets the given ItemGem, replacing whatever gem is currently held.
 	 * @param gem the ItemGem to socket
 	 */
-	public void socket(DisplayableItemStack gem)
+	public void socket(ItemStack gem)
 	{
 		this.gem = gem;
 	}	
@@ -29,7 +30,7 @@ public class GemSocket
 	 * Gets the ItemGem stored in this GemSocket. This will be null if none is stored in it.
 	 * @return the ItemGem stored in this socket; or null if there is none.
 	 */
-	public DisplayableItemStack getGem()
+	public ItemStack getGem()
 	{
 		return gem;
 	}

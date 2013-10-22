@@ -2,7 +2,7 @@ package utils;
 
 import java.io.Serializable;
 
-import client.GameEngine;
+import entry.MPGameLoop;
 import enums.EnumColor;
 
 public class ColoredText
@@ -17,7 +17,7 @@ public class ColoredText
 	{
 		this.color = color;
 		this.text = text;
-		ticksLeft = 8 * GameEngine.TICKS_PER_SECOND;
+		ticksLeft = 8 * MPGameLoop.TICKS_PER_SECOND;
 	}
 	
 	public ColoredText(EnumColor color, String text, int ticksLeft)

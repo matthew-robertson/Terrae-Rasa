@@ -1,8 +1,8 @@
 package items;
 
+import server.entities.EntityPlayer;
 import world.World;
-import audio.SoundEngine;
-import entities.EntityPlayer;
+import entry.MPGameEngine;
 
 public class ItemPotionHealth extends Item
 {
@@ -18,7 +18,13 @@ public class ItemPotionHealth extends Item
 	{
 		if(!player.isOnCooldown(id))
 		{
-			SoundEngine.playSoundEffect(onUseSound);
+			boolean success = player.heal(world, healthRestored, true);
+			if(success)
+			{
+				player.inventory.removeItemsFromInventoryStack(player, 1, player.selectedSlot);
+				player.putOnCooldown(id, 60);
+				MPGameEngine.terraeRasa.gameEngine.addCommandUpdate("/soundeffect " + onUseSound);
+			}
 		}
 	}
 	

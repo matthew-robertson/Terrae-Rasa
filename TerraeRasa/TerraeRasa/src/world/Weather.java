@@ -1,9 +1,15 @@
 package world;
 
-import io.Chunk;
 
 import java.io.Serializable;
 
+import blocks.Chunk;
+
+import transmission.ServerUpdate;
+import utils.WeatherData;
+import client.world.WeatherSnow;
+
+//TODO: weather is a bit borked.
 public abstract class Weather 
 		implements Serializable
 {
@@ -14,9 +20,8 @@ public abstract class Weather
 	protected int height;
 	protected int x;
 	protected int width;
-	protected Biome weatherLocation;
 	
-	public abstract void update(World world);
+	public abstract void update(World world, ServerUpdate update);
 	
 	public abstract void initialize();
 	
@@ -38,12 +43,43 @@ public abstract class Weather
 		return ticksLeft <= 0;
 	}
 	
+	public void setTicksLeft(int ticksLeft)
+	{
+		this.ticksLeft = ticksLeft;
+	}
+	
+	public WeatherData getData()
+	{
+		WeatherData data = new WeatherData();
+		data.x = x;
+		data.y = y;
+		data.height = height;
+		data.width = width;
+		data.averageGroundLevel = averageGroundLevel;
+		data.ticksLeft = ticksLeft;
+		data.id = getID();
+		return data;
+	}
+	//Client only
 	public static Weather generateWeatherByID(int id, Chunk chunk, int averageWorldHeight)
 	{
 		if(id == WeatherSnow.ID)
 		{
-			return new WeatherSnow(chunk, averageWorldHeight);
+			//TODO fix!
+			return new client.world.WeatherSnow(chunk, averageWorldHeight);
 		}
 		return null;
 	}
+	//Client only
+	public static Weather generateWeatherByID(WeatherData data)
+	{
+		if(data.id == WeatherSnow.ID)
+		{
+			return new client.world.WeatherSnow(data);
+		}
+		return null;
+	}
+	
+	
+	public abstract int getID();
 }

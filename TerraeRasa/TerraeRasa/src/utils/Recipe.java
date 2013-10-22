@@ -13,11 +13,10 @@ import blocks.Block;
  */
 public class Recipe 
 {
-	public static int RECIPE_ID_GEN = 0;
 	/** What the recipe yields */
-	private DisplayableItemStack result; 
+	private RecipeResult result; 
 	/** What the recipe requires. */
-	private DisplayableItemStack[] recipe; 
+	private ItemStack[] recipe; 
 	/** The block that has to be nearby to craft this. Block.none indicates no nearby block is needed. */
 	private Block requiredBlock;
 	private final int id;
@@ -29,21 +28,21 @@ public class Recipe
 	 * @param requiredBlock the required nearby Block to craft this Recipe - Block.none means no nearby Block requirement
 	 * @param stacks the materials required to craft this Recipe
 	 */
-	public Recipe(RecipeManager manager, DisplayableItemStack result, Block requiredBlock, DisplayableItemStack[] stacks)
+	public Recipe(RecipeManager manager, RecipeResult result, Block requiredBlock, ItemStack[] stacks)
 	{
 		this.recipe = stacks;
 		this.result = result;
-		this.id = RECIPE_ID_GEN++;
+		this.id = manager.getNextID();
 		this.requiredBlock = requiredBlock;
 		manager.registerRecipe(this);
 	}
 	
-	public final DisplayableItemStack getResult()
+	public final ItemStack getResult()
 	{
-		return new DisplayableItemStack(result);
+		return result.getResult();
 	}
 	
-	public final DisplayableItemStack[] getRecipe()
+	public final ItemStack[] getRecipe()
 	{
 		return recipe;
 	}
@@ -64,6 +63,6 @@ public class Recipe
 	 */
 	public String toString()
 	{
-		return result.getItemName();
+		return result.getResult().getItemName();
 	}
 }
