@@ -33,7 +33,7 @@ public class MPGameEngine extends Thread
 	public MPGameLoop gameEngine;
 	public volatile static MPGameEngine terraeRasa;
 	private ServerSocket serverSocket;
-	private ConsoleInputThread consoleInputThread;
+	private static ConsoleInputThread consoleInputThread = new ConsoleInputThread();;
 	private static Object gameEngineLock = new Object();
 	public volatile static boolean canAcceptConnections = false;
 	private static Vector<CloseRequest> closeRequests = new Vector<CloseRequest>();
@@ -68,8 +68,10 @@ public class MPGameEngine extends Thread
 		this.gameEngine = new MPGameLoop((universeName != null) ? this.universeName : settings.universeName);
 		gameEngine.start();
 
-		consoleInputThread = new ConsoleInputThread();
-		consoleInputThread.start();
+		if(!consoleInputThread.isAlive())
+		{
+			consoleInputThread.start();
+		}
 
 		//Deny connections (by blocking this thread) until the world loads.
 		while(!canAcceptConnections)

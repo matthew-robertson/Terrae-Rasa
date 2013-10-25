@@ -10,7 +10,6 @@ import org.newdawn.slick.openal.AudioLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
 import client.Settings;
-import entry.SPGameEngine;
 import entry.TerraeRasa;
 
 public class SoundEngine{

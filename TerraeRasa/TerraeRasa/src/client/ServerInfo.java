@@ -57,6 +57,6 @@ public class ServerInfo
 	
 	public String toString()
 	{
-		return name;
+		return "ServerName=" + name + " @IP=" + ip + " @Port=" + port + " Password=" + password;
 	}
 }

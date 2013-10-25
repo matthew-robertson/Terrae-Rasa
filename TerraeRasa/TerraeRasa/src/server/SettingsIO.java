@@ -39,7 +39,7 @@ public class SettingsIO
 			mods.copyInto(temp);
 			return temp;
 		} catch (IOException e) {
-			e.printStackTrace();
+			Log.log("Failed to find the file: " + filepath + ". Creating the file now.");
 		} finally {
 			try {
 				file.createNewFile();
@@ -91,7 +91,7 @@ public class SettingsIO
 			}
 			reader.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			Log.log("Failed to find the server.properties file. Creating a default properties file now.");
 		} finally {
 			try {
 				createSettingsFile();
@@ -187,7 +187,7 @@ public class SettingsIO
 			writer.write("universe_name=World" + '\n');
 			writer.write("server_port=48615" + '\n');
 			writer.write("world_difficulty=normal" + '\n');
-			writer.write("world_size=mini");
+			writer.write("world_size=mini" + '\n');
 			writer.write("use_password=false" + '\n');
 			writer.write("password=" + '\n');
 			writer.write("spawn_monsters=true" + '\n');

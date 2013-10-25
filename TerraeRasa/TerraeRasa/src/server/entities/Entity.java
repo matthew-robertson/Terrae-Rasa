@@ -53,6 +53,8 @@ public class Entity
 	protected double maxHeightFallenSafely;
 	protected double baseSpeed;
 	protected double movementSpeedModifier;
+	/** a true value indicates the entity is now allowed to move or jump. */
+	protected boolean isImmobile;
 	
 	/**
 	 * Constructs a new instance of Entity, with some basic and generic values.
@@ -272,7 +274,7 @@ public class Entity
 	 */
 	public void tryToJumpAgain()
 	{
-		if(canJumpAgain)// If the entity can jump, let them
+		if(canJumpAgain && !isStunned && !isImmobile)// If the entity can jump, let them
 		{
 			isJumping = true;
 			upwardJumpCounter = 0;
@@ -330,7 +332,7 @@ public class Entity
 	public void moveEntityUp(World world, double movementValue)
 	{		
 		int loops = (int) (movementValue / 6) + 1;
-		if(isStunned())
+		if(isStunned() || isImmobile)
 		{
 			isJumping = false;
 			return;
@@ -418,7 +420,7 @@ public class Entity
 	{
 		double movementValue = MathHelper.roundDowndouble20th(getBaseSpeed() * getMovementSpeedModifier());
 		int loops = (int) (movementValue / 6) + 1;
-		if(isStunned())
+		if(isStunned() || isImmobile)
 		{
 			return;
 		}
@@ -454,7 +456,7 @@ public class Entity
 	{
 		double movementValue = (int)(getBaseSpeed() * getMovementSpeedModifier());
 		int loops = (int) (movementValue / 6) + 1;
-		if(isStunned())
+		if(isStunned() || isImmobile)
 		{
 			return;
 		}
@@ -488,7 +490,7 @@ public class Entity
 	public void moveEntityRight(World world, double movementValue)
 	{
 		int loops = (int) (movementValue / 6) + 1;
-		if(isStunned())
+		if(isStunned() || isImmobile)
 		{
 			return;
 		}
@@ -521,7 +523,7 @@ public class Entity
 	public void moveEntityLeft(World world, double movementValue) 
 	{
 		int loops = (int) (movementValue / 6) + 1;
-		if(isStunned())
+		if(isStunned() || isImmobile)
 		{
 			return;
 		}
@@ -738,7 +740,8 @@ public class Entity
 			{
 				for(int j = upOffset; j < downOffset + blockHeight; j++) //and each block vertically
 				{
-					if(world.getBlock(MathHelper.returnIntegerInWorldMapBounds_X(world, x + i), MathHelper.returnIntegerInWorldMapBounds_Y(world, y + j)).id == block.id)
+					MinimalBlock minBlock = world.getBlock(MathHelper.returnIntegerInWorldMapBounds_X(world, x + i), MathHelper.returnIntegerInWorldMapBounds_Y(world, y + j));
+					if(minBlock != null && minBlock.id == block.id)
 					{ //see if the block matches the specified block
 						return true;				
 					}
@@ -782,4 +785,13 @@ public class Entity
 		this.textureHeight = textureHeight;
 	}
 	
+	public void setIsImmobile(boolean flag)
+	{
+		this.isImmobile = flag;
+	}
+	
+	public boolean getIsImmobile()
+	{
+		return isImmobile;
+	}
 }

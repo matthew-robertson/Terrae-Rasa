@@ -14,17 +14,17 @@ import world.World;
  */
 public class StatusEffectJump extends StatusEffect
 {
+	private static final long serialVersionUID = 1L;
 
 	/**
-	 * 
-	 * @param durationSeconds
-	 * @param tier
-	 * @param power the increase in blocks
-	 * @param ticksBetweenEffect
+	 * Creates a new StatusEffectJump, allowing an entity to jump a different height, based on the given power.
+	 * @param durationSeconds the double duration of the effect in seconds
+	 * @param tier the int tier of the effect
+	 * @param power the int increase in block jump height
 	 */
-	public StatusEffectJump(double durationSeconds, int tier, int power, int ticksBetweenEffect) 
+	public StatusEffectJump(double durationSeconds, int tier, int power) 
 	{
-		super(durationSeconds, tier, power, ticksBetweenEffect);
+		super(durationSeconds, tier, power, 1);
 		this.isBeneficialEffect = false;
 		iconX = 0;
 		iconY = 0;

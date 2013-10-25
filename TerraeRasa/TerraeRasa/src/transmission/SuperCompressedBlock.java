@@ -35,6 +35,6 @@ public class SuperCompressedBlock
 		this.id = (short) block.id;
 		this.metaData = (byte) block.metaData;
 		this.bitMap = (byte) block.getBitMap();
-		mainInventory = block.mainInventory;
+		mainInventory = block.getMainInventory();
 	}
 }

@@ -2,6 +2,7 @@ package server.world;
 
 import blocks.Block;
 import blocks.BlockChest;
+import blocks.MinimalBlock;
 
 
 /**
@@ -12,7 +13,7 @@ import blocks.BlockChest;
 public class WorldGen{
 	protected int count;
 	
-	protected void generateChests(WorldServerEarth world, Block chest, int x, int w, int y, int h){
+	protected void generateChests(WorldServerEarth world, int x, int w, int y, int h){
 		int chance = 0;
 		int xskip = 1;
 		int yskip = 1;
@@ -22,7 +23,7 @@ public class WorldGen{
 				//yskip = (int)(Math.random() * 15 + 1);
 				chance = (int) (Math.random() * 1000 + 1);
 				if (chance >= 999){
-					placeChest(world, chest, i,j);
+					placeChest(world, Block.chest, i,j);
 				}
 			}
 		}
@@ -30,10 +31,9 @@ public class WorldGen{
 	
 	protected void placeChest(WorldServerEarth world, Block chest, int x, int y){
 		world.generateLargeBlock(x, y, Block.chest);
-		Block active = world.getAssociatedBlock(x, y);
-		if (active instanceof BlockChest){
-			BlockChest c = (BlockChest)active;
-			c.setInventory(world.lootGenerator.getLowLevelChestCommon());
+		MinimalBlock active = world.getBlock(x, y);
+		if (Block.blocksList[active.id] instanceof BlockChest){
+			active.setMainInventory(world.lootGenerator.getLowLevelChestCommon(), true);
 		}
 	}
 	

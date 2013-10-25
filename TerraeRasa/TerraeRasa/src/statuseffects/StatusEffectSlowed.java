@@ -14,6 +14,8 @@ import world.World;
  */
 public class StatusEffectSlowed extends StatusEffect
 {
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * Creates a new daze effect. A daze effect's strength is based on it's power from 0-1F, indicating the overall % slowed. 
 	 * A value of 0.6 for example indicates an overall slow of 60% (multiplicative). A daze is capped at 95% effectiveness.

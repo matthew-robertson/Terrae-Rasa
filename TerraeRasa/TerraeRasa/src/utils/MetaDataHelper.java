@@ -26,11 +26,11 @@ package utils;
 public class MetaDataHelper 
 {	
 	/**
-	 * Returns a constant metadata array of size w by h. This can be of any size from 0x0 to 100x100.
+	 * Returns a constant metadata array of size (w/6) by (h/6). This can be of any size from 0x0 to 100x100.
 	 * Any value beyond 100 is denied based on the fact it is ridiculous.
 	 * @param w the width of the metadata (block width)
 	 * @param h the height of the metadata (block height)
-	 * @return a metadata array of specified width and height
+	 * @return a metadata array of specified (width/6) and (height/6)
 	 */
 	public static int[][] getMetaDataArray(int w, int h)
 	{

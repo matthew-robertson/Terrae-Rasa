@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.URISyntaxException;
 
 import transmission.CompressedClientUpdate;
@@ -88,6 +89,8 @@ public class ClientConnectionThread extends Thread
 		        }
 		        
 			}
+		} catch (SocketException e){
+			System.out.println("Clientside Socket connection terminated.");
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {

@@ -447,7 +447,7 @@ public class ChunkManager
 				sblock.bitMap = blocks[i][k].bitMap;
 				sblock.id = blocks[i][k].id;
 				sblock.metaData = blocks[i][k].metaData;
-				sblock.mainInventory = blocks[i][k].mainInventory;
+				sblock.mainInventory = blocks[i][k].getMainInventory();
 						//(blocks[i][k] instanceof BlockChest) ? ((BlockChest)(blocks[i][k])).getMainInventory() : new ItemStack[0];
 				savables[i][k] = sblock;			
 			}

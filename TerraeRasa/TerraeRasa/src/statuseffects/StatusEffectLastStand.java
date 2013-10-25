@@ -21,7 +21,8 @@ import enums.EnumDamageType;
 public class StatusEffectLastStand extends StatusEffect
 {
 	private int actualHealthIncrease;
-	
+	private static final long serialVersionUID = 1L;
+
 	public StatusEffectLastStand(double durationSeconds, int tier, double power, int ticksBetweenEffect) 
 	{
 		super(durationSeconds, tier, power, ticksBetweenEffect);

@@ -14,7 +14,6 @@ import world.World;
 import client.Settings;
 import client.hardware.Keys;
 import client.utils.FileManager;
-import entry.MPGameEngine;
 import entry.SPGameEngine;
 import entry.TerraeRasa;
 

@@ -17,6 +17,7 @@ import enums.EnumDamageType;
  */
 public class StatusEffectPoison extends StatusEffect
 {
+	private static final long serialVersionUID = 1L;
 
 	public StatusEffectPoison(double durationSeconds, int tier, int power, int ticksBetweenEffect) 
 	{

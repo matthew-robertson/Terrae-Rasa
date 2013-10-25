@@ -821,16 +821,18 @@ public class WorldServerEarth extends WorldServer
 	 */
 	private int updateGeneralBitMap(int x, int y){
 		int bit = 0;
-		if (getBlock(x, y - 1).isSolid){
+		//null blocks are treated as though they're solid.
+		//Generally, this should only happen on the edges of a map.
+		if ((getBlock(x, y - 1) != null) ? getBlock(x, y - 1).isSolid : true){
 			bit += 1;
 		}
-		if (getBlock(x, y + 1).isSolid){
+		if ((getBlock(x, y + 1) != null) ? getBlock(x, y - 1).isSolid : true){
 			bit += 4;
 		}
-		if (getBlock(x - 1, y).isSolid){
+		if ((getBlock(x - 1, y) != null) ? getBlock(x, y - 1).isSolid : true){
 			bit += 8;
 		}
-		if (getBlock(x + 1, y).isSolid){
+		if ((getBlock(x + 1, y) != null) ? getBlock(x, y - 1).isSolid : true){
 			bit += 2;
 		}
 		if (getAssociatedBlock(x, y) instanceof BlockGrass && (bit == 15 || bit == 11 || bit == 27 || bit == 31)){
@@ -1458,7 +1460,7 @@ public class WorldServerEarth extends WorldServer
 		{
 			double blockWidth = block.getBlockWidth() / 6;
 			double blockHeight = block.getBlockHeight() / 6;
-			int[][] metadata = MetaDataHelper.getMetaDataArray((int)blockWidth, (int)blockHeight);
+			int[][] metadata = MetaDataHelper.getMetaDataArray((int)(blockWidth), (int)(blockHeight));
 			
 			for(int i = 0; i < blockWidth; i++) //is it possible to place the block?
 			{
@@ -1737,7 +1739,7 @@ public class WorldServerEarth extends WorldServer
 			generatedHeightMap[i] = (Integer)(values.get(i));
 		}
 		
-		System.out.println("Average World Height: " + average);
+		Log.log("Average World Height: " + average);
 	}
 		
 	/**

@@ -14,6 +14,8 @@ import world.World;
  */
 public class StatusEffectSwiftness extends StatusEffect
 {
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * Creates a new speed effect. A speed effect's strength is based on it's power, indicating the overall % of increase. 
 	 * A power of 1 indicates a 100% increase, 0.5 a 50% increase, et cetera.

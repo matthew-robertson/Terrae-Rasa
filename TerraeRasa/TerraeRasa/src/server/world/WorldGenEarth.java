@@ -4,6 +4,7 @@ package server.world;
 
 import java.util.Random;
 
+import server.Log;
 import world.Biome;
 import world.World;
 import blocks.Block;
@@ -72,7 +73,7 @@ public class WorldGenEarth extends WorldGen
 		cellauto(world, xLoc + 1, (xLoc + width) - 2, yLoc, (yLoc + depth) - 2);
 		ores(world, xLoc + 1, (xLoc + width) - 4, yLoc + 1, (yLoc + depth) - 11, placeableOres);
 		gems(world, xLoc + 1, (xLoc + width) - 4, yLoc + 1, (yLoc + depth) - 11, placeableGems);
-		generateChests(world, Block.chest, xLoc, width - 5, yLoc, depth - 40);
+		generateChests(world, xLoc, width - 5, yLoc, depth - 40);
 		System.gc();
 				
 		Biome biome;
@@ -133,9 +134,9 @@ public class WorldGenEarth extends WorldGen
 					}
 				}
 				if (world.getAssociatedBlock(k, j).getID() == Block.grass.getID()){
-					System.out.println(world.getBlock(k,j).getBitMap());
+//					System.out.println(world.getBlock(k,j).getBitMap());
 					world.setBitMap(k, j, world.getBlock(k, j).getBitMap() + 16);
-					System.out.println(world.getBlock(k,j).getBitMap());
+//					System.out.println(world.getBlock(k,j).getBitMap());
 				}
 			}
 		}
@@ -355,7 +356,7 @@ public class WorldGenEarth extends WorldGen
 			t_biome = Biome.getBiomeFromBiomeList(getBiomeType()); //get the correct biome from the Biome class
 			t_biome.setBiomeBounds(Chunk.getChunkWidth() * i, 0, Chunk.getChunkWidth(), world.getHeight()); //set the bounds			
 			biomes[i] = t_biome;						
-			System.out.println("Generated Biome " + i + ": " + t_biome.getBiomeName());
+			Log.log("Generated Biome " + i + ": " + t_biome.getBiomeName());
 		}		
 				
 		return biomes;
@@ -374,7 +375,7 @@ public class WorldGenEarth extends WorldGen
 			}
 		}
 		
-		System.out.println("[WorldGenEarth]: World biomes assigned to chunks");
+//		System.out.println("[WorldGenEarth]: World biomes assigned to chunks");
 	}
 	
 	public void backWalls(WorldServerEarth world, int x, int w, int y, int h){
@@ -398,8 +399,6 @@ public class WorldGenEarth extends WorldGen
 	 * <li>Arctic = 2
 	 * <li>Jungle = NYI
 	 * <li>Ocean = NYI
-	 * <li>Corruption = NYI
-	 * <li>The Hallow = NYI
 	 */
 	private int getBiomeType()
 	{		

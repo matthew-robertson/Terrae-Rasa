@@ -14,6 +14,8 @@ import world.World;
  */
 public class StatusEffectDodgeBuff extends StatusEffect
 {
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * Creates a new dodge effect. A dodge effect's strength is based on it's power, indicating the overall % of increase. 
 	 * A power of 1 indicates a 100% increase, 0.5 a 50% increase, et cetera. 100% is probably "unhittable". <b>Dodge

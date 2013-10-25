@@ -6,7 +6,6 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
 import transmission.ClientUpdate;
-import world.World;
 import client.Settings;
 import client.entities.EntityPlayer;
 import client.render.TrueTypeFont;

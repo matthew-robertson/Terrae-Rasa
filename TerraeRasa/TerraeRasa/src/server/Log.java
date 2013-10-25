@@ -38,7 +38,7 @@ public class Log
 	 * the server is stopped.
 	 * @param message the message to log
 	 */
-	public static void log(String message)
+	public synchronized static void log(String message)
 	{
 		String output = getServerTimeStamp() + " " + message;
 		System.out.println(output);
@@ -61,7 +61,7 @@ public class Log
 	 * Writes the server log to disk, under the filename 'last_server_log.txt'. This is located in the main directory
 	 * of the server alongside the jar.
 	 */
-	public static void writeWithTimestamp()
+	public synchronized static void writeWithTimestamp()
 	{
 		try {
 			String folderPath = TerraeRasa.getBasePath() + "/logs";

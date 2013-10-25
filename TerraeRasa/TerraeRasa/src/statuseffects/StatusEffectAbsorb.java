@@ -13,6 +13,7 @@ import world.World;
  */
 public class StatusEffectAbsorb extends StatusEffect
 {
+	private static final long serialVersionUID = 1L;
 	/** The initial absorb amount of the effect. */
 	private int startAbsorbAmount;
 	/** The remaining absorb amount of this effect. */

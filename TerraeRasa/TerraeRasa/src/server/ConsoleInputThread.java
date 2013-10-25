@@ -7,28 +7,24 @@ import entry.MPGameEngine;
 public class ConsoleInputThread extends Thread
 {
 	private boolean done;
+	private Scanner scanner;
 	
 	public ConsoleInputThread()
 	{
 		setName("ConsoleInputThread");
 		setDaemon(true);
 		done = false;
+		scanner = new Scanner(System.in);
+		Log.log("Starting the console input thread");
 	}
-	
+
 	public void run()
 	{
 		while(!done)
 		{
-			Scanner scanner = new Scanner(System.in);
 			String input = scanner.nextLine();
 			MPGameEngine.addServerIssuedCommand(input);
 		}
-	}
-	
-	public void close()
-	{
-		done = true;
-		//This will likely throw something.
-		interrupt();
+		System.out.println("Terminating the console input thread.");
 	}
 }

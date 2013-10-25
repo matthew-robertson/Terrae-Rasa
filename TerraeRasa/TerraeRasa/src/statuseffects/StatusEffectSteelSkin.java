@@ -13,6 +13,7 @@ import world.World;
  */
 public class StatusEffectSteelSkin extends StatusEffect
 {
+	private static final long serialVersionUID = 1L;
 
 	public StatusEffectSteelSkin(double durationSeconds, int tier, double power, int ticksBetweenEffect)
 	{

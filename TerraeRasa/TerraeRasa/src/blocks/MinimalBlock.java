@@ -14,7 +14,7 @@ import utils.ItemStack;
 public class MinimalBlock 
 {
 	/** An items this Block may be holding (this does not have to exceed length 0). */
-	public ItemStack[] mainInventory;
+	protected ItemStack[] mainInventory;
 	/** An id, which corresponds to some entry of the Block.blockList[]*/
 	public short id;
 	/** A metadata value for this block. Defaults to 1 but may change beyond size 1x1. This is used to identify parts of a large block. */
@@ -95,5 +95,51 @@ public class MinimalBlock
 	public int getBitMap() 
 	{
 		return bitMap;
+	}
+
+	/**
+	 * Returns a reference to this MinimalBlock's mainInventory[]. 
+	 * @return a reference to this MinimalBlock's mainInventory[]
+	 */
+	public ItemStack[] getMainInventory()
+	{
+		return mainInventory;
+	}
+	
+	/**
+	 * Sets the mainInventory[] to the given ItemStacks. This is bounds safe, and reference safe. Excess items will simply be ignored.
+	 * @param stacks the new contains of the mainInventory[]
+	 * @param invertPlacementOrder a boolean indicating that, if true, placement should begin at the end of the inventory[]
+	 */
+	public void setMainInventory(ItemStack[] stacks, boolean invertPlacementOrder) 
+	{
+		if(invertPlacementOrder)
+		{
+			int k = 0;
+			for(int i = mainInventory.length - 1; i >= 0; i--)
+			{
+				if(k < stacks.length)
+				{
+					if(stacks[k] != null)
+					{
+						mainInventory[i] = new ItemStack(stacks[k]);
+					}
+				}
+				k++;
+			}		
+		}
+		else
+		{
+			for(int i = 0; i < mainInventory.length; i++)
+			{
+				if(i < stacks.length)
+				{
+					if(stacks[i] != null)
+					{
+						mainInventory[i] = new ItemStack(stacks[i]);
+					}
+				}
+			}		
+		}
 	}
 }

@@ -16,7 +16,8 @@ import affix.AffixSturdy;
 
 public class RecipeResult 
 {
-	private double affixChance = 1.0;
+	/** The chance of an affix being added to this recipe result if applicable. By default it is 5%.*/
+	private double affixChance = 0.05;
 	private ItemStack result;
 	private List<Integer> possibleAffixIDs;
 	

@@ -21,6 +21,7 @@ import statuseffects.StatusEffectCriticalBuff;
 import statuseffects.StatusEffectDamageBuff;
 import statuseffects.StatusEffectDodgeBuff;
 import statuseffects.StatusEffectFallHeight;
+import statuseffects.StatusEffectImmobilise;
 import statuseffects.StatusEffectJump;
 import statuseffects.StatusEffectLastStand;
 import statuseffects.StatusEffectManaRegeneration;
@@ -79,6 +80,7 @@ public class Commands
 //	      14 - Poison
 //	      15 - Slowed
 //	      16 - Stun
+//		  17 - Immobilise
 		if(effectID == 1)
 		{
 			StatusEffectAbsorb effect = new StatusEffectAbsorb(timeSeconds, 1, (int) power);
@@ -111,7 +113,7 @@ public class Commands
 		}
 		else if(effectID == 7)
 		{
-			StatusEffectJump effect = new StatusEffectJump(timeSeconds, 1, (int) power, 20);
+			StatusEffectJump effect = new StatusEffectJump(timeSeconds, 1, (int) power);
 			player.registerStatusEffect(world, effect);
 		}
 		else if(effectID == 8)
@@ -159,7 +161,11 @@ public class Commands
 			StatusEffectStun effect = new StatusEffectStun(timeSeconds, 1, (int) power, 20);
 			player.registerStatusEffect(world, effect);
 		}
-		
+		else if(effectID == 17)
+		{
+			StatusEffectImmobilise effect = new StatusEffectImmobilise(timeSeconds);
+			player.registerStatusEffect(world, effect);
+		}
 		
 		
 		
@@ -255,22 +261,32 @@ public class Commands
 		}
 		if(command.startsWith("/say"))
 		{
-			return PERMISSION_ADMIN;
+			return PERMISSION_CONSOLE;
 		}
 		return 	PERMISSION_CONSOLE;
 	}
 		
+	private static String removeExtraSpaces(String command)
+	{
+		String newString = command;
+		while(newString.contains("  "))
+		{
+			newString = newString.replaceAll("  ", " ");
+		}	
+		return newString;
+	}
+	
 	// -- These are server commands
 	public static void processConsoleCommand(ServerSettings settings, ServerUpdate update, Vector<EntityPlayer> players, WorldServerEarth world, MPGameLoop engine, String command)
 	{	
 		synchronized(processConsoleCommandLock)
 		{
+			Log.log("Processing the command: " + command);
 			try {
-//				String[] commandComponents = command.split(" ");
 				//Everyone or above			
 				if(command.startsWith("/kill"))
 				{
-					String[] split = command.split(" ");
+					String[] split = (command).split(" ");
 					EntityPlayer player = (EntityPlayer)(world.getEntityByID(Integer.parseInt(split[1])));
 					player.kill();
 				}
@@ -333,7 +349,7 @@ public class Commands
 				//Mod or above
 				if(command.startsWith("/teleport"))
 				{
-					String[] split = command.split(" ");
+					String[] split = removeExtraSpaces(command).split(" ");
 					if(split.length == 3)
 					{
 //						/teleport <p1> <p2>
@@ -373,7 +389,7 @@ public class Commands
 				if(command.startsWith("/settime"))
 				{
 	//				/time-set <hour>
-					String[] split = command.split(" ");
+					String[] split = removeExtraSpaces(command).split(" ");
 					double hour = Double.parseDouble(split[1]) % 24;
 					int timeInTicks = (int) (hour * World.GAMETICKSPERHOUR);
 					world.setTime(timeInTicks);
@@ -383,7 +399,7 @@ public class Commands
 				{
 	//				/mod <name|ip> 
 	//				This will take an argument of a player name if that player is logged on. Otherwise, it will take an IP at any time.
-					String[] split = command.split(" ");
+					String[] split = removeExtraSpaces(command).split(" ");
 					EntityPlayer player = engine.getPlayer(split[1]);
 					if(player != null)
 					{
@@ -399,7 +415,7 @@ public class Commands
 				{
 	//				/unmod <name|ip> 
 	//				This will take an argument of a player name if that player is logged on. Otherwise, it will take an IP at any time.
-					String[] split = command.split(" ");
+					String[] split = removeExtraSpaces(command).split(" ");
 					EntityPlayer player = engine.getPlayer(split[1]);
 					if(player != null)
 					{
@@ -414,14 +430,14 @@ public class Commands
 				if(command.startsWith("/kick"))
 				{
 	//				/kick <player-name>
-					String[] split = command.split(" ");
+					String[] split = removeExtraSpaces(command).split(" ");
 					MPGameEngine.kick(split[1]);
 				}
 				if(command.startsWith("/ban"))
 				{
 	//				/ban <name|ip>
 	//				This will take an argument of a player name if that player is logged on. Otherwise, it will take an IP at any time.
-					String[] split = command.split(" ");
+					String[] split = removeExtraSpaces(command).split(" ");
 					EntityPlayer player = engine.getPlayer(split[1]);
 					if(player != null)
 					{
@@ -436,7 +452,7 @@ public class Commands
 				{
 	//				/unban <name|ip>
 	//				This will take an argument of a player name if that player is logged on. Otherwise, it will take an IP at any time.
-					String[] split = command.split(" ");
+					String[] split = removeExtraSpaces(command).split(" ");
 					EntityPlayer player = engine.getPlayer(split[1]);
 					if(player != null)
 					{
@@ -473,7 +489,7 @@ public class Commands
 				{
 	//				/admin <name|ip> 
 	//				This will take an argument of a player name if that player is logged on. Otherwise, it will take an IP at any time.
-					String[] split = command.split(" ");
+					String[] split = removeExtraSpaces(command).split(" ");
 					EntityPlayer player = engine.getPlayer(split[1]);
 					if(player != null)
 					{
@@ -489,7 +505,7 @@ public class Commands
 				{
 	//				/unadmin <name|ip> 
 	//				This will take an argument of a player name if that player is logged on. Otherwise, it will take an IP at any time.
-					String[] split = command.split(" ");
+					String[] split = removeExtraSpaces(command).split(" ");
 					EntityPlayer player = engine.getPlayer(split[1]);
 					if(player != null)
 					{
@@ -504,7 +520,7 @@ public class Commands
 				if(command.startsWith("/heal"))
 				{
 	//				/heal <player-name> <amount>
-					String[] split = command.split(" ");
+					String[] split = removeExtraSpaces(command).split(" ");
 					EntityPlayer player = engine.getPlayer(split[1]);
 					if(player != null)
 					{
@@ -520,7 +536,7 @@ public class Commands
 				if(command.startsWith("/mana"))
 				{
 	//				/mana <player-name> <amount>
-					String[] split = command.split(" ");
+					String[] split = removeExtraSpaces(command).split(" ");
 					EntityPlayer player = engine.getPlayer(split[1]);
 					if(player != null)
 					{
@@ -536,7 +552,7 @@ public class Commands
 				if(command.startsWith("/special"))
 				{
 	//				/special <player-name> <amount>
-					String[] split = command.split(" ");
+					String[] split = removeExtraSpaces(command).split(" ");
 					EntityPlayer player = engine.getPlayer(split[1]);
 					if(player != null)
 					{
@@ -553,7 +569,7 @@ public class Commands
 				{
 	//				/give <player> <id> <amount>
 	//				If the player cannot hold all the items, they simply wont be given.
-					String[] split = command.split(" ");
+					String[] split = removeExtraSpaces(command).split(" ");
 					EntityPlayer player = engine.getPlayer(split[1]);
 					if(player != null)
 					{
@@ -587,7 +603,7 @@ public class Commands
 				}
 				if(command.startsWith("/weather"))
 				{
-					String[] split = command.split(" ");
+					String[] split = removeExtraSpaces(command).split(" ");
 					if(split[1].equals("off"))
 					{
 //						/weather off
@@ -611,7 +627,7 @@ public class Commands
 				}
 				if(command.startsWith("/effect"))
 				{
-					String[] split = command.split(" ");
+					String[] split = removeExtraSpaces(command).split(" ");
 //					/effect <id> <time> <power> <player_id> 
 					causeStatusEffect(world, (EntityPlayer)(world.getEntityByID(Integer.parseInt(split[4]))), Integer.parseInt(split[1]), Integer.parseInt(split[2]), Double.parseDouble(split[3]));
 				}
@@ -619,7 +635,7 @@ public class Commands
 				{
 	//				/affix <id> 
 	//				/affix <affix_id> <player_id> <main_inventory_index> #server command
-					String[] split = command.split(" ");
+					String[] split = removeExtraSpaces(command).split(" ");
 					EntityPlayer player = (EntityPlayer)(world.getEntityByID(Integer.parseInt(split[2])));
 					player.inventory.getMainInventory()[Integer.parseInt(split[3])].rollAffixBonuses(Integer.parseInt(split[1]));
 				}
@@ -1008,7 +1024,7 @@ public class Commands
 				}
 			
 			} catch (Exception e) {
-				System.err.println("Client-Based-Command failed: " + command);
+				System.err.println("Command failed: " + command);
 				e.printStackTrace();
 			}
 			return "";

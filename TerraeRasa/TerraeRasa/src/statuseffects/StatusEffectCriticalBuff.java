@@ -14,6 +14,8 @@ import world.World;
  */
 public class StatusEffectCriticalBuff extends StatusEffect
 {
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * Creates a critical strike buff effect. A critical buff's strength is based on it's power, indicating the overall % of increase. 
 	 * A power of 1 indicates a 100% increase, 0.5 a 50% increase, et cetera. A critical chance of 100% in general means everything

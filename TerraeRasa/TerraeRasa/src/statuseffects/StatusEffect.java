@@ -1,5 +1,7 @@
 package statuseffects;
 
+import java.io.Serializable;
+
 import server.entities.EntityLiving;
 import world.World;
 
@@ -20,8 +22,9 @@ import world.World;
  * @since       1.0
  */
 public class StatusEffect 
-		 implements IStatusEffect
+		 implements IStatusEffect, Serializable
 {
+	private static final long serialVersionUID = 1L;
 	public boolean reapplicationSkipsRemovalEffect;
 	public int tier;
 	public boolean stacksIndependantly;
@@ -92,8 +95,7 @@ public class StatusEffect
 	{	
 	}
 	
-	public void removeInitialEffect(World world, EntityLiving entity)
-	{	
+	public void removeInitialEffect(World world, EntityLiving entity) {
 	}
 	
 	public void applyPeriodicBonus(World world, EntityLiving entity)

@@ -20,7 +20,8 @@ import world.World;
 public class StatusEffectRegeneration extends StatusEffect
 {
 	private boolean percentageBased;
-	
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * Creates a new StatusEffectRegeneration which will restore a given amount or 
 	 * percent of health every given number of game ticks.

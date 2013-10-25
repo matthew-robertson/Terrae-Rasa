@@ -53,7 +53,7 @@ public class ChunkCompressor
 						cblock.bitMap = blocks[i][k].bitMap;
 						cblock.id = blocks[i][k].id;
 						cblock.metaData = blocks[i][k].metaData;
-						cblock.mainInventory = blocks[i][k].mainInventory.length == 0 ? null : convert(blocks[i][k].mainInventory);
+						cblock.mainInventory = blocks[i][k].getMainInventory().length == 0 ? null : convert(blocks[i][k].getMainInventory());
 						compressed[i][k] = cblock;			
 					}
 				}
@@ -75,7 +75,7 @@ public class ChunkCompressor
 						cblock.bitMap = blocks[i][k].bitMap;
 						cblock.id = blocks[i][k].id;
 						cblock.metaData = blocks[i][k].metaData;
-						cblock.mainInventory = blocks[i][k].mainInventory.length == 0 ? null : convert(blocks[i][k].mainInventory);
+						cblock.mainInventory = blocks[i][k].getMainInventory().length == 0 ? null : convert(blocks[i][k].getMainInventory());
 						compressed[i][k] = cblock;			
 					}
 				}

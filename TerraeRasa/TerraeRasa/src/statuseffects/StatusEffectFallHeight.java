@@ -14,6 +14,7 @@ import world.World;
  */
 public class StatusEffectFallHeight extends StatusEffect
 {
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * 
